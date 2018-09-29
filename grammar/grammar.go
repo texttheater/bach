@@ -10,20 +10,24 @@ import (
 
 var Lexer = lexer.Must(lexer.Regexp(
 	`([\s]+)` +
-	`|(?P<Float>(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))`,
-	// TODO What about binary, octal, hexadecimal literals?
+	`|(?P<Float>(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?))` +
+	`|(?P<Int>(?:[1-9]\d*|0[0-7]*|0[xX][0-9a-fA-F]+))`,
 ))
 
 ///////////////////////////////////////////////////////////////////////////////
 
 type Component struct {
 	Pos lexer.Position
-	Number *float64 `@Float`
+	Float *float64 `@Float`
+	Int *int64 `|@Int`
 }
 
 func (c *Component) ast() ast.Expression {
-	if c.Number != nil {
-		return ast.NumberExpression{c.Pos, *c.Number}
+	if c.Float != nil {
+		return ast.NumberExpression{c.Pos, *c.Float}
+	}
+	if c.Int != nil {
+		return ast.NumberExpression{c.Pos, float64(*c.Int)}
 	}
 	panic("invalid component")
 }
