@@ -11,7 +11,7 @@ import (
 func Explain(kind string, program string, err error) {
 	lexerError, ok := err.(*lexer.Error)
 	if !ok {
-		panic("unexpected error")
+		panic(err)
 	}
 	lines := strings.SplitAfter(program, "\n")
 	line := lines[lexerError.Pos.Line - 1]
