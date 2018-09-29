@@ -10,7 +10,8 @@ import (
 
 var Lexer = lexer.Must(lexer.Regexp(
 	`([\s]+)` +
-	`|(?P<Float>\d+(?:\.\d+)?)`,
+	`|(?P<Float>(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))`,
+	// TODO What about binary, octal, hexadecimal literals?
 ))
 
 ///////////////////////////////////////////////////////////////////////////////
