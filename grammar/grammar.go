@@ -30,6 +30,12 @@ func (c *Component) ast() ast.Expression {
 	if c.Number != nil {
 		return ast.NumberExpression{c.Pos, *c.Number}
 	}
+	if c.Op1Number != nil {
+		return ast.NFFCallExpression{c.Pos, c.Op1Number.Op, []ast.Expression{ast.NumberExpression{c.Pos, c.Op1Number.Number}}}
+	}
+	if c.Op2Number != nil {
+		return ast.NFFCallExpression{c.Pos, c.Op2Number.Op, []ast.Expression{ast.NumberExpression{c.Pos, c.Op2Number.Number}}}
+	}
 	panic("invalid component")
 }
 
@@ -38,16 +44,16 @@ func (c *Component) ast() ast.Expression {
 type Op1Number struct {
 	Pos lexer.Position
 	Op string
-	Number *float64
+	Number float64
 }
 
-func (o Op1Number) Capture(values []string) error {
+func (o *Op1Number) Capture(values []string) error {
 	o.Op = string(values[0][:1])
 	f, err := strconv.ParseFloat(values[0][1:], 64)
 	if err != nil {
 		return err
 	}
-	o.Number = &f
+	o.Number = f
 	return nil
 }
 
@@ -56,7 +62,7 @@ func (o Op1Number) Capture(values []string) error {
 type Op2Number struct {
 	Pos lexer.Position
 	Op string
-	Number *float64
+	Number float64
 }
 
 func (o Op2Number) Capture(values []string) error {
@@ -65,7 +71,7 @@ func (o Op2Number) Capture(values []string) error {
 	if err != nil {
 		return err
 	}
-	o.Number = &f
+	o.Number = f
 	return nil
 }
 

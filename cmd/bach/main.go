@@ -29,7 +29,11 @@ func main() {
 	}
 	// type-check
 	c := contexts.Context{types.AnyType{}}
-	f := x.Function(c) // TODO error handling
+	f, err := x.Function(c)
+	if err != nil {
+		errors.Explain("type", e, err)
+		os.Exit(1)
+	}
 	// evaluate
 	output := f.Evaluate(values.NullValue{}) // TODO error handling
 	fmt.Println(output.String()) // TODO sequence handling

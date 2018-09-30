@@ -1,5 +1,9 @@
 package types
 
+import (
+	"fmt"
+)
+
 type Type interface {
 	Subsumes(Type) bool
 }
@@ -9,8 +13,12 @@ type Type interface {
 type AnyType struct {
 }
 
-func (self AnyType) Subsumes(other Type) bool {
+func (t AnyType) Subsumes(other Type) bool {
 	return true
+}
+
+func (t AnyType) String() string {
+	return "Any"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,12 +27,16 @@ type SeqType struct {
 	ElementType Type
 }
 
-func (self SeqType) Subsumes(other Type) bool {
+func (t SeqType) Subsumes(other Type) bool {
 	otherSeqType, ok := other.(SeqType)
 	if !ok {
 		return false
 	}
-	return self.ElementType.Subsumes(otherSeqType.ElementType)
+	return t.ElementType.Subsumes(otherSeqType.ElementType)
+}
+
+func (t SeqType) String() string {
+	return fmt.Sprintf("Seq<%v>", t.ElementType)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -32,9 +44,13 @@ func (self SeqType) Subsumes(other Type) bool {
 type NullType struct {
 }
 
-func (self NullType) Subsumes(other Type) bool {
+func (t NullType) Subsumes(other Type) bool {
 	_, ok := other.(NullType)
 	return ok
+}
+
+func (t NullType) String() string {
+	return "Null"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,9 +58,13 @@ func (self NullType) Subsumes(other Type) bool {
 type BooleanType struct {
 }
 
-func (self BooleanType) Subsumes(other Type) bool {
+func (t BooleanType) Subsumes(other Type) bool {
 	_, ok := other.(NullType)
 	return ok
+}
+
+func (t BooleanType) String() string {
+	return "Boolean"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,9 +72,13 @@ func (self BooleanType) Subsumes(other Type) bool {
 type NumberType struct {
 }
 
-func (self NumberType) Subsumes(other Type) bool {
+func (t NumberType) Subsumes(other Type) bool {
 	_, ok := other.(NumberType)
 	return ok
+}
+
+func (t NumberType) String() string {
+	return "Number"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -62,9 +86,13 @@ func (self NumberType) Subsumes(other Type) bool {
 type StringType struct {
 }
 
-func (self StringType) Subsumes(other Type) bool {
+func (t StringType) Subsumes(other Type) bool {
 	_, ok := other.(StringType)
 	return ok
+}
+
+func (t StringType) String() string {
+	return "String"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,20 +103,24 @@ type ArrayType struct {
 	Length      uint
 }
 
-func (self ArrayType) Subsumes(other Type) bool {
+func (t ArrayType) Subsumes(other Type) bool {
 	otherArrayType, ok := other.(ArrayType)
 	if !ok {
 		return false
 	}
-	if self.HasLength {
+	if t.HasLength {
 		if !otherArrayType.HasLength {
 			return false
 		}
-		if otherArrayType.Length != self.Length {
+		if otherArrayType.Length != t.Length {
 			return false
 		}
 	}
-	return self.ElementType.Subsumes(otherArrayType.ElementType)
+	return t.ElementType.Subsumes(otherArrayType.ElementType)
+}
+
+func (t ArrayType) String() string {
+	return "Array" // TODO be more specific
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -97,17 +129,21 @@ type ObjectType struct {
 	fieldTypeMap map[string]Type
 }
 
-func (self ObjectType) Subsumes(other Type) bool {
+func (t ObjectType) Subsumes(other Type) bool {
 	otherObjectType, ok := other.(ObjectType)
 	if !ok {
 		return false
 	}
 	for field, b := range otherObjectType.fieldTypeMap {
-		if a, ok := self.fieldTypeMap[field]; ok {
+		if a, ok := t.fieldTypeMap[field]; ok {
 			if !a.Subsumes(b) {
 				return false
 			}
 		}
 	}
 	return true
+}
+
+func (t ObjectType) String() string {
+	return "Object" // TODO be more specific
 }
