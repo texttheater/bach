@@ -18,11 +18,11 @@ type IdentityFunction struct {
 	Type_ types.Type
 }
 
-func (f IdentityFunction) Type() types.Type {
+func (f *IdentityFunction) Type() types.Type {
 	return f.Type_
 }
 
-func (f IdentityFunction) Evaluate(input values.Value) values.Value {
+func (f *IdentityFunction) Evaluate(input values.Value) values.Value {
 	return input
 }
 
@@ -33,11 +33,11 @@ type CompositionFunction struct {
 	Right Function
 }
 
-func (f CompositionFunction) Type() types.Type {
+func (f *CompositionFunction) Type() types.Type {
 	return f.Right.Type()
 }
 
-func (f CompositionFunction) Evaluate(input values.Value) values.Value {
+func (f *CompositionFunction) Evaluate(input values.Value) values.Value {
 	return f.Right.Evaluate(f.Left.Evaluate(input))
 }
 
@@ -47,10 +47,10 @@ type NumberFunction struct {
 	Value float64
 }
 
-func (f NumberFunction) Type() types.Type {
-	return types.NumberType{}
+func (f *NumberFunction) Type() types.Type {
+	return &types.NumberType{}
 }
 
-func (f NumberFunction) Evaluate(input values.Value) values.Value {
-	return values.NumberValue{f.Value}
+func (f *NumberFunction) Evaluate(input values.Value) values.Value {
+	return &values.NumberValue{f.Value}
 }

@@ -27,12 +27,12 @@ func main() {
 		os.Exit(1)
 	}
 	// type-check
-	f, err := x.Function(types.AnyType{})
+	f, err := x.Function(&types.AnyType{})
 	if err != nil {
 		errors.Explain("type", e, err)
 		os.Exit(1)
 	}
 	// evaluate
-	output := f.Evaluate(values.NullValue{}) // TODO error handling
-	fmt.Println(output.String())             // TODO sequence handling
+	output := f.Evaluate(&values.NullValue{}) // TODO error handling
+	fmt.Println(output.String())              // TODO sequence handling
 }

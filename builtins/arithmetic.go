@@ -13,12 +13,12 @@ type Add struct {
 }
 
 func (f Add) Type() types.Type {
-	return types.NumberType{}
+	return &types.NumberType{}
 }
 
 func (f Add) Evaluate(input values.Value) values.Value {
-	numberInput, _ := input.(values.NumberValue)
-	argValue := f.Arg.Evaluate(values.NullValue{})
-	numberArgValue, _ := argValue.(values.NumberValue)
-	return values.NumberValue{numberInput.Value + numberArgValue.Value}
+	numberInput, _ := input.(*values.NumberValue)
+	argValue := f.Arg.Evaluate(&values.NullValue{})
+	numberArgValue, _ := argValue.(*values.NumberValue)
+	return &values.NumberValue{numberInput.Value + numberArgValue.Value}
 }

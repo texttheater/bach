@@ -18,8 +18,8 @@ type Expression interface {
 type IdentityExpression struct {
 }
 
-func (x IdentityExpression) Function(inputType types.Type) (functions.Function, error) {
-	return functions.IdentityFunction{inputType}, nil
+func (x *IdentityExpression) Function(inputType types.Type) (functions.Function, error) {
+	return &functions.IdentityFunction{inputType}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -29,7 +29,7 @@ type CompositionExpression struct {
 	Right Expression
 }
 
-func (x CompositionExpression) Function(inputType types.Type) (functions.Function, error) {
+func (x *CompositionExpression) Function(inputType types.Type) (functions.Function, error) {
 	leftFunction, err := x.Left.Function(inputType)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (x CompositionExpression) Function(inputType types.Type) (functions.Functio
 	if err != nil {
 		return nil, err
 	}
-	return functions.CompositionFunction{leftFunction, rightFunction}, nil
+	return &functions.CompositionFunction{leftFunction, rightFunction}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -48,8 +48,8 @@ type NumberExpression struct {
 	Value float64
 }
 
-func (x NumberExpression) Function(inputType types.Type) (functions.Function, error) {
-	return functions.NumberFunction{x.Value}, nil
+func (x *NumberExpression) Function(inputType types.Type) (functions.Function, error) {
+	return &functions.NumberFunction{x.Value}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,10 +65,10 @@ type NFFCallExpression struct {
 	Args []Expression
 }
 
-func (x NFFCallExpression) Function(inputType types.Type) (functions.Function, error) {
+func (x *NFFCallExpression) Function(inputType types.Type) (functions.Function, error) {
 	argFunctions := make([]functions.Function, len(x.Args))
 	for i, arg := range x.Args {
-		f, err := arg.Function(types.AnyType{})
+		f, err := arg.Function(&types.AnyType{})
 		if err != nil {
 			return nil, err
 		}

@@ -13,11 +13,11 @@ type Type interface {
 type AnyType struct {
 }
 
-func (t AnyType) Subsumes(other Type) bool {
+func (t *AnyType) Subsumes(other Type) bool {
 	return true
 }
 
-func (t AnyType) String() string {
+func (t *AnyType) String() string {
 	return "Any"
 }
 
@@ -27,15 +27,15 @@ type SeqType struct {
 	ElementType Type
 }
 
-func (t SeqType) Subsumes(other Type) bool {
-	otherSeqType, ok := other.(SeqType)
+func (t *SeqType) Subsumes(other Type) bool {
+	otherSeqType, ok := other.(*SeqType)
 	if !ok {
 		return false
 	}
 	return t.ElementType.Subsumes(otherSeqType.ElementType)
 }
 
-func (t SeqType) String() string {
+func (t *SeqType) String() string {
 	return fmt.Sprintf("Seq<%v>", t.ElementType)
 }
 
@@ -44,12 +44,12 @@ func (t SeqType) String() string {
 type NullType struct {
 }
 
-func (t NullType) Subsumes(other Type) bool {
-	_, ok := other.(NullType)
+func (t *NullType) Subsumes(other Type) bool {
+	_, ok := other.(*NullType)
 	return ok
 }
 
-func (t NullType) String() string {
+func (t *NullType) String() string {
 	return "Null"
 }
 
@@ -58,12 +58,12 @@ func (t NullType) String() string {
 type BooleanType struct {
 }
 
-func (t BooleanType) Subsumes(other Type) bool {
-	_, ok := other.(NullType)
+func (t *BooleanType) Subsumes(other Type) bool {
+	_, ok := other.(*NullType)
 	return ok
 }
 
-func (t BooleanType) String() string {
+func (t *BooleanType) String() string {
 	return "Boolean"
 }
 
@@ -72,12 +72,12 @@ func (t BooleanType) String() string {
 type NumberType struct {
 }
 
-func (t NumberType) Subsumes(other Type) bool {
-	_, ok := other.(NumberType)
+func (t *NumberType) Subsumes(other Type) bool {
+	_, ok := other.(*NumberType)
 	return ok
 }
 
-func (t NumberType) String() string {
+func (t *NumberType) String() string {
 	return "Number"
 }
 
@@ -86,12 +86,12 @@ func (t NumberType) String() string {
 type StringType struct {
 }
 
-func (t StringType) Subsumes(other Type) bool {
-	_, ok := other.(StringType)
+func (t *StringType) Subsumes(other Type) bool {
+	_, ok := other.(*StringType)
 	return ok
 }
 
-func (t StringType) String() string {
+func (t *StringType) String() string {
 	return "String"
 }
 
@@ -103,8 +103,8 @@ type ArrayType struct {
 	Length      uint
 }
 
-func (t ArrayType) Subsumes(other Type) bool {
-	otherArrayType, ok := other.(ArrayType)
+func (t *ArrayType) Subsumes(other Type) bool {
+	otherArrayType, ok := other.(*ArrayType)
 	if !ok {
 		return false
 	}
@@ -129,8 +129,8 @@ type ObjectType struct {
 	fieldTypeMap map[string]Type
 }
 
-func (t ObjectType) Subsumes(other Type) bool {
-	otherObjectType, ok := other.(ObjectType)
+func (t *ObjectType) Subsumes(other Type) bool {
+	otherObjectType, ok := other.(*ObjectType)
 	if !ok {
 		return false
 	}
@@ -144,6 +144,6 @@ func (t ObjectType) Subsumes(other Type) bool {
 	return true
 }
 
-func (t ObjectType) String() string {
+func (t *ObjectType) String() string {
 	return "Object" // TODO be more specific
 }

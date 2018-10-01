@@ -19,9 +19,9 @@ type entry struct {
 
 var entries = []entry{
 	entry{
-		types.NumberType{},
+		&types.NumberType{},
 		"+",
-		[]types.Type{types.NumberType{}},
+		[]types.Type{&types.NumberType{}},
 		func(argFunctions []functions.Function) functions.Function {
 			return builtins.Add{argFunctions[0]}
 		},
