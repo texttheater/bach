@@ -19,24 +19,53 @@ var Lexer = lexer.Must(lexer.Regexp(
 
 ///////////////////////////////////////////////////////////////////////////////
 
+type Composition struct {
+	Components []*Component `{ @@ }`
+}
+
+func (cc *Composition) ast() ast.Expression {
+	var e ast.Expression
+	e = &ast.IdentityExpression{}
+	for _, c := range cc.Components {
+		e = &ast.CompositionExpression{e, c.ast()}
+	}
+	return e
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 type Component struct {
-	Pos       lexer.Position
-	Number    *float64   `@Number`
-	Op1Number *Op1Number `|@Op1Number`
-	Op2Number *Op2Number `|@Op2Number`
+	Pos     lexer.Position
+	Number  *float64 `@Number`
+	NFFCall *NFFCall `|@@`
 }
 
 func (c *Component) ast() ast.Expression {
 	if c.Number != nil {
 		return &ast.NumberExpression{c.Pos, *c.Number}
 	}
+	if c.NFFCall != nil {
+		return c.NFFCall.ast()
+	}
+	panic("invalid component")
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type NFFCall struct {
+	Pos       lexer.Position
+	Op1Number *Op1Number `@Op1Number`
+	Op2Number *Op2Number `|@Op2Number`
+}
+
+func (c *NFFCall) ast() ast.Expression {
 	if c.Op1Number != nil {
 		return &ast.NFFCallExpression{c.Pos, c.Op1Number.Op, []ast.Expression{&ast.NumberExpression{c.Pos, c.Op1Number.Number}}}
 	}
 	if c.Op2Number != nil {
 		return &ast.NFFCallExpression{c.Pos, c.Op2Number.Op, []ast.Expression{&ast.NumberExpression{c.Pos, c.Op2Number.Number}}}
 	}
-	panic("invalid component")
+	panic("invalid NFF call")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,21 +102,6 @@ func (o Op2Number) Capture(values []string) error {
 	}
 	o.Number = f
 	return nil
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Composition struct {
-	Components []*Component `{ @@ }`
-}
-
-func (cc *Composition) ast() ast.Expression {
-	var e ast.Expression
-	e = &ast.IdentityExpression{}
-	for _, c := range cc.Components {
-		e = &ast.CompositionExpression{e, c.ast()}
-	}
-	return e
 }
 
 ///////////////////////////////////////////////////////////////////////////////
