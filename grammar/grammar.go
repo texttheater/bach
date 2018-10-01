@@ -28,13 +28,13 @@ type Component struct {
 
 func (c *Component) ast() ast.Expression {
 	if c.Number != nil {
-		return ast.NumberExpression{c.Pos, *c.Number}
+		return &ast.NumberExpression{c.Pos, *c.Number}
 	}
 	if c.Op1Number != nil {
-		return ast.NFFCallExpression{c.Pos, c.Op1Number.Op, []ast.Expression{ast.NumberExpression{c.Pos, c.Op1Number.Number}}}
+		return &ast.NFFCallExpression{c.Pos, c.Op1Number.Op, []ast.Expression{&ast.NumberExpression{c.Pos, c.Op1Number.Number}}}
 	}
 	if c.Op2Number != nil {
-		return ast.NFFCallExpression{c.Pos, c.Op2Number.Op, []ast.Expression{ast.NumberExpression{c.Pos, c.Op2Number.Number}}}
+		return &ast.NFFCallExpression{c.Pos, c.Op2Number.Op, []ast.Expression{&ast.NumberExpression{c.Pos, c.Op2Number.Number}}}
 	}
 	panic("invalid component")
 }
@@ -83,9 +83,9 @@ type Composition struct {
 
 func (cc *Composition) ast() ast.Expression {
 	var e ast.Expression
-	e = ast.IdentityExpression{}
+	e = &ast.IdentityExpression{}
 	for _, c := range cc.Components {
-		e = ast.CompositionExpression{e, c.ast()}
+		e = &ast.CompositionExpression{e, c.ast()}
 	}
 	return e
 }
