@@ -25,7 +25,7 @@ func (x IdentityExpression) Function(inputType types.Type) (functions.Function, 
 ///////////////////////////////////////////////////////////////////////////////
 
 type CompositionExpression struct {
-	Left Expression
+	Left  Expression
 	Right Expression
 }
 
@@ -44,7 +44,7 @@ func (x CompositionExpression) Function(inputType types.Type) (functions.Functio
 ///////////////////////////////////////////////////////////////////////////////
 
 type NumberExpression struct {
-	Pos lexer.Position
+	Pos   lexer.Position
 	Value float64
 }
 
@@ -60,7 +60,7 @@ func (x NumberExpression) Function(inputType types.Type) (functions.Function, er
 // TODO namespaces
 
 type NFFCallExpression struct {
-	Pos lexer.Position
+	Pos  lexer.Position
 	Name string
 	Args []Expression
 }

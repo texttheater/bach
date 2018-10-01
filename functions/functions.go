@@ -9,7 +9,6 @@ import (
 
 type Function interface {
 	Type() types.Type
-
 	Evaluate(input values.Value) values.Value
 }
 
@@ -30,7 +29,7 @@ func (f IdentityFunction) Evaluate(input values.Value) values.Value {
 ///////////////////////////////////////////////////////////////////////////////
 
 type CompositionFunction struct {
-	Left Function
+	Left  Function
 	Right Function
 }
 

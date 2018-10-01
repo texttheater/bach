@@ -34,5 +34,5 @@ func main() {
 	}
 	// evaluate
 	output := f.Evaluate(values.NullValue{}) // TODO error handling
-	fmt.Println(output.String()) // TODO sequence handling
+	fmt.Println(output.String())             // TODO sequence handling
 }
