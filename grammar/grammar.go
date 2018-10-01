@@ -12,16 +12,16 @@ import (
 
 var Lexer = lexer.Must(lexer.Regexp(
 	`([\s]+)` +
-	`|(?P<Number>(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-	`|(?P<Op1Number>[+\-*/%<>=](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-	`|(?P<Op2Number>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))`,
+		`|(?P<Number>(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
+		`|(?P<Op1Number>[+\-*/%<>=](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
+		`|(?P<Op2Number>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))`,
 ))
 
 ///////////////////////////////////////////////////////////////////////////////
 
 type Component struct {
-	Pos lexer.Position
-	Number *float64 `@Number`
+	Pos       lexer.Position
+	Number    *float64   `@Number`
 	Op1Number *Op1Number `|@Op1Number`
 	Op2Number *Op2Number `|@Op2Number`
 }
@@ -42,8 +42,8 @@ func (c *Component) ast() ast.Expression {
 ///////////////////////////////////////////////////////////////////////////////
 
 type Op1Number struct {
-	Pos lexer.Position
-	Op string
+	Pos    lexer.Position
+	Op     string
 	Number float64
 }
 
@@ -60,8 +60,8 @@ func (o *Op1Number) Capture(values []string) error {
 ///////////////////////////////////////////////////////////////////////////////
 
 type Op2Number struct {
-	Pos lexer.Position
-	Op string
+	Pos    lexer.Position
+	Op     string
 	Number float64
 }
 
