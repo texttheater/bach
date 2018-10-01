@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/texttheater/bach/contexts"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/grammar"
 	"github.com/texttheater/bach/types"
@@ -28,8 +27,7 @@ func main() {
 		os.Exit(1)
 	}
 	// type-check
-	c := contexts.Context{types.AnyType{}}
-	f, err := x.Function(c)
+	f, err := x.Function(types.AnyType{})
 	if err != nil {
 		errors.Explain("type", e, err)
 		os.Exit(1)
