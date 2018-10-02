@@ -1,6 +1,9 @@
 package ast
 
 import (
+	//"fmt"
+	//"os"
+
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/nffs"
