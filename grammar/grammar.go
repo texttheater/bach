@@ -23,11 +23,11 @@ type Composition struct {
 	Components []*Component `{ @@ }`
 }
 
-func (cc *Composition) ast() ast.Expression {
+func (c *Composition) ast() ast.Expression {
 	var e ast.Expression
 	e = &ast.IdentityExpression{}
-	for _, c := range cc.Components {
-		e = &ast.CompositionExpression{e, c.ast()}
+	for _, comp := range c.Components {
+		e = &ast.CompositionExpression{e, comp.ast()}
 	}
 	return e
 }
@@ -76,18 +76,18 @@ type Op1Number struct {
 	Number float64
 }
 
-func (o *Op1Number) Capture(values []string) error {
-	o.Op = string(values[0][:1])
+func (c *Op1Number) Capture(values []string) error {
+	c.Op = string(values[0][:1])
 	f, err := strconv.ParseFloat(values[0][1:], 64)
 	if err != nil {
 		return err
 	}
-	o.Number = f
+	c.Number = f
 	return nil
 }
 
-func (o *Op1Number) ast() ast.Expression {
-	return &ast.NFFCallExpression{o.Pos, o.Op, []ast.Expression{&ast.NumberExpression{o.Pos, o.Number}}}
+func (c *Op1Number) ast() ast.Expression {
+	return &ast.NFFCallExpression{c.Pos, c.Op, []ast.Expression{&ast.NumberExpression{c.Pos, c.Number}}}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -98,18 +98,18 @@ type Op2Number struct {
 	Number float64
 }
 
-func (o Op2Number) Capture(values []string) error {
-	o.Op = string(values[0][:2])
+func (c Op2Number) Capture(values []string) error {
+	c.Op = string(values[0][:2])
 	f, err := strconv.ParseFloat(values[0][2:], 64)
 	if err != nil {
 		return err
 	}
-	o.Number = f
+	c.Number = f
 	return nil
 }
 
-func (o *Op2Number) ast() ast.Expression {
-	return &ast.NFFCallExpression{o.Pos, o.Op, []ast.Expression{&ast.NumberExpression{o.Pos, o.Number}}}
+func (c *Op2Number) ast() ast.Expression {
+	return &ast.NFFCallExpression{c.Pos, c.Op, []ast.Expression{&ast.NumberExpression{c.Pos, c.Number}}}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
