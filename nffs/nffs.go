@@ -26,6 +26,30 @@ var entries = []entry{
 			return builtins.Add{argFunctions[0]}
 		},
 	},
+	entry{
+		&types.NumberType{},
+		"-",
+		[]types.Type{&types.NumberType{}},
+		func(argFunctions []functions.Function) functions.Function {
+			return builtins.Subtract{argFunctions[0]}
+		},
+	},
+	entry{
+		&types.NumberType{},
+		"*",
+		[]types.Type{&types.NumberType{}},
+		func(argFunctions []functions.Function) functions.Function {
+			return builtins.Multiply{argFunctions[0]}
+		},
+	},
+	entry{
+		&types.NumberType{},
+		"/",
+		[]types.Type{&types.NumberType{}},
+		func(argFunctions []functions.Function) functions.Function {
+			return builtins.Divide{argFunctions[0]}
+		},
+	},
 }
 
 func Function(Pos lexer.Position, inputType types.Type, name string, argFunctions []functions.Function) (functions.Function, error) {

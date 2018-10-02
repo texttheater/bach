@@ -22,3 +22,54 @@ func (f Add) Evaluate(input values.Value) values.Value {
 	numberArgValue, _ := argValue.(*values.NumberValue)
 	return &values.NumberValue{numberInput.Value + numberArgValue.Value}
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+type Subtract struct {
+	Arg functions.Function
+}
+
+func (f Subtract) Type() types.Type {
+	return &types.NumberType{}
+}
+
+func (f Subtract) Evaluate(input values.Value) values.Value {
+	numberInput, _ := input.(*values.NumberValue)
+	argValue := f.Arg.Evaluate(&values.NullValue{})
+	numberArgValue, _ := argValue.(*values.NumberValue)
+	return &values.NumberValue{numberInput.Value - numberArgValue.Value}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type Multiply struct {
+	Arg functions.Function
+}
+
+func (f Multiply) Type() types.Type {
+	return &types.NumberType{}
+}
+
+func (f Multiply) Evaluate(input values.Value) values.Value {
+	numberInput, _ := input.(*values.NumberValue)
+	argValue := f.Arg.Evaluate(&values.NullValue{})
+	numberArgValue, _ := argValue.(*values.NumberValue)
+	return &values.NumberValue{numberInput.Value * numberArgValue.Value}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type Divide struct {
+	Arg functions.Function
+}
+
+func (f Divide) Type() types.Type {
+	return &types.NumberType{}
+}
+
+func (f Divide) Evaluate(input values.Value) values.Value {
+	numberInput, _ := input.(*values.NumberValue)
+	argValue := f.Arg.Evaluate(&values.NullValue{})
+	numberArgValue, _ := argValue.(*values.NumberValue)
+	return &values.NumberValue{numberInput.Value / numberArgValue.Value}
+}
