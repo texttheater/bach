@@ -60,10 +60,10 @@ type NFFCall struct {
 
 func (c *NFFCall) ast() ast.Expression {
 	if c.Op1Number != nil {
-		return &ast.NFFCallExpression{c.Pos, c.Op1Number.Op, []ast.Expression{&ast.NumberExpression{c.Pos, c.Op1Number.Number}}}
+		return c.Op1Number.ast()
 	}
 	if c.Op2Number != nil {
-		return &ast.NFFCallExpression{c.Pos, c.Op2Number.Op, []ast.Expression{&ast.NumberExpression{c.Pos, c.Op2Number.Number}}}
+		return c.Op2Number.ast()
 	}
 	panic("invalid NFF call")
 }
@@ -86,6 +86,10 @@ func (o *Op1Number) Capture(values []string) error {
 	return nil
 }
 
+func (o *Op1Number) ast() ast.Expression {
+	return &ast.NFFCallExpression{o.Pos, o.Op, []ast.Expression{&ast.NumberExpression{o.Pos, o.Number}}}
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 type Op2Number struct {
@@ -102,6 +106,10 @@ func (o Op2Number) Capture(values []string) error {
 	}
 	o.Number = f
 	return nil
+}
+
+func (o *Op2Number) ast() ast.Expression {
+	return &ast.NFFCallExpression{o.Pos, o.Op, []ast.Expression{&ast.NumberExpression{o.Pos, o.Number}}}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
