@@ -8,17 +8,41 @@ import (
 	"github.com/alecthomas/participle/lexer"
 )
 
-func Explain(kind string, program string, err error) {
-	lexerError, ok := err.(*lexer.Error)
-	if !ok {
-		panic(err)
+type bachError struct {
+	cat string
+	pos lexer.Position
+	msg string
+}
+
+func (be bachError) Error() string {
+	return be.msg
+}
+
+func Errorf(cat string, pos lexer.Position, format string, a ...interface{}) bachError {
+	return bachError{cat, pos, fmt.Sprintf(format, a)}
+}
+
+func Explain(err error, program string) {
+	be, ok := err.(bachError)
+	if ok {
+		explain(be.cat, be.pos, be.msg, program)
+		return
 	}
-	if lexerError.Pos.Line > 0 && lexerError.Pos.Column > 0 {
+	lexerError, ok := err.(*lexer.Error)
+	if ok {
+		explain("syntax", lexerError.Pos, lexerError.Message, program)
+		return
+	}
+	panic(err)
+}
+
+func explain(cat string, pos lexer.Position, msg string, program string) {
+	if pos.Line > 0 && pos.Column > 0 {
 		lines := strings.SplitAfter(program, "\n")
-		line := lines[lexerError.Pos.Line-1]
-		column := lexerError.Pos.Column
+		line := lines[pos.Line-1]
+		column := pos.Column
 		// TODO shorten long lines
-		fmt.Fprintln(os.Stderr, kind, "error at", lexerError.Pos)
+		fmt.Fprintln(os.Stderr, cat, "error at", pos)
 		fmt.Fprint(os.Stderr, line)
 		if len(line) == 0 || line[len(line)-1] != '\n' {
 			fmt.Fprintln(os.Stderr)
@@ -26,5 +50,5 @@ func Explain(kind string, program string, err error) {
 		fmt.Fprint(os.Stderr, strings.Repeat(" ", column-1))
 		fmt.Fprintln(os.Stderr, "^")
 	}
-	fmt.Fprintln(os.Stderr, lexerError.Message)
+	fmt.Fprintln(os.Stderr, msg)
 }

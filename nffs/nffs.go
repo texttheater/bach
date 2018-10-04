@@ -6,6 +6,7 @@ import (
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/builtins"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
 )
@@ -75,7 +76,7 @@ Entries:
 		}
 		return e.Funcer(argFunctions), nil
 	}
-	return nil, lexer.Errorf(Pos, "no function found: for %v %v(%s)", inputType, name, formatArgTypes(argTypes))
+	return nil, errors.Errorf("type", Pos, "no function found: for %v %v(%s)", inputType, name, formatArgTypes(argTypes))
 }
 
 func formatArgTypes(argTypes []types.Type) string {
