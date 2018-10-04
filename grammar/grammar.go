@@ -58,7 +58,6 @@ func (c *Component) ast() ast.Expression {
 ///////////////////////////////////////////////////////////////////////////////
 
 type NFFCall struct {
-	Pos         lexer.Position
 	Op1Number   *Op1Number   `  @Op1Number`
 	Op2Number   *Op2Number   `| @Op2Number`
 	NameArglist *NameArglist `| @@`
@@ -66,10 +65,10 @@ type NFFCall struct {
 
 func (c *NFFCall) ast() ast.Expression {
 	if c.Op1Number != nil {
-		return c.Op1Number.ast(c.Pos)
+		return c.Op1Number.ast()
 	}
 	if c.Op2Number != nil {
-		return c.Op2Number.ast(c.Pos)
+		return c.Op2Number.ast()
 	}
 	if c.NameArglist != nil {
 		return c.NameArglist.ast()
@@ -80,6 +79,7 @@ func (c *NFFCall) ast() ast.Expression {
 ///////////////////////////////////////////////////////////////////////////////
 
 type Op1Number struct {
+	Pos    lexer.Position
 	Op     string
 	Number float64
 }
@@ -94,13 +94,14 @@ func (c *Op1Number) Capture(values []string) error {
 	return nil
 }
 
-func (c *Op1Number) ast(pos lexer.Position) ast.Expression {
-	return &ast.NFFCallExpression{pos, c.Op, []ast.Expression{&ast.NumberExpression{pos, c.Number}}}
+func (c *Op1Number) ast() ast.Expression {
+	return &ast.NFFCallExpression{c.Pos, c.Op, []ast.Expression{&ast.NumberExpression{c.Pos, c.Number}}}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 type Op2Number struct {
+	Pos    lexer.Position
 	Op     string
 	Number float64
 }
@@ -115,8 +116,8 @@ func (c *Op2Number) Capture(values []string) error {
 	return nil
 }
 
-func (c *Op2Number) ast(pos lexer.Position) ast.Expression {
-	return &ast.NFFCallExpression{pos, c.Op, []ast.Expression{&ast.NumberExpression{pos, c.Number}}}
+func (c *Op2Number) ast() ast.Expression {
+	return &ast.NFFCallExpression{c.Pos, c.Op, []ast.Expression{&ast.NumberExpression{c.Pos, c.Number}}}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
