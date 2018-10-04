@@ -19,7 +19,7 @@ func (be bachError) Error() string {
 }
 
 func Errorf(cat string, pos lexer.Position, format string, a ...interface{}) bachError {
-	return bachError{cat, pos, fmt.Sprintf(format, a)}
+	return bachError{cat, pos, fmt.Sprintf(format, a...)}
 }
 
 func Explain(err error, program string) {
