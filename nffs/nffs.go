@@ -76,7 +76,7 @@ Entries:
 		}
 		return e.Funcer(argFunctions), nil
 	}
-	return nil, errors.Errorf("type", Pos, "no function found: for %v %v(%s)", inputType, name, formatArgTypes(argTypes))
+	return nil, errors.E("type", Pos, "no function found: for %v %v(%s)", inputType, name, formatArgTypes(argTypes))
 }
 
 func formatArgTypes(argTypes []types.Type) string {

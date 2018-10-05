@@ -8,6 +8,7 @@ import (
 	"github.com/alecthomas/participle"
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/ast"
+	"github.com/texttheater/bach/errors"
 )
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -155,11 +156,17 @@ func (g *NameLpar) Capture(values []string) error {
 func Parse(input string) (ast.Expression, error) {
 	parser, err := participle.Build(&Composition{}, participle.Lexer(Lexer))
 	if err != nil {
+		if lexerError, ok := err.(*lexer.Error); ok {
+			return nil, errors.E("syntax", lexerError.Pos, lexerError.Message)
+		}
 		return nil, err
 	}
 	composition := &Composition{}
 	err = parser.ParseString(input, composition)
 	if err != nil {
+		if lexerError, ok := err.(*lexer.Error); ok {
+			return nil, errors.E("syntax", lexerError.Pos, lexerError.Message)
+		}
 		return nil, err
 	}
 	return composition.ast(), nil

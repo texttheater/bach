@@ -8,41 +8,39 @@ import (
 	"github.com/alecthomas/participle/lexer"
 )
 
-type bachError struct {
-	cat string
-	pos lexer.Position
-	msg string
+type Error struct {
+	Kind string
+	Pos lexer.Position
+	Message string
 }
 
-func (be bachError) Error() string {
-	return be.msg
+func (e Error) Error() string {
+	return e.Message
 }
 
-func Errorf(cat string, pos lexer.Position, format string, a ...interface{}) bachError {
-	return bachError{cat, pos, fmt.Sprintf(format, a...)}
+func E(kind string, pos lexer.Position, format string, a ...interface{}) error {
+	return Error{kind, pos, fmt.Sprintf(format, a...)}
+}
+
+func Is(kind string, err error) bool {
+	e, ok := err.(Error)
+	if !ok {
+		return false
+	}
+	return e.Kind == kind
 }
 
 func Explain(err error, program string) {
-	be, ok := err.(bachError)
-	if ok {
-		explain(be.cat, be.pos, be.msg, program)
-		return
+	e, ok := err.(Error)
+	if !ok {
+		panic(err)
 	}
-	lexerError, ok := err.(*lexer.Error)
-	if ok {
-		explain("syntax", lexerError.Pos, lexerError.Message, program)
-		return
-	}
-	panic(err)
-}
-
-func explain(cat string, pos lexer.Position, msg string, program string) {
-	if pos.Line > 0 && pos.Column > 0 {
+	if e.Pos.Line > 0 && e.Pos.Column > 0 {
 		lines := strings.SplitAfter(program, "\n")
-		line := lines[pos.Line-1]
-		column := pos.Column
+		line := lines[e.Pos.Line-1]
+		column := e.Pos.Column
 		// TODO shorten long lines
-		fmt.Fprintln(os.Stderr, cat, "error at", pos)
+		fmt.Fprintln(os.Stderr, e.Kind, "error at", e.Pos)
 		fmt.Fprint(os.Stderr, line)
 		if len(line) == 0 || line[len(line)-1] != '\n' {
 			fmt.Fprintln(os.Stderr)
@@ -50,5 +48,5 @@ func explain(cat string, pos lexer.Position, msg string, program string) {
 		fmt.Fprint(os.Stderr, strings.Repeat(" ", column-1))
 		fmt.Fprintln(os.Stderr, "^")
 	}
-	fmt.Fprintln(os.Stderr, msg)
+	fmt.Fprintln(os.Stderr, e.Message)
 }
