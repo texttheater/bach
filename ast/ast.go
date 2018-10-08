@@ -11,6 +11,8 @@ import (
 	//"os"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/builtin"
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/shapes"
 )
 
@@ -26,7 +28,7 @@ type IdentityExpression struct {
 }
 
 func (x *IdentityExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
-	return &shapes.IdentityFunction{}, nil
+	return &functions.IdentityFunction{}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,7 +47,7 @@ func (x *CompositionExpression) Function(inputShape shapes.Shape) (shapes.Functi
 	if err != nil {
 		return nil, err
 	}
-	return &shapes.CompositionFunction{leftFunction, rightFunction}, nil
+	return &functions.CompositionFunction{leftFunction, rightFunction}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,7 +58,7 @@ type NumberExpression struct {
 }
 
 func (x *NumberExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
-	return &shapes.NumberFunction{x.Value}, nil
+	return &functions.NumberFunction{x.Value}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,13 +77,13 @@ type NFFCallExpression struct {
 func (x *NFFCallExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
 	argFunctions := make([]shapes.Function, len(x.Args))
 	for i, arg := range x.Args {
-		f, err := arg.Function(shapes.InitialShape)
+		f, err := arg.Function(builtin.InitialShape)
 		if err != nil {
 			return nil, err
 		}
 		argFunctions[i] = f
 	}
-	f, err := shapes.ResolveNFF(x.Pos, inputShape, x.Name, argFunctions)
+	f, err := inputShape.ResolveNFF(x.Pos, x.Name, argFunctions, builtin.InitialShape)
 	if err != nil {
 		return nil, err
 	}

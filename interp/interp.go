@@ -1,9 +1,8 @@
 package interp
 
 import (
+	"github.com/texttheater/bach/builtin"
 	"github.com/texttheater/bach/grammar"
-	"github.com/texttheater/bach/shapes"
-	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/values"
 )
 
@@ -16,10 +15,10 @@ func InterpretString(program string) (values.Value, error) {
 		return nil, err
 	}
 	// type-check
-	f, err := x.Function(shapes.InitialShape)
+	f, err := x.Function(builtin.InitialShape)
 	if err != nil {
 		return nil, err
 	}
 	// evaluate
-	return f.OutputState(states.InitialState).Value, nil // TODO error handling
+	return f.OutputState(builtin.InitialState).Value, nil // TODO error handling
 }

@@ -1,6 +1,7 @@
-package shapes
+package builtin
 
 import (
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/values"
 )
@@ -10,16 +11,16 @@ import (
 ///////////////////////////////////////////////////////////////////////////////
 
 type Add struct {
-	Arg Function
+	Arg shapes.Function
 }
 
-func (f Add) OutputShape(inputShape Shape) Shape {
+func (f Add) OutputShape(inputShape shapes.Shape) shapes.Shape {
 	return inputShape
 }
 
 func (f Add) OutputState(inputState states.State) states.State {
 	numberInput, _ := inputState.Value.(*values.NumberValue)
-	argValue := f.Arg.OutputState(states.InitialState).Value
+	argValue := f.Arg.OutputState(InitialState).Value
 	numberArgValue, _ := argValue.(*values.NumberValue)
 	outputValue := &values.NumberValue{numberInput.Value + numberArgValue.Value}
 	return states.State{outputValue, inputState.Stack}
@@ -28,16 +29,16 @@ func (f Add) OutputState(inputState states.State) states.State {
 ///////////////////////////////////////////////////////////////////////////////
 
 type Subtract struct {
-	Arg Function
+	Arg shapes.Function
 }
 
-func (f Subtract) OutputShape(inputShape Shape) Shape {
+func (f Subtract) OutputShape(inputShape shapes.Shape) shapes.Shape {
 	return inputShape
 }
 
 func (f Subtract) OutputState(inputState states.State) states.State {
 	numberInput, _ := inputState.Value.(*values.NumberValue)
-	argValue := f.Arg.OutputState(states.InitialState).Value
+	argValue := f.Arg.OutputState(InitialState).Value
 	numberArgValue, _ := argValue.(*values.NumberValue)
 	outputValue := &values.NumberValue{numberInput.Value - numberArgValue.Value}
 	return states.State{outputValue, inputState.Stack}
@@ -46,16 +47,16 @@ func (f Subtract) OutputState(inputState states.State) states.State {
 ///////////////////////////////////////////////////////////////////////////////
 
 type Multiply struct {
-	Arg Function
+	Arg shapes.Function
 }
 
-func (f Multiply) OutputShape(inputShape Shape) Shape {
+func (f Multiply) OutputShape(inputShape shapes.Shape) shapes.Shape {
 	return inputShape
 }
 
 func (f Multiply) OutputState(inputState states.State) states.State {
 	numberInput, _ := inputState.Value.(*values.NumberValue)
-	argValue := f.Arg.OutputState(states.InitialState).Value
+	argValue := f.Arg.OutputState(InitialState).Value
 	numberArgValue, _ := argValue.(*values.NumberValue)
 	outputValue := &values.NumberValue{numberInput.Value * numberArgValue.Value}
 	return states.State{outputValue, inputState.Stack}
@@ -64,16 +65,16 @@ func (f Multiply) OutputState(inputState states.State) states.State {
 ///////////////////////////////////////////////////////////////////////////////
 
 type Divide struct {
-	Arg Function
+	Arg shapes.Function
 }
 
-func (f Divide) OutputShape(inputShape Shape) Shape {
+func (f Divide) OutputShape(inputShape shapes.Shape) shapes.Shape {
 	return inputShape
 }
 
 func (f Divide) OutputState(inputState states.State) states.State {
 	numberInput, _ := inputState.Value.(*values.NumberValue)
-	argValue := f.Arg.OutputState(states.InitialState).Value
+	argValue := f.Arg.OutputState(InitialState).Value
 	numberArgValue, _ := argValue.(*values.NumberValue)
 	outputValue := &values.NumberValue{numberInput.Value / numberArgValue.Value}
 	return states.State{outputValue, inputState.Stack}

@@ -1,6 +1,7 @@
-package shapes
+package functions
 
 import (
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
@@ -11,7 +12,7 @@ import (
 type IdentityFunction struct {
 }
 
-func (f *IdentityFunction) OutputShape(inputShape Shape) Shape {
+func (f *IdentityFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
 	return inputShape
 }
 
@@ -22,11 +23,11 @@ func (f *IdentityFunction) OutputState(inputState states.State) states.State {
 ///////////////////////////////////////////////////////////////////////////////
 
 type CompositionFunction struct {
-	Left Function
-	Right Function
+	Left shapes.Function
+	Right shapes.Function
 }
 
-func (f *CompositionFunction) OutputShape(inputShape Shape) Shape {
+func (f *CompositionFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
 	return f.Right.OutputShape(f.Left.OutputShape(inputShape))
 }
 
@@ -42,8 +43,8 @@ type NumberFunction struct {
 	Value float64
 }
 
-func (f *NumberFunction) OutputShape(inputShape Shape) Shape {
-	return Shape{&types.NumberType{}, inputShape.Stack}
+func (f *NumberFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
+	return shapes.Shape{&types.NumberType{}, inputShape.Stack}
 }
 
 func (f *NumberFunction) OutputState(inputState states.State) states.State {

@@ -26,5 +26,3 @@ type NamedValue struct {
 	Name string
 	Value values.Value
 }
-
-var InitialState = State{&values.NullValue{}, nil}
