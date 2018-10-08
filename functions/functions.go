@@ -23,7 +23,7 @@ func (f *IdentityFunction) OutputState(inputState states.State) states.State {
 ///////////////////////////////////////////////////////////////////////////////
 
 type CompositionFunction struct {
-	Left shapes.Function
+	Left  shapes.Function
 	Right shapes.Function
 }
 

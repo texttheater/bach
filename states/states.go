@@ -23,6 +23,6 @@ func (stack *Stack) Pop() *Stack {
 }
 
 type NamedValue struct {
-	Name string
+	Name  string
 	Value values.Value
 }

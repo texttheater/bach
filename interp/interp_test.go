@@ -12,9 +12,9 @@ import (
 
 func TestInterp(t *testing.T) {
 	cases := []struct {
-		program string
-		want    values.Value
-		errorKind	string
+		program   string
+		want      values.Value
+		errorKind string
 	}{
 		{"1", &values.NumberValue{1}, ""},
 		{"1 2", &values.NumberValue{2}, ""},

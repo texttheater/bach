@@ -9,8 +9,8 @@ import (
 )
 
 type Error struct {
-	Kind string
-	Pos lexer.Position
+	Kind    string
+	Pos     lexer.Position
 	Message string
 }
 

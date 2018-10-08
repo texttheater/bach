@@ -24,7 +24,7 @@ import (
 )
 
 type Shape struct {
-	Type types.Type
+	Type  types.Type
 	Stack *Stack
 }
 
@@ -43,9 +43,9 @@ func (stack *Stack) Pop() *Stack {
 
 type NFF struct {
 	InputType types.Type // TODO type parameters
-	Name string // TODO namespaces
-	ArgTypes []types.Type
-	Funcer func([]Function) Function // TODO first-class functions
+	Name      string     // TODO namespaces
+	ArgTypes  []types.Type
+	Funcer    func([]Function) Function // TODO first-class functions
 }
 
 type Function interface {
