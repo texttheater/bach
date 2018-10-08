@@ -2,7 +2,8 @@ package interp
 
 import (
 	"github.com/texttheater/bach/grammar"
-	"github.com/texttheater/bach/types"
+	"github.com/texttheater/bach/shapes"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/values"
 )
 
@@ -15,10 +16,10 @@ func InterpretString(program string) (values.Value, error) {
 		return nil, err
 	}
 	// type-check
-	f, err := x.Function(&types.AnyType{})
+	f, err := x.Function(shapes.InitialShape)
 	if err != nil {
 		return nil, err
 	}
 	// evaluate
-	return f.Evaluate(&values.NullValue{}), nil // TODO error handling
+	return f.OutputState(states.InitialState).Value, nil // TODO error handling
 }

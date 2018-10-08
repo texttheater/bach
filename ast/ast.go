@@ -1,3 +1,9 @@
+/*
+Package ast implements Bach's abstract syntax trees.
+
+An alternative name for this package would be: expressions. Because that's what
+an AST is, an expression consisting of subexpressions.
+*/
 package ast
 
 import (
@@ -5,15 +11,13 @@ import (
 	//"os"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/functions"
-	"github.com/texttheater/bach/nffs"
-	"github.com/texttheater/bach/types"
+	"github.com/texttheater/bach/shapes"
 )
 
 ///////////////////////////////////////////////////////////////////////////////
 
 type Expression interface {
-	Function(inputType types.Type) (functions.Function, error)
+	Function(inputShape shapes.Shape) (shapes.Function, error)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,8 +25,8 @@ type Expression interface {
 type IdentityExpression struct {
 }
 
-func (x *IdentityExpression) Function(inputType types.Type) (functions.Function, error) {
-	return &functions.IdentityFunction{inputType}, nil
+func (x *IdentityExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
+	return &shapes.IdentityFunction{}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -32,16 +36,16 @@ type CompositionExpression struct {
 	Right Expression
 }
 
-func (x *CompositionExpression) Function(inputType types.Type) (functions.Function, error) {
-	leftFunction, err := x.Left.Function(inputType)
+func (x *CompositionExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
+	leftFunction, err := x.Left.Function(inputShape)
 	if err != nil {
 		return nil, err
 	}
-	rightFunction, err := x.Right.Function(leftFunction.Type())
+	rightFunction, err := x.Right.Function(leftFunction.OutputShape(inputShape))
 	if err != nil {
 		return nil, err
 	}
-	return &functions.CompositionFunction{leftFunction, rightFunction}, nil
+	return &shapes.CompositionFunction{leftFunction, rightFunction}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,8 +55,8 @@ type NumberExpression struct {
 	Value float64
 }
 
-func (x *NumberExpression) Function(inputType types.Type) (functions.Function, error) {
-	return &functions.NumberFunction{x.Value}, nil
+func (x *NumberExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
+	return &shapes.NumberFunction{x.Value}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,16 +72,16 @@ type NFFCallExpression struct {
 	Args []Expression
 }
 
-func (x *NFFCallExpression) Function(inputType types.Type) (functions.Function, error) {
-	argFunctions := make([]functions.Function, len(x.Args))
+func (x *NFFCallExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
+	argFunctions := make([]shapes.Function, len(x.Args))
 	for i, arg := range x.Args {
-		f, err := arg.Function(&types.AnyType{})
+		f, err := arg.Function(shapes.InitialShape)
 		if err != nil {
 			return nil, err
 		}
 		argFunctions[i] = f
 	}
-	f, err := nffs.Function(x.Pos, inputType, x.Name, argFunctions)
+	f, err := shapes.ResolveNFF(x.Pos, inputShape, x.Name, argFunctions)
 	if err != nil {
 		return nil, err
 	}
