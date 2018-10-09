@@ -7,6 +7,28 @@ import (
 	"github.com/texttheater/bach/values"
 )
 
+///////////////////////////////////////////////////////////////////////////////
+
+type EvaluatorFunction struct {
+	ArgumentFunctions []shapes.Function
+	OutputType        types.Type
+	Kernel            func(inputValue values.Value, argumentValues []values.Value) values.Value
+}
+
+func (f *EvaluatorFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
+	return shapes.Shape{f.OutputType, inputShape.Stack}
+}
+
+func (f *EvaluatorFunction) OutputState(inputState states.State) states.State {
+	argumentValues := make([]values.Value, len(f.ArgumentFunctions))
+	for i, a := range f.ArgumentFunctions {
+		argumentValues[i] = a.OutputState(InitialState).Value
+	}
+	return states.State{f.Kernel(inputState.Value, argumentValues), inputState.Stack}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 var InitialShape = initialShape()
 
 func initialShape() shapes.Shape {
@@ -15,59 +37,41 @@ func initialShape() shapes.Shape {
 		&types.NumberType{},
 		"+",
 		[]types.Type{&types.NumberType{}},
-		func(argFunctions []shapes.Function) shapes.Function {
-			return Add{argFunctions[0]}
-		},
+		Add,
 	})
 	shape.Stack = shape.Stack.Push(shapes.NFF{
 		&types.NumberType{},
 		"-",
 		[]types.Type{&types.NumberType{}},
-		func(argFunctions []shapes.Function) shapes.Function {
-			return Subtract{argFunctions[0]}
-		},
+		Subtract,
 	})
 	shape.Stack = shape.Stack.Push(shapes.NFF{
 		&types.NumberType{},
 		"*",
 		[]types.Type{&types.NumberType{}},
-		func(argFunctions []shapes.Function) shapes.Function {
-			return Multiply{argFunctions[0]}
-		},
+		Multiply,
 	})
 	shape.Stack = shape.Stack.Push(shapes.NFF{
 		&types.NumberType{},
 		"/",
 		[]types.Type{&types.NumberType{}},
-		func(argFunctions []shapes.Function) shapes.Function {
-			return Divide{argFunctions[0]}
-		},
+		Divide,
 	})
-	//shape.Stack = shape.Stack.Push(shapes.NFF{
-	//	&types.NumberType{},
-	//	"%",
-	//	[]types.Type{&types.NumberType{}},
-	//	func(argFunctions []shapes.Function) shapes.Function {
-	//		return Modulo{argFunctions[0]}
-	//	},
-	//})
 	shape.Stack = shape.Stack.Push(shapes.NFF{
 		&types.NumberType{},
 		"<",
 		[]types.Type{&types.NumberType{}},
-		func(argFunctions []shapes.Function) shapes.Function {
-			return LessThan{argFunctions[0]}
-		},
+		LessThan,
 	})
 	shape.Stack = shape.Stack.Push(shapes.NFF{
 		&types.NumberType{},
 		">",
 		[]types.Type{&types.NumberType{}},
-		func(argFunctions []shapes.Function) shapes.Function {
-			return GreaterThan{argFunctions[0]}
-		},
+		GreaterThan,
 	})
 	return shape
 }
 
-	var InitialState = states.State{&values.NullValue{}, nil}
+///////////////////////////////////////////////////////////////////////////////
+
+var InitialState = states.State{&values.NullValue{}, nil}

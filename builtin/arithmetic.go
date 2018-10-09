@@ -2,119 +2,78 @@ package builtin
 
 import (
 	"github.com/texttheater/bach/shapes"
-	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
-// TODO need more abstraction below
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Add struct {
-	Arg shapes.Function
+func Add(argFunctions []shapes.Function) shapes.Function {
+	return &EvaluatorFunction{
+		argFunctions,
+		&types.NumberType{},
+		func (inputValue values.Value, argumentValues []values.Value) values.Value {
+			inputNumber := inputValue.(*values.NumberValue)
+			argumentNumber := argumentValues[0].(*values.NumberValue)
+			return &values.NumberValue{inputNumber.Value + argumentNumber.Value}
+		},
+	}
 }
 
-func (f Add) OutputShape(inputShape shapes.Shape) shapes.Shape {
-	return inputShape
+func Subtract(argFunctions []shapes.Function) shapes.Function {
+	return &EvaluatorFunction{
+		argFunctions,
+		&types.NumberType{},
+		func (inputValue values.Value, argumentValues []values.Value) values.Value {
+			inputNumber := inputValue.(*values.NumberValue)
+			argumentNumber := argumentValues[0].(*values.NumberValue)
+			return &values.NumberValue{inputNumber.Value - argumentNumber.Value}
+		},
+	}
 }
 
-func (f Add) OutputState(inputState states.State) states.State {
-	numberInput, _ := inputState.Value.(*values.NumberValue)
-	argValue := f.Arg.OutputState(InitialState).Value
-	numberArgValue, _ := argValue.(*values.NumberValue)
-	outputValue := &values.NumberValue{numberInput.Value + numberArgValue.Value}
-	return states.State{outputValue, inputState.Stack}
+func Multiply(argFunctions []shapes.Function) shapes.Function {
+	return &EvaluatorFunction{
+		argFunctions,
+		&types.NumberType{},
+		func (inputValue values.Value, argumentValues []values.Value) values.Value {
+			inputNumber := inputValue.(*values.NumberValue)
+			argumentNumber := argumentValues[0].(*values.NumberValue)
+			return &values.NumberValue{inputNumber.Value * argumentNumber.Value}
+		},
+	}
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-type Subtract struct {
-	Arg shapes.Function
+func Divide(argFunctions []shapes.Function) shapes.Function {
+	return &EvaluatorFunction{
+		argFunctions,
+		&types.NumberType{},
+		func (inputValue values.Value, argumentValues []values.Value) values.Value {
+			inputNumber := inputValue.(*values.NumberValue)
+			argumentNumber := argumentValues[0].(*values.NumberValue)
+			return &values.NumberValue{inputNumber.Value / argumentNumber.Value}
+		},
+	}
 }
 
-func (f Subtract) OutputShape(inputShape shapes.Shape) shapes.Shape {
-	return inputShape
+func LessThan(argFunctions []shapes.Function) shapes.Function {
+	return &EvaluatorFunction{
+		argFunctions,
+		&types.BooleanType{},
+		func (inputValue values.Value, argumentValues []values.Value) values.Value {
+			inputNumber := inputValue.(*values.NumberValue)
+			argumentNumber := argumentValues[0].(*values.NumberValue)
+			return &values.BooleanValue{inputNumber.Value < argumentNumber.Value}
+		},
+	}
 }
 
-func (f Subtract) OutputState(inputState states.State) states.State {
-	numberInput, _ := inputState.Value.(*values.NumberValue)
-	argValue := f.Arg.OutputState(InitialState).Value
-	numberArgValue, _ := argValue.(*values.NumberValue)
-	outputValue := &values.NumberValue{numberInput.Value - numberArgValue.Value}
-	return states.State{outputValue, inputState.Stack}
+func GreaterThan(argFunctions []shapes.Function) shapes.Function {
+	return &EvaluatorFunction{
+		argFunctions,
+		&types.BooleanType{},
+		func (inputValue values.Value, argumentValues []values.Value) values.Value {
+			inputNumber := inputValue.(*values.NumberValue)
+			argumentNumber := argumentValues[0].(*values.NumberValue)
+			return &values.BooleanValue{inputNumber.Value > argumentNumber.Value}
+		},
+	}
 }
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Multiply struct {
-	Arg shapes.Function
-}
-
-func (f Multiply) OutputShape(inputShape shapes.Shape) shapes.Shape {
-	return inputShape
-}
-
-func (f Multiply) OutputState(inputState states.State) states.State {
-	numberInput, _ := inputState.Value.(*values.NumberValue)
-	argValue := f.Arg.OutputState(InitialState).Value
-	numberArgValue, _ := argValue.(*values.NumberValue)
-	outputValue := &values.NumberValue{numberInput.Value * numberArgValue.Value}
-	return states.State{outputValue, inputState.Stack}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Divide struct {
-	Arg shapes.Function
-}
-
-func (f Divide) OutputShape(inputShape shapes.Shape) shapes.Shape {
-	return inputShape
-}
-
-func (f Divide) OutputState(inputState states.State) states.State {
-	numberInput, _ := inputState.Value.(*values.NumberValue)
-	argValue := f.Arg.OutputState(InitialState).Value
-	numberArgValue, _ := argValue.(*values.NumberValue)
-	outputValue := &values.NumberValue{numberInput.Value / numberArgValue.Value}
-	return states.State{outputValue, inputState.Stack}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type LessThan struct {
-	Arg shapes.Function
-}
-
-func (f LessThan) OutputShape(inputShape shapes.Shape) shapes.Shape {
-	return shapes.Shape{&types.BooleanType{}, inputShape.Stack}
-}
-
-func (f LessThan) OutputState(inputState states.State) states.State {
-	numberInput, _ := inputState.Value.(*values.NumberValue)
-	argValue := f.Arg.OutputState(InitialState).Value
-	numberArgValue, _ := argValue.(*values.NumberValue)
-	outputValue := &values.BooleanValue{numberInput.Value < numberArgValue.Value}
-	return states.State{outputValue, inputState.Stack}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type GreaterThan struct {
-	Arg shapes.Function
-}
-
-func (f GreaterThan) OutputShape(inputShape shapes.Shape) shapes.Shape {
-	return shapes.Shape{&types.BooleanType{}, inputShape.Stack}
-}
-
-func (f GreaterThan) OutputState(inputState states.State) states.State {
-	numberInput, _ := inputState.Value.(*values.NumberValue)
-	argValue := f.Arg.OutputState(InitialState).Value
-	numberArgValue, _ := argValue.(*values.NumberValue)
-	outputValue := &values.BooleanValue{numberInput.Value > numberArgValue.Value}
-	return states.State{outputValue, inputState.Stack}
-}
-
-///////////////////////////////////////////////////////////////////////////////
