@@ -30,6 +30,8 @@ func TestInterp(t *testing.T) {
 		{"2 <3", &values.BooleanValue{true}, ""},
 		{"3 >2", &values.BooleanValue{true}, ""},
 		{"3 <2", &values.BooleanValue{false}, ""},
+		{"3 <2 +1", nil, "type"},
+		{"+", nil, "syntax"},
 	}
 	for _, c := range cases {
 		got, err := interp.InterpretString(c.program)
