@@ -1,13 +1,14 @@
 package builtin
 
 import (
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
 func Add(argFunctions []shapes.Function) shapes.Function {
-	return &EvaluatorFunction{
+	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.NumberType{},
 		func (inputValue values.Value, argumentValues []values.Value) values.Value {
@@ -19,7 +20,7 @@ func Add(argFunctions []shapes.Function) shapes.Function {
 }
 
 func Subtract(argFunctions []shapes.Function) shapes.Function {
-	return &EvaluatorFunction{
+	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.NumberType{},
 		func (inputValue values.Value, argumentValues []values.Value) values.Value {
@@ -31,7 +32,7 @@ func Subtract(argFunctions []shapes.Function) shapes.Function {
 }
 
 func Multiply(argFunctions []shapes.Function) shapes.Function {
-	return &EvaluatorFunction{
+	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.NumberType{},
 		func (inputValue values.Value, argumentValues []values.Value) values.Value {
@@ -43,7 +44,7 @@ func Multiply(argFunctions []shapes.Function) shapes.Function {
 }
 
 func Divide(argFunctions []shapes.Function) shapes.Function {
-	return &EvaluatorFunction{
+	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.NumberType{},
 		func (inputValue values.Value, argumentValues []values.Value) values.Value {
@@ -55,7 +56,7 @@ func Divide(argFunctions []shapes.Function) shapes.Function {
 }
 
 func LessThan(argFunctions []shapes.Function) shapes.Function {
-	return &EvaluatorFunction{
+	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.BooleanType{},
 		func (inputValue values.Value, argumentValues []values.Value) values.Value {
@@ -67,7 +68,7 @@ func LessThan(argFunctions []shapes.Function) shapes.Function {
 }
 
 func GreaterThan(argFunctions []shapes.Function) shapes.Function {
-	return &EvaluatorFunction{
+	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.BooleanType{},
 		func (inputValue values.Value, argumentValues []values.Value) values.Value {

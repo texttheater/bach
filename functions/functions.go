@@ -52,3 +52,23 @@ func (f *NumberFunction) OutputState(inputState states.State) states.State {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+type EvaluatorFunction struct {
+	ArgumentFunctions []shapes.Function
+	OutputType        types.Type
+	Kernel            func(inputValue values.Value, argumentValues []values.Value) values.Value
+}
+
+func (f *EvaluatorFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
+	return shapes.Shape{f.OutputType, inputShape.Stack}
+}
+
+func (f *EvaluatorFunction) OutputState(inputState states.State) states.State {
+	argumentValues := make([]values.Value, len(f.ArgumentFunctions))
+	for i, a := range f.ArgumentFunctions {
+		argumentValues[i] = a.OutputState(states.InitialState).Value
+	}
+	return states.State{f.Kernel(inputState.Value, argumentValues), inputState.Stack}
+}
+
+///////////////////////////////////////////////////////////////////////////////
