@@ -43,7 +43,31 @@ func initialShape() shapes.Shape {
 			return Divide{argFunctions[0]}
 		},
 	})
+	//shape.Stack = shape.Stack.Push(shapes.NFF{
+	//	&types.NumberType{},
+	//	"%",
+	//	[]types.Type{&types.NumberType{}},
+	//	func(argFunctions []shapes.Function) shapes.Function {
+	//		return Modulo{argFunctions[0]}
+	//	},
+	//})
+	shape.Stack = shape.Stack.Push(shapes.NFF{
+		&types.NumberType{},
+		"<",
+		[]types.Type{&types.NumberType{}},
+		func(argFunctions []shapes.Function) shapes.Function {
+			return LessThan{argFunctions[0]}
+		},
+	})
+	shape.Stack = shape.Stack.Push(shapes.NFF{
+		&types.NumberType{},
+		">",
+		[]types.Type{&types.NumberType{}},
+		func(argFunctions []shapes.Function) shapes.Function {
+			return GreaterThan{argFunctions[0]}
+		},
+	})
 	return shape
 }
 
-var InitialState = states.State{&values.NullValue{}, nil}
+	var InitialState = states.State{&values.NullValue{}, nil}

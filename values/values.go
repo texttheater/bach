@@ -28,3 +28,15 @@ type NumberValue struct {
 func (v *NumberValue) String() string {
 	return strconv.FormatFloat(v.Value, 'f', -1, 64)
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+type BooleanValue struct {
+	Value bool
+}
+
+func (v *BooleanValue) String() string {
+	return strconv.FormatBool(v.Value)
+}
+
+///////////////////////////////////////////////////////////////////////////////
