@@ -1,4 +1,4 @@
-package interp_test
+package main_test
 
 import (
 	"math"
