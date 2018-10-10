@@ -25,7 +25,7 @@ func TestInterp(t *testing.T) {
 		{"1 /0", &values.NumberValue{math.Inf(1)}, ""},
 		{"-1 *2", nil, "type"},
 		{"0 -1 *2", &values.NumberValue{-2}, ""},
-		//{"15 %7", &values.NumberValue{1}, ""},
+		{"15 %7", &values.NumberValue{1}, ""},
 		{"2 >3", &values.BooleanValue{false}, ""},
 		{"2 <3", &values.BooleanValue{true}, ""},
 		{"3 >2", &values.BooleanValue{true}, ""},

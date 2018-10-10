@@ -1,6 +1,8 @@
 package builtin
 
 import (
+	"math"
+
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/types"
@@ -51,6 +53,18 @@ func Divide(argFunctions []shapes.Function) shapes.Function {
 			inputNumber := inputValue.(*values.NumberValue)
 			argumentNumber := argumentValues[0].(*values.NumberValue)
 			return &values.NumberValue{inputNumber.Value / argumentNumber.Value}
+		},
+	}
+}
+
+func Modulo(argFunctions []shapes.Function) shapes.Function {
+	return &functions.EvaluatorFunction{
+		argFunctions,
+		&types.NumberType{},
+		func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			inputNumber := inputValue.(*values.NumberValue)
+			argumentNumber := argumentValues[0].(*values.NumberValue)
+			return &values.NumberValue{math.Mod(inputNumber.Value, argumentNumber.Value)}
 		},
 	}
 }

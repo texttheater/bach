@@ -35,6 +35,12 @@ func initialShape() shapes.Shape {
 	})
 	shape.Stack = shape.Stack.Push(shapes.NFF{
 		&types.NumberType{},
+		"%",
+		[]types.Type{&types.NumberType{}},
+		Modulo,
+	})
+	shape.Stack = shape.Stack.Push(shapes.NFF{
+		&types.NumberType{},
 		"<",
 		[]types.Type{&types.NumberType{}},
 		LessThan,
