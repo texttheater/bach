@@ -92,3 +92,39 @@ func GreaterThan(argFunctions []shapes.Function) shapes.Function {
 		},
 	}
 }
+
+func Equal(argFunctions []shapes.Function) shapes.Function {
+	return &functions.EvaluatorFunction{
+		argFunctions,
+		&types.BooleanType{},
+		func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			inputNumber := inputValue.(*values.NumberValue)
+			argumentNumber := argumentValues[0].(*values.NumberValue)
+			return &values.BooleanValue{inputNumber.Value == argumentNumber.Value}
+		},
+	}
+}
+
+func LessEqual(argFunctions []shapes.Function) shapes.Function {
+	return &functions.EvaluatorFunction{
+		argFunctions,
+		&types.BooleanType{},
+		func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			inputNumber := inputValue.(*values.NumberValue)
+			argumentNumber := argumentValues[0].(*values.NumberValue)
+			return &values.BooleanValue{inputNumber.Value <= argumentNumber.Value}
+		},
+	}
+}
+
+func GreaterEqual(argFunctions []shapes.Function) shapes.Function {
+	return &functions.EvaluatorFunction{
+		argFunctions,
+		&types.BooleanType{},
+		func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			inputNumber := inputValue.(*values.NumberValue)
+			argumentNumber := argumentValues[0].(*values.NumberValue)
+			return &values.BooleanValue{inputNumber.Value >= argumentNumber.Value}
+		},
+	}
+}

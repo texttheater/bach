@@ -16,22 +16,29 @@ func TestInterp(t *testing.T) {
 		want      values.Value
 		errorKind string
 	}{
+		// syntax errors
+		{"+", nil, "syntax"},
+		// type errors
+		{"-1 *2", nil, "type"},
+		{"3 <2 +1", nil, "type"},
+		// literals
 		{"1", &values.NumberValue{1}, ""},
 		{"1 2", &values.NumberValue{2}, ""},
 		{"1 2 3.5", &values.NumberValue{3.5}, ""},
+		// math
 		{"1 +1", &values.NumberValue{2}, ""},
 		{"1 +2 *3", &values.NumberValue{9}, ""},
 		{"1 +(2 *3)", &values.NumberValue{7}, ""},
 		{"1 /0", &values.NumberValue{math.Inf(1)}, ""},
-		{"-1 *2", nil, "type"},
 		{"0 -1 *2", &values.NumberValue{-2}, ""},
 		{"15 %7", &values.NumberValue{1}, ""},
 		{"2 >3", &values.BooleanValue{false}, ""},
 		{"2 <3", &values.BooleanValue{true}, ""},
 		{"3 >2", &values.BooleanValue{true}, ""},
 		{"3 <2", &values.BooleanValue{false}, ""},
-		{"3 <2 +1", nil, "type"},
-		{"+", nil, "syntax"},
+		{"1 +1 ==2", &values.BooleanValue{true}, ""},
+		{"1 +1 >=2", &values.BooleanValue{true}, ""},
+		{"1 +1 <=2", &values.BooleanValue{true}, ""},
 	}
 	for _, c := range cases {
 		got, err := interp.InterpretString(c.program)

@@ -51,5 +51,23 @@ func initialShape() shapes.Shape {
 		[]types.Type{&types.NumberType{}},
 		GreaterThan,
 	})
+	shape.Stack = shape.Stack.Push(shapes.NFF{
+		&types.NumberType{},
+		"==",
+		[]types.Type{&types.NumberType{}},
+		Equal,
+	})
+	shape.Stack = shape.Stack.Push(shapes.NFF{
+		&types.NumberType{},
+		"<=",
+		[]types.Type{&types.NumberType{}},
+		LessEqual,
+	})
+	shape.Stack = shape.Stack.Push(shapes.NFF{
+		&types.NumberType{},
+		">=",
+		[]types.Type{&types.NumberType{}},
+		GreaterEqual,
+	})
 	return shape
 }
