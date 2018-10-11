@@ -22,6 +22,14 @@ func E(kind string, pos lexer.Position, format string, a ...interface{}) error {
 	return Error{kind, pos, fmt.Sprintf(format, a...)}
 }
 
+func Kind(err error) string {
+	e, ok := err.(Error)
+	if !ok {
+		return "unknown"
+	}
+	return e.Kind
+}
+
 func Is(kind string, err error) bool {
 	e, ok := err.(Error)
 	if !ok {
