@@ -64,9 +64,10 @@ func (f *EvaluatorFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
 }
 
 func (f *EvaluatorFunction) OutputState(inputState states.State) states.State {
+	argumentInput := states.State{&values.NullValue{}, inputState.Stack}
 	argumentValues := make([]values.Value, len(f.ArgumentFunctions))
 	for i, a := range f.ArgumentFunctions {
-		argumentValues[i] = a.OutputState(states.InitialState).Value
+		argumentValues[i] = a.OutputState(argumentInput).Value
 	}
 	return states.State{f.Kernel(inputState.Value, argumentValues), inputState.Stack}
 }
