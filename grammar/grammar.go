@@ -18,7 +18,8 @@ var Lexer = lexer.Must(lexer.Regexp(
 		`|(?P<Number>(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op1Number>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op2Number>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=)\()` +
+		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
+		`|(?P<Name>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Comma>,)` +
 		`|(?P<Rpar>\))`,
 ))
@@ -59,9 +60,11 @@ func (g *Component) ast() ast.Expression {
 ///////////////////////////////////////////////////////////////////////////////
 
 type NFFCall struct {
+	Pos         lexer.Position
 	Op1Number   *Op1Number   `  @Op1Number`
 	Op2Number   *Op2Number   `| @Op2Number`
 	NameArglist *NameArglist `| @@`
+	Name        *string       `| @Name`
 }
 
 func (g *NFFCall) ast() ast.Expression {
@@ -73,6 +76,9 @@ func (g *NFFCall) ast() ast.Expression {
 	}
 	if g.NameArglist != nil {
 		return g.NameArglist.ast()
+	}
+	if g.Name != nil {
+		return &ast.NFFCallExpression{g.Pos, *g.Name, []ast.Expression{}}
 	}
 	panic("invalid NFF call")
 }

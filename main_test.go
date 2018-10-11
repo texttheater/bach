@@ -17,10 +17,12 @@ func TestInterp(t *testing.T) {
 		errorKind string
 	}{
 		// syntax errors
-		{"+", nil, "syntax"},
+		{"&", nil, "syntax"},
 		// type errors
 		{"-1 *2", nil, "type"},
 		{"3 <2 +1", nil, "type"},
+		{"+", nil, "type"},
+		{"hurz", nil, "type"},
 		// literals
 		{"1", &values.NumberValue{1}, ""},
 		{"1 2", &values.NumberValue{2}, ""},
