@@ -44,12 +44,12 @@ func TestInterp(t *testing.T) {
 		got, err := interp.InterpretString(c.program)
 		if c.errorKind != "" {
 			if !errors.Is(c.errorKind, err) {
-				t.Errorf("program: %q, expected %q error, got: %q", c.program, c.errorKind, err)
+				t.Errorf("program: %q, want %v error, got %v error: %q", c.program, c.errorKind, errors.Kind(err), err)
 			}
 			continue
 		}
 		if err != nil {
-			t.Errorf("program: %q, want: %q, got error: %q", c.program, c.want, err)
+			t.Errorf("program: %q, want %q, got %v error: %q", c.program, c.want, errors.Kind(err), err)
 			continue
 		}
 		if !reflect.DeepEqual(got, c.want) {
