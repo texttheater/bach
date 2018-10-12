@@ -59,7 +59,7 @@ type BooleanType struct {
 }
 
 func (t *BooleanType) Subsumes(other Type) bool {
-	_, ok := other.(*NullType)
+	_, ok := other.(*BooleanType)
 	return ok
 }
 
