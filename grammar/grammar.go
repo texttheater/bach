@@ -18,6 +18,8 @@ var Lexer = lexer.Must(lexer.Regexp(
 		`|(?P<Number>(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op1Number>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op2Number>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
+		`|(?P<Op1Name>[+\-*/%<>](?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
+		`|(?P<Op2Name>(?:==|<=|>=)(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
 		`|(?P<Name>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Comma>,)` +
@@ -63,8 +65,10 @@ type NFFCall struct {
 	Pos         lexer.Position
 	Op1Number   *Op1Number   `  @Op1Number`
 	Op2Number   *Op2Number   `| @Op2Number`
+	Op1Name     *Op1Name     `| @Op1Name`
+	Op2Name     *Op2Name     `| @Op2Name`
 	NameArglist *NameArglist `| @@`
-	Name        *string       `| @Name`
+	Name        *string      `| @Name`
 }
 
 func (g *NFFCall) ast() ast.Expression {
@@ -73,6 +77,12 @@ func (g *NFFCall) ast() ast.Expression {
 	}
 	if g.Op2Number != nil {
 		return g.Op2Number.ast()
+	}
+	if g.Op1Name != nil {
+		return g.Op1Name.ast()
+	}
+	if g.Op2Name != nil {
+		return g.Op2Name.ast()
 	}
 	if g.NameArglist != nil {
 		return g.NameArglist.ast()
@@ -125,6 +135,42 @@ func (g *Op2Number) Capture(values []string) error {
 
 func (g *Op2Number) ast() ast.Expression {
 	return &ast.NFFCallExpression{g.Pos, g.Op, []ast.Expression{&ast.NumberExpression{g.Pos, g.Number}}}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type Op1Name struct {
+	Pos  lexer.Position
+	Op   string
+	Name string
+}
+
+func (g *Op1Name) Capture(values []string) error {
+	g.Op = string(values[0][:1])
+	g.Name = values[0][1:]
+	return nil
+}
+
+func (g *Op1Name) ast() ast.Expression {
+	return &ast.NFFCallExpression{g.Pos, g.Op, []ast.Expression{&ast.NFFCallExpression{g.Pos, g.Name, []ast.Expression{}}}}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type Op2Name struct {
+	Pos  lexer.Position
+	Op   string
+	Name string
+}
+
+func (g *Op2Name) Capture(values []string) error {
+	g.Op = string(values[0][:2])
+	g.Name = values[0][2:]
+	return nil
+}
+
+func (g *Op2Name) ast() ast.Expression {
+	return &ast.NFFCallExpression{g.Pos, g.Op, []ast.Expression{&ast.NFFCallExpression{g.Pos, g.Name, []ast.Expression{}}}}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

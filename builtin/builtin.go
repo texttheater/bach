@@ -99,5 +99,11 @@ func initialShape() shapes.Shape {
 		[]types.Type{},
 		Not,
 	})
+	shape.Stack = shape.Stack.Push(shapes.NFF{
+		&types.BooleanType{},
+		"==",
+		[]types.Type{&types.BooleanType{}},
+		BooleanEqual,
+	})
 	return shape
 }
