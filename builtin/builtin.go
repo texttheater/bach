@@ -81,5 +81,23 @@ func initialShape() shapes.Shape {
 		[]types.Type{},
 		False,
 	})
+	shape.Stack = shape.Stack.Push(shapes.NFF{
+		&types.BooleanType{},
+		"and",
+		[]types.Type{&types.BooleanType{}},
+		And,
+	})
+	shape.Stack = shape.Stack.Push(shapes.NFF{
+		&types.BooleanType{},
+		"or",
+		[]types.Type{&types.BooleanType{}},
+		Or,
+	})
+	shape.Stack = shape.Stack.Push(shapes.NFF{
+		&types.BooleanType{},
+		"not",
+		[]types.Type{},
+		Not,
+	})
 	return shape
 }

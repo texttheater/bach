@@ -44,6 +44,16 @@ func TestInterp(t *testing.T) {
 		// logic
 		{"true", &values.BooleanValue{true}, ""},
 		{"false", &values.BooleanValue{false}, ""},
+		{"true and(true)", &values.BooleanValue{true}, ""},
+		{"true and(false)", &values.BooleanValue{false}, ""},
+		{"false and(false)", &values.BooleanValue{false}, ""},
+		{"false and(true)", &values.BooleanValue{false}, ""},
+		{"true or(true)", &values.BooleanValue{true}, ""},
+		{"true or(false)", &values.BooleanValue{true}, ""},
+		{"false or(false)", &values.BooleanValue{false}, ""},
+		{"false or(true)", &values.BooleanValue{true}, ""},
+		{"false not", &values.BooleanValue{true}, ""},
+		{"true not", &values.BooleanValue{false}, ""},
 	}
 	for _, c := range cases {
 		got, err := interp.InterpretString(c.program)
