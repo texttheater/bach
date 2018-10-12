@@ -54,6 +54,7 @@ func TestInterp(t *testing.T) {
 		{"false or(true)", &values.BooleanValue{true}, ""},
 		{"false not", &values.BooleanValue{true}, ""},
 		{"true not", &values.BooleanValue{false}, ""},
+		{"1 +1 ==2 and(2 +2 ==5 not)", &values.BooleanValue{true}, ""},
 	}
 	for _, c := range cases {
 		got, err := interp.InterpretString(c.program)
