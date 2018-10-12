@@ -41,6 +41,9 @@ func TestInterp(t *testing.T) {
 		{"1 +1 ==2", &values.BooleanValue{true}, ""},
 		{"1 +1 >=2", &values.BooleanValue{true}, ""},
 		{"1 +1 <=2", &values.BooleanValue{true}, ""},
+		// logic
+		{"true", &values.BooleanValue{true}, ""},
+		{"false", &values.BooleanValue{false}, ""},
 	}
 	for _, c := range cases {
 		got, err := interp.InterpretString(c.program)
