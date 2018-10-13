@@ -53,10 +53,10 @@ type Function interface {
 	OutputState(inputState states.State) states.State
 }
 
-func (inputShape Shape) ResolveNFF(Pos lexer.Position, name string, argFunctions []Function, protoShape Shape) (Function, error) {
+func (inputShape Shape) ResolveNFF(Pos lexer.Position, name string, argFunctions []Function) (Function, error) {
 	argShapes := make([]Shape, len(argFunctions))
 	for i, f := range argFunctions {
-		argShapes[i] = f.OutputShape(protoShape)
+		argShapes[i] = f.OutputShape(inputShape)
 	}
 	stack := inputShape.Stack
 Entries:

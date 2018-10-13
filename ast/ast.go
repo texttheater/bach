@@ -11,7 +11,6 @@ import (
 	//"os"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/builtin"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/shapes"
 )
@@ -77,15 +76,28 @@ type NFFCallExpression struct {
 func (x *NFFCallExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
 	argFunctions := make([]shapes.Function, len(x.Args))
 	for i, arg := range x.Args {
-		f, err := arg.Function(builtin.InitialShape)
+		f, err := arg.Function(inputShape)
 		if err != nil {
 			return nil, err
 		}
 		argFunctions[i] = f
 	}
-	f, err := inputShape.ResolveNFF(x.Pos, x.Name, argFunctions, builtin.InitialShape)
+	f, err := inputShape.ResolveNFF(x.Pos, x.Name, argFunctions)
 	if err != nil {
 		return nil, err
 	}
 	return f, nil
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+type AssignmentExpression struct {
+	Pos  lexer.Position
+	Name string
+}
+
+func (x *AssignmentExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
+	return &functions.AssignmentFunction{x.Name}, nil
+}
+
+///////////////////////////////////////////////////////////////////////////////

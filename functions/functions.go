@@ -73,3 +73,55 @@ func (f *EvaluatorFunction) OutputState(inputState states.State) states.State {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+type AssignmentFunction struct {
+	Name string
+}
+
+func (f *AssignmentFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
+	return shapes.Shape{inputShape.Type, inputShape.Stack.Push(shapes.NFF{
+		&types.AnyType{},
+		f.Name,
+		[]types.Type{},
+		func(argumentFunctions []shapes.Function) shapes.Function {
+			return &VariableFunction{f.Name, inputShape.Type}
+		},
+	})}
+}
+
+func (f *AssignmentFunction) OutputState(inputState states.State) states.State {
+	return states.State{
+		inputState.Value,
+		inputState.Stack.Push(states.NamedValue{
+			f.Name,
+			inputState.Value,
+		}),
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type VariableFunction struct {
+	Name string
+	Type types.Type
+}
+
+func (f *VariableFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
+	return shapes.Shape{f.Type, inputShape.Stack}
+}
+
+func (f *VariableFunction) OutputState(inputState states.State) states.State {
+	stack := inputState.Stack
+	for stack != nil {
+		if stack.Head.Name == f.Name {
+			return states.State{
+				stack.Head.Value,
+				inputState.Stack,
+			}
+		}
+		stack = stack.Tail
+	}
+	panic("variable not found")
+}
+
+///////////////////////////////////////////////////////////////////////////////

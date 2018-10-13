@@ -18,8 +18,9 @@ var Lexer = lexer.Must(lexer.Regexp(
 		`|(?P<Number>(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op1Number>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op2Number>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-		`|(?P<Op1Name>[+\-*/%<>](?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
+		`|(?P<Op1Name>[+\-*/%<>](?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Op2Name>(?:==|<=|>=)(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
+		`|(?P<Assignment>=(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
 		`|(?P<Name>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Comma>,)` +
@@ -44,9 +45,10 @@ func (g *Composition) ast() ast.Expression {
 ///////////////////////////////////////////////////////////////////////////////
 
 type Component struct {
-	Pos     lexer.Position
-	Number  *float64 `  @Number`
-	NFFCall *NFFCall `| @@`
+	Pos        lexer.Position
+	Number     *float64    `  @Number`
+	NFFCall    *NFFCall    `| @@`
+	Assignment *Assignment `| @Assignment`
 }
 
 func (g *Component) ast() ast.Expression {
@@ -55,6 +57,9 @@ func (g *Component) ast() ast.Expression {
 	}
 	if g.NFFCall != nil {
 		return g.NFFCall.ast()
+	}
+	if g.Assignment != nil {
+		return g.Assignment.ast()
 	}
 	panic("invalid component")
 }
@@ -171,6 +176,22 @@ func (g *Op2Name) Capture(values []string) error {
 
 func (g *Op2Name) ast() ast.Expression {
 	return &ast.NFFCallExpression{g.Pos, g.Op, []ast.Expression{&ast.NFFCallExpression{g.Pos, g.Name, []ast.Expression{}}}}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type Assignment struct {
+	Pos  lexer.Position
+	Name string
+}
+
+func (g *Assignment) Capture(values []string) error {
+	g.Name = values[0][1:]
+	return nil
+}
+
+func (g *Assignment) ast() ast.Expression {
+	return &ast.AssignmentExpression{g.Pos, g.Name}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

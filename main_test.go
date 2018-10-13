@@ -59,6 +59,9 @@ func TestInterp(t *testing.T) {
 		{"false ==false", &values.BooleanValue{true}, ""},
 		{"false ==true", &values.BooleanValue{false}, ""},
 		{"1 +1 ==2 and(2 +2 ==5 not)", &values.BooleanValue{true}, ""},
+		// assignment
+		{"1 +1 =a 3 *2 +a", &values.NumberValue{8}, ""},
+		{"1 +1 ==2 =p 1 +1 ==1 =q p ==q not", &values.BooleanValue{true}, ""},
 	}
 	for _, c := range cases {
 		got, err := interp.InterpretString(c.program)
