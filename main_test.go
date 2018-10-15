@@ -62,6 +62,10 @@ func TestInterp(t *testing.T) {
 		// assignment
 		{"1 +1 =a 3 *2 +a", &values.NumberValue{8}, ""},
 		{"1 +1 ==2 =p 1 +1 ==1 =q p ==q not", &values.BooleanValue{true}, ""},
+		// strings
+		{`"abc"`, &values.StringValue{"abc"}, ""},
+		{`"\"\\abc\""`, &values.StringValue{`"\abc"`}, ""},
+		{`1 "abc"`, &values.StringValue{"abc"}, ""},
 	}
 	for _, c := range cases {
 		got, err := interp.InterpretString(c.program)

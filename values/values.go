@@ -1,6 +1,7 @@
 package values
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -21,6 +22,16 @@ func (v *NullValue) String() string {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+type BooleanValue struct {
+	Value bool
+}
+
+func (v *BooleanValue) String() string {
+	return strconv.FormatBool(v.Value)
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 type NumberValue struct {
 	Value float64
 }
@@ -31,12 +42,12 @@ func (v *NumberValue) String() string {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type BooleanValue struct {
-	Value bool
+type StringValue struct {
+	Value string
 }
 
-func (v *BooleanValue) String() string {
-	return strconv.FormatBool(v.Value)
+func (v *StringValue) String() string {
+	return fmt.Sprintf("%q", v.Value)
 }
 
 ///////////////////////////////////////////////////////////////////////////////

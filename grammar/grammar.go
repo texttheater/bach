@@ -16,6 +16,7 @@ import (
 var Lexer = lexer.Must(lexer.Regexp(
 	`([\s]+)` +
 		`|(?P<Number>(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
+		`|(?P<String>"(?:\\.|[^"])*")` +
 		`|(?P<Op1Number>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op2Number>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op1Name>[+\-*/%<>](?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
@@ -47,6 +48,7 @@ func (g *Composition) ast() ast.Expression {
 type Component struct {
 	Pos        lexer.Position
 	Number     *float64    `  @Number`
+	String     *string     `| @String`
 	NFFCall    *NFFCall    `| @@`
 	Assignment *Assignment `| @Assignment`
 }
@@ -54,6 +56,9 @@ type Component struct {
 func (g *Component) ast() ast.Expression {
 	if g.Number != nil {
 		return &ast.NumberExpression{g.Pos, *g.Number}
+	}
+	if g.String != nil {
+		return &ast.StringExpression{g.Pos, *g.String}
 	}
 	if g.NFFCall != nil {
 		return g.NFFCall.ast()
@@ -227,7 +232,7 @@ func (g *NameLpar) Capture(values []string) error {
 ///////////////////////////////////////////////////////////////////////////////
 
 func Parse(input string) (ast.Expression, error) {
-	parser, err := participle.Build(&Composition{}, participle.Lexer(Lexer))
+	parser, err := participle.Build(&Composition{}, participle.Lexer(Lexer), participle.Unquote(Lexer, "String"))
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {
 			return nil, errors.E("syntax", lexerError.Pos, lexerError.Message)

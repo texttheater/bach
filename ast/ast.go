@@ -13,6 +13,8 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/shapes"
+	"github.com/texttheater/bach/types"
+	"github.com/texttheater/bach/values"
 )
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,7 +59,18 @@ type NumberExpression struct {
 }
 
 func (x *NumberExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
-	return &functions.NumberFunction{x.Value}, nil
+	return &functions.LiteralFunction{&types.NumberType{}, &values.NumberValue{x.Value}}, nil
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type StringExpression struct {
+	Pos   lexer.Position
+	Value string
+}
+
+func (x *StringExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
+	return &functions.LiteralFunction{&types.StringType{}, &values.StringValue{x.Value}}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////

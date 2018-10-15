@@ -37,18 +37,17 @@ func (f *CompositionFunction) OutputState(inputState states.State) states.State 
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// TODO generalize to LiteralFunction, storing Type and Value
-
-type NumberFunction struct {
-	Value float64
+type LiteralFunction struct {
+	Type  types.Type
+	Value values.Value
 }
 
-func (f *NumberFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
-	return shapes.Shape{&types.NumberType{}, inputShape.Stack}
+func (f *LiteralFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
+	return shapes.Shape{f.Type, inputShape.Stack}
 }
 
-func (f *NumberFunction) OutputState(inputState states.State) states.State {
-	return states.State{&values.NumberValue{f.Value}, inputState.Stack}
+func (f *LiteralFunction) OutputState(inputState states.State) states.State {
+	return states.State{f.Value, inputState.Stack}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
