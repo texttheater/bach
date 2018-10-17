@@ -54,9 +54,10 @@ type Function interface {
 }
 
 func (inputShape Shape) ResolveNFF(Pos lexer.Position, name string, argFunctions []Function) (Function, error) {
+	argInputShape := Shape{&types.AnyType{}, inputShape.Stack}
 	argShapes := make([]Shape, len(argFunctions))
 	for i, f := range argFunctions {
-		argShapes[i] = f.OutputShape(Shape{&types.AnyType{}, inputShape.Stack})
+		argShapes[i] = f.OutputShape(argInputShape)
 	}
 	stack := inputShape.Stack
 Entries:
