@@ -10,10 +10,11 @@ import (
 ///////////////////////////////////////////////////////////////////////////////
 
 type IdentityFunction struct {
+	Type types.Type
 }
 
-func (f *IdentityFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
-	return inputShape
+func (f *IdentityFunction) OutputShape(inputStack *shapes.Stack) shapes.Shape {
+	return shapes.Shape{f.Type, inputStack}
 }
 
 func (f *IdentityFunction) OutputState(inputState states.State) states.State {
@@ -27,8 +28,8 @@ type CompositionFunction struct {
 	Right shapes.Function
 }
 
-func (f *CompositionFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
-	return f.Right.OutputShape(f.Left.OutputShape(inputShape))
+func (f *CompositionFunction) OutputShape(inputStack *shapes.Stack) shapes.Shape {
+	return f.Right.OutputShape(f.Left.OutputShape(inputStack).Stack)
 }
 
 func (f *CompositionFunction) OutputState(inputState states.State) states.State {
@@ -42,8 +43,8 @@ type LiteralFunction struct {
 	Value values.Value
 }
 
-func (f *LiteralFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
-	return shapes.Shape{f.Type, inputShape.Stack}
+func (f *LiteralFunction) OutputShape(inputStack *shapes.Stack) shapes.Shape {
+	return shapes.Shape{f.Type, inputStack}
 }
 
 func (f *LiteralFunction) OutputState(inputState states.State) states.State {
@@ -58,8 +59,8 @@ type EvaluatorFunction struct {
 	Kernel            func(inputValue values.Value, argumentValues []values.Value) values.Value
 }
 
-func (f *EvaluatorFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
-	return shapes.Shape{f.OutputType, inputShape.Stack}
+func (f *EvaluatorFunction) OutputShape(inputStack *shapes.Stack) shapes.Shape {
+	return shapes.Shape{f.OutputType, inputStack}
 }
 
 func (f *EvaluatorFunction) OutputState(inputState states.State) states.State {
@@ -74,16 +75,17 @@ func (f *EvaluatorFunction) OutputState(inputState states.State) states.State {
 ///////////////////////////////////////////////////////////////////////////////
 
 type AssignmentFunction struct {
+	Type types.Type
 	Name string
 }
 
-func (f *AssignmentFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
-	return shapes.Shape{inputShape.Type, inputShape.Stack.Push(shapes.NFF{
+func (f *AssignmentFunction) OutputShape(inputStack *shapes.Stack) shapes.Shape {
+	return shapes.Shape{f.Type, inputStack.Push(shapes.NFF{
 		&types.AnyType{},
 		f.Name,
 		[]types.Type{},
 		func(argumentFunctions []shapes.Function) shapes.Function {
-			return &VariableFunction{f.Name, inputShape.Type}
+			return &VariableFunction{f.Name, f.Type}
 		},
 	})}
 }
@@ -105,8 +107,8 @@ type VariableFunction struct {
 	Type types.Type
 }
 
-func (f *VariableFunction) OutputShape(inputShape shapes.Shape) shapes.Shape {
-	return shapes.Shape{f.Type, inputShape.Stack}
+func (f *VariableFunction) OutputShape(inputStack *shapes.Stack) shapes.Shape {
+	return shapes.Shape{f.Type, inputStack}
 }
 
 func (f *VariableFunction) OutputState(inputState states.State) states.State {

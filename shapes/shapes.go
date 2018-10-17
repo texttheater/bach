@@ -49,15 +49,14 @@ type NFF struct {
 }
 
 type Function interface {
-	OutputShape(inputShape Shape) Shape
+	OutputShape(inputStack *Stack) Shape
 	OutputState(inputState states.State) states.State
 }
 
 func (inputShape Shape) ResolveNFF(Pos lexer.Position, name string, argFunctions []Function) (Function, error) {
-	argInputShape := Shape{&types.AnyType{}, inputShape.Stack}
 	argShapes := make([]Shape, len(argFunctions))
 	for i, f := range argFunctions {
-		argShapes[i] = f.OutputShape(argInputShape)
+		argShapes[i] = f.OutputShape(inputShape.Stack)
 	}
 	stack := inputShape.Stack
 Entries:

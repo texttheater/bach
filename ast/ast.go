@@ -29,7 +29,7 @@ type IdentityExpression struct {
 }
 
 func (x *IdentityExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
-	return &functions.IdentityFunction{}, nil
+	return &functions.IdentityFunction{inputShape.Type}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ func (x *CompositionExpression) Function(inputShape shapes.Shape) (shapes.Functi
 	if err != nil {
 		return nil, err
 	}
-	rightFunction, err := x.Right.Function(leftFunction.OutputShape(inputShape))
+	rightFunction, err := x.Right.Function(leftFunction.OutputShape(inputShape.Stack))
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ type AssignmentExpression struct {
 }
 
 func (x *AssignmentExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
-	return &functions.AssignmentFunction{x.Name}, nil
+	return &functions.AssignmentFunction{inputShape.Type, x.Name}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
