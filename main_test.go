@@ -62,21 +62,25 @@ func TestInterp(t *testing.T) {
 		// assignment
 		{"1 +1 =a 3 *2 +a", &values.NumberValue{8}, ""},
 		{"1 +1 ==2 =p 1 +1 ==1 =q p ==q not", &values.BooleanValue{true}, ""},
+		// strings
+		{`"abc"`, &values.StringValue{"abc"}, ""},
+		{`"\"\\abc\""`, &values.StringValue{`"\abc"`}, ""},
+		{`1 "abc"`, &values.StringValue{"abc"}, ""},
 	}
 	for _, c := range cases {
 		got, err := interp.InterpretString(c.program)
 		if c.errorKind != "" {
 			if !errors.Is(c.errorKind, err) {
-				t.Errorf("program: %q, want %v error, got %v error: %q", c.program, c.errorKind, errors.Kind(err), err)
+				t.Errorf("program: %v, want %v error, got %v error: %v", c.program, c.errorKind, errors.Kind(err), err)
 			}
 			continue
 		}
 		if err != nil {
-			t.Errorf("program: %q, want %q, got %v error: %q", c.program, c.want, errors.Kind(err), err)
+			t.Errorf("program: %v, want %v, got %v error: %v", c.program, c.want, errors.Kind(err), err)
 			continue
 		}
 		if !reflect.DeepEqual(got, c.want) {
-			t.Errorf("program: %q, want: %q, got: %q", c.program, c.want, got)
+			t.Errorf("program: %v, want: %v, got: %v", c.program, c.want, got)
 		}
 	}
 }
