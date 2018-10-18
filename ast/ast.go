@@ -96,38 +96,21 @@ func (x *NFFCallExpression) Function(inputShape functions.Shape) (functions.Func
 		}
 		argFunctions[i] = f
 	}
-	// Step 2: determine the output shape of each argument function
+	// Step 2: search the stack for matching NFFs
+	stack := inputShape.Stack
+	for stack != nil {
+		function, ok := stack.Head.Function(inputShape, x.Name, argFunctions)
+		if ok {
+			return function, nil
+		}
+		stack = stack.Tail
+	}
+	// Fail:
 	argShapes := make([]functions.Shape, len(argFunctions))
 	for i, f := range argFunctions {
 		argShapes[i] = f.OutputShape(inputShape.Stack)
 	}
-	// Step 3: search the stack for matching NFFs
-	stack := inputShape.Stack
-Entries:
-	for stack != nil {
-		if !(stack.Head.Name == x.Name) {
-			stack = stack.Tail
-			continue
-		}
-		if len(stack.Head.ArgTypes) != len(argFunctions) {
-			stack = stack.Tail
-			continue
-		}
-		if !stack.Head.InputType.Subsumes(inputShape.Type) {
-			stack = stack.Tail
-			continue
-		}
-		for i, argType := range stack.Head.ArgTypes {
-			if !argType.Subsumes(argShapes[i].Type) {
-				stack = stack.Tail
-				continue Entries
-			}
-		}
-		return stack.Head.Funcer(argFunctions), nil
-	}
-	return nil, errors.E("type", x.Pos,
-		"no function found: for %v %v(%s)",
-		inputShape.Type, x.Name, formatArgTypes(argShapes))
+	return nil, errors.E("type", x.Pos, "no function found: for %v %v(%s)", inputShape.Type, x.Name, formatArgTypes(argShapes))
 }
 
 func formatArgTypes(argShapes []functions.Shape) string {

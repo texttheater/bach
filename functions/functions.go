@@ -76,7 +76,7 @@ func (f *LiteralFunction) OutputState(inputState State) State {
 type EvaluatorFunction struct {
 	ArgumentFunctions []Function
 	OutputType        types.Type
-	Kernel            func(inputValue values.Value, argumentValues []values.Value) values.Value
+	Kernel            Kernel
 }
 
 func (f *EvaluatorFunction) OutputShape(inputStack *NFFStack) Shape {
@@ -89,7 +89,7 @@ func (f *EvaluatorFunction) OutputState(inputState State) State {
 	for i, a := range f.ArgumentFunctions {
 		argumentValues[i] = a.OutputState(argumentInput).Value
 	}
-	return State{f.Kernel(inputState.Value, argumentValues), inputState.Stack}
+	return State{f.Kernel(inputState, argumentValues), inputState.Stack}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,8 +104,16 @@ func (f *AssignmentFunction) OutputShape(inputStack *NFFStack) Shape {
 		&types.AnyType{},
 		f.Name,
 		[]types.Type{},
-		func(argumentFunctions []Function) Function {
-			return &VariableFunction{f.Name, f.Type}
+		f.Type,
+		func(inputState State, argumentValues []values.Value) values.Value {
+			stack := inputState.Stack
+			for stack != nil {
+				if stack.Head.Name == f.Name {
+					return stack.Head.Value
+				}
+				stack = stack.Tail
+			}
+			panic("variable not found")
 		},
 	})}
 }
@@ -118,31 +126,6 @@ func (f *AssignmentFunction) OutputState(inputState State) State {
 			inputState.Value,
 		}),
 	}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type VariableFunction struct {
-	Name string
-	Type types.Type
-}
-
-func (f *VariableFunction) OutputShape(inputStack *NFFStack) Shape {
-	return Shape{f.Type, inputStack}
-}
-
-func (f *VariableFunction) OutputState(inputState State) State {
-	stack := inputState.Stack
-	for stack != nil {
-		if stack.Head.Name == f.Name {
-			return State{
-				stack.Head.Value,
-				inputState.Stack,
-			}
-		}
-		stack = stack.Tail
-	}
-	panic("variable not found")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
