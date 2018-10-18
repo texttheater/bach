@@ -7,12 +7,12 @@ an AST is, an expression consisting of subexpressions.
 package ast
 
 import (
-	//"fmt"
-	//"os"
+	"fmt"
+	"strings"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
-	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -20,7 +20,7 @@ import (
 ///////////////////////////////////////////////////////////////////////////////
 
 type Expression interface {
-	Function(inputShape shapes.Shape) (shapes.Function, error)
+	Function(inputShape functions.Shape) (functions.Function, error)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ type Expression interface {
 type IdentityExpression struct {
 }
 
-func (x *IdentityExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
+func (x *IdentityExpression) Function(inputShape functions.Shape) (functions.Function, error) {
 	return &functions.IdentityFunction{inputShape.Type}, nil
 }
 
@@ -39,7 +39,7 @@ type CompositionExpression struct {
 	Right Expression
 }
 
-func (x *CompositionExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
+func (x *CompositionExpression) Function(inputShape functions.Shape) (functions.Function, error) {
 	leftFunction, err := x.Left.Function(inputShape)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ type NumberExpression struct {
 	Value float64
 }
 
-func (x *NumberExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
+func (x *NumberExpression) Function(inputShape functions.Shape) (functions.Function, error) {
 	return &functions.LiteralFunction{&types.NumberType{}, &values.NumberValue{x.Value}}, nil
 }
 
@@ -69,7 +69,7 @@ type StringExpression struct {
 	Value string
 }
 
-func (x *StringExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
+func (x *StringExpression) Function(inputShape functions.Shape) (functions.Function, error) {
 	return &functions.LiteralFunction{&types.StringType{}, &values.StringValue{x.Value}}, nil
 }
 
@@ -86,8 +86,9 @@ type NFFCallExpression struct {
 	Args []Expression
 }
 
-func (x *NFFCallExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
-	argFunctions := make([]shapes.Function, len(x.Args))
+func (x *NFFCallExpression) Function(inputShape functions.Shape) (functions.Function, error) {
+	// Step 1: resolve arguments to functions
+	argFunctions := make([]functions.Function, len(x.Args))
 	for i, arg := range x.Args {
 		f, err := arg.Function(inputShape)
 		if err != nil {
@@ -95,11 +96,46 @@ func (x *NFFCallExpression) Function(inputShape shapes.Shape) (shapes.Function, 
 		}
 		argFunctions[i] = f
 	}
-	f, err := inputShape.ResolveNFF(x.Pos, x.Name, argFunctions)
-	if err != nil {
-		return nil, err
+	// Step 2: determine the output shape of each argument function
+	argShapes := make([]functions.Shape, len(argFunctions))
+	for i, f := range argFunctions {
+		argShapes[i] = f.OutputShape(inputShape.Stack)
 	}
-	return f, nil
+	// Step 3: search the stack for matching NFFs
+	stack := inputShape.Stack
+Entries:
+	for stack != nil {
+		if !(stack.Head.Name == x.Name) {
+			stack = stack.Tail
+			continue
+		}
+		if len(stack.Head.ArgTypes) != len(argFunctions) {
+			stack = stack.Tail
+			continue
+		}
+		if !stack.Head.InputType.Subsumes(inputShape.Type) {
+			stack = stack.Tail
+			continue
+		}
+		for i, argType := range stack.Head.ArgTypes {
+			if !argType.Subsumes(argShapes[i].Type) {
+				stack = stack.Tail
+				continue Entries
+			}
+		}
+		return stack.Head.Funcer(argFunctions), nil
+	}
+	return nil, errors.E("type", x.Pos,
+		"no function found: for %v %v(%s)",
+		inputShape.Type, x.Name, formatArgTypes(argShapes))
+}
+
+func formatArgTypes(argShapes []functions.Shape) string {
+	formatted := make([]string, len(argShapes))
+	for i, s := range argShapes {
+		formatted[i] = fmt.Sprintf("%v", s.Type)
+	}
+	return strings.Join(formatted, ", ")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -109,7 +145,7 @@ type AssignmentExpression struct {
 	Name string
 }
 
-func (x *AssignmentExpression) Function(inputShape shapes.Shape) (shapes.Function, error) {
+func (x *AssignmentExpression) Function(inputShape functions.Shape) (functions.Function, error) {
 	return &functions.AssignmentFunction{inputShape.Type, x.Name}, nil
 }
 

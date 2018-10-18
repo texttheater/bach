@@ -2,12 +2,11 @@ package builtin
 
 import (
 	"github.com/texttheater/bach/functions"
-	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
-func True(argFunctions []shapes.Function) shapes.Function {
+func True(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.BooleanType{},
@@ -17,7 +16,7 @@ func True(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func False(argFunctions []shapes.Function) shapes.Function {
+func False(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.BooleanType{},
@@ -27,7 +26,7 @@ func False(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func And(argFunctions []shapes.Function) shapes.Function {
+func And(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.BooleanType{},
@@ -39,7 +38,7 @@ func And(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func Or(argFunctions []shapes.Function) shapes.Function {
+func Or(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.BooleanType{},
@@ -51,7 +50,7 @@ func Or(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func Not(argFunctions []shapes.Function) shapes.Function {
+func Not(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.BooleanType{},
@@ -62,7 +61,7 @@ func Not(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func BooleanEqual(argFunctions []shapes.Function) shapes.Function {
+func BooleanEqual(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.BooleanType{},

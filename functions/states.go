@@ -1,4 +1,4 @@
-package states
+package functions
 
 import (
 	"github.com/texttheater/bach/values"
@@ -6,19 +6,19 @@ import (
 
 type State struct {
 	Value values.Value
-	Stack *Stack
+	Stack *VarStack
 }
 
-type Stack struct {
+type VarStack struct {
 	Head NamedValue
-	Tail *Stack
+	Tail *VarStack
 }
 
-func (stack *Stack) Push(n NamedValue) *Stack {
-	return &Stack{n, stack}
+func (stack *VarStack) Push(n NamedValue) *VarStack {
+	return &VarStack{n, stack}
 }
 
-func (stack *Stack) Pop() *Stack {
+func (stack *VarStack) Pop() *VarStack {
 	return stack.Tail
 }
 

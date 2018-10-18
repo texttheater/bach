@@ -4,12 +4,11 @@ import (
 	"math"
 
 	"github.com/texttheater/bach/functions"
-	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
-func Add(argFunctions []shapes.Function) shapes.Function {
+func Add(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.NumberType{},
@@ -21,7 +20,7 @@ func Add(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func Subtract(argFunctions []shapes.Function) shapes.Function {
+func Subtract(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.NumberType{},
@@ -33,7 +32,7 @@ func Subtract(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func Multiply(argFunctions []shapes.Function) shapes.Function {
+func Multiply(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.NumberType{},
@@ -45,7 +44,7 @@ func Multiply(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func Divide(argFunctions []shapes.Function) shapes.Function {
+func Divide(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.NumberType{},
@@ -57,7 +56,7 @@ func Divide(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func Modulo(argFunctions []shapes.Function) shapes.Function {
+func Modulo(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.NumberType{},
@@ -69,7 +68,7 @@ func Modulo(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func LessThan(argFunctions []shapes.Function) shapes.Function {
+func LessThan(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.BooleanType{},
@@ -81,7 +80,7 @@ func LessThan(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func GreaterThan(argFunctions []shapes.Function) shapes.Function {
+func GreaterThan(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.BooleanType{},
@@ -93,7 +92,7 @@ func GreaterThan(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func Equal(argFunctions []shapes.Function) shapes.Function {
+func Equal(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.BooleanType{},
@@ -105,7 +104,7 @@ func Equal(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func LessEqual(argFunctions []shapes.Function) shapes.Function {
+func LessEqual(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.BooleanType{},
@@ -117,7 +116,7 @@ func LessEqual(argFunctions []shapes.Function) shapes.Function {
 	}
 }
 
-func GreaterEqual(argFunctions []shapes.Function) shapes.Function {
+func GreaterEqual(argFunctions []functions.Function) functions.Function {
 	return &functions.EvaluatorFunction{
 		argFunctions,
 		&types.BooleanType{},
