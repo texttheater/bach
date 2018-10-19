@@ -14,113 +14,112 @@ func initialShape() functions.Shape {
 		&types.NumberType{},
 		"+",
 		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
-		&types.NumberType{},
-		Add,
+		functions.DumbFuncer(&types.NumberType{}, Add),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"-",
 		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
-		&types.NumberType{},
-		Subtract,
+		functions.DumbFuncer(&types.NumberType{}, Subtract),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"*",
 		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
-		&types.NumberType{},
-		Multiply,
+		functions.DumbFuncer(&types.NumberType{}, Multiply),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"/",
 		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
-		&types.NumberType{},
-		Divide,
+		functions.DumbFuncer(&types.NumberType{}, Divide),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"%",
 		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
-		&types.NumberType{},
-		Modulo,
+		functions.DumbFuncer(&types.NumberType{}, Modulo),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"<",
 		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
-		&types.BooleanType{},
-		LessThan,
+		functions.DumbFuncer(&types.BooleanType{}, LessThan),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		">",
 		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
-		&types.BooleanType{},
-		GreaterThan,
+		functions.DumbFuncer(&types.BooleanType{}, GreaterThan),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"==",
 		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
-		&types.BooleanType{},
-		Equal,
+		functions.DumbFuncer(&types.BooleanType{}, Equal),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"<=",
 		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
-		&types.BooleanType{},
-		LessEqual,
+		functions.DumbFuncer(&types.BooleanType{}, LessEqual),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		">=",
 		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
-		&types.BooleanType{},
-		GreaterEqual,
+		functions.DumbFuncer(&types.BooleanType{}, GreaterEqual),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.AnyType{},
 		"true",
 		[]*parameters.Parameter{},
-		&types.BooleanType{},
-		True,
+		functions.DumbFuncer(&types.BooleanType{}, True),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.AnyType{},
 		"false",
 		[]*parameters.Parameter{},
-		&types.BooleanType{},
-		False,
+		functions.DumbFuncer(&types.BooleanType{}, False),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.BooleanType{},
 		"and",
 		[]*parameters.Parameter{parameters.DumbPar(&types.BooleanType{})},
-		&types.BooleanType{},
-		And,
+		functions.DumbFuncer(&types.BooleanType{}, And),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.BooleanType{},
 		"or",
 		[]*parameters.Parameter{parameters.DumbPar(&types.BooleanType{})},
-		&types.BooleanType{},
-		Or,
+		functions.DumbFuncer(&types.BooleanType{}, Or),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.BooleanType{},
 		"not",
 		[]*parameters.Parameter{},
-		&types.BooleanType{},
-		Not,
+		functions.DumbFuncer(&types.BooleanType{}, Not),
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.BooleanType{},
 		"==",
 		[]*parameters.Parameter{parameters.DumbPar(&types.BooleanType{})},
-		&types.BooleanType{},
-		BooleanEqual,
+		functions.DumbFuncer(&types.BooleanType{}, BooleanEqual),
+	})
+	// TODO remove; this is just for testing
+	shape.Stack = shape.Stack.Push(functions.NFF{
+		&types.NumberType{},
+		"apply",
+		[]*parameters.Parameter{
+			&parameters.Parameter{
+				&types.NumberType{},
+				[]*parameters.Parameter{},
+				&types.NumberType{},
+			},
+		},
+		func(argFunctions []functions.Function) functions.Function {
+			return &functions.ApplyFunction{argFunctions[0]}
+		},
 	})
 	return shape
 }

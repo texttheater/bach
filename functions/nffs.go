@@ -12,9 +12,24 @@ type NFF struct {
 	InputType  types.Type // TODO type parameters
 	Name       string     // TODO namespaces
 	Parameters []*parameters.Parameter
-	OutputType types.Type
-	Kernel     Kernel
+	Funcer     Funcer
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+func DumbFuncer(outputType types.Type, kernel Kernel) Funcer {
+	return func(argFunctions []Function) Function {
+		return &EvaluatorFunction{
+			argFunctions,
+			outputType,
+			kernel,
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type Funcer func([]Function) Function
 
 ///////////////////////////////////////////////////////////////////////////////
 

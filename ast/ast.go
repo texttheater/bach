@@ -114,13 +114,9 @@ Entries:
 			}
 			argFunctions = append(argFunctions, argFunction)
 		}
-		return &functions.EvaluatorFunction{
-			argFunctions,
-			stack.Head.OutputType,
-			stack.Head.Kernel,
-		}, nil
+		return stack.Head.Funcer(argFunctions), nil
 	}
-	return nil, errors.E("type", x.Pos, "no function found")
+	return nil, errors.E("type", x.Pos, "no such function")
 }
 
 func formatArgTypes(argShapes []functions.Shape) string {

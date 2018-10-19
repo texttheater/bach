@@ -105,8 +105,7 @@ func (f *AssignmentFunction) OutputShape(inputStack *NFFStack) Shape {
 		&types.AnyType{},
 		f.Name,
 		[]*parameters.Parameter{},
-		f.Type,
-		func(inputState State, argumentValues []values.Value) values.Value {
+		DumbFuncer(f.Type, func(inputState State, argumentValues []values.Value) values.Value {
 			stack := inputState.Stack
 			for stack != nil {
 				if stack.Head.Name == f.Name {
@@ -115,7 +114,7 @@ func (f *AssignmentFunction) OutputShape(inputStack *NFFStack) Shape {
 				stack = stack.Tail
 			}
 			panic("variable not found")
-		},
+		}),
 	})}
 }
 
@@ -126,6 +125,26 @@ func (f *AssignmentFunction) OutputState(inputState State) State {
 			f.Name,
 			inputState.Value,
 		}),
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type ApplyFunction struct {
+	Function Function
+}
+
+func (f *ApplyFunction) OutputShape(inputStack *NFFStack) Shape {
+	return Shape{
+		f.Function.OutputShape(inputStack).Type,
+		inputStack,
+	}
+}
+
+func (f *ApplyFunction) OutputState(inputState State) State {
+	return State{
+		f.Function.OutputState(inputState).Value,
+		inputState.Stack,
 	}
 }
 
