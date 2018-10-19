@@ -81,36 +81,46 @@ func (x *StringExpression) Function(inputShape functions.Shape) (functions.Funct
 // TODO namespaces
 
 type NFFCallExpression struct {
-	Pos  lexer.Position
-	Name string
-	Args []Expression
+	Pos       lexer.Position
+	Name      string
+	Arguments []Expression
 }
 
 func (x *NFFCallExpression) Function(inputShape functions.Shape) (functions.Function, error) {
-	// Step 1: resolve arguments to functions
-	argFunctions := make([]functions.Function, len(x.Args))
-	for i, arg := range x.Args {
-		f, err := arg.Function(inputShape)
-		if err != nil {
-			return nil, err
-		}
-		argFunctions[i] = f
-	}
-	// Step 2: search the stack for matching NFFs
 	stack := inputShape.Stack
+Entries:
 	for stack != nil {
-		function, ok := stack.Head.Function(inputShape, x.Name, argFunctions)
-		if ok {
-			return function, nil
+		if stack.Head.Name != x.Name {
+			stack = stack.Tail
+			continue
 		}
-		stack = stack.Tail
+		if len(stack.Head.Parameters) != len(x.Arguments) {
+			stack = stack.Tail
+			continue
+		}
+		if !stack.Head.InputType.Subsumes(inputShape.Type) {
+			stack = stack.Tail
+			continue
+		}
+		argFunctions := make([]functions.Function, 0, len(x.Arguments))
+		for i, par := range stack.Head.Parameters {
+			argFunction, err := x.Arguments[i].Function(functions.Shape{par.InputType, inputShape.Stack})
+			if err != nil {
+				continue Entries
+			}
+			argOutputType := argFunction.OutputShape(inputShape.Stack).Type
+			if !par.OutputType.Subsumes(argOutputType) {
+				continue Entries
+			}
+			argFunctions = append(argFunctions, argFunction)
+		}
+		return &functions.EvaluatorFunction{
+			argFunctions,
+			stack.Head.OutputType,
+			stack.Head.Kernel,
+		}, nil
 	}
-	// Fail:
-	argShapes := make([]functions.Shape, len(argFunctions))
-	for i, f := range argFunctions {
-		argShapes[i] = f.OutputShape(inputShape.Stack)
-	}
-	return nil, errors.E("type", x.Pos, "no function found: for %v %v(%s)", inputShape.Type, x.Name, formatArgTypes(argShapes))
+	return nil, errors.E("type", x.Pos, "no function found")
 }
 
 func formatArgTypes(argShapes []functions.Shape) string {

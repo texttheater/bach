@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/types"
 )
 
@@ -12,112 +13,112 @@ func initialShape() functions.Shape {
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"+",
-		[]types.Type{&types.NumberType{}},
+		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
 		&types.NumberType{},
 		Add,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"-",
-		[]types.Type{&types.NumberType{}},
+		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
 		&types.NumberType{},
 		Subtract,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"*",
-		[]types.Type{&types.NumberType{}},
+		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
 		&types.NumberType{},
 		Multiply,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"/",
-		[]types.Type{&types.NumberType{}},
+		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
 		&types.NumberType{},
 		Divide,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"%",
-		[]types.Type{&types.NumberType{}},
+		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
 		&types.NumberType{},
 		Modulo,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"<",
-		[]types.Type{&types.NumberType{}},
+		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
 		&types.BooleanType{},
 		LessThan,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		">",
-		[]types.Type{&types.NumberType{}},
+		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
 		&types.BooleanType{},
 		GreaterThan,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"==",
-		[]types.Type{&types.NumberType{}},
+		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
 		&types.BooleanType{},
 		Equal,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		"<=",
-		[]types.Type{&types.NumberType{}},
+		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
 		&types.BooleanType{},
 		LessEqual,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.NumberType{},
 		">=",
-		[]types.Type{&types.NumberType{}},
+		[]*parameters.Parameter{parameters.DumbPar(&types.NumberType{})},
 		&types.BooleanType{},
 		GreaterEqual,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.AnyType{},
 		"true",
-		[]types.Type{},
+		[]*parameters.Parameter{},
 		&types.BooleanType{},
 		True,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.AnyType{},
 		"false",
-		[]types.Type{},
+		[]*parameters.Parameter{},
 		&types.BooleanType{},
 		False,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.BooleanType{},
 		"and",
-		[]types.Type{&types.BooleanType{}},
+		[]*parameters.Parameter{parameters.DumbPar(&types.BooleanType{})},
 		&types.BooleanType{},
 		And,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.BooleanType{},
 		"or",
-		[]types.Type{&types.BooleanType{}},
+		[]*parameters.Parameter{parameters.DumbPar(&types.BooleanType{})},
 		&types.BooleanType{},
 		Or,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.BooleanType{},
 		"not",
-		[]types.Type{},
+		[]*parameters.Parameter{},
 		&types.BooleanType{},
 		Not,
 	})
 	shape.Stack = shape.Stack.Push(functions.NFF{
 		&types.BooleanType{},
 		"==",
-		[]types.Type{&types.BooleanType{}},
+		[]*parameters.Parameter{parameters.DumbPar(&types.BooleanType{})},
 		&types.BooleanType{},
 		BooleanEqual,
 	})

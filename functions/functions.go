@@ -16,6 +16,7 @@
 package functions
 
 import (
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -103,7 +104,7 @@ func (f *AssignmentFunction) OutputShape(inputStack *NFFStack) Shape {
 	return Shape{f.Type, inputStack.Push(NFF{
 		&types.AnyType{},
 		f.Name,
-		[]types.Type{},
+		[]*parameters.Parameter{},
 		f.Type,
 		func(inputState State, argumentValues []values.Value) values.Value {
 			stack := inputState.Stack
