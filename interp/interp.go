@@ -16,10 +16,10 @@ func InterpretString(program string) (values.Value, error) {
 		return nil, err
 	}
 	// type-check
-	f, err := x.Function(builtin.InitialShape)
+	f, err := x.Funcer(builtin.InitialShape)
 	if err != nil {
 		return nil, err
 	}
 	// evaluate
-	return f.OutputState(functions.InitialState).Value, nil // TODO error handling
+	return f().OutputState(functions.InitialState).Value, nil // TODO error handling
 }

@@ -20,7 +20,7 @@ import (
 ///////////////////////////////////////////////////////////////////////////////
 
 type Expression interface {
-	Function(inputShape functions.Shape) (functions.Function, error)
+	Funcer(inputShape functions.Shape) (functions.Funcer, error)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -28,8 +28,8 @@ type Expression interface {
 type IdentityExpression struct {
 }
 
-func (x *IdentityExpression) Function(inputShape functions.Shape) (functions.Function, error) {
-	return &functions.IdentityFunction{inputShape.Type}, nil
+func (x *IdentityExpression) Funcer(inputShape functions.Shape) (functions.Funcer, error) {
+	return functions.NoArgFuncer(&functions.IdentityFunction{inputShape.Type}), nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,16 +39,17 @@ type CompositionExpression struct {
 	Right Expression
 }
 
-func (x *CompositionExpression) Function(inputShape functions.Shape) (functions.Function, error) {
-	leftFunction, err := x.Left.Function(inputShape)
+func (x *CompositionExpression) Funcer(inputShape functions.Shape) (functions.Funcer, error) {
+	leftFuncer, err := x.Left.Funcer(inputShape)
 	if err != nil {
 		return nil, err
 	}
-	rightFunction, err := x.Right.Function(leftFunction.OutputShape(inputShape.Stack))
+	leftFunction := leftFuncer()
+	rightFuncer, err := x.Right.Funcer(leftFuncer().OutputShape(inputShape.Stack))
 	if err != nil {
 		return nil, err
 	}
-	return &functions.CompositionFunction{leftFunction, rightFunction}, nil
+	return functions.NoArgFuncer(&functions.CompositionFunction{leftFunction, rightFuncer()}), nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,8 +59,8 @@ type NumberExpression struct {
 	Value float64
 }
 
-func (x *NumberExpression) Function(inputShape functions.Shape) (functions.Function, error) {
-	return &functions.LiteralFunction{&types.NumberType{}, &values.NumberValue{x.Value}}, nil
+func (x *NumberExpression) Funcer(inputShape functions.Shape) (functions.Funcer, error) {
+	return functions.NoArgFuncer(&functions.LiteralFunction{&types.NumberType{}, &values.NumberValue{x.Value}}), nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -69,8 +70,8 @@ type StringExpression struct {
 	Value string
 }
 
-func (x *StringExpression) Function(inputShape functions.Shape) (functions.Function, error) {
-	return &functions.LiteralFunction{&types.StringType{}, &values.StringValue{x.Value}}, nil
+func (x *StringExpression) Funcer(inputShape functions.Shape) (functions.Funcer, error) {
+	return functions.NoArgFuncer(&functions.LiteralFunction{&types.StringType{}, &values.StringValue{x.Value}}), nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -86,7 +87,7 @@ type NFFCallExpression struct {
 	Arguments []Expression
 }
 
-func (x *NFFCallExpression) Function(inputShape functions.Shape) (functions.Function, error) {
+func (x *NFFCallExpression) Funcer(inputShape functions.Shape) (functions.Funcer, error) {
 	stack := inputShape.Stack
 Entries:
 	for stack != nil {
@@ -102,19 +103,25 @@ Entries:
 			stack = stack.Tail
 			continue
 		}
-		argFunctions := make([]functions.Function, 0, len(x.Arguments))
+		argFuncers := make([]functions.Funcer, 0, len(x.Arguments))
 		for i, par := range stack.Head.Parameters {
-			argFunction, err := x.Arguments[i].Function(functions.Shape{par.InputType, inputShape.Stack})
+			argFuncer, err := x.Arguments[i].Funcer(functions.Shape{par.InputType, inputShape.Stack})
 			if err != nil {
 				continue Entries
 			}
+			argFunction := argFuncer() // TODO pass arguments
 			argOutputType := argFunction.OutputShape(inputShape.Stack).Type
 			if !par.OutputType.Subsumes(argOutputType) {
 				continue Entries
 			}
-			argFunctions = append(argFunctions, argFunction)
+			argFuncers = append(argFuncers, argFuncer)
 		}
-		return stack.Head.Funcer(argFunctions), nil
+		return func(preFuncers ...functions.Funcer) functions.Function {
+			for _, argFuncer := range argFuncers {
+				preFuncers = append(preFuncers, argFuncer)
+			}
+			return stack.Head.Funcer(preFuncers...)
+		}, nil
 	}
 	return nil, errors.E("type", x.Pos, "no such function")
 }
@@ -134,8 +141,8 @@ type AssignmentExpression struct {
 	Name string
 }
 
-func (x *AssignmentExpression) Function(inputShape functions.Shape) (functions.Function, error) {
-	return &functions.AssignmentFunction{inputShape.Type, x.Name}, nil
+func (x *AssignmentExpression) Funcer(inputShape functions.Shape) (functions.Funcer, error) {
+	return functions.NoArgFuncer(&functions.AssignmentFunction{inputShape.Type, x.Name}), nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -18,7 +18,11 @@ type NFF struct {
 ////////////////////////////////////////////////////////////////////////////////
 
 func DumbFuncer(outputType types.Type, kernel Kernel) Funcer {
-	return func(argFunctions []Function) Function {
+	return func(argFuncers ...Funcer) Function {
+		argFunctions := make([]Function, 0, len(argFuncers))
+		for _, argFuncer := range argFuncers {
+			argFunctions = append(argFunctions, argFuncer())
+		}
 		return &EvaluatorFunction{
 			argFunctions,
 			outputType,
@@ -27,9 +31,15 @@ func DumbFuncer(outputType types.Type, kernel Kernel) Funcer {
 	}
 }
 
+func NoArgFuncer(function Function) Funcer {
+	return func(...Funcer) Function {
+		return function
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
-type Funcer func([]Function) Function
+type Funcer func(...Funcer) Function
 
 ///////////////////////////////////////////////////////////////////////////////
 

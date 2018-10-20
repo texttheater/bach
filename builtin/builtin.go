@@ -117,9 +117,30 @@ func initialShape() functions.Shape {
 				&types.NumberType{},
 			},
 		},
-		func(argFunctions []functions.Function) functions.Function {
-			return &functions.ApplyFunction{argFunctions[0]}
+		func(argFuncers ...functions.Funcer) functions.Function {
+			argFunction := argFuncers[0]()
+			return &functions.ApplyFunction{argFunction}
 		},
 	})
+	//	shape.Stack = shape.Stack.Push(functions.NFF{
+	//		&types.AnyType{},
+	//		"one_o_one",
+	//		[]*parameters.Parameter{
+	//			&parameters.Parameter{
+	//				&types.NumberType{},
+	//				[]*parameters.Parameter{
+	//					&parameters.Parameter{
+	//						&types.AnyType{},
+	//						[]*parameters.Parameter{},
+	//						&types.NumberType{},
+	//					},
+	//				},
+	//				&types.NumberType{},
+	//			}
+	//		},
+	//		func(argFunctions []functions.Function) functions.Function {
+	//
+	//		}
+	//	})
 	return shape
 }
