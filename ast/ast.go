@@ -8,6 +8,7 @@ package ast
 
 import (
 	"fmt"
+	//"os"
 	"strings"
 
 	"github.com/alecthomas/participle/lexer"
@@ -20,36 +21,43 @@ import (
 ///////////////////////////////////////////////////////////////////////////////
 
 type Expression interface {
-	Funcer(inputShape functions.Shape) (functions.Funcer, error)
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type IdentityExpression struct {
-}
-
-func (x *IdentityExpression) Funcer(inputShape functions.Shape) (functions.Funcer, error) {
-	return functions.NoArgFuncer(&functions.IdentityFunction{inputShape.Type}), nil
+	Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 type CompositionExpression struct {
+	Pos   lexer.Position
 	Left  Expression
 	Right Expression
 }
 
-func (x *CompositionExpression) Funcer(inputShape functions.Shape) (functions.Funcer, error) {
-	leftFuncer, err := x.Left.Funcer(inputShape)
+func (x *CompositionExpression) Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error) {
+	if len(params) > 0 {
+		return nil, errors.E("type", x.Pos, fmt.Sprintf("%s parameters required here, but composition expressions have no parameters", len(params)))
+	}
+	leftFunction, err := x.Left.Function(inputShape, nil)
 	if err != nil {
 		return nil, err
 	}
-	leftFunction := leftFuncer()
-	rightFuncer, err := x.Right.Funcer(leftFuncer().OutputShape(inputShape.Stack))
+	middleShape := leftFunction.UpdateShape(inputShape)
+	rightFunction, err := x.Right.Function(middleShape, nil)
 	if err != nil {
 		return nil, err
 	}
-	return functions.NoArgFuncer(&functions.CompositionFunction{leftFunction, rightFuncer()}), nil
+	return &functions.Function{
+		inputShape.Type,
+		"",
+		nil,
+		nil,
+		func(inputShape functions.Shape) functions.Shape {
+			return rightFunction.UpdateShape(middleShape)
+		},
+		func(inputState functions.State, args []*functions.Function) functions.State {
+			middleState := leftFunction.Apply(inputState, nil)
+			return rightFunction.Apply(middleState, nil)
+		},
+	}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,8 +67,19 @@ type NumberExpression struct {
 	Value float64
 }
 
-func (x *NumberExpression) Funcer(inputShape functions.Shape) (functions.Funcer, error) {
-	return functions.NoArgFuncer(&functions.LiteralFunction{&types.NumberType{}, &values.NumberValue{x.Value}}), nil
+func (x *NumberExpression) Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error) {
+	if len(params) > 0 {
+		return nil, errors.E("type", x.Pos, fmt.Sprintf("%s parameters required here, but number expressions have no parameters", len(params)))
+	}
+	return functions.SimpleFunction(
+		&types.AnyType{},
+		"",
+		nil,
+		&types.NumberType{},
+		func(values.Value, []values.Value) values.Value {
+			return &values.NumberValue{x.Value}
+		},
+	), nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -70,58 +89,74 @@ type StringExpression struct {
 	Value string
 }
 
-func (x *StringExpression) Funcer(inputShape functions.Shape) (functions.Funcer, error) {
-	return functions.NoArgFuncer(&functions.LiteralFunction{&types.StringType{}, &values.StringValue{x.Value}}), nil
+func (x *StringExpression) Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error) {
+	if len(params) > 0 {
+		return nil, errors.E("type", x.Pos, fmt.Sprintf("%s parameters required here, but string expressions have no parameters", len(params)))
+	}
+	return functions.SimpleFunction(
+		&types.AnyType{},
+		"",
+		nil,
+		&types.StringType{},
+		func(values.Value, []values.Value) values.Value {
+			return &values.StringValue{x.Value}
+		},
+	), nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// NFF = named function family (close to what is called a function in most
-// programming languages). TODO rename to something prettier.
-
-// TODO namespaces
-
-type NFFCallExpression struct {
+type CallExpression struct {
 	Pos       lexer.Position
-	Name      string
+	Name      string // TODO namespaces
 	Arguments []Expression
 }
 
-func (x *NFFCallExpression) Funcer(inputShape functions.Shape) (functions.Funcer, error) {
+func (x *CallExpression) Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error) {
 	stack := inputShape.Stack
-Entries:
 	for stack != nil {
-		if stack.Head.Name != x.Name {
+		function := stack.Head
+		if function.Name != x.Name {
 			stack = stack.Tail
 			continue
 		}
-		if len(stack.Head.Parameters) != len(x.Arguments) {
+		if len(function.OpenParams) != len(x.Arguments)+len(params) {
 			stack = stack.Tail
 			continue
 		}
-		if !stack.Head.InputType.Subsumes(inputShape.Type) {
+		if !function.InputType.Subsumes(inputShape.Type) {
 			stack = stack.Tail
 			continue
 		}
-		argFuncers := make([]functions.Funcer, 0, len(x.Arguments))
-		for i, par := range stack.Head.Parameters {
-			argFuncer, err := x.Arguments[i].Funcer(functions.Shape{par.InputType, inputShape.Stack})
+		for i, arg := range x.Arguments {
+			argInputShape := functions.Shape{
+				function.OpenParams[0].InputType,
+				inputShape.Stack,
+			}
+			argFunction, err := arg.Function(argInputShape,
+				function.OpenParams[0].Parameters)
 			if err != nil {
-				continue Entries
+				return nil, err
 			}
-			argFunction := argFuncer() // TODO pass arguments
-			argOutputType := argFunction.OutputShape(inputShape.Stack).Type
-			if !par.OutputType.Subsumes(argOutputType) {
-				continue Entries
+			argOutputType := argFunction.UpdateShape(
+				argFunction.UpdateShape(argInputShape),
+			).Type
+			if !function.OpenParams[0].OutputType.Subsumes(argOutputType) {
+				return nil, errors.E("type", x.Pos,
+					"argument #%s needs output type %s, got %s", i,
+					function.OpenParams[0],
+					argOutputType)
 			}
-			argFuncers = append(argFuncers, argFuncer)
+			function = function.SetArg(argFunction)
 		}
-		return func(preFuncers ...functions.Funcer) functions.Function {
-			for _, argFuncer := range argFuncers {
-				preFuncers = append(preFuncers, argFuncer)
+		for i, param := range params {
+			if !param.Subsumes(function.OpenParams[i]) {
+				return nil, errors.E("type", x.Pos,
+					"parameter #%s must be %s, got %s", i,
+					param, function.OpenParams[i])
 			}
-			return stack.Head.Funcer(preFuncers...)
-		}, nil
+		}
+		return function, nil
 	}
 	return nil, errors.E("type", x.Pos, "no such function")
 }
@@ -141,8 +176,55 @@ type AssignmentExpression struct {
 	Name string
 }
 
-func (x *AssignmentExpression) Funcer(inputShape functions.Shape) (functions.Funcer, error) {
-	return functions.NoArgFuncer(&functions.AssignmentFunction{inputShape.Type, x.Name}), nil
+func (x *AssignmentExpression) Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error) {
+	if len(params) > 0 {
+		return nil, errors.E("type", x.Pos, fmt.Sprintf("%s parameters required here, but assignment expressions have no parameters", len(params)))
+	}
+	return &functions.Function{
+		inputShape.Type,
+		"",
+		nil,
+		nil,
+		func(inputShape functions.Shape) functions.Shape {
+			return functions.Shape{
+				inputShape.Type,
+				inputShape.Stack.Push(&functions.Function{
+					&types.AnyType{},
+					x.Name,
+					nil,
+					nil,
+					func(varInputShape functions.Shape) functions.Shape {
+						return functions.Shape{
+							inputShape.Type,
+							varInputShape.Stack,
+						}
+					},
+					func(inputState functions.State, argFunctions []*functions.Function) functions.State {
+						stack := inputState.Stack
+						for stack != nil {
+							if stack.Head.Name == x.Name {
+								return functions.State{
+									stack.Head.Value,
+									inputState.Stack,
+								}
+							}
+							stack = stack.Tail
+						}
+						panic("unknown variable")
+					},
+				}),
+			}
+		},
+		func(inputState functions.State, argFunctions []*functions.Function) functions.State {
+			return functions.State{
+				inputState.Value,
+				inputState.Stack.Push(functions.NamedValue{
+					x.Name,
+					inputState.Value,
+				}),
+			}
+		},
+	}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////

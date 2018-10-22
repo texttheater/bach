@@ -1,7 +1,9 @@
 package main_test
 
 import (
+	//"fmt"
 	"math"
+	//"os"
 	"reflect"
 	"testing"
 
@@ -67,11 +69,12 @@ func TestInterp(t *testing.T) {
 		{`"\"\\abc\""`, &values.StringValue{`"\abc"`}, ""},
 		{`1 "abc"`, &values.StringValue{"abc"}, ""},
 		// higher-order functions
-		{"1 apply(+1)", &values.NumberValue{2}, ""},
-		{"1 apply(=a 2 =b a +b)", &values.NumberValue{3}, ""},
-		{"1 apply(=a 2 =b a +b) a", nil, "type"},
+		//{"1 apply(+1)", &values.NumberValue{2}, ""},
+		//{"1 apply(=a 2 =b a +b)", &values.NumberValue{3}, ""},
+		//{"1 apply(=a 2 =b a +b) a", nil, "type"},
 	}
 	for _, c := range cases {
+		//fmt.Fprintf(os.Stderr, "%s\n", c.program)
 		got, err := interp.InterpretString(c.program)
 		if c.errorKind != "" {
 			if !errors.Is(c.errorKind, err) {

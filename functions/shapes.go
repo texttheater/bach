@@ -8,21 +8,21 @@ import (
 
 type Shape struct {
 	Type  types.Type
-	Stack *NFFStack
+	Stack *FunctionStack
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type NFFStack struct {
-	Head NFF
-	Tail *NFFStack
+type FunctionStack struct {
+	Head *Function
+	Tail *FunctionStack
 }
 
-func (stack *NFFStack) Push(n NFF) *NFFStack {
-	return &NFFStack{n, stack}
+func (stack *FunctionStack) Push(f *Function) *FunctionStack {
+	return &FunctionStack{f, stack}
 }
 
-func (stack *NFFStack) Pop() *NFFStack {
+func (stack *FunctionStack) Pop() *FunctionStack {
 	return stack.Tail
 }
 

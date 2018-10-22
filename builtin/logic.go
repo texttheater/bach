@@ -1,37 +1,36 @@
 package builtin
 
 import (
-	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/values"
 )
 
-func True(inputState functions.State, argumentValues []values.Value) values.Value {
+func True(inputValue values.Value, argumentValues []values.Value) values.Value {
 	return &values.BooleanValue{true}
 }
 
-func False(inputState functions.State, argumentValues []values.Value) values.Value {
+func False(inputValue values.Value, argumentValues []values.Value) values.Value {
 	return &values.BooleanValue{false}
 }
 
-func And(inputState functions.State, argumentValues []values.Value) values.Value {
-	inputBoolean := inputState.Value.(*values.BooleanValue)
+func And(inputValue values.Value, argumentValues []values.Value) values.Value {
+	inputBoolean := inputValue.(*values.BooleanValue)
 	argumentBoolean := argumentValues[0].(*values.BooleanValue)
 	return &values.BooleanValue{inputBoolean.Value && argumentBoolean.Value}
 }
 
-func Or(inputState functions.State, argumentValues []values.Value) values.Value {
-	inputBoolean := inputState.Value.(*values.BooleanValue)
+func Or(inputValue values.Value, argumentValues []values.Value) values.Value {
+	inputBoolean := inputValue.(*values.BooleanValue)
 	argumentBoolean := argumentValues[0].(*values.BooleanValue)
 	return &values.BooleanValue{inputBoolean.Value || argumentBoolean.Value}
 }
 
-func Not(inputState functions.State, argumentValues []values.Value) values.Value {
-	inputBoolean := inputState.Value.(*values.BooleanValue)
+func Not(inputValue values.Value, argumentValues []values.Value) values.Value {
+	inputBoolean := inputValue.(*values.BooleanValue)
 	return &values.BooleanValue{!inputBoolean.Value}
 }
 
-func BooleanEqual(inputState functions.State, argumentValues []values.Value) values.Value {
-	inputBoolean := inputState.Value.(*values.BooleanValue)
+func BooleanEqual(inputValue values.Value, argumentValues []values.Value) values.Value {
+	inputBoolean := inputValue.(*values.BooleanValue)
 	argumentBoolean := argumentValues[0].(*values.BooleanValue)
 	return &values.BooleanValue{inputBoolean.Value == argumentBoolean.Value}
 }

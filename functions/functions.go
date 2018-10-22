@@ -4,148 +4,84 @@
 // values).
 //
 // Shapes are to states as types are to values. A shape consists of a type and
-// a stack of available NFFs (named function families).
+// a stack of available functions.
 //
 // Interpreting a Bach program involves assigning each expression an input
 // shape, a function and an output shape. The first expression in the program
 // gets the initial shape, consisting of the Any type and a stack consisting
-// only of builtin NFFs. The input shape of an expression and the expression
-// together determine its function. The function and the input shape together
-// determine its output shape. In a composition expression L R, the output
-// shape of L is the input shape of R.
+// only of builtin functions. The input shape of an expression and the
+// expression together determine its function. The function and the input shape
+// together determine its output shape. In a composition expression L R, the
+// output shape of L is the input shape of R.
 package functions
 
 import (
-	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
-///////////////////////////////////////////////////////////////////////////////
-
-type Function interface {
-	OutputShape(inputStack *NFFStack) Shape
-	OutputState(inputState State) State
+type Function struct {
+	InputType    types.Type
+	Name         string      // TODO namespaces
+	FilledParams []*Function // TODO make stack instead?
+	OpenParams   []*Parameter
+	UpdateShape  func(inputShape Shape) Shape
+	UpdateState  func(inputState State, args []*Function) State
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-type IdentityFunction struct {
-	Type types.Type
-}
-
-func (f *IdentityFunction) OutputShape(inputStack *NFFStack) Shape {
-	return Shape{f.Type, inputStack}
-}
-
-func (f *IdentityFunction) OutputState(inputState State) State {
-	return inputState
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type CompositionFunction struct {
-	Left  Function
-	Right Function
-}
-
-func (f *CompositionFunction) OutputShape(inputStack *NFFStack) Shape {
-	return f.Right.OutputShape(f.Left.OutputShape(inputStack).Stack)
-}
-
-func (f *CompositionFunction) OutputState(inputState State) State {
-	return f.Right.OutputState(f.Left.OutputState(inputState))
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type LiteralFunction struct {
-	Type  types.Type
-	Value values.Value
-}
-
-func (f *LiteralFunction) OutputShape(inputStack *NFFStack) Shape {
-	return Shape{f.Type, inputStack}
-}
-
-func (f *LiteralFunction) OutputState(inputState State) State {
-	return State{f.Value, inputState.Stack}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type EvaluatorFunction struct {
-	ArgumentFunctions []Function
-	OutputType        types.Type
-	Kernel            Kernel
-}
-
-func (f *EvaluatorFunction) OutputShape(inputStack *NFFStack) Shape {
-	return Shape{f.OutputType, inputStack}
-}
-
-func (f *EvaluatorFunction) OutputState(inputState State) State {
-	argumentInput := State{&values.NullValue{}, inputState.Stack}
-	argumentValues := make([]values.Value, len(f.ArgumentFunctions))
-	for i, a := range f.ArgumentFunctions {
-		argumentValues[i] = a.OutputState(argumentInput).Value
-	}
-	return State{f.Kernel(inputState, argumentValues), inputState.Stack}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type AssignmentFunction struct {
-	Type types.Type
-	Name string
-}
-
-func (f *AssignmentFunction) OutputShape(inputStack *NFFStack) Shape {
-	return Shape{f.Type, inputStack.Push(NFF{
-		&types.AnyType{},
+func (f *Function) SetArg(arg *Function) *Function {
+	filledParams := make([]*Function, 0, len(f.FilledParams)+1)
+	filledParams = append(filledParams, f.FilledParams...)
+	filledParams = append(filledParams, arg)
+	return &Function{
+		f.InputType,
 		f.Name,
-		[]*parameters.Parameter{},
-		DumbFuncer(f.Type, func(inputState State, argumentValues []values.Value) values.Value {
-			stack := inputState.Stack
-			for stack != nil {
-				if stack.Head.Name == f.Name {
-					return stack.Head.Value
-				}
-				stack = stack.Tail
+		filledParams,
+		f.OpenParams[1:],
+		f.UpdateShape,
+		f.UpdateState,
+	}
+}
+
+func (f *Function) Apply(inputState State, outsideArgs []*Function) State {
+	args := make([]*Function, 0, len(f.FilledParams)+len(outsideArgs))
+	args = append(args, f.FilledParams...)
+	args = append(args, outsideArgs...)
+	return f.UpdateState(inputState, args)
+}
+
+func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
+	outputType types.Type,
+	eval func(values.Value, []values.Value) values.Value) *Function {
+	params := make([]*Parameter, 0, len(argTypes))
+	for _, argType := range argTypes {
+		params = append(params, &Parameter{
+			&types.AnyType{},
+			nil,
+			argType,
+		})
+	}
+	return &Function{
+		inputType,
+		name,
+		nil,
+		params,
+		func(inputShape Shape) Shape {
+			return Shape{
+				outputType,
+				inputShape.Stack,
 			}
-			panic("variable not found")
-		}),
-	})}
-}
-
-func (f *AssignmentFunction) OutputState(inputState State) State {
-	return State{
-		inputState.Value,
-		inputState.Stack.Push(NamedValue{
-			f.Name,
-			inputState.Value,
-		}),
+		},
+		func(inputState State, args []*Function) State {
+			argValues := make([]values.Value, 0, len(args))
+			for _, arg := range args {
+				argValues = append(argValues,
+					arg.Apply(inputState, nil).Value)
+			}
+			return State{
+				eval(inputState.Value, argValues),
+				inputState.Stack,
+			}
+		},
 	}
 }
-
-///////////////////////////////////////////////////////////////////////////////
-
-type ApplyFunction struct {
-	Function Function
-}
-
-func (f *ApplyFunction) OutputShape(inputStack *NFFStack) Shape {
-	return Shape{
-		f.Function.OutputShape(inputStack).Type,
-		inputStack,
-	}
-}
-
-func (f *ApplyFunction) OutputState(inputState State) State {
-	return State{
-		f.Function.OutputState(inputState).Value,
-		inputState.Stack,
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////
