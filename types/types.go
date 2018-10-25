@@ -18,7 +18,7 @@ func (t *AnyType) Subsumes(other Type) bool {
 }
 
 func (t *AnyType) String() string {
-	return "any"
+	return "Any"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ func (t *SeqType) Subsumes(other Type) bool {
 }
 
 func (t *SeqType) String() string {
-	return fmt.Sprintf("seq<%v>", t.ElementType)
+	return fmt.Sprintf("Seq<%v>", t.ElementType)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ func (t *NullType) Subsumes(other Type) bool {
 }
 
 func (t *NullType) String() string {
-	return "null"
+	return "Null"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ func (t *BooleanType) Subsumes(other Type) bool {
 }
 
 func (t *BooleanType) String() string {
-	return "bool"
+	return "Bool"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@ func (t *NumberType) Subsumes(other Type) bool {
 }
 
 func (t *NumberType) String() string {
-	return "num"
+	return "Num"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,7 +92,7 @@ func (t *StringType) Subsumes(other Type) bool {
 }
 
 func (t *StringType) String() string {
-	return "str"
+	return "Str"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -120,7 +120,7 @@ func (t *ArrayType) Subsumes(other Type) bool {
 }
 
 func (t ArrayType) String() string {
-	return "arr" // TODO be more specific
+	return "Arr" // TODO be more specific
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -145,5 +145,5 @@ func (t *ObjectType) Subsumes(other Type) bool {
 }
 
 func (t *ObjectType) String() string {
-	return "obj" // TODO be more specific
+	return "Obj" // TODO be more specific
 }
