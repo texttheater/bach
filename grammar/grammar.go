@@ -13,7 +13,7 @@ import (
 
 ///////////////////////////////////////////////////////////////////////////////
 
-var Lexer = lexer.Must(lexer.Regexp(
+var LexerDefinition = lexer.Must(lexer.Regexp(
 	`([\s]+)` +
 		`|(?P<Number>(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<String>"(?:\\.|[^"])*")` +
@@ -25,7 +25,8 @@ var Lexer = lexer.Must(lexer.Regexp(
 		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
 		`|(?P<Name>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Comma>,)` +
-		`|(?P<Rpar>\))`,
+		`|(?P<Rpar>\))` +
+		`|(?P<Keyword>for|def|as|ok)`, // these will be scanned as Names, but mapped to Keyword tokens by name2keyword (see below)
 ))
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -53,6 +54,7 @@ type Component struct {
 	String     *string     `| @String`
 	Call       *Call       `| @@`
 	Assignment *Assignment `| @Assignment`
+	Definition *Definition `| @@`
 }
 
 func (g *Component) ast() ast.Expression {
@@ -203,6 +205,12 @@ func (g *Assignment) ast() ast.Expression {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+type Definition struct {
+	Pos lexer.Position ` "for" "def" "as" "ok" ` // TODO dummy syntax
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 type NameArglist struct {
 	Pos      lexer.Position
 	NameLpar *NameLpar      `@NameLpar`
@@ -234,7 +242,7 @@ func (g *NameLpar) Capture(values []string) error {
 ///////////////////////////////////////////////////////////////////////////////
 
 func Parse(input string) (ast.Expression, error) {
-	parser, err := participle.Build(&Composition{}, participle.Lexer(Lexer), participle.Unquote(Lexer, "String"))
+	parser, err := participle.Build(&Composition{}, participle.Lexer(LexerDefinition), participle.Unquote(LexerDefinition, "String"), participle.Map(name2keyword))
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {
 			return nil, errors.E("syntax", lexerError.Pos, lexerError.Message)
@@ -251,3 +259,19 @@ func Parse(input string) (ast.Expression, error) {
 	}
 	return composition.ast(), nil
 }
+
+func name2keyword(t lexer.Token) lexer.Token {
+	if t.Type != LexerDefinition.Symbols()["Name"] {
+		return t
+	}
+	if isKeyword(t.Value) {
+		t.Type = LexerDefinition.Symbols()["Keyword"]
+	}
+	return t
+}
+
+func isKeyword(name string) bool {
+	return name == "for" || name == "def" || name == "as" || name == "ok"
+}
+
+///////////////////////////////////////////////////////////////////////////////
