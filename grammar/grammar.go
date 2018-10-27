@@ -54,6 +54,7 @@ type Component struct {
 	String     *string     `| @String`
 	Call       *Call       `| @@`
 	Assignment *Assignment `| @Assignment`
+	Definition *Definition `| @@`
 }
 
 func (g *Component) ast() ast.Expression {
@@ -200,6 +201,12 @@ func (g *Assignment) Capture(values []string) error {
 
 func (g *Assignment) ast() ast.Expression {
 	return &ast.AssignmentExpression{g.Pos, g.Name}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type Definition struct {
+	Pos lexer.Position ` "for" "def" "as" "ok" ` // TODO dummy syntax
 }
 
 ///////////////////////////////////////////////////////////////////////////////
