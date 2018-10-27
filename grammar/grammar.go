@@ -6,27 +6,28 @@ import (
 	"strconv"
 
 	"github.com/alecthomas/participle"
-	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/ast"
+	"github.com/texttheater/bach/lexer"
 	"github.com/texttheater/bach/errors"
 )
 
 ///////////////////////////////////////////////////////////////////////////////
 
-var Lexer = lexer.Must(lexer.Regexp(
-	`([\s]+)` +
-		`|(?P<Number>(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-		`|(?P<String>"(?:\\.|[^"])*")` +
-		`|(?P<Op1Number>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-		`|(?P<Op2Number>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-		`|(?P<Op1Name>[+\-*/%<>](?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
-		`|(?P<Op2Name>(?:==|<=|>=)(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
-		`|(?P<Assignment>=(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
-		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
-		`|(?P<Name>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
-		`|(?P<Comma>,)` +
-		`|(?P<Rpar>\))`,
-))
+//var Lexer = lexer.Must(lexer.Regexp(
+//	`([\s]+)` +
+//		`|(?P<Number>\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)` +
+//		`|(?P<String>"(?:\\.|[^"])*")` +
+//		`|(?P<Op1Number>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
+//		`|(?P<Op2Number>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
+//		`|(?P<Op1Name>[+\-*/%<>](?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
+//		`|(?P<Op2Name>(?:==|<=|>=)(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
+//		`|(?P<Assignment>=(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
+//		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
+//		`|(?P<Name>[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)` +
+//		`|(?P<Comma>,)` +
+//		`|(?P<Rpar>\))` +
+//		`|(?P<Keyword>for|def|as|ok)`,
+//))
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -227,14 +228,18 @@ type NameLpar struct {
 }
 
 func (g *NameLpar) Capture(values []string) error {
-	g.Name = values[0][:len(values[0])-1]
+	name := values[0][:len(values[0])-1]
+	if isKeyword(name) {
+		return errors.E("lexer", g.Pos, "invalid name (keyword)")
+	}
+	g.Name = name
 	return nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 func Parse(input string) (ast.Expression, error) {
-	parser, err := participle.Build(&Composition{}, participle.Lexer(Lexer), participle.Unquote(Lexer, "String"))
+	parser, err := participle.Build(&Composition{}, lexer.BachLexerDefinition{}, participle.Unquote(Lexer, "String"))
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {
 			return nil, errors.E("syntax", lexerError.Pos, lexerError.Message)
