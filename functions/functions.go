@@ -50,17 +50,9 @@ func (f *Function) Apply(inputState State, outsideArgs []*Function) State {
 	return f.UpdateState(inputState, args)
 }
 
-func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
+func SimpleFunction(inputType types.Type, name string, params []*Parameter,
 	outputType types.Type,
 	eval func(values.Value, []values.Value) values.Value) *Function {
-	params := make([]*Parameter, 0, len(argTypes))
-	for _, argType := range argTypes {
-		params = append(params, &Parameter{
-			&types.AnyType{},
-			nil,
-			argType,
-		})
-	}
 	return &Function{
 		inputType,
 		name,

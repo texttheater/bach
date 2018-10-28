@@ -12,70 +12,70 @@ func initialShape() functions.Shape {
 	shape.Stack = shape.Stack.Push(functions.SimpleFunction(
 		&types.NumberType{},
 		"+",
-		[]types.Type{&types.NumberType{}},
+		[]*functions.Parameter{functions.SimpleParameter("summand", &types.NumberType{})},
 		&types.NumberType{},
 		Add,
 	))
 	shape.Stack = shape.Stack.Push(functions.SimpleFunction(
 		&types.NumberType{},
 		"-",
-		[]types.Type{&types.NumberType{}},
+		[]*functions.Parameter{functions.SimpleParameter("subtrahend", &types.NumberType{})},
 		&types.NumberType{},
 		Subtract,
 	))
 	shape.Stack = shape.Stack.Push(functions.SimpleFunction(
 		&types.NumberType{},
 		"*",
-		[]types.Type{&types.NumberType{}},
+		[]*functions.Parameter{functions.SimpleParameter("factor", &types.NumberType{})},
 		&types.NumberType{},
 		Multiply,
 	))
 	shape.Stack = shape.Stack.Push(functions.SimpleFunction(
 		&types.NumberType{},
 		"/",
-		[]types.Type{&types.NumberType{}},
+		[]*functions.Parameter{functions.SimpleParameter("divisor", &types.NumberType{})},
 		&types.NumberType{},
 		Divide,
 	))
 	shape.Stack = shape.Stack.Push(functions.SimpleFunction(
 		&types.NumberType{},
 		"%",
-		[]types.Type{&types.NumberType{}},
+		[]*functions.Parameter{functions.SimpleParameter("divisor", &types.NumberType{})},
 		&types.NumberType{},
 		Modulo,
 	))
 	shape.Stack = shape.Stack.Push(functions.SimpleFunction(
 		&types.NumberType{},
 		"<",
-		[]types.Type{&types.NumberType{}},
+		[]*functions.Parameter{functions.SimpleParameter("other", &types.NumberType{})},
 		&types.BooleanType{},
 		LessThan,
 	))
 	shape.Stack = shape.Stack.Push(functions.SimpleFunction(
 		&types.NumberType{},
 		">",
-		[]types.Type{&types.NumberType{}},
+		[]*functions.Parameter{functions.SimpleParameter("other", &types.NumberType{})},
 		&types.BooleanType{},
 		GreaterThan,
 	))
 	shape.Stack = shape.Stack.Push(functions.SimpleFunction(
 		&types.NumberType{},
 		"==",
-		[]types.Type{&types.NumberType{}},
+		[]*functions.Parameter{functions.SimpleParameter("other", &types.NumberType{})},
 		&types.BooleanType{},
 		Equal,
 	))
 	shape.Stack = shape.Stack.Push(functions.SimpleFunction(
 		&types.NumberType{},
 		"<=",
-		[]types.Type{&types.NumberType{}},
+		[]*functions.Parameter{functions.SimpleParameter("other", &types.NumberType{})},
 		&types.BooleanType{},
 		LessEqual,
 	))
 	shape.Stack = shape.Stack.Push(functions.SimpleFunction(
 		&types.NumberType{},
 		">=",
-		[]types.Type{&types.NumberType{}},
+		[]*functions.Parameter{functions.SimpleParameter("other", &types.NumberType{})},
 		&types.BooleanType{},
 		GreaterEqual,
 	))
@@ -96,14 +96,14 @@ func initialShape() functions.Shape {
 	shape.Stack = shape.Stack.Push(functions.SimpleFunction(
 		&types.BooleanType{},
 		"and",
-		[]types.Type{&types.BooleanType{}},
+		[]*functions.Parameter{functions.SimpleParameter("other", &types.BooleanType{})},
 		&types.BooleanType{},
 		And,
 	))
 	shape.Stack = shape.Stack.Push(functions.SimpleFunction(
 		&types.BooleanType{},
 		"or",
-		[]types.Type{&types.BooleanType{}},
+		[]*functions.Parameter{functions.SimpleParameter("other", &types.BooleanType{})},
 		&types.BooleanType{},
 		Or,
 	))
@@ -117,7 +117,7 @@ func initialShape() functions.Shape {
 	shape.Stack = shape.Stack.Push(functions.SimpleFunction(
 		&types.BooleanType{},
 		"==",
-		[]types.Type{&types.BooleanType{}},
+		[]*functions.Parameter{functions.SimpleParameter("other", &types.BooleanType{})},
 		&types.BooleanType{},
 		BooleanEqual,
 	))

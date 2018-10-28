@@ -69,6 +69,10 @@ func TestInterp(t *testing.T) {
 		{`"\"\\abc\""`, &values.StringValue{`"\abc"`}, ""},
 		{`1 "abc"`, &values.StringValue{"abc"}, ""},
 		// higher-order functions
+		{"for Num def apply(for Num f() Num) Num as f ok 1 apply(+1)", &values.NumberValue{2}, ""},
+		{"for Num def apply(for Num f() Num) Num as f ok 1 apply(/2)", &values.NumberValue{0.5}, ""},
+		{"for Num def connectSelf(for Num f(Num) Num) Num as =i f(i) ok 2 connectSelf(+)", &values.NumberValue{4}, ""},
+		{"for Num def connectSelf(for Num f(Num) Num) Num as =i f(i) ok 2 connectSelf(/)", &values.NumberValue{1}, ""},
 		//{"1 apply(+1)", &values.NumberValue{2}, ""},
 		//{"1 apply(=a 2 =b a +b)", &values.NumberValue{3}, ""},
 		//{"1 apply(=a 2 =b a +b) a", nil, "type"},

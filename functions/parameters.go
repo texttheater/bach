@@ -9,6 +9,7 @@ import (
 
 type Parameter struct {
 	InputType  types.Type
+	Name       string
 	Parameters []*Parameter
 	OutputType types.Type
 }
@@ -40,10 +41,11 @@ func (p *Parameter) Subsumes(q *Parameter) bool {
 	return true
 }
 
-func SimpleParameter(OutputType types.Type) *Parameter {
+func SimpleParameter(name string, outputType types.Type) *Parameter {
 	return &Parameter{
 		&types.AnyType{},
+		name,
 		[]*Parameter{},
-		OutputType,
+		outputType,
 	}
 }

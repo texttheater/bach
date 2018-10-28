@@ -9,6 +9,8 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/ast"
 	"github.com/texttheater/bach/errors"
+	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/types"
 )
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,7 +28,9 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Name>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Comma>,)` +
 		`|(?P<Rpar>\))` +
-		`|(?P<Keyword>for|def|as|ok)`, // these will be scanned as Names, but mapped to Keyword tokens by name2keyword (see below)
+		// These will be scanned as Name tokens and mapped to Keyword
+		// tokens using participle.Map (see below):
+		`|(?P<Keyword>for|def|as|ok|Any|Seq|Null|Bool|Num|Str|Arr|Obj)`,
 ))
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -69,6 +73,9 @@ func (g *Component) ast() ast.Expression {
 	}
 	if g.Assignment != nil {
 		return g.Assignment.ast()
+	}
+	if g.Definition != nil {
+		return g.Definition.ast()
 	}
 	panic("invalid component")
 }
@@ -206,7 +213,50 @@ func (g *Assignment) ast() ast.Expression {
 ///////////////////////////////////////////////////////////////////////////////
 
 type Definition struct {
-	Pos lexer.Position ` "for" "def" "as" "ok" ` // TODO dummy syntax
+	Pos        lexer.Position `"for"`
+	InputType  *Type          `@@ "def"`
+	NameLpar   *NameLpar      `@NameLpar`
+	Params     []*Parameter   `[ @@ { "," @@ } ] ")"`
+	OutputType *Type          `@@ "as"`
+	Body       *Composition   `@@ "ok"`
+}
+
+func (g *Definition) ast() ast.Expression {
+	params := make([]*functions.Parameter, 0, len(g.Params))
+	for _, param := range g.Params {
+		params = append(params, param.parameter())
+	}
+	return &ast.DefinitionExpression{
+		g.Pos,
+		g.InputType.type_(),
+		g.NameLpar.Name,
+		params,
+		g.OutputType.type_(),
+		g.Body.ast(),
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type Parameter struct {
+	Pos        lexer.Position `"for"`
+	InputType  *Type          `@@`
+	NameLpar   *NameLpar      `@NameLpar`
+	Params     []*Parameter   `[ @@ { "," @@ } ] ")"`
+	OutputType *Type          `@@`
+}
+
+func (g *Parameter) parameter() *functions.Parameter {
+	params := make([]*functions.Parameter, 0, len(g.Params))
+	for _, param := range g.Params {
+		params = append(params, param.parameter())
+	}
+	return &functions.Parameter{
+		g.InputType.type_(),
+		g.NameLpar.Name,
+		params,
+		g.OutputType.type_(),
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -241,6 +291,31 @@ func (g *NameLpar) Capture(values []string) error {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+type Type struct {
+	Pos   lexer.Position
+	Value *string `@"Any" | @"Null" | @"Bool" | @"Num" | @"Str"`
+	// TODO parameterized types
+}
+
+func (g *Type) type_() types.Type {
+	switch *g.Value {
+	case "Any":
+		return &types.AnyType{}
+	case "Null":
+		return &types.NullType{}
+	case "Bool":
+		return &types.BooleanType{}
+	case "Num":
+		return &types.NumberType{}
+	case "Str":
+		return &types.StringType{}
+	default:
+		panic("invalid type")
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 func Parse(input string) (ast.Expression, error) {
 	parser, err := participle.Build(&Composition{}, participle.Lexer(LexerDefinition), participle.Unquote(LexerDefinition, "String"), participle.Map(name2keyword))
 	if err != nil {
@@ -271,7 +346,10 @@ func name2keyword(t lexer.Token) lexer.Token {
 }
 
 func isKeyword(name string) bool {
-	return name == "for" || name == "def" || name == "as" || name == "ok"
+	return name == "for" || name == "def" || name == "as" ||
+		name == "ok" || name == "Any" || name == "Seq" ||
+		name == "Null" || name == "Bool" || name == "Num" ||
+		name == "Str" || name == "Arr" || name == "Obj"
 }
 
 ///////////////////////////////////////////////////////////////////////////////

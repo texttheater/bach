@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/builtin"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
@@ -46,14 +47,14 @@ func (x *CompositionExpression) Function(inputShape functions.Shape, params []*f
 		return nil, err
 	}
 	return &functions.Function{
-		inputShape.Type,
-		"",
-		nil,
-		nil,
-		func(inputShape functions.Shape) functions.Shape {
+		InputType: inputShape.Type,
+		Name: "",
+		FilledParams: nil,
+		OpenParams: nil,
+		UpdateShape: func(inputShape functions.Shape) functions.Shape {
 			return rightFunction.UpdateShape(middleShape)
 		},
-		func(inputState functions.State, args []*functions.Function) functions.State {
+		UpdateState: func(inputState functions.State, args []*functions.Function) functions.State {
 			middleState := leftFunction.Apply(inputState, nil)
 			return rightFunction.Apply(middleState, nil)
 		},
@@ -181,11 +182,11 @@ func (x *AssignmentExpression) Function(inputShape functions.Shape, params []*fu
 		return nil, errors.E("type", x.Pos, fmt.Sprintf("%s parameters required here, but assignment expressions have no parameters", len(params)))
 	}
 	return &functions.Function{
-		inputShape.Type,
-		"",
-		nil,
-		nil,
-		func(inputShape functions.Shape) functions.Shape {
+		InputType: inputShape.Type,
+		Name: "",
+		FilledParams: nil,
+		OpenParams: nil,
+		UpdateShape: func(inputShape functions.Shape) functions.Shape {
 			return functions.Shape{
 				inputShape.Type,
 				inputShape.Stack.Push(&functions.Function{
@@ -215,7 +216,7 @@ func (x *AssignmentExpression) Function(inputShape functions.Shape, params []*fu
 				}),
 			}
 		},
-		func(inputState functions.State, argFunctions []*functions.Function) functions.State {
+		UpdateState: func(inputState functions.State, argFunctions []*functions.Function) functions.State {
 			return functions.State{
 				inputState.Value,
 				inputState.Stack.Push(functions.NamedValue{
@@ -223,6 +224,69 @@ func (x *AssignmentExpression) Function(inputShape functions.Shape, params []*fu
 					inputState.Value,
 				}),
 			}
+		},
+	}, nil
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type DefinitionExpression struct {
+	Pos        lexer.Position
+	InputType  types.Type
+	Name       string
+	Params     []*functions.Parameter
+	OutputType types.Type
+	Body       Expression
+}
+
+func (x *DefinitionExpression) Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error) {
+	if len(params) > 0 {
+		return nil, errors.E("type", x.Pos, fmt.Sprintf("%s parameters required here, but definition expressions have no parameters", len(params)))
+	}
+	// TODO check that body output type matches declared output type - using dummy arguments?
+	return &functions.Function{
+		InputType: inputShape.Type,
+		Name: "",
+		FilledParams: nil,
+		OpenParams: nil,
+		UpdateShape: func(inputShape functions.Shape) functions.Shape {
+			return functions.Shape{
+				inputShape.Type,
+				inputShape.Stack.Push(&functions.Function{
+					InputType: x.InputType,
+					Name: x.Name,
+					FilledParams: nil,
+					OpenParams: x.Params,
+					UpdateShape: func(inputShape functions.Shape) functions.Shape {
+						return functions.Shape{
+							Type: x.OutputType,
+							Stack: inputShape.Stack,
+						}
+					},
+					UpdateState: func(inputState functions.State, args []*functions.Function) functions.State {
+						stack := builtin.InitialShape.Stack // TODO closures, recursion
+						for _, arg := range args {
+							stack = stack.Push(arg)
+						}
+						bodyInputShape := functions.Shape{
+							Type: inputShape.Type,
+							Stack: stack,
+						}
+						bodyFunction, err := x.Body.Function(bodyInputShape, nil)
+						if err != nil {
+							panic(err)
+						}
+						bodyOutputState := bodyFunction.Apply(functions.InitialState, nil)
+						return functions.State {
+							Value: bodyOutputState.Value,
+							Stack: inputState.Stack,
+						}
+					},
+				}),
+			}
+		},
+		UpdateState: func(inputState functions.State, args []*functions.Function) functions.State {
+			return inputState
 		},
 	}, nil
 }
