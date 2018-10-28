@@ -226,7 +226,7 @@ type DefinitionExpression struct {
 
 func (x *DefinitionExpression) Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error) {
 	if len(params) > 0 {
-		return nil, errors.E("type", x.Pos, fmt.Sprintf("%s parameters required here, but definition expressions have no parameters", len(params)))
+		return nil, errors.E("type", x.Pos, "%s parameters required here, but definition expressions have no parameters", len(params))
 	}
 	// TODO check that body output type matches declared output type - using dummy arguments?
 	return &functions.Function{
