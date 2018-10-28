@@ -26,7 +26,7 @@ type Function struct {
 	FilledParams []*Function // TODO make stack instead?
 	OpenParams   []*Parameter
 	UpdateShape  func(inputShape Shape) Shape
-	UpdateState  func(inputState State, args []*Function) State
+	Evaluate      func(inputValue values.Value, args []*Function) values.Value
 }
 
 func (f *Function) SetArg(arg *Function) *Function {
@@ -39,15 +39,15 @@ func (f *Function) SetArg(arg *Function) *Function {
 		filledParams,
 		f.OpenParams[1:],
 		f.UpdateShape,
-		f.UpdateState,
+		f.Evaluate,
 	}
 }
 
-func (f *Function) Apply(inputState State, outsideArgs []*Function) State {
+func (f *Function) Apply(inputValue values.Value, outsideArgs []*Function) values.Value {
 	args := make([]*Function, 0, len(f.FilledParams)+len(outsideArgs))
 	args = append(args, f.FilledParams...)
 	args = append(args, outsideArgs...)
-	return f.UpdateState(inputState, args)
+	return f.Evaluate(inputValue, args)
 }
 
 func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
@@ -56,32 +56,28 @@ func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
 	params := make([]*Parameter, 0, len(argTypes))
 	for _, argType := range argTypes {
 		params = append(params, &Parameter{
-			&types.AnyType{},
-			nil,
-			argType,
+			InputType: &types.AnyType{},
+			Parameters: nil,
+			OutputType: argType,
 		})
 	}
 	return &Function{
-		inputType,
-		name,
-		nil,
-		params,
-		func(inputShape Shape) Shape {
+		InputType: inputType,
+		Name: name,
+		FilledParams: nil,
+		OpenParams: params,
+		UpdateShape: func(inputShape Shape) Shape {
 			return Shape{
 				outputType,
 				inputShape.Stack,
 			}
 		},
-		func(inputState State, args []*Function) State {
+		Evaluate: func(inputValue values.Value, args []*Function) values.Value {
 			argValues := make([]values.Value, 0, len(args))
 			for _, arg := range args {
-				argValues = append(argValues,
-					arg.Apply(inputState, nil).Value)
+				argValues = append(argValues, arg.Apply(inputValue , nil))
 			}
-			return State{
-				eval(inputState.Value, argValues),
-				inputState.Stack,
-			}
+			return eval(inputValue, argValues)
 		},
 	}
 }

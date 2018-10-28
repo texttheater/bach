@@ -2,7 +2,6 @@ package interp
 
 import (
 	"github.com/texttheater/bach/builtin"
-	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/grammar"
 	"github.com/texttheater/bach/values"
 )
@@ -21,5 +20,5 @@ func InterpretString(program string) (values.Value, error) {
 		return nil, err
 	}
 	// evaluate
-	return f.Apply(functions.InitialState, nil).Value, nil // TODO error handling
+	return f.Apply(&values.NullValue{}, nil), nil // TODO error handling
 }

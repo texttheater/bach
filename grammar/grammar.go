@@ -200,7 +200,10 @@ func (g *Assignment) Capture(values []string) error {
 }
 
 func (g *Assignment) ast() ast.Expression {
-	return &ast.AssignmentExpression{g.Pos, g.Name}
+	return &ast.AssignmentExpression{
+		Pos: g.Pos,
+		Name: g.Name,
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
