@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/builtin"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
@@ -144,8 +143,8 @@ func (x *CallExpression) Function(inputShape functions.Shape, params []*function
 			).Type
 			if !function.OpenParams[0].OutputType.Subsumes(argOutputType) {
 				return nil, errors.E("type", x.Pos,
-					"argument #%s needs output type %s, got %s", i,
-					function.OpenParams[0],
+					"argument #%v needs output type %s, got %s", i,
+					function.OpenParams[0].OutputType,
 					argOutputType)
 			}
 			function = function.SetArg(argFunction)
@@ -159,7 +158,7 @@ func (x *CallExpression) Function(inputShape functions.Shape, params []*function
 		}
 		return function, nil
 	}
-	return nil, errors.E("type", x.Pos, "no such function")
+	return nil, errors.E("type", x.Pos, "no such function (input type %s, name %s, %v parameters)", inputShape.Type, x.Name, len(x.Arguments)+len(params))
 }
 
 func formatArgTypes(argShapes []functions.Shape) string {
@@ -264,19 +263,23 @@ func (x *DefinitionExpression) Function(inputShape functions.Shape, params []*fu
 						}
 					},
 					UpdateState: func(inputState functions.State, args []*functions.Function) functions.State {
-						stack := builtin.InitialShape.Stack // TODO closures, recursion
-						for _, arg := range args {
-							stack = stack.Push(arg)
+						stack := inputShape.Stack // TODO recursion
+						for i, arg := range args {
+							stack = stack.Push(arg.Rename(x.Params[i].Name))
 						}
 						bodyInputShape := functions.Shape{
-							Type: inputShape.Type,
+							Type: x.InputType,
 							Stack: stack,
 						}
 						bodyFunction, err := x.Body.Function(bodyInputShape, nil)
 						if err != nil {
 							panic(err)
 						}
-						bodyOutputState := bodyFunction.Apply(functions.InitialState, nil)
+						bodyInputState := functions.State {
+							Value: inputState.Value,
+							Stack: functions.InitialState.Stack, // TODO closures
+						}
+						bodyOutputState := bodyFunction.Apply(bodyInputState, nil)
 						return functions.State {
 							Value: bodyOutputState.Value,
 							Stack: inputState.Stack,

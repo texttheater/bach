@@ -43,6 +43,17 @@ func (f *Function) SetArg(arg *Function) *Function {
 	}
 }
 
+func (f *Function) Rename(newName string) *Function {
+	return &Function{
+		f.InputType,
+		newName,
+		f.FilledParams,
+		f.OpenParams,
+		f.UpdateShape,
+		f.UpdateState,
+	}
+}
+
 func (f *Function) Apply(inputState State, outsideArgs []*Function) State {
 	args := make([]*Function, 0, len(f.FilledParams)+len(outsideArgs))
 	args = append(args, f.FilledParams...)
