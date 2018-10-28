@@ -46,16 +46,16 @@ func (x *CompositionExpression) Function(inputShape functions.Shape, params []*f
 		return nil, err
 	}
 	return &functions.Function{
-		InputType: inputShape.Type,
-		Name: "",
+		InputType:    inputShape.Type,
+		Name:         "",
 		FilledParams: nil,
-		OpenParams: nil,
+		OpenParams:   nil,
 		UpdateShape: func(inputShape functions.Shape) functions.Shape {
 			return rightFunction.UpdateShape(middleShape)
 		},
-		UpdateState: func(inputState functions.State, args []*functions.Function) functions.State {
-			middleState := leftFunction.Apply(inputState, nil)
-			return rightFunction.Apply(middleState, nil)
+		Evaluate: func(inputValue values.Value, args []*functions.Function) values.Value {
+			middleValue := leftFunction.Apply(inputValue, nil)
+			return rightFunction.Apply(middleValue, nil)
 		},
 	}, nil
 }
@@ -172,8 +172,9 @@ func formatArgTypes(argShapes []functions.Shape) string {
 ///////////////////////////////////////////////////////////////////////////////
 
 type AssignmentExpression struct {
-	Pos  lexer.Position
-	Name string
+	Pos   lexer.Position
+	Name  string
+	Value values.Value
 }
 
 func (x *AssignmentExpression) Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error) {
@@ -181,48 +182,33 @@ func (x *AssignmentExpression) Function(inputShape functions.Shape, params []*fu
 		return nil, errors.E("type", x.Pos, fmt.Sprintf("%s parameters required here, but assignment expressions have no parameters", len(params)))
 	}
 	return &functions.Function{
-		InputType: inputShape.Type,
-		Name: "",
+		InputType:    inputShape.Type,
+		Name:         "",
 		FilledParams: nil,
-		OpenParams: nil,
+		OpenParams:   nil,
 		UpdateShape: func(inputShape functions.Shape) functions.Shape {
 			return functions.Shape{
 				inputShape.Type,
 				inputShape.Stack.Push(&functions.Function{
-					&types.AnyType{},
-					x.Name,
-					nil,
-					nil,
-					func(varInputShape functions.Shape) functions.Shape {
+					InputType:    &types.AnyType{},
+					Name:         x.Name,
+					FilledParams: nil,
+					OpenParams:   nil,
+					UpdateShape: func(varInputShape functions.Shape) functions.Shape {
 						return functions.Shape{
 							inputShape.Type,
 							varInputShape.Stack,
 						}
 					},
-					func(inputState functions.State, argFunctions []*functions.Function) functions.State {
-						stack := inputState.Stack
-						for stack != nil {
-							if stack.Head.Name == x.Name {
-								return functions.State{
-									stack.Head.Value,
-									inputState.Stack,
-								}
-							}
-							stack = stack.Tail
-						}
-						panic("unknown variable")
+					Evaluate: func(inputValue values.Value, argFunctions []*functions.Function) values.Value {
+						return x.Value
 					},
 				}),
 			}
 		},
-		UpdateState: func(inputState functions.State, argFunctions []*functions.Function) functions.State {
-			return functions.State{
-				inputState.Value,
-				inputState.Stack.Push(functions.NamedValue{
-					x.Name,
-					inputState.Value,
-				}),
-			}
+		Evaluate: func(inputValue values.Value, argFunctions []*functions.Function) values.Value {
+			x.Value = inputValue
+			return inputValue
 		},
 	}, nil
 }
@@ -244,52 +230,44 @@ func (x *DefinitionExpression) Function(inputShape functions.Shape, params []*fu
 	}
 	// TODO check that body output type matches declared output type - using dummy arguments?
 	return &functions.Function{
-		InputType: inputShape.Type,
-		Name: "",
+		InputType:    inputShape.Type,
+		Name:         "",
 		FilledParams: nil,
-		OpenParams: nil,
+		OpenParams:   nil,
 		UpdateShape: func(inputShape functions.Shape) functions.Shape {
 			return functions.Shape{
 				inputShape.Type,
 				inputShape.Stack.Push(&functions.Function{
-					InputType: x.InputType,
-					Name: x.Name,
+					InputType:    x.InputType,
+					Name:         x.Name,
 					FilledParams: nil,
-					OpenParams: x.Params,
+					OpenParams:   x.Params,
 					UpdateShape: func(inputShape functions.Shape) functions.Shape {
 						return functions.Shape{
-							Type: x.OutputType,
+							Type:  x.OutputType,
 							Stack: inputShape.Stack,
 						}
 					},
-					UpdateState: func(inputState functions.State, args []*functions.Function) functions.State {
+					Evaluate: func(inputValue values.Value, args []*functions.Function) values.Value {
 						stack := inputShape.Stack // TODO recursion
 						for i, arg := range args {
 							stack = stack.Push(arg.Rename(x.Params[i].Name))
 						}
 						bodyInputShape := functions.Shape{
-							Type: x.InputType,
+							Type:  x.InputType,
 							Stack: stack,
 						}
 						bodyFunction, err := x.Body.Function(bodyInputShape, nil)
 						if err != nil {
 							panic(err)
 						}
-						bodyInputState := functions.State {
-							Value: inputState.Value,
-							Stack: functions.InitialState.Stack, // TODO closures
-						}
-						bodyOutputState := bodyFunction.Apply(bodyInputState, nil)
-						return functions.State {
-							Value: bodyOutputState.Value,
-							Stack: inputState.Stack,
-						}
+						return bodyFunction.Apply(inputValue, nil)
 					},
 				}),
 			}
 		},
-		UpdateState: func(inputState functions.State, args []*functions.Function) functions.State {
-			return inputState
+		Evaluate: func(inputValue values.Value, args []*functions.Function) values.Value {
+			return inputValue
 		},
 	}, nil
 }

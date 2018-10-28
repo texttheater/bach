@@ -75,6 +75,8 @@ func TestInterp(t *testing.T) {
 		{"for Num def connectSelf(for Num f(for Any n() Num) Num) Num as =i f(i) ok 2 connectSelf(/)", &values.NumberValue{1}, ""},
 		{"for Num def apply(for Num f() Num) Num as f ok 1 apply(==1)", nil, "type"},
 		//{"for Num def plusOne() Num as ==1 ok", nil, "type"},
+		{"5 =x for Any def five() Num as x ok five", &values.NumberValue{5}, ""},
+		{"5 =x for Any def five() Num as x ok 3 =x five", &values.NumberValue{5}, ""},
 	}
 	for _, c := range cases {
 		fmt.Fprintf(os.Stderr, "%s\n", c.program)
