@@ -9,6 +9,8 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/ast"
 	"github.com/texttheater/bach/errors"
+	"github.com/texttheater/bach/types"
+	"github.com/texttheater/bach/values"
 )
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,10 +61,10 @@ type Component struct {
 
 func (g *Component) ast() ast.Expression {
 	if g.Number != nil {
-		return &ast.NumberExpression{g.Pos, *g.Number}
+		return &ast.ConstantExpression{g.Pos, &types.NumberType{}, &values.NumberValue{*g.Number}}
 	}
 	if g.String != nil {
-		return &ast.StringExpression{g.Pos, *g.String}
+		return &ast.ConstantExpression{g.Pos, &types.NumberType{}, &values.StringValue{*g.String}}
 	}
 	if g.Call != nil {
 		return g.Call.ast()
@@ -126,7 +128,17 @@ func (g *Op1Number) Capture(values []string) error {
 }
 
 func (g *Op1Number) ast() ast.Expression {
-	return &ast.CallExpression{g.Pos, g.Op, []ast.Expression{&ast.NumberExpression{g.Pos, g.Number}}}
+	return &ast.CallExpression{
+		Pos:  g.Pos,
+		Name: g.Op,
+		Args: []ast.Expression{
+			&ast.ConstantExpression{
+				Pos:   g.Pos,
+				Type:  &types.NumberType{},
+				Value: &values.NumberValue{g.Number},
+			},
+		},
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -148,7 +160,17 @@ func (g *Op2Number) Capture(values []string) error {
 }
 
 func (g *Op2Number) ast() ast.Expression {
-	return &ast.CallExpression{g.Pos, g.Op, []ast.Expression{&ast.NumberExpression{g.Pos, g.Number}}}
+	return &ast.CallExpression{
+		Pos:  g.Pos,
+		Name: g.Op,
+		Args: []ast.Expression{
+			&ast.ConstantExpression{
+				Pos:   g.Pos,
+				Type:  &types.NumberType{},
+				Value: &values.NumberValue{g.Number},
+			},
+		},
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -201,7 +223,7 @@ func (g *Assignment) Capture(values []string) error {
 
 func (g *Assignment) ast() ast.Expression {
 	return &ast.AssignmentExpression{
-		Pos: g.Pos,
+		Pos:  g.Pos,
 		Name: g.Name,
 	}
 }

@@ -7,10 +7,6 @@ an AST is, an expression consisting of subexpressions.
 package ast
 
 import (
-	"fmt"
-	//"os"
-	"strings"
-
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
@@ -21,7 +17,28 @@ import (
 ///////////////////////////////////////////////////////////////////////////////
 
 type Expression interface {
-	Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error)
+	Typecheck(inputContext functions.Context, params []*functions.Param) (outputContext functions.Context, action functions.Action, err error)
+}
+
+var nullContext functions.Context = functions.Context{}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type ConstantExpression struct {
+	Pos   lexer.Position
+	Type  types.Type
+	Value values.Value
+}
+
+func (x *ConstantExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
+	if len(params) > 0 {
+		return nullContext, nil, errors.E("type", x.Pos, "number expression does not take parameters")
+	}
+	outputContext := functions.Context{x.Type, inputContext.FunctionStack}
+	action := func(inputValue values.Value, args []functions.Action) values.Value {
+		return x.Value
+	}
+	return outputContext, action, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -32,141 +49,89 @@ type CompositionExpression struct {
 	Right Expression
 }
 
-func (x *CompositionExpression) Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error) {
+func (x *CompositionExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
 	if len(params) > 0 {
-		return nil, errors.E("type", x.Pos, fmt.Sprintf("%s parameters required here, but composition expressions have no parameters", len(params)))
+		return nullContext, nil, errors.E("type", x.Pos, "composition expression does not take parameters")
 	}
-	leftFunction, err := x.Left.Function(inputShape, nil)
+	middleContext, lAction, err := x.Left.Typecheck(inputContext, nil)
 	if err != nil {
-		return nil, err
+		return nullContext, nil, err
 	}
-	middleShape := leftFunction.UpdateShape(inputShape)
-	rightFunction, err := x.Right.Function(middleShape, nil)
+	outputContext, rAction, err := x.Right.Typecheck(middleContext, nil)
 	if err != nil {
-		return nil, err
+		return nullContext, nil, err
 	}
-	return &functions.Function{
-		InputType: inputShape.Type,
-		Name: "",
-		FilledParams: nil,
-		OpenParams: nil,
-		UpdateShape: func(inputShape functions.Shape) functions.Shape {
-			return rightFunction.UpdateShape(middleShape)
-		},
-		Evaluate: func(inputValue values.Value, args []*functions.Function) values.Value {
-			middleValue := leftFunction.Apply(inputValue, nil)
-			return rightFunction.Apply(middleValue, nil)
-		},
-	}, nil
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type NumberExpression struct {
-	Pos   lexer.Position
-	Value float64
-}
-
-func (x *NumberExpression) Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error) {
-	if len(params) > 0 {
-		return nil, errors.E("type", x.Pos, fmt.Sprintf("%s parameters required here, but number expressions have no parameters", len(params)))
+	action := func(inputValue values.Value, args []functions.Action) values.Value {
+		middleValue := lAction(inputValue, nil)
+		outputValue := rAction(middleValue, nil)
+		return outputValue
 	}
-	return functions.SimpleFunction(
-		&types.AnyType{},
-		"",
-		nil,
-		&types.NumberType{},
-		func(values.Value, []values.Value) values.Value {
-			return &values.NumberValue{x.Value}
-		},
-	), nil
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type StringExpression struct {
-	Pos   lexer.Position
-	Value string
-}
-
-func (x *StringExpression) Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error) {
-	if len(params) > 0 {
-		return nil, errors.E("type", x.Pos, fmt.Sprintf("%s parameters required here, but string expressions have no parameters", len(params)))
-	}
-	return functions.SimpleFunction(
-		&types.AnyType{},
-		"",
-		nil,
-		&types.StringType{},
-		func(values.Value, []values.Value) values.Value {
-			return &values.StringValue{x.Value}
-		},
-	), nil
+	return outputContext, action, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 type CallExpression struct {
-	Pos       lexer.Position
-	Name      string // TODO namespaces
-	Arguments []Expression
+	Pos  lexer.Position
+	Name string
+	Args []Expression
 }
 
-func (x *CallExpression) Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error) {
-	stack := inputShape.Stack
-	for stack != nil {
+func (x *CallExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
+	// Go down the function stack and find the function invoked by this
+	// call
+	stack := inputContext.FunctionStack
+Entries:
+	for {
+		// Reached bottom of stack without finding a matching function
+		if stack == nil {
+			return nullContext, nil, errors.E("type", x.Pos, "no such function")
+		}
+		// Try the function on top of the stack
 		function := stack.Head
+		// Check function name
 		if function.Name != x.Name {
 			stack = stack.Tail
 			continue
 		}
-		if len(function.OpenParams) != len(x.Arguments)+len(params) {
+		// Check number of params
+		if len(function.Params) != len(x.Args)+len(params) {
 			stack = stack.Tail
 			continue
 		}
-		if !function.InputType.Subsumes(inputShape.Type) {
+		// Check input type
+		if !function.InputType.Subsumes(inputContext.Type) {
 			stack = stack.Tail
 			continue
 		}
-		for i, arg := range x.Arguments {
-			argInputShape := functions.Shape{
-				function.OpenParams[0].InputType,
-				inputShape.Stack,
-			}
-			argFunction, err := arg.Function(argInputShape,
-				function.OpenParams[0].Parameters)
+		// Prepare action:
+		action := function.Action
+		// Check function params filled by this call
+		for i := 0; i < len(x.Args); i++ {
+			param := function.Params[i]
+			argInputContext := functions.Context{param.InputType, inputContext.FunctionStack}
+			argOutputContext, argAction, err := x.Args[i].Typecheck(argInputContext, param.Params)
 			if err != nil {
-				return nil, err
+				stack = stack.Tail
+				continue Entries
 			}
-			argOutputType := argFunction.UpdateShape(
-				argFunction.UpdateShape(argInputShape),
-			).Type
-			if !function.OpenParams[0].OutputType.Subsumes(argOutputType) {
-				return nil, errors.E("type", x.Pos,
-					"argument #%s needs output type %s, got %s", i,
-					function.OpenParams[0],
-					argOutputType)
+			if !param.OutputType.Subsumes(argOutputContext.Type) {
+				stack = stack.Tail
+				continue Entries
 			}
-			function = function.SetArg(argFunction)
+			action = action.SetArg(argAction)
 		}
-		for i, param := range params {
-			if !param.Subsumes(function.OpenParams[i]) {
-				return nil, errors.E("type", x.Pos,
-					"parameter #%s must be %s, got %s", i,
-					param, function.OpenParams[i])
+		// Check function params *not* filled by this call (thus left
+		// to function to call)
+		for i := 0; i < len(params); i++ {
+			if !params[i].Subsumes(function.Params[len(x.Args)+i]) {
+				stack = stack.Tail
+				continue Entries
 			}
 		}
-		return function, nil
+		// Return result
+		return functions.Context{function.OutputType, inputContext.FunctionStack}, action, nil
 	}
-	return nil, errors.E("type", x.Pos, "no such function")
-}
-
-func formatArgTypes(argShapes []functions.Shape) string {
-	formatted := make([]string, len(argShapes))
-	for i, s := range argShapes {
-		formatted[i] = fmt.Sprintf("%v", s.Type)
-	}
-	return strings.Join(formatted, ", ")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -174,43 +139,24 @@ func formatArgTypes(argShapes []functions.Shape) string {
 type AssignmentExpression struct {
 	Pos  lexer.Position
 	Name string
-	Value values.Value
 }
 
-func (x *AssignmentExpression) Function(inputShape functions.Shape, params []*functions.Parameter) (*functions.Function, error) {
-	if len(params) > 0 {
-		return nil, errors.E("type", x.Pos, fmt.Sprintf("%s parameters required here, but assignment expressions have no parameters", len(params)))
+func (x *AssignmentExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
+	var value values.Value
+	outputContext := functions.Context{inputContext.Type, inputContext.FunctionStack.Push(functions.Function{
+		InputType:  &types.AnyType{},
+		Name:       x.Name,
+		Params:     nil,
+		OutputType: inputContext.Type,
+		Action: func(inputValue values.Value, args []functions.Action) values.Value {
+			return value
+		},
+	})}
+	action := func(inputValue values.Value, args []functions.Action) values.Value {
+		value = inputValue
+		return inputValue
 	}
-	return &functions.Function{
-		InputType: inputShape.Type,
-		Name: "",
-		FilledParams: nil,
-		OpenParams: nil,
-		UpdateShape: func(inputShape functions.Shape) functions.Shape {
-			return functions.Shape{
-				inputShape.Type,
-				inputShape.Stack.Push(&functions.Function{
-					InputType: &types.AnyType{},
-					Name: x.Name,
-					FilledParams: nil,
-					OpenParams: nil,
-					UpdateShape: func(varInputShape functions.Shape) functions.Shape {
-						return functions.Shape{
-							inputShape.Type,
-							varInputShape.Stack,
-						}
-					},
-					Evaluate: func(inputValue values.Value, argFunctions []*functions.Function) values.Value {
-						return x.Value
-					},
-				}),
-			}
-		},
-		Evaluate: func(inputValue values.Value, argFunctions []*functions.Function) values.Value {
-			x.Value = inputValue
-			return inputValue
-		},
-	}, nil
+	return outputContext, action, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
