@@ -1,10 +1,6 @@
 package grammar
 
 import (
-	// "fmt"
-	// "os"
-	"strconv"
-
 	"github.com/alecthomas/participle"
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/ast"
@@ -28,241 +24,8 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Name>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Comma>,)` +
 		`|(?P<Rpar>\))` +
-		`|(?P<Keyword>for|def|as|ok)`, // these will be scanned as Names, but mapped to Keyword tokens by name2keyword (see below)
+		`|(?P<Keyword>for|def|as|ok|Num)`, // these will be scanned as Names, but mapped to Keyword tokens by name2keyword (see below)
 ))
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Composition struct {
-	Pos        lexer.Position
-	Component  *Component   `@@`
-	Components []*Component `{ @@ }`
-}
-
-func (g *Composition) ast() ast.Expression {
-	pos := g.Component.Pos
-	e := g.Component.ast()
-	for _, comp := range g.Components {
-		e = &ast.CompositionExpression{pos, e, comp.ast()}
-	}
-	return e
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Component struct {
-	Pos        lexer.Position
-	Number     *float64    `  @Number`
-	String     *string     `| @String`
-	Call       *Call       `| @@`
-	Assignment *Assignment `| @Assignment`
-	Definition *Definition `| @@`
-}
-
-func (g *Component) ast() ast.Expression {
-	if g.Number != nil {
-		return &ast.ConstantExpression{g.Pos, &types.NumberType{}, &values.NumberValue{*g.Number}}
-	}
-	if g.String != nil {
-		return &ast.ConstantExpression{g.Pos, &types.NumberType{}, &values.StringValue{*g.String}}
-	}
-	if g.Call != nil {
-		return g.Call.ast()
-	}
-	if g.Assignment != nil {
-		return g.Assignment.ast()
-	}
-	panic("invalid component")
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Call struct {
-	Pos         lexer.Position
-	Op1Number   *Op1Number   `  @Op1Number`
-	Op2Number   *Op2Number   `| @Op2Number`
-	Op1Name     *Op1Name     `| @Op1Name`
-	Op2Name     *Op2Name     `| @Op2Name`
-	NameArglist *NameArglist `| @@`
-	Name        *string      `| @Name`
-}
-
-func (g *Call) ast() ast.Expression {
-	if g.Op1Number != nil {
-		return g.Op1Number.ast()
-	}
-	if g.Op2Number != nil {
-		return g.Op2Number.ast()
-	}
-	if g.Op1Name != nil {
-		return g.Op1Name.ast()
-	}
-	if g.Op2Name != nil {
-		return g.Op2Name.ast()
-	}
-	if g.NameArglist != nil {
-		return g.NameArglist.ast()
-	}
-	if g.Name != nil {
-		return &ast.CallExpression{g.Pos, *g.Name, []ast.Expression{}}
-	}
-	panic("invalid call")
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Op1Number struct {
-	Pos    lexer.Position
-	Op     string
-	Number float64
-}
-
-func (g *Op1Number) Capture(values []string) error {
-	g.Op = string(values[0][:1])
-	f, err := strconv.ParseFloat(values[0][1:], 64)
-	if err != nil {
-		return err
-	}
-	g.Number = f
-	return nil
-}
-
-func (g *Op1Number) ast() ast.Expression {
-	return &ast.CallExpression{
-		Pos:  g.Pos,
-		Name: g.Op,
-		Args: []ast.Expression{
-			&ast.ConstantExpression{
-				Pos:   g.Pos,
-				Type:  &types.NumberType{},
-				Value: &values.NumberValue{g.Number},
-			},
-		},
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Op2Number struct {
-	Pos    lexer.Position
-	Op     string
-	Number float64
-}
-
-func (g *Op2Number) Capture(values []string) error {
-	g.Op = string(values[0][:2])
-	f, err := strconv.ParseFloat(values[0][2:], 64)
-	if err != nil {
-		return err
-	}
-	g.Number = f
-	return nil
-}
-
-func (g *Op2Number) ast() ast.Expression {
-	return &ast.CallExpression{
-		Pos:  g.Pos,
-		Name: g.Op,
-		Args: []ast.Expression{
-			&ast.ConstantExpression{
-				Pos:   g.Pos,
-				Type:  &types.NumberType{},
-				Value: &values.NumberValue{g.Number},
-			},
-		},
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Op1Name struct {
-	Pos  lexer.Position
-	Op   string
-	Name string
-}
-
-func (g *Op1Name) Capture(values []string) error {
-	g.Op = string(values[0][:1])
-	g.Name = values[0][1:]
-	return nil
-}
-
-func (g *Op1Name) ast() ast.Expression {
-	return &ast.CallExpression{g.Pos, g.Op, []ast.Expression{&ast.CallExpression{g.Pos, g.Name, []ast.Expression{}}}}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Op2Name struct {
-	Pos  lexer.Position
-	Op   string
-	Name string
-}
-
-func (g *Op2Name) Capture(values []string) error {
-	g.Op = string(values[0][:2])
-	g.Name = values[0][2:]
-	return nil
-}
-
-func (g *Op2Name) ast() ast.Expression {
-	return &ast.CallExpression{g.Pos, g.Op, []ast.Expression{&ast.CallExpression{g.Pos, g.Name, []ast.Expression{}}}}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Assignment struct {
-	Pos  lexer.Position
-	Name string
-}
-
-func (g *Assignment) Capture(values []string) error {
-	g.Name = values[0][1:]
-	return nil
-}
-
-func (g *Assignment) ast() ast.Expression {
-	return &ast.AssignmentExpression{
-		Pos:  g.Pos,
-		Name: g.Name,
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Definition struct {
-	Pos lexer.Position ` "for" "def" "as" "ok" ` // TODO dummy syntax
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type NameArglist struct {
-	Pos      lexer.Position
-	NameLpar *NameLpar      `@NameLpar`
-	Arg      *Composition   `@@`
-	Args     []*Composition `{ "," @@ } ")"`
-}
-
-func (g *NameArglist) ast() ast.Expression {
-	args := make([]ast.Expression, len(g.Args)+1)
-	args[0] = g.Arg.ast()
-	for i, Arg := range g.Args {
-		args[i+1] = Arg.ast()
-	}
-	return &ast.CallExpression{g.Pos, g.NameLpar.Name, args}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type NameLpar struct {
-	Pos  lexer.Position
-	Name string
-}
-
-func (g *NameLpar) Capture(values []string) error {
-	g.Name = values[0][:len(values[0])-1]
-	return nil
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -282,7 +45,7 @@ func Parse(input string) (ast.Expression, error) {
 		}
 		return nil, err
 	}
-	return composition.ast(), nil
+	return composition.Ast(), nil
 }
 
 func name2keyword(t lexer.Token) lexer.Token {
@@ -296,7 +59,59 @@ func name2keyword(t lexer.Token) lexer.Token {
 }
 
 func isKeyword(name string) bool {
-	return name == "for" || name == "def" || name == "as" || name == "ok"
+	return name == "for" || name == "def" || name == "as" || name == "ok" || name == "Num"
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type Composition struct {
+	Pos        lexer.Position
+	Component  *Component   `@@`
+	Components []*Component `{ @@ }`
+}
+
+func (g *Composition) Ast() ast.Expression {
+	pos := g.Component.Pos
+	e := g.Component.Ast()
+	for _, comp := range g.Components {
+		e = &ast.CompositionExpression{pos, e, comp.Ast()}
+	}
+	return e
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type Component struct {
+	Pos        lexer.Position
+	Number     *float64    `  @Number`
+	String     *string     `| @String`
+	Call       *Call       `| @@`
+	Assignment *Assignment `| @Assignment`
+	Definition *Definition `| @@`
+}
+
+func (g *Component) Ast() ast.Expression {
+	if g.Number != nil {
+		return &ast.ConstantExpression{
+			Pos:   g.Pos,
+			Type:  &types.NumberType{},
+			Value: &values.NumberValue{*g.Number},
+		}
+	}
+	if g.String != nil {
+		return &ast.ConstantExpression{
+			Pos:   g.Pos,
+			Type:  &types.StringType{},
+			Value: &values.StringValue{*g.String},
+		}
+	}
+	if g.Call != nil {
+		return g.Call.Ast()
+	}
+	if g.Assignment != nil {
+		return g.Assignment.Ast()
+	}
+	panic("invalid component")
 }
 
 ///////////////////////////////////////////////////////////////////////////////

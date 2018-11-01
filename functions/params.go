@@ -6,7 +6,7 @@ import (
 
 type Param struct {
 	InputType  types.Type
-	Name       string // TODO do we actually use this?
+	Name       string
 	Params     []*Param
 	OutputType types.Type
 }
