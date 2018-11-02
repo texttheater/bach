@@ -16,11 +16,13 @@ import (
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type Expression interface {
-	Typecheck(inputContext functions.Context, params []*functions.Param) (outputContext functions.Context, action functions.Action, err error)
-}
+var nullContext = functions.Context{}
 
-var nullContext functions.Context = functions.Context{}
+///////////////////////////////////////////////////////////////////////////////
+
+type Expression interface {
+	Typecheck(inputContext functions.Context, params []*functions.Param) (outputContext functions.Context, action *functions.Action, err error)
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -30,13 +32,15 @@ type ConstantExpression struct {
 	Value values.Value
 }
 
-func (x *ConstantExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
+func (x *ConstantExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, *functions.Action, error) {
 	if len(params) > 0 {
 		return nullContext, nil, errors.E("type", x.Pos, "number expression does not take parameters")
 	}
 	outputContext := functions.Context{x.Type, inputContext.FunctionStack}
-	action := func(inputValue values.Value, args []functions.Action) values.Value {
-		return x.Value
+	action := &functions.Action{
+		Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
+			return x.Value
+		},
 	}
 	return outputContext, action, nil
 }
@@ -49,7 +53,7 @@ type CompositionExpression struct {
 	Right Expression
 }
 
-func (x *CompositionExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
+func (x *CompositionExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, *functions.Action, error) {
 	if len(params) > 0 {
 		return nullContext, nil, errors.E("type", x.Pos, "composition expression does not take parameters")
 	}
@@ -61,10 +65,12 @@ func (x *CompositionExpression) Typecheck(inputContext functions.Context, params
 	if err != nil {
 		return nullContext, nil, err
 	}
-	action := func(inputValue values.Value, args []functions.Action) values.Value {
-		middleValue := lAction(inputValue, nil)
-		outputValue := rAction(middleValue, nil)
-		return outputValue
+	action := &functions.Action{
+		Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
+			middleValue := lAction.Execute(inputValue, nil)
+			outputValue := rAction.Execute(middleValue, nil)
+			return outputValue
+		},
 	}
 	return outputContext, action, nil
 }
@@ -77,7 +83,7 @@ type CallExpression struct {
 	Args []Expression
 }
 
-func (x *CallExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
+func (x *CallExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, *functions.Action, error) {
 	// Go down the function stack and find the function invoked by this
 	// call
 	stack := inputContext.FunctionStack
@@ -141,20 +147,24 @@ type AssignmentExpression struct {
 	Name string
 }
 
-func (x *AssignmentExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
+func (x *AssignmentExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, *functions.Action, error) {
 	var value values.Value
 	outputContext := functions.Context{inputContext.Type, inputContext.FunctionStack.Push(functions.Function{
 		InputType:  &types.AnyType{},
 		Name:       x.Name,
 		Params:     nil,
 		OutputType: inputContext.Type,
-		Action: func(inputValue values.Value, args []functions.Action) values.Value {
-			return value
+		Action: &functions.Action{
+			Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
+				return value
+			},
 		},
 	})}
-	action := func(inputValue values.Value, args []functions.Action) values.Value {
-		value = inputValue
-		return inputValue
+	action := &functions.Action{
+		Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
+			value = inputValue
+			return inputValue
+		},
 	}
 	return outputContext, action, nil
 }
