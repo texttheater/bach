@@ -148,6 +148,9 @@ type AssignmentExpression struct {
 }
 
 func (x *AssignmentExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, *functions.Action, error) {
+	if len(params) > 0 {
+		return nullContext, nil, errors.E("type", x.Pos, "assignment expression does not take parameters")
+	}
 	var value values.Value
 	outputContext := functions.Context{inputContext.Type, inputContext.FunctionStack.Push(functions.Function{
 		InputType:  &types.AnyType{},
@@ -163,6 +166,72 @@ func (x *AssignmentExpression) Typecheck(inputContext functions.Context, params 
 	action := &functions.Action{
 		Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
 			value = inputValue
+			return inputValue
+		},
+	}
+	return outputContext, action, nil
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type DefinitionExpression struct {
+	Pos        lexer.Position
+	InputType  types.Type
+	Name       string
+	Params     []*functions.Param
+	OutputType types.Type
+	Body       Expression
+}
+
+func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, *functions.Action, error) {
+	if len(params) > 0 {
+		return nullContext, nil, errors.E("type", x.Pos, "definition expression does not take parameters")
+	}
+	paramActions := make([]*functions.Action, 0, len(params))
+	stack := inputContext.FunctionStack
+	for _, param := range params {
+		paramAction := &functions.Action{
+			Execute: nil, // will be set on call
+		}
+		paramActions = append(paramActions, paramAction)
+		stack = stack.Push(functions.Function{
+			InputType: param.InputType,
+			Name: param.Name,
+			Params: param.Params,
+			OutputType: param.OutputType,
+			Action: paramAction,
+		})
+	}
+	bodyInputContext := functions.Context{
+		Type: x.InputType,
+		FunctionStack: stack,
+	}
+	bodyOutputContext, bodyAction, err := x.Body.Typecheck(bodyInputContext, nil)
+	if err != nil {
+		return nullContext, nil, err
+	}
+	if !x.OutputType.Subsumes(bodyOutputContext.Type) {
+		return nullContext, nil, errors.E("type", x.Pos, "expected function body output type %s, got %s", x.OutputType, bodyOutputContext.Type)
+	}
+	outputContext := functions.Context{
+		Type: inputContext.Type,
+		FunctionStack: inputContext.FunctionStack.Push(functions.Function{
+			InputType: x.InputType,
+			Name: x.Name,
+			Params: x.Params,
+			OutputType: x.OutputType,
+			Action: &functions.Action{
+				Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
+					for i, paramAction := range paramActions {
+						paramAction.Execute = args[i].Execute
+					}
+					return bodyAction.Execute(inputValue, nil)
+				},
+			},
+		}),
+	}
+	action := &functions.Action{
+		Execute: func (inputValue values.Value, args []*functions.Action) values.Value {
 			return inputValue
 		},
 	}
