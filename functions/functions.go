@@ -29,7 +29,7 @@ func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
 	params := make([]*Param, 0, len(argTypes))
 	for _, argType := range argTypes {
 		params = append(params, &Param{
-			InputType:  &types.NullType{},
+			InputType:  &types.AnyType{},
 			Name:       "", // TODO ?
 			Params:     nil,
 			OutputType: argType,
