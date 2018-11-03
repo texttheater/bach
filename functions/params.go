@@ -34,9 +34,9 @@ func (this *Param) Subsumes(that *Param) bool {
 
 func (p *Param) DummyFunction() Function {
 	return Function{
-		InputType: p.InputType,
-		Name: p.Name,
-		Params: p.Params,
+		InputType:  p.InputType,
+		Name:       p.Name,
+		Params:     p.Params,
 		OutputType: p.OutputType,
 		Action: &Action{
 			Execute: nil,

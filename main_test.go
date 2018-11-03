@@ -1,9 +1,7 @@
 package main_test
 
 import (
-	//"fmt"
 	"math"
-	//"os"
 	"reflect"
 	"testing"
 

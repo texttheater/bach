@@ -195,15 +195,15 @@ func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params 
 		}
 		paramActions = append(paramActions, paramAction)
 		stack = stack.Push(functions.Function{
-			InputType: param.InputType,
-			Name: param.Name,
-			Params: param.Params,
+			InputType:  param.InputType,
+			Name:       param.Name,
+			Params:     param.Params,
 			OutputType: param.OutputType,
-			Action: paramAction,
+			Action:     paramAction,
 		})
 	}
 	bodyInputContext := functions.Context{
-		Type: x.InputType,
+		Type:          x.InputType,
 		FunctionStack: stack,
 	}
 	bodyOutputContext, bodyAction, err := x.Body.Typecheck(bodyInputContext, nil)
@@ -216,9 +216,9 @@ func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params 
 	outputContext := functions.Context{
 		Type: inputContext.Type,
 		FunctionStack: inputContext.FunctionStack.Push(functions.Function{
-			InputType: x.InputType,
-			Name: x.Name,
-			Params: x.Params,
+			InputType:  x.InputType,
+			Name:       x.Name,
+			Params:     x.Params,
 			OutputType: x.OutputType,
 			Action: &functions.Action{
 				Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
@@ -231,7 +231,7 @@ func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params 
 		}),
 	}
 	action := &functions.Action{
-		Execute: func (inputValue values.Value, args []*functions.Action) values.Value {
+		Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
 			return inputValue
 		},
 	}
