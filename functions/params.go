@@ -1,6 +1,9 @@
 package functions
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/texttheater/bach/types"
 )
 
@@ -39,4 +42,13 @@ func (p *Param) DummyFunction() Function {
 			Execute: nil,
 		},
 	}
+}
+
+func (p *Param) String() string {
+	paramStrings := make([]string, 0, len(p.Params))
+	for _, param := range p.Params {
+		paramStrings = append(paramStrings, param.String())
+	}
+	paramsString := strings.Join(paramStrings, ",")
+	return fmt.Sprintf("for %s %s(%s) %s", p.InputType, p.Name, paramsString, p.OutputType)
 }

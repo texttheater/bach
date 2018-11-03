@@ -13,6 +13,15 @@ type Function struct {
 	Action     *Action
 }
 
+func (f Function) Signature() *Param {
+	return &Param{
+		InputType:  f.InputType,
+		Name:       f.Name,
+		Params:     f.Params,
+		OutputType: f.OutputType,
+	}
+}
+
 type Kernel func(inputValue values.Value, argValues []values.Value) values.Value
 
 func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
