@@ -189,7 +189,7 @@ func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params 
 	}
 	paramActions := make([]*functions.Action, 0, len(params))
 	stack := inputContext.FunctionStack
-	for _, param := range params {
+	for _, param := range x.Params {
 		paramAction := &functions.Action{
 			Execute: nil, // will be set on call
 		}
