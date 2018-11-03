@@ -24,13 +24,15 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Name>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Comma>,)` +
 		`|(?P<Rpar>\))` +
-		`|(?P<Keyword>for|def|as|ok|Num)`, // these will be scanned as Names, but mapped to Keyword tokens by name2keyword (see below)
+		// the following will be scanned as Name, but mapped to the appropriate token types by name2keyword (see below)
+		`|(?P<Keyword>for|def|as|ok)` +
+		`|(?P<Type>Num|Str|Bool|Null|Any)`,
 ))
 
 ///////////////////////////////////////////////////////////////////////////////
 
 func Parse(input string) (ast.Expression, error) {
-	parser, err := participle.Build(&Composition{}, participle.Lexer(LexerDefinition), participle.Unquote(LexerDefinition, "String"), participle.Map(name2keyword))
+	parser, err := participle.Build(&Composition{}, participle.Lexer(LexerDefinition), participle.Unquote(LexerDefinition, "String"), participle.Map(Name2keyword))
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {
 			return nil, errors.E("syntax", lexerError.Pos, lexerError.Message)
@@ -48,9 +50,12 @@ func Parse(input string) (ast.Expression, error) {
 	return composition.Ast(), nil
 }
 
-func name2keyword(t lexer.Token) lexer.Token {
+func Name2keyword(t lexer.Token) lexer.Token {
 	if t.Type != LexerDefinition.Symbols()["Name"] {
 		return t
+	}
+	if isTypeKeyword(t.Value) {
+		t.Type = LexerDefinition.Symbols()["Type"]
 	}
 	if isKeyword(t.Value) {
 		t.Type = LexerDefinition.Symbols()["Keyword"]
@@ -58,8 +63,14 @@ func name2keyword(t lexer.Token) lexer.Token {
 	return t
 }
 
+func isTypeKeyword(name string) bool {
+	return name == "Num" || name == "Str" || name == "Bool" ||
+		name == "Null" || name == "Any"
+}
+
 func isKeyword(name string) bool {
-	return name == "for" || name == "def" || name == "as" || name == "ok" || name == "Num"
+	return name == "for" || name == "def" || name == "as" ||
+		name == "ok"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,6 +121,9 @@ func (g *Component) Ast() ast.Expression {
 	}
 	if g.Assignment != nil {
 		return g.Assignment.Ast()
+	}
+	if g.Definition != nil {
+		return g.Definition.Ast()
 	}
 	panic("invalid component")
 }

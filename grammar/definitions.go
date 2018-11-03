@@ -2,6 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/ast"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
 )
@@ -10,11 +11,28 @@ import (
 
 type Definition struct {
 	Pos         lexer.Position
-	InputType   *Type        `"for" @@`
+	InputType   *string      `"for" @Type`
 	NameParlist *NameParlist `"def" ( @@`
 	Name        *string      `      | @Name)`
-	OutputType  *Type
+	OutputType  *string      `@Type`
 	Body        *Composition `"as" @@ "ok"`
+}
+
+func (g *Definition) Ast() ast.Expression {
+	var name *string = g.Name
+	var params []*functions.Param = nil
+	if g.NameParlist != nil {
+		name = &g.NameParlist.NameLpar.Name
+		params = g.NameParlist.Ast()
+	}
+	return &ast.DefinitionExpression{
+		Pos:        g.Pos,
+		InputType:  string2type(*g.InputType),
+		Name:       *name,
+		Params:     params,
+		OutputType: string2type(*g.OutputType),
+		Body:       g.Body.Ast(),
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,14 +44,23 @@ type NameParlist struct {
 	Params   []*Param  `{ "," @@ } ")"`
 }
 
+func (g *NameParlist) Ast() []*functions.Param {
+	params := make([]*functions.Param, 0, 1+len(g.Params))
+	params = append(params, g.Param.Ast())
+	for _, param := range g.Params {
+		params = append(params, param.Ast())
+	}
+	return params
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 type Param struct {
 	Pos         lexer.Position
-	InputType   *Type        `"for" @@`
-	NameParlist *NameParlist `"def" ( @@`
-	Name        *string      `      | @Name)`
-	OutputType  *Type        `@@`
+	InputType   *string      `"for" @Type`
+	NameParlist *NameParlist `( @@`
+	Name        *string      `| @Name)`
+	OutputType  *string      `@Type`
 }
 
 func (g *Param) Ast() *functions.Param {
@@ -51,21 +78,32 @@ func (g *Param) Ast() *functions.Param {
 		params = nil
 	}
 	return &functions.Param{
-		InputType:  g.InputType.Ast(),
+		InputType:  string2type(*g.InputType),
 		Name:       name,
 		Params:     params,
-		OutputType: g.OutputType.Ast(),
+		OutputType: string2type(*g.OutputType),
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type Type struct {
-	Pos lexer.Position `"Num"`
-}
-
-func (g *Type) Ast() types.Type {
-	return &types.NumberType{}
+func string2type(s string) types.Type {
+	if s == "Num" {
+		return &types.NumberType{}
+	}
+	if s == "Str" {
+		return &types.StringType{}
+	}
+	if s == "Bool" {
+		return &types.BooleanType{}
+	}
+	if s == "Null" {
+		return &types.NullType{}
+	}
+	if s == "Any" {
+		return &types.AnyType{}
+	}
+	panic("invalid type")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
