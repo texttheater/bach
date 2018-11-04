@@ -67,11 +67,12 @@ func TestInterp(t *testing.T) {
 		{`"\"\\abc\""`, &values.StringValue{`"\abc"`}, ""},
 		{`1 "abc"`, &values.StringValue{"abc"}, ""},
 		// function definitions
-		{`for Num def apply(for Num f Num) Num as f ok`, &values.NullValue{}, ""},
+		{`for Num def plusOne Num as +1 ok 1 plusOne`, &values.NumberValue{2}, ""},
+		{`for Num def plusOne Num as +1 ok 1 plusOne plusOne`, &values.NumberValue{3}, ""},
 		{`for Num def apply(for Num f Num) Num as f ok 1 apply(+1)`, &values.NumberValue{2}, ""},
-		{`for Num def connectSelf(for Num f(for Any g Num) Num) Num as =x f(x) ok`, &values.NullValue{}, ""},
 		{`for Num def connectSelf(for Num f(for Any g Num) Num) Num as =x f(x) ok 1 connectSelf(+)`, &values.NumberValue{2}, ""},
 		{`for Num def connectSelf(for Num f(for Any g Num) Num) Num as =x f(x) ok 1 connectSelf(+) 3 connectSelf(*)`, &values.NumberValue{9}, ""},
+		{`for Num def connectSelf(for Num f(g Num) Num) Num as =x f(x) ok 1 connectSelf(+)`, &values.NumberValue{2}, ""},
 	}
 	for _, c := range cases {
 		//fmt.Fprintf(os.Stderr, "%s\n", c.program)

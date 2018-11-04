@@ -57,16 +57,25 @@ func (g *NameParlist) Ast() []*functions.Param {
 
 type Param struct {
 	Pos         lexer.Position
-	InputType   *string      `"for" @Type`
-	NameParlist *NameParlist `( @@`
-	Name        *string      `| @Name)`
+	Name1       *string      `( @Name`
+	InputType   *string      `| "for" @Type`
+	NameParlist *NameParlist `  ( @@`
+	Name2       *string      `  | @Name) )`
 	OutputType  *string      `@Type`
 }
 
 func (g *Param) Ast() *functions.Param {
+	var inputType types.Type
+	if g.InputType != nil {
+		inputType = string2type(*g.InputType)
+	} else {
+		inputType = &types.AnyType{}
+	}
 	var name string
-	var params []*functions.Param
-	if g.NameParlist != nil {
+	var params []*functions.Param = nil
+	if g.Name1 != nil {
+		name = *g.Name1
+	} else if g.NameParlist != nil {
 		name = g.NameParlist.NameLpar.Name
 		params = make([]*functions.Param, 0, len(g.NameParlist.Params)+1)
 		params = append(params, g.NameParlist.Param.Ast())
@@ -74,11 +83,10 @@ func (g *Param) Ast() *functions.Param {
 			params = append(params, param.Ast())
 		}
 	} else {
-		name = *g.Name
-		params = nil
+		name = *g.Name2
 	}
 	return &functions.Param{
-		InputType:  string2type(*g.InputType),
+		InputType:  inputType,
 		Name:       name,
 		Params:     params,
 		OutputType: string2type(*g.OutputType),
