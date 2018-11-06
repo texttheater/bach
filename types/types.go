@@ -99,8 +99,6 @@ func (t *StringType) String() string {
 
 type ArrayType struct {
 	ElementType Type
-	HasLength   bool
-	Length      uint
 }
 
 func (t *ArrayType) Subsumes(other Type) bool {
@@ -108,19 +106,11 @@ func (t *ArrayType) Subsumes(other Type) bool {
 	if !ok {
 		return false
 	}
-	if t.HasLength {
-		if !otherArrayType.HasLength {
-			return false
-		}
-		if otherArrayType.Length != t.Length {
-			return false
-		}
-	}
 	return t.ElementType.Subsumes(otherArrayType.ElementType)
 }
 
 func (t ArrayType) String() string {
-	return "Arr" // TODO be more specific
+	return fmt.Sprintf("Arr<%s>", t.ElementType)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
