@@ -73,6 +73,15 @@ func TestInterp(t *testing.T) {
 		{`for Num def connectSelf(for Num f(for Any g Num) Num) Num as =x f(x) ok 1 connectSelf(+)`, &values.NumberValue{2}, ""},
 		{`for Num def connectSelf(for Num f(for Any g Num) Num) Num as =x f(x) ok 1 connectSelf(+) 3 connectSelf(*)`, &values.NumberValue{9}, ""},
 		{`for Num def connectSelf(for Num f(g Num) Num) Num as =x f(x) ok 1 connectSelf(+)`, &values.NumberValue{2}, ""},
+		// conditionals
+		{`if true then 2 else 3 ok`, &values.NumberValue{2}, ""},
+		{`for Num def heart Bool as if <3 then true else false ok ok 2 heart`, &values.BooleanValue{true}, ""},
+		{`for Num def heart Bool as if <3 then true else false ok ok 4 heart`, &values.BooleanValue{false}, ""},
+		{`for Num def expand Num as if <0 then -1 elif >0 then +1 else 0 ok ok 0 -1 expand`, &values.NumberValue{-2}, ""},
+		{`for Num def expand Num as if <0 then -1 elif >0 then +1 else 0 ok ok 1 expand`, &values.NumberValue{2}, ""},
+		{`for Num def expand Num as if <0 then -1 elif >0 then +1 else 0 ok ok 0 expand`, &values.NumberValue{0}, ""},
+		// recursion
+		//{`for Num def fac Num as if ==0 then 1 else =n -1 fac *n ok ok 3 fac`, &values.NumberValue{6}, ""},
 	}
 	for _, c := range cases {
 		//fmt.Fprintf(os.Stderr, "%s\n", c.program)

@@ -25,7 +25,7 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Comma>,)` +
 		`|(?P<Rpar>\))` +
 		// the following will be scanned as Name, but mapped to the appropriate token types by name2keyword (see below)
-		`|(?P<Keyword>for|def|as|ok)` +
+		`|(?P<Keyword>for|def|as|ok|if|then|elif|else)` +
 		`|(?P<Type>Num|Str|Bool|Null|Any)`,
 ))
 
@@ -70,7 +70,8 @@ func isTypeKeyword(name string) bool {
 
 func isKeyword(name string) bool {
 	return name == "for" || name == "def" || name == "as" ||
-		name == "ok"
+		name == "ok" || name == "if" || name == "then" ||
+		name == "elif" || name == "else"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -93,12 +94,13 @@ func (g *Composition) Ast() ast.Expression {
 ///////////////////////////////////////////////////////////////////////////////
 
 type Component struct {
-	Pos        lexer.Position
-	Number     *float64    `  @Number`
-	String     *string     `| @String`
-	Call       *Call       `| @@`
-	Assignment *Assignment `| @Assignment`
-	Definition *Definition `| @@`
+	Pos         lexer.Position
+	Number      *float64     `  @Number`
+	String      *string      `| @String`
+	Call        *Call        `| @@`
+	Assignment  *Assignment  `| @Assignment`
+	Definition  *Definition  `| @@`
+	Conditional *Conditional `| @@`
 }
 
 func (g *Component) Ast() ast.Expression {
@@ -124,6 +126,9 @@ func (g *Component) Ast() ast.Expression {
 	}
 	if g.Definition != nil {
 		return g.Definition.Ast()
+	}
+	if g.Conditional != nil {
+		return g.Conditional.Ast()
 	}
 	panic("invalid component")
 }

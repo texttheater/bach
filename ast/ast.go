@@ -18,6 +18,8 @@ import (
 
 var nullContext = functions.Context{}
 
+var booleanType = types.BooleanType{}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 type Expression interface {
@@ -234,6 +236,84 @@ func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params 
 		Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
 			return inputValue
 		},
+	}
+	return outputContext, action, nil
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type ConditionalExpression struct {
+	Pos             lexer.Position
+	Condition       Expression
+	Consequent      Expression
+	ElifConditions  []Expression
+	ElifConsequents []Expression
+	Alternative     Expression
+}
+
+func (x *ConditionalExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, *functions.Action, error) {
+	conditionOutputContext, conditionAction, err := x.Condition.Typecheck(inputContext, nil)
+	if err != nil {
+		return nullContext, nil, err
+	}
+	if !booleanType.Subsumes(conditionOutputContext.Type) {
+		return nullContext, nil, errors.E("type", x.Pos, "condition must be boolean")
+	}
+	// context is the shared input context for all conditions and consequents.
+	// Each condition may add to the FunctionStack. Type always stays the same.
+	context := functions.Context{
+		Type:          inputContext.Type,
+		FunctionStack: conditionOutputContext.FunctionStack,
+	}
+	consequentOutputContext, consequentAction, err := x.Consequent.Typecheck(context, nil)
+	if err != nil {
+		return nullContext, nil, err
+	}
+	outputType := consequentOutputContext.Type
+	elifConditionActions := make([]*functions.Action, 0, len(x.ElifConditions))
+	elifConsequentActions := make([]*functions.Action, 0, len(x.ElifConsequents))
+	for i := range x.ElifConditions {
+		conditionOutputContext, elifConditionAction, err := x.ElifConditions[i].Typecheck(context, nil)
+		if err != nil {
+			return nullContext, nil, err
+		}
+		if !booleanType.Subsumes(conditionOutputContext.Type) {
+			return nullContext, nil, errors.E("type", x.Pos, "condition must be boolean")
+		}
+		context.FunctionStack = conditionOutputContext.FunctionStack
+		elifConditionActions = append(elifConditionActions, elifConditionAction)
+		consequentOutputContext, elifConsequentAction, err := x.ElifConsequents[i].Typecheck(context, nil)
+		if err != nil {
+			return nullContext, nil, err
+		}
+		elifConsequentActions = append(elifConsequentActions, elifConsequentAction)
+		outputType = types.Disjoin(outputType, consequentOutputContext.Type)
+	}
+	alternativeOutputContext, alternativeAction, err := x.Alternative.Typecheck(context, nil)
+	if err != nil {
+		return nullContext, nil, err
+	}
+	outputType = types.Disjoin(outputType, alternativeOutputContext.Type)
+	action := &functions.Action{
+		Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
+			conditionValue := conditionAction.Execute(inputValue, nil)
+			boolConditionValue, _ := conditionValue.(*values.BooleanValue)
+			if boolConditionValue.Value {
+				return consequentAction.Execute(inputValue, nil)
+			}
+			for i := range elifConditionActions {
+				conditionValue = elifConditionActions[i].Execute(inputValue, nil)
+				boolConditionValue, _ = conditionValue.(*values.BooleanValue)
+				if boolConditionValue.Value {
+					return elifConsequentActions[i].Execute(inputValue, nil)
+				}
+			}
+			return alternativeAction.Execute(inputValue, nil)
+		},
+	}
+	outputContext := functions.Context{
+		Type:          outputType,
+		FunctionStack: inputContext.FunctionStack,
 	}
 	return outputContext, action, nil
 }
