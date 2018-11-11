@@ -36,7 +36,7 @@ func (t *SeqType) Subsumes(other Type) bool {
 }
 
 func (t *SeqType) String() string {
-	return fmt.Sprintf("Seq<%v>", t.ElementType)
+	return fmt.Sprintf("Seq<%s>", t.ElementType)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
