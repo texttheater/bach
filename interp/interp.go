@@ -20,5 +20,5 @@ func InterpretString(program string) (values.Value, error) {
 		return nil, err
 	}
 	// evaluate
-	return action.Execute(&values.NullValue{}, nil), nil // TODO error handling
+	return action(&values.NullValue{}, nil), nil // TODO error handling
 }

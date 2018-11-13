@@ -23,7 +23,7 @@ var booleanType = types.BooleanType{}
 ///////////////////////////////////////////////////////////////////////////////
 
 type Expression interface {
-	Typecheck(inputContext functions.Context, params []*functions.Param) (outputContext functions.Context, action *functions.Action, err error)
+	Typecheck(inputContext functions.Context, params []*functions.Param) (outputContext functions.Context, action functions.Action, err error)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,15 +34,13 @@ type ConstantExpression struct {
 	Value values.Value
 }
 
-func (x *ConstantExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, *functions.Action, error) {
+func (x *ConstantExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
 	if len(params) > 0 {
 		return nullContext, nil, errors.E("type", x.Pos, "number expression does not take parameters")
 	}
 	outputContext := functions.Context{x.Type, inputContext.FunctionStack}
-	action := &functions.Action{
-		Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
-			return x.Value
-		},
+	action := func(inputValue values.Value, args []functions.Action) values.Value {
+		return x.Value
 	}
 	return outputContext, action, nil
 }
@@ -55,7 +53,7 @@ type CompositionExpression struct {
 	Right Expression
 }
 
-func (x *CompositionExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, *functions.Action, error) {
+func (x *CompositionExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
 	if len(params) > 0 {
 		return nullContext, nil, errors.E("type", x.Pos, "composition expression does not take parameters")
 	}
@@ -67,12 +65,10 @@ func (x *CompositionExpression) Typecheck(inputContext functions.Context, params
 	if err != nil {
 		return nullContext, nil, err
 	}
-	action := &functions.Action{
-		Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
-			middleValue := lAction.Execute(inputValue, nil)
-			outputValue := rAction.Execute(middleValue, nil)
-			return outputValue
-		},
+	action := func(inputValue values.Value, args []functions.Action) values.Value {
+		middleValue := lAction(inputValue, nil)
+		outputValue := rAction(middleValue, nil)
+		return outputValue
 	}
 	return outputContext, action, nil
 }
@@ -85,7 +81,7 @@ type CallExpression struct {
 	Args []Expression
 }
 
-func (x *CallExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, *functions.Action, error) {
+func (x *CallExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
 	// Go down the function stack and find the function invoked by this
 	// call
 	stack := inputContext.FunctionStack
@@ -149,7 +145,7 @@ type AssignmentExpression struct {
 	Name string
 }
 
-func (x *AssignmentExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, *functions.Action, error) {
+func (x *AssignmentExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
 	if len(params) > 0 {
 		return nullContext, nil, errors.E("type", x.Pos, "assignment expression does not take parameters")
 	}
@@ -159,17 +155,13 @@ func (x *AssignmentExpression) Typecheck(inputContext functions.Context, params 
 		Name:       x.Name,
 		Params:     nil,
 		OutputType: inputContext.Type,
-		Action: &functions.Action{
-			Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
-				return value
-			},
+		Action: func(inputValue values.Value, args []functions.Action) values.Value {
+			return value
 		},
 	})}
-	action := &functions.Action{
-		Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
-			value = inputValue
-			return inputValue
-		},
+	action := func(inputValue values.Value, args []functions.Action) values.Value {
+		value = inputValue
+		return inputValue
 	}
 	return outputContext, action, nil
 }
@@ -185,23 +177,20 @@ type DefinitionExpression struct {
 	Body       Expression
 }
 
-func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, *functions.Action, error) {
+func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
 	if len(params) > 0 {
 		return nullContext, nil, errors.E("type", x.Pos, "definition expression does not take parameters")
 	}
-	paramActions := make([]*functions.Action, 0, len(params))
 	stack := inputContext.FunctionStack
 	for _, param := range x.Params {
-		paramAction := &functions.Action{
-			Execute: nil, // will be set on call
-		}
-		paramActions = append(paramActions, paramAction)
 		stack = stack.Push(functions.Function{
 			InputType:  param.InputType,
 			Name:       param.Name,
 			Params:     param.Params,
 			OutputType: param.OutputType,
-			Action:     paramAction,
+			Action: func(inputValue values.Value, args []functions.Action) values.Value {
+				return param.ActionStack.Head(inputValue, args)
+			},
 		})
 	}
 	bodyInputContext := functions.Context{
@@ -222,20 +211,21 @@ func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params 
 			Name:       x.Name,
 			Params:     x.Params,
 			OutputType: x.OutputType,
-			Action: &functions.Action{
-				Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
-					for i, paramAction := range paramActions {
-						paramAction.Execute = args[i].Execute
-					}
-					return bodyAction.Execute(inputValue, nil)
-				},
+			Action: func(inputValue values.Value, args []functions.Action) values.Value {
+				// Push, call, pop
+				for i, param := range params {
+					param.ActionStack = param.ActionStack.Push(args[i])
+				}
+				result := bodyAction(inputValue, nil)
+				for _, param := range params {
+					param.ActionStack = param.ActionStack.Tail
+				}
+				return result
 			},
 		}),
 	}
-	action := &functions.Action{
-		Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
-			return inputValue
-		},
+	action := func(inputValue values.Value, args []functions.Action) values.Value {
+		return inputValue
 	}
 	return outputContext, action, nil
 }
@@ -251,7 +241,7 @@ type ConditionalExpression struct {
 	Alternative     Expression
 }
 
-func (x *ConditionalExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, *functions.Action, error) {
+func (x *ConditionalExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
 	conditionOutputContext, conditionAction, err := x.Condition.Typecheck(inputContext, nil)
 	if err != nil {
 		return nullContext, nil, err
@@ -270,8 +260,8 @@ func (x *ConditionalExpression) Typecheck(inputContext functions.Context, params
 		return nullContext, nil, err
 	}
 	outputType := consequentOutputContext.Type
-	elifConditionActions := make([]*functions.Action, 0, len(x.ElifConditions))
-	elifConsequentActions := make([]*functions.Action, 0, len(x.ElifConsequents))
+	elifConditionActions := make([]functions.Action, 0, len(x.ElifConditions))
+	elifConsequentActions := make([]functions.Action, 0, len(x.ElifConsequents))
 	for i := range x.ElifConditions {
 		conditionOutputContext, elifConditionAction, err := x.ElifConditions[i].Typecheck(context, nil)
 		if err != nil {
@@ -294,22 +284,20 @@ func (x *ConditionalExpression) Typecheck(inputContext functions.Context, params
 		return nullContext, nil, err
 	}
 	outputType = types.Disjoin(outputType, alternativeOutputContext.Type)
-	action := &functions.Action{
-		Execute: func(inputValue values.Value, args []*functions.Action) values.Value {
-			conditionValue := conditionAction.Execute(inputValue, nil)
-			boolConditionValue, _ := conditionValue.(*values.BooleanValue)
+	action := func(inputValue values.Value, args []functions.Action) values.Value {
+		conditionValue := conditionAction(inputValue, nil)
+		boolConditionValue, _ := conditionValue.(*values.BooleanValue)
+		if boolConditionValue.Value {
+			return consequentAction(inputValue, nil)
+		}
+		for i := range elifConditionActions {
+			conditionValue = elifConditionActions[i](inputValue, nil)
+			boolConditionValue, _ = conditionValue.(*values.BooleanValue)
 			if boolConditionValue.Value {
-				return consequentAction.Execute(inputValue, nil)
+				return elifConsequentActions[i](inputValue, nil)
 			}
-			for i := range elifConditionActions {
-				conditionValue = elifConditionActions[i].Execute(inputValue, nil)
-				boolConditionValue, _ = conditionValue.(*values.BooleanValue)
-				if boolConditionValue.Value {
-					return elifConsequentActions[i].Execute(inputValue, nil)
-				}
-			}
-			return alternativeAction.Execute(inputValue, nil)
-		},
+		}
+		return alternativeAction(inputValue, nil)
 	}
 	outputContext := functions.Context{
 		Type:          outputType,

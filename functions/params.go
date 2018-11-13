@@ -8,10 +8,11 @@ import (
 )
 
 type Param struct {
-	InputType  types.Type
-	Name       string
-	Params     []*Param
-	OutputType types.Type
+	InputType   types.Type
+	Name        string
+	Params      []*Param
+	OutputType  types.Type
+	ActionStack *ActionStack
 }
 
 func (this *Param) Subsumes(that *Param) bool {
@@ -32,18 +33,6 @@ func (this *Param) Subsumes(that *Param) bool {
 	return true
 }
 
-func (p *Param) DummyFunction() Function {
-	return Function{
-		InputType:  p.InputType,
-		Name:       p.Name,
-		Params:     p.Params,
-		OutputType: p.OutputType,
-		Action: &Action{
-			Execute: nil,
-		},
-	}
-}
-
 func (p *Param) String() string {
 	paramStrings := make([]string, 0, len(p.Params))
 	for _, param := range p.Params {
@@ -51,4 +40,16 @@ func (p *Param) String() string {
 	}
 	paramsString := strings.Join(paramStrings, ",")
 	return fmt.Sprintf("for %s %s(%s) %s", p.InputType, p.Name, paramsString, p.OutputType)
+}
+
+type ActionStack struct {
+	Head Action
+	Tail *ActionStack
+}
+
+func (s *ActionStack) Push(action Action) *ActionStack {
+	return &ActionStack{
+		Head: action,
+		Tail: s,
+	}
 }

@@ -10,7 +10,7 @@ type Function struct {
 	Name       string
 	Params     []*Param
 	OutputType types.Type
-	Action     *Action
+	Action     Action
 }
 
 func (f Function) Signature() *Param {
@@ -40,14 +40,12 @@ func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
 		Name:       name,
 		Params:     params,
 		OutputType: outputType,
-		Action: &Action{
-			Execute: func(inputValue values.Value, args []*Action) values.Value {
-				argValues := make([]values.Value, 0, len(argTypes))
-				for _, arg := range args {
-					argValues = append(argValues, arg.Execute(&values.NullValue{}, nil))
-				}
-				return kernel(inputValue, argValues)
-			},
+		Action: func(inputValue values.Value, args []Action) values.Value {
+			argValues := make([]values.Value, 0, len(argTypes))
+			for _, arg := range args {
+				argValues = append(argValues, arg(&values.NullValue{}, nil))
+			}
+			return kernel(inputValue, argValues)
 		},
 	}
 }
