@@ -213,11 +213,11 @@ func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params 
 			OutputType: x.OutputType,
 			Action: func(inputValue values.Value, args []functions.Action) values.Value {
 				// Push, call, pop
-				for i, param := range params {
+				for i, param := range x.Params {
 					param.ActionStack = param.ActionStack.Push(args[i])
 				}
 				result := bodyAction(inputValue, nil)
-				for _, param := range params {
+				for _, param := range x.Params {
 					param.ActionStack = param.ActionStack.Tail
 				}
 				return result
