@@ -53,3 +53,10 @@ func (s *ActionStack) Push(action Action) *ActionStack {
 		Tail: s,
 	}
 }
+
+func (s *ActionStack) Length() int {
+	if s == nil {
+		return 0
+	}
+	return 1 + s.Tail.Length()
+}
