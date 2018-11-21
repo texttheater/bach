@@ -81,7 +81,7 @@ func TestInterp(t *testing.T) {
 		{`for Num def expand Num as if <0 then -1 elif >0 then +1 else 0 ok ok 1 expand`, &values.NumberValue{2}, ""},
 		{`for Num def expand Num as if <0 then -1 elif >0 then +1 else 0 ok ok 0 expand`, &values.NumberValue{0}, ""},
 		// recursion
-		//{`for Num def fac Num as if ==0 then 1 else =n -1 fac *n ok ok 3 fac`, &values.NumberValue{6}, ""},
+		{`for Num def fac Num as if ==0 then 1 else =n -1 fac *n ok ok 3 fac`, &values.NumberValue{6}, ""},
 	}
 	for _, c := range cases {
 		//fmt.Fprintf(os.Stderr, "%s\n", c.program)

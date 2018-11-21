@@ -178,12 +178,34 @@ type DefinitionExpression struct {
 }
 
 func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params []*functions.Param) (functions.Context, functions.Action, error) {
+	// make sure we got no parameters
 	if len(params) > 0 {
 		return nullContext, nil, errors.E("type", x.Pos, "definition expression does not take parameters")
 	}
-	stack := inputContext.FunctionStack
+	// variable for body action (will be set later)
+	var bodyAction functions.Action = nil
+	// add the function defined here to the function stack
+	functionStack := inputContext.FunctionStack.Push(functions.Function{
+		InputType: x.InputType,
+		Name: x.Name,
+		Params: x.Params,
+		OutputType: x.OutputType,
+		Action: func(inputValue values.Value, args []functions.Action) values.Value {
+			// Push, call, pop
+			for i, param := range x.Params {
+				param.ActionStack = param.ActionStack.Push(args[i])
+			}
+			result := bodyAction(inputValue, nil)
+			for _, param := range x.Params {
+				param.ActionStack = param.ActionStack.Tail
+			}
+			return result
+		},
+	})
+	// add parameter functions for use in the body
+	bodyFunctionStack := functionStack
 	for _, param := range x.Params {
-		stack = stack.Push(functions.Function{
+		bodyFunctionStack = bodyFunctionStack.Push(functions.Function{
 			InputType:  param.InputType,
 			Name:       param.Name,
 			Params:     param.Params,
@@ -193,40 +215,30 @@ func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params 
 			},
 		})
 	}
+	// define body input context
 	bodyInputContext := functions.Context{
 		Type:          x.InputType,
-		FunctionStack: stack,
+		FunctionStack: bodyFunctionStack,
 	}
+	// typecheck body (crucially, setting body action)
 	bodyOutputContext, bodyAction, err := x.Body.Typecheck(bodyInputContext, nil)
 	if err != nil {
 		return nullContext, nil, err
 	}
+	// check body output type
 	if !x.OutputType.Subsumes(bodyOutputContext.Type) {
 		return nullContext, nil, errors.E("type", x.Pos, "expected function body output type %s, got %s", x.OutputType, bodyOutputContext.Type)
 	}
+	// define output context
 	outputContext := functions.Context{
 		Type: inputContext.Type,
-		FunctionStack: inputContext.FunctionStack.Push(functions.Function{
-			InputType:  x.InputType,
-			Name:       x.Name,
-			Params:     x.Params,
-			OutputType: x.OutputType,
-			Action: func(inputValue values.Value, args []functions.Action) values.Value {
-				// Push, call, pop
-				for i, param := range x.Params {
-					param.ActionStack = param.ActionStack.Push(args[i])
-				}
-				result := bodyAction(inputValue, nil)
-				for _, param := range x.Params {
-					param.ActionStack = param.ActionStack.Tail
-				}
-				return result
-			},
-		}),
+		FunctionStack: functionStack,
 	}
+	// define action (simple identity)
 	action := func(inputValue values.Value, args []functions.Action) values.Value {
 		return inputValue
 	}
+	// return
 	return outputContext, action, nil
 }
 
