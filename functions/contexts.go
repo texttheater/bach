@@ -4,7 +4,7 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-type Shape struct {
+type Context struct {
 	Type          types.Type
 	FunctionStack *FunctionStack
 }

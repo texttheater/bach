@@ -40,22 +40,12 @@ func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
 		Name:       name,
 		Params:     params,
 		OutputType: outputType,
-		Action: Action{
-			Name: name,
-			Execute: func(inputState State, args []Action) State {
-				argValues := make([]values.Value, 0, len(argTypes))
-				argInputState := State{
-					Value:       &values.NullValue{},
-					ActionStack: inputState.ActionStack,
-				}
-				for _, arg := range args {
-					argValues = append(argValues, arg.Execute(argInputState, nil).Value)
-				}
-				return State{
-					Value:       kernel(inputState.Value, argValues),
-					ActionStack: inputState.ActionStack,
-				}
-			},
+		Action: func(inputValue values.Value, args []Action) values.Value {
+			argValues := make([]values.Value, 0, len(argTypes))
+			for _, arg := range args {
+				argValues = append(argValues, arg(&values.NullValue{}, nil))
+			}
+			return kernel(inputValue, argValues)
 		},
 	}
 }
