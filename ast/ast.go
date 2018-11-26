@@ -11,6 +11,7 @@ import (
 	//"os"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/actions"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/shapes"
@@ -28,7 +29,7 @@ var booleanType = types.BooleanType{}
 ///////////////////////////////////////////////////////////////////////////////
 
 type Expression interface {
-	Typecheck(inputShape shapes.Shape, params []*functions.Param) (outputShape shapes.Shape, action functions.Action, err error)
+	Typecheck(inputShape shapes.Shape, params []*functions.Param) (outputShape shapes.Shape, action actions.Action, err error)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,12 +40,12 @@ type ConstantExpression struct {
 	Value values.Value
 }
 
-func (x *ConstantExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, functions.Action, error) {
+func (x *ConstantExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, actions.Action, error) {
 	if len(params) > 0 {
 		return nullShape, nil, errors.E("type", x.Pos, "number expression does not take parameters")
 	}
 	outputShape := shapes.Shape{x.Type, inputShape.FunctionStack}
-	action := func(inputState states.State, args []functions.Action) states.State {
+	action := func(inputState states.State, args []actions.Action) states.State {
 		return states.State{
 			Value: x.Value,
 			Stack: inputState.Stack,
@@ -61,7 +62,7 @@ type CompositionExpression struct {
 	Right Expression
 }
 
-func (x *CompositionExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, functions.Action, error) {
+func (x *CompositionExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, actions.Action, error) {
 	if len(params) > 0 {
 		return nullShape, nil, errors.E("type", x.Pos, "composition expression does not take parameters")
 	}
@@ -73,7 +74,7 @@ func (x *CompositionExpression) Typecheck(inputShape shapes.Shape, params []*fun
 	if err != nil {
 		return nullShape, nil, err
 	}
-	action := func(inputState states.State, args []functions.Action) states.State {
+	action := func(inputState states.State, args []actions.Action) states.State {
 		middleState := lAction(inputState, nil)
 		outputState := rAction(middleState, nil)
 		return outputState
@@ -89,7 +90,7 @@ type CallExpression struct {
 	Args []Expression
 }
 
-func (x *CallExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, functions.Action, error) {
+func (x *CallExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, actions.Action, error) {
 	// Go down the function stack and find the function invoked by this
 	// call
 	stack := inputShape.FunctionStack
@@ -153,7 +154,7 @@ type AssignmentExpression struct {
 	Name string
 }
 
-func (x *AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, functions.Action, error) {
+func (x *AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, actions.Action, error) {
 	if len(params) > 0 {
 		return nullShape, nil, errors.E("type", x.Pos, "assignment expression does not take parameters")
 	}
@@ -162,7 +163,7 @@ func (x *AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*func
 		Name:       x.Name,
 		Params:     nil,
 		OutputType: inputShape.Type,
-		Action: func(inputState states.State, args []functions.Action) states.State {
+		Action: func(inputState states.State, args []actions.Action) states.State {
 			stack := inputState.Stack
 			for stack != nil {
 				if stack.Head.Name == x.Name {
@@ -176,7 +177,7 @@ func (x *AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*func
 			panic(fmt.Sprintf("variable %s not found", x.Name))
 		},
 	})}
-	action := func(inputState states.State, args []functions.Action) states.State {
+	action := func(inputState states.State, args []actions.Action) states.State {
 		return states.State{
 			Value: inputState.Value,
 			Stack: inputState.Stack.Push(states.Variable{
@@ -208,21 +209,21 @@ type DefinitionExpression struct {
 	Body       Expression
 }
 
-func (x *DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, functions.Action, error) {
+func (x *DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, actions.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return nullShape, nil, errors.E("type", x.Pos, "definition expression does not take parameters")
 	}
 	// variables for body input stack, action (will be set later)
 	var bodyInputStack *states.Stack = nil
-	var bodyAction functions.Action = nil
+	var bodyAction actions.Action = nil
 	// add the function defined here to the function stack
 	functionStack := inputShape.FunctionStack.Push(functions.Function{
 		InputType:  x.InputType,
 		Name:       x.Name,
 		Params:     x.Params,
 		OutputType: x.OutputType,
-		Action: func(inputState states.State, args []functions.Action) states.State {
+		Action: func(inputState states.State, args []actions.Action) states.State {
 			// Push, call, pop
 			for i, param := range x.Params {
 				param.ActionStack = param.ActionStack.Push(args[i])
@@ -249,7 +250,7 @@ func (x *DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*func
 			Name:       param.Name,
 			Params:     param.Params,
 			OutputType: param.OutputType,
-			Action: func(inputState states.State, args []functions.Action) states.State {
+			Action: func(inputState states.State, args []actions.Action) states.State {
 				return param.ActionStack.Head(inputState, args)
 			},
 		})
@@ -274,7 +275,7 @@ func (x *DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*func
 		FunctionStack: functionStack,
 	}
 	// define action
-	action := func(inputState states.State, args []functions.Action) states.State {
+	action := func(inputState states.State, args []actions.Action) states.State {
 		bodyInputStack = inputState.Stack
 		return inputState
 	}
@@ -293,7 +294,7 @@ type ConditionalExpression struct {
 	Alternative     Expression
 }
 
-func (x *ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, functions.Action, error) {
+func (x *ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, actions.Action, error) {
 	conditionOutputShape, conditionAction, err := x.Condition.Typecheck(inputShape, nil)
 	if err != nil {
 		return nullShape, nil, err
@@ -312,8 +313,8 @@ func (x *ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*fun
 		return nullShape, nil, err
 	}
 	outputType := consequentOutputShape.Type
-	elifConditionActions := make([]functions.Action, 0, len(x.ElifConditions))
-	elifConsequentActions := make([]functions.Action, 0, len(x.ElifConsequents))
+	elifConditionActions := make([]actions.Action, 0, len(x.ElifConditions))
+	elifConsequentActions := make([]actions.Action, 0, len(x.ElifConsequents))
 	for i := range x.ElifConditions {
 		conditionOutputShape, elifConditionAction, err := x.ElifConditions[i].Typecheck(shape, nil)
 		if err != nil {
@@ -336,7 +337,7 @@ func (x *ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*fun
 		return nullShape, nil, err
 	}
 	outputType = types.Disjoin(outputType, alternativeOutputShape.Type)
-	action := func(inputState states.State, args []functions.Action) states.State {
+	action := func(inputState states.State, args []actions.Action) states.State {
 		conditionState := conditionAction(inputState, nil)
 		boolConditionValue, _ := conditionState.Value.(*values.BooleanValue)
 		if boolConditionValue.Value {

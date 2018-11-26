@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/texttheater/bach/actions"
 	"github.com/texttheater/bach/types"
 )
 
@@ -43,11 +44,11 @@ func (p *Param) String() string {
 }
 
 type ActionStack struct {
-	Head Action
+	Head actions.Action
 	Tail *ActionStack
 }
 
-func (s *ActionStack) Push(action Action) *ActionStack {
+func (s *ActionStack) Push(action actions.Action) *ActionStack {
 	return &ActionStack{
 		Head: action,
 		Tail: s,
