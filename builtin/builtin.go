@@ -2,21 +2,19 @@ package builtin
 
 import (
 	"github.com/texttheater/bach/functions"
-	"github.com/texttheater/bach/shapes"
-	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
 var InitialShape = initialShape()
 
-var InitialState = states.State{
+var InitialState = functions.State{
 	Value:       &values.NullValue{},
 	ActionStack: nil,
 }
 
-func initialShape() shapes.Shape {
-	shape := shapes.Shape{&types.AnyType{}, nil}
+func initialShape() functions.Shape {
+	shape := functions.Shape{&types.AnyType{}, nil}
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
 		&types.NumberType{},
 		"+",
