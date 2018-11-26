@@ -19,7 +19,7 @@ func InterpretString(program string) (values.Value, error) {
 		return nil, err
 	}
 	// type-check
-	_, action, err := x.Typecheck(builtin.InitialContext, nil)
+	_, action, err := x.Typecheck(builtin.InitialShape, nil)
 	if err != nil {
 		return nil, err
 	}
