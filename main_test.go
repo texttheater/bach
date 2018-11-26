@@ -1,7 +1,9 @@
 package main_test
 
 import (
+	//"fmt"
 	"math"
+	//"os"
 	"reflect"
 	"testing"
 
@@ -82,6 +84,11 @@ func TestInterp(t *testing.T) {
 		{`for Num def expand Num as if <0 then -1 elif >0 then +1 else 0 ok ok 0 expand`, &values.NumberValue{0}, ""},
 		// recursion
 		{`for Num def fac Num as if ==0 then 1 else =n -1 fac *n ok ok 3 fac`, &values.NumberValue{6}, ""},
+		// overloading
+		{`for Bool def f Num as 1 ok for Num def f Num as 2 ok true f`, &values.NumberValue{1}, ""},
+		{`for Bool def f Num as 1 ok for Num def f Num as 2 ok 1 f`, &values.NumberValue{2}, ""},
+		// closures
+		{`1 =a for Any def f Num as a ok f 2 =a f`, &values.NumberValue{1}, ""},
 	}
 	for _, c := range cases {
 		//fmt.Fprintf(os.Stderr, "%s\n", c.program)

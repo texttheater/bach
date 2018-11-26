@@ -1,8 +1,12 @@
 package interp
 
 import (
+	//"fmt"
+	//"os"
+
 	"github.com/texttheater/bach/builtin"
 	"github.com/texttheater/bach/grammar"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/values"
 )
 
@@ -20,5 +24,12 @@ func InterpretString(program string) (values.Value, error) {
 		return nil, err
 	}
 	// evaluate
-	return action(&values.NullValue{}, nil), nil // TODO error handling
+	outputState := action(states.InitialState, nil) // TODO error handling
+	//fmt.Fprintf(os.Stderr, "Variables in output state:\n")
+	//stack := outputState.Stack
+	//for stack != nil {
+	//	fmt.Fprintf(os.Stderr, "%s\n", stack.Head.Name)
+	//	stack = stack.Tail
+	//}
+	return outputState.Value, nil
 }

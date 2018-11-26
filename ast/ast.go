@@ -7,9 +7,13 @@ an AST is, an expression consisting of subexpressions.
 package ast
 
 import (
+	"fmt"
+	//"os"
+
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -39,8 +43,11 @@ func (x *ConstantExpression) Typecheck(inputContext functions.Context, params []
 		return nullContext, nil, errors.E("type", x.Pos, "number expression does not take parameters")
 	}
 	outputContext := functions.Context{x.Type, inputContext.FunctionStack}
-	action := func(inputValue values.Value, args []functions.Action) values.Value {
-		return x.Value
+	action := func(inputState states.State, args []functions.Action) states.State {
+		return states.State{
+			Value: x.Value,
+			Stack: inputState.Stack,
+		}
 	}
 	return outputContext, action, nil
 }
@@ -65,10 +72,10 @@ func (x *CompositionExpression) Typecheck(inputContext functions.Context, params
 	if err != nil {
 		return nullContext, nil, err
 	}
-	action := func(inputValue values.Value, args []functions.Action) values.Value {
-		middleValue := lAction(inputValue, nil)
-		outputValue := rAction(middleValue, nil)
-		return outputValue
+	action := func(inputState states.State, args []functions.Action) states.State {
+		middleState := lAction(inputState, nil)
+		outputState := rAction(middleState, nil)
+		return outputState
 	}
 	return outputContext, action, nil
 }
@@ -149,21 +156,44 @@ func (x *AssignmentExpression) Typecheck(inputContext functions.Context, params 
 	if len(params) > 0 {
 		return nullContext, nil, errors.E("type", x.Pos, "assignment expression does not take parameters")
 	}
-	var value values.Value
 	outputContext := functions.Context{inputContext.Type, inputContext.FunctionStack.Push(functions.Function{
 		InputType:  &types.AnyType{},
 		Name:       x.Name,
 		Params:     nil,
 		OutputType: inputContext.Type,
-		Action: func(inputValue values.Value, args []functions.Action) values.Value {
-			return value
+		Action: func(inputState states.State, args []functions.Action) states.State {
+			stack := inputState.Stack
+			for stack != nil {
+				if stack.Head.Name == x.Name {
+					return states.State{
+						Value: stack.Head.Value,
+						Stack: inputState.Stack,
+					}
+				}
+				stack = stack.Tail
+			}
+			panic(fmt.Sprintf("variable %s not found", x.Name))
 		},
 	})}
-	action := func(inputValue values.Value, args []functions.Action) values.Value {
-		value = inputValue
-		return inputValue
+	action := func(inputState states.State, args []functions.Action) states.State {
+		return states.State{
+			Value: inputState.Value,
+			Stack: inputState.Stack.Push(states.Variable{
+				Name:  x.Name,
+				Value: inputState.Value,
+			}),
+		}
 	}
 	return outputContext, action, nil
+}
+
+type valueStack struct {
+	Head values.Value
+	Tail *valueStack
+}
+
+func (s *valueStack) Push(element values.Value) *valueStack {
+	return &valueStack{element, s}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -182,24 +212,32 @@ func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params 
 	if len(params) > 0 {
 		return nullContext, nil, errors.E("type", x.Pos, "definition expression does not take parameters")
 	}
-	// variable for body action (will be set later)
+	// variables for body input stack, action (will be set later)
+	var bodyInputStack *states.Stack = nil
 	var bodyAction functions.Action = nil
 	// add the function defined here to the function stack
 	functionStack := inputContext.FunctionStack.Push(functions.Function{
-		InputType: x.InputType,
-		Name: x.Name,
-		Params: x.Params,
+		InputType:  x.InputType,
+		Name:       x.Name,
+		Params:     x.Params,
 		OutputType: x.OutputType,
-		Action: func(inputValue values.Value, args []functions.Action) values.Value {
+		Action: func(inputState states.State, args []functions.Action) states.State {
 			// Push, call, pop
 			for i, param := range x.Params {
 				param.ActionStack = param.ActionStack.Push(args[i])
 			}
-			result := bodyAction(inputValue, nil)
+			bodyInputState := states.State{
+				Value: inputState.Value,
+				Stack: bodyInputStack,
+			}
+			bodyOutputState := bodyAction(bodyInputState, nil)
 			for _, param := range x.Params {
 				param.ActionStack = param.ActionStack.Tail
 			}
-			return result
+			return states.State{
+				Value: bodyOutputState.Value,
+				Stack: inputState.Stack,
+			}
 		},
 	})
 	// add parameter functions for use in the body
@@ -210,8 +248,8 @@ func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params 
 			Name:       param.Name,
 			Params:     param.Params,
 			OutputType: param.OutputType,
-			Action: func(inputValue values.Value, args []functions.Action) values.Value {
-				return param.ActionStack.Head(inputValue, args)
+			Action: func(inputState states.State, args []functions.Action) states.State {
+				return param.ActionStack.Head(inputState, args)
 			},
 		})
 	}
@@ -231,12 +269,13 @@ func (x *DefinitionExpression) Typecheck(inputContext functions.Context, params 
 	}
 	// define output context
 	outputContext := functions.Context{
-		Type: inputContext.Type,
+		Type:          inputContext.Type,
 		FunctionStack: functionStack,
 	}
-	// define action (simple identity)
-	action := func(inputValue values.Value, args []functions.Action) values.Value {
-		return inputValue
+	// define action
+	action := func(inputState states.State, args []functions.Action) states.State {
+		bodyInputStack = inputState.Stack
+		return inputState
 	}
 	// return
 	return outputContext, action, nil
@@ -296,20 +335,40 @@ func (x *ConditionalExpression) Typecheck(inputContext functions.Context, params
 		return nullContext, nil, err
 	}
 	outputType = types.Disjoin(outputType, alternativeOutputContext.Type)
-	action := func(inputValue values.Value, args []functions.Action) values.Value {
-		conditionValue := conditionAction(inputValue, nil)
-		boolConditionValue, _ := conditionValue.(*values.BooleanValue)
+	action := func(inputState states.State, args []functions.Action) states.State {
+		conditionState := conditionAction(inputState, nil)
+		boolConditionValue, _ := conditionState.Value.(*values.BooleanValue)
 		if boolConditionValue.Value {
-			return consequentAction(inputValue, nil)
-		}
-		for i := range elifConditionActions {
-			conditionValue = elifConditionActions[i](inputValue, nil)
-			boolConditionValue, _ = conditionValue.(*values.BooleanValue)
-			if boolConditionValue.Value {
-				return elifConsequentActions[i](inputValue, nil)
+			consequentInputState := states.State{
+				Value: inputState.Value,
+				Stack: conditionState.Stack,
+			}
+			consequentOutputState := consequentAction(consequentInputState, nil)
+			return states.State{
+				Value: consequentOutputState.Value,
+				Stack: inputState.Stack,
 			}
 		}
-		return alternativeAction(inputValue, nil)
+		for i := range elifConditionActions {
+			conditionState = elifConditionActions[i](inputState, nil)
+			boolConditionValue, _ = conditionState.Value.(*values.BooleanValue)
+			if boolConditionValue.Value {
+				consequentInputState := states.State{
+					Value: inputState.Value,
+					Stack: conditionState.Stack,
+				}
+				consequentOutputState := elifConsequentActions[i](consequentInputState, nil)
+				return states.State{
+					Value: consequentOutputState.Value,
+					Stack: inputState.Stack,
+				}
+			}
+		}
+		alternativeOutputState := alternativeAction(inputState, nil)
+		return states.State{
+			Value: alternativeOutputState.Value,
+			Stack: inputState.Stack,
+		}
 	}
 	outputContext := functions.Context{
 		Type:          outputType,

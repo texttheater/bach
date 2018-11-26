@@ -1,6 +1,7 @@
 package functions
 
 import (
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -40,12 +41,19 @@ func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
 		Name:       name,
 		Params:     params,
 		OutputType: outputType,
-		Action: func(inputValue values.Value, args []Action) values.Value {
+		Action: func(inputState states.State, args []Action) states.State {
 			argValues := make([]values.Value, 0, len(argTypes))
-			for _, arg := range args {
-				argValues = append(argValues, arg(&values.NullValue{}, nil))
+			argInputState := states.State{
+				Value: &values.NullValue{},
+				Stack: inputState.Stack,
 			}
-			return kernel(inputValue, argValues)
+			for _, arg := range args {
+				argValues = append(argValues, arg(argInputState, nil).Value)
+			}
+			return states.State{
+				Value: kernel(inputState.Value, argValues),
+				Stack: inputState.Stack,
+			}
 		},
 	}
 }
