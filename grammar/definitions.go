@@ -3,7 +3,7 @@ package grammar
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/ast"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/types"
 )
 
@@ -20,7 +20,7 @@ type Definition struct {
 
 func (g *Definition) Ast() ast.Expression {
 	var name *string = g.Name
-	var params []*functions.Param = nil
+	var params []*parameters.Parameter = nil
 	if g.NameParlist != nil {
 		name = &g.NameParlist.NameLpar.Name
 		params = g.NameParlist.Ast()
@@ -44,8 +44,8 @@ type NameParlist struct {
 	Params   []*Param  `{ "," @@ } ")"`
 }
 
-func (g *NameParlist) Ast() []*functions.Param {
-	params := make([]*functions.Param, 0, 1+len(g.Params))
+func (g *NameParlist) Ast() []*parameters.Parameter {
+	params := make([]*parameters.Parameter, 0, 1+len(g.Params))
 	params = append(params, g.Param.Ast())
 	for _, param := range g.Params {
 		params = append(params, param.Ast())
@@ -64,7 +64,7 @@ type Param struct {
 	OutputType  *string      `@Type`
 }
 
-func (g *Param) Ast() *functions.Param {
+func (g *Param) Ast() *parameters.Parameter {
 	var inputType types.Type
 	if g.InputType != nil {
 		inputType = string2type(*g.InputType)
@@ -72,12 +72,12 @@ func (g *Param) Ast() *functions.Param {
 		inputType = &types.AnyType{}
 	}
 	var name string
-	var params []*functions.Param = nil
+	var params []*parameters.Parameter = nil
 	if g.Name1 != nil {
 		name = *g.Name1
 	} else if g.NameParlist != nil {
 		name = g.NameParlist.NameLpar.Name
-		params = make([]*functions.Param, 0, len(g.NameParlist.Params)+1)
+		params = make([]*parameters.Parameter, 0, len(g.NameParlist.Params)+1)
 		params = append(params, g.NameParlist.Param.Ast())
 		for _, param := range g.NameParlist.Params {
 			params = append(params, param.Ast())
@@ -85,7 +85,7 @@ func (g *Param) Ast() *functions.Param {
 	} else {
 		name = *g.Name2
 	}
-	return &functions.Param{
+	return &parameters.Parameter{
 		InputType:  inputType,
 		Name:       name,
 		Params:     params,

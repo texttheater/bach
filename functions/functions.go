@@ -2,6 +2,7 @@ package functions
 
 import (
 	"github.com/texttheater/bach/actions"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
@@ -10,13 +11,13 @@ import (
 type Function struct {
 	InputType  types.Type
 	Name       string
-	Params     []*Param
+	Params     []*parameters.Parameter
 	OutputType types.Type
 	Action     actions.Action
 }
 
-func (f Function) Signature() *Param {
-	return &Param{
+func (f Function) Signature() *parameters.Parameter {
+	return &parameters.Parameter{
 		InputType:  f.InputType,
 		Name:       f.Name,
 		Params:     f.Params,
@@ -28,9 +29,9 @@ type Kernel func(inputValue values.Value, argValues []values.Value) values.Value
 
 func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
 	outputType types.Type, kernel Kernel) Function {
-	params := make([]*Param, 0, len(argTypes))
+	params := make([]*parameters.Parameter, 0, len(argTypes))
 	for _, argType := range argTypes {
-		params = append(params, &Param{
+		params = append(params, &parameters.Parameter{
 			InputType:  &types.AnyType{},
 			Name:       "", // TODO ?
 			Params:     nil,

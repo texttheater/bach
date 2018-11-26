@@ -14,6 +14,7 @@ import (
 	"github.com/texttheater/bach/actions"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -29,7 +30,7 @@ var booleanType = types.BooleanType{}
 ///////////////////////////////////////////////////////////////////////////////
 
 type Expression interface {
-	Typecheck(inputShape shapes.Shape, params []*functions.Param) (outputShape shapes.Shape, action actions.Action, err error)
+	Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (outputShape shapes.Shape, action actions.Action, err error)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,7 +41,7 @@ type ConstantExpression struct {
 	Value values.Value
 }
 
-func (x *ConstantExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, actions.Action, error) {
+func (x *ConstantExpression) Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (shapes.Shape, actions.Action, error) {
 	if len(params) > 0 {
 		return nullShape, nil, errors.E("type", x.Pos, "number expression does not take parameters")
 	}
@@ -62,7 +63,7 @@ type CompositionExpression struct {
 	Right Expression
 }
 
-func (x *CompositionExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, actions.Action, error) {
+func (x *CompositionExpression) Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (shapes.Shape, actions.Action, error) {
 	if len(params) > 0 {
 		return nullShape, nil, errors.E("type", x.Pos, "composition expression does not take parameters")
 	}
@@ -90,7 +91,7 @@ type CallExpression struct {
 	Args []Expression
 }
 
-func (x *CallExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, actions.Action, error) {
+func (x *CallExpression) Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (shapes.Shape, actions.Action, error) {
 	// Go down the function stack and find the function invoked by this
 	// call
 	stack := inputShape.FunctionStack
@@ -154,7 +155,7 @@ type AssignmentExpression struct {
 	Name string
 }
 
-func (x *AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, actions.Action, error) {
+func (x *AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (shapes.Shape, actions.Action, error) {
 	if len(params) > 0 {
 		return nullShape, nil, errors.E("type", x.Pos, "assignment expression does not take parameters")
 	}
@@ -204,12 +205,12 @@ type DefinitionExpression struct {
 	Pos        lexer.Position
 	InputType  types.Type
 	Name       string
-	Params     []*functions.Param
+	Params     []*parameters.Parameter
 	OutputType types.Type
 	Body       Expression
 }
 
-func (x *DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, actions.Action, error) {
+func (x *DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (shapes.Shape, actions.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return nullShape, nil, errors.E("type", x.Pos, "definition expression does not take parameters")
@@ -294,7 +295,7 @@ type ConditionalExpression struct {
 	Alternative     Expression
 }
 
-func (x *ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*functions.Param) (shapes.Shape, actions.Action, error) {
+func (x *ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (shapes.Shape, actions.Action, error) {
 	conditionOutputShape, conditionAction, err := x.Condition.Typecheck(inputShape, nil)
 	if err != nil {
 		return nullShape, nil, err

@@ -1,4 +1,4 @@
-package functions
+package parameters
 
 import (
 	"fmt"
@@ -8,15 +8,15 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-type Param struct {
+type Parameter struct {
 	InputType   types.Type
 	Name        string
-	Params      []*Param
+	Params      []*Parameter
 	OutputType  types.Type
 	ActionStack *ActionStack
 }
 
-func (this *Param) Subsumes(that *Param) bool {
+func (this *Parameter) Subsumes(that *Parameter) bool {
 	if len(this.Params) != len(that.Params) {
 		return false
 	}
@@ -34,7 +34,7 @@ func (this *Param) Subsumes(that *Param) bool {
 	return true
 }
 
-func (p *Param) String() string {
+func (p *Parameter) String() string {
 	paramStrings := make([]string, 0, len(p.Params))
 	for _, param := range p.Params {
 		paramStrings = append(paramStrings, param.String())
