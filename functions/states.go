@@ -9,18 +9,6 @@ type State struct {
 	ActionStack *ActionStack
 }
 
-type ActionStack struct {
-	Head Action
-	Tail *ActionStack
-}
-
-func (s *ActionStack) Push(action Action) *ActionStack {
-	return &ActionStack{
-		Head: action,
-		Tail: s,
-	}
-}
-
 type Action struct {
 	Name    string
 	Execute func(inputState State, outerArgs []Action) State
