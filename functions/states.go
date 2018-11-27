@@ -22,7 +22,7 @@ func (s *Stack) Push(element Variable) *Stack {
 }
 
 type Variable struct {
-	Name   string
+	Id     interface{}
 	Action Action
 }
 

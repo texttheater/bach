@@ -155,6 +155,7 @@ func (x *AssignmentExpression) Typecheck(inputShape functions.Shape, params []*f
 	if len(params) > 0 {
 		return nullShape, nil, errors.E("type", x.Pos, "assignment expression does not take parameters")
 	}
+	var Id interface{} = x
 	outputShape := functions.Shape{inputShape.Type, inputShape.FunctionStack.Push(functions.Function{
 		InputType:  &types.AnyType{},
 		Name:       x.Name,
@@ -163,7 +164,7 @@ func (x *AssignmentExpression) Typecheck(inputShape functions.Shape, params []*f
 		Action: func(inputState functions.State, args []functions.Action) functions.State {
 			stack := inputState.Stack
 			for stack != nil {
-				if stack.Head.Name == x.Name {
+				if stack.Head.Id == Id {
 					return functions.State{
 						Value: stack.Head.Action(functions.InitialState, nil).Value,
 						Stack: inputState.Stack,
@@ -178,7 +179,7 @@ func (x *AssignmentExpression) Typecheck(inputShape functions.Shape, params []*f
 		return functions.State{
 			Value: inputState.Value,
 			Stack: inputState.Stack.Push(functions.Variable{
-				Name: x.Name,
+				Id: Id,
 				Action: func(i functions.State, as []functions.Action) functions.State {
 					return functions.State{
 						Value: inputState.Value,
