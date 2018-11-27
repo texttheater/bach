@@ -23,7 +23,7 @@ func (s *Stack) Push(element Variable) *Stack {
 
 type Variable struct {
 	Name  string
-	Value values.Value
+	Action Action
 }
 
 var InitialState State = State{

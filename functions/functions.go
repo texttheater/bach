@@ -1,7 +1,6 @@
 package functions
 
 import (
-	"github.com/texttheater/bach/actions"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -13,7 +12,7 @@ type Function struct {
 	Name       string
 	Params     []*parameters.Parameter
 	OutputType types.Type
-	Action     actions.Action
+	Action     states.Action
 }
 
 func (f Function) Signature() *parameters.Parameter {
@@ -43,7 +42,7 @@ func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
 		Name:       name,
 		Params:     params,
 		OutputType: outputType,
-		Action: func(inputState states.State, args []actions.Action) states.State {
+		Action: func(inputState states.State, args []states.Action) states.State {
 			argValues := make([]values.Value, 0, len(argTypes))
 			argInputState := states.State{
 				Value: &values.NullValue{},
