@@ -8,11 +8,10 @@ import (
 )
 
 type Parameter struct {
-	InputType   types.Type
-	Name        string
-	Params      []*Parameter
-	OutputType  types.Type
-	ActionStack *ActionStack
+	InputType  types.Type
+	Name       string
+	Params     []*Parameter
+	OutputType types.Type
 }
 
 func (this *Parameter) Subsumes(that *Parameter) bool {
@@ -40,16 +39,4 @@ func (p *Parameter) String() string {
 	}
 	paramsString := strings.Join(paramStrings, ",")
 	return fmt.Sprintf("for %s %s(%s) %s", p.InputType, p.Name, paramsString, p.OutputType)
-}
-
-type ActionStack struct {
-	Head Action
-	Tail *ActionStack
-}
-
-func (s *ActionStack) Push(action Action) *ActionStack {
-	return &ActionStack{
-		Head: action,
-		Tail: s,
-	}
 }

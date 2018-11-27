@@ -213,12 +213,21 @@ type DefinitionExpression struct {
 }
 
 func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+	// This function is responsible for interpreting function definitions,
+	// and as such it is probably the most complicated function in the Bach
+	// interpreter. All the shapes, states, parameters, stacks, and actions
+	// have to be wired so that recursion, closures, and parameters work as
+	// expected. Everything has to happen in a counterintuitve order due to
+	// recursion (the function needs to know how to call itself before it
+	// is defined) and parameters (their actions change from call to call).
+	// TODO: untangle and document everything more thoroughly.
+
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return nullShape, nil, errors.E("type", x.Pos, "definition expression does not take parameters")
 	}
 	// variables for body input stack, action (will be set later)
-	var bodyInputStack *functions.Stack = nil
+	var bodyInputStackStub *functions.Stack = nil
 	var bodyAction functions.Action = nil
 	// add the function defined here to the function stack
 	functionStack := inputShape.FunctionStack.Push(functions.Function{
@@ -227,18 +236,21 @@ func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*f
 		Params:     x.Params,
 		OutputType: x.OutputType,
 		Action: func(inputState functions.State, args []functions.Action) functions.State {
-			// Push, call, pop
+			// Bind parameters to arguments by adding corresponding
+			// Variable objects to the body input state.
+			bodyInputStack := bodyInputStackStub
 			for i, param := range x.Params {
-				param.ActionStack = param.ActionStack.Push(args[i])
+				var Id interface{} = param
+				bodyInputStack = bodyInputStack.Push(functions.Variable{
+					Id:     Id,
+					Action: args[i],
+				})
 			}
 			bodyInputState := functions.State{
 				Value: inputState.Value,
 				Stack: bodyInputStack,
 			}
 			bodyOutputState := bodyAction(bodyInputState, nil)
-			for _, param := range x.Params {
-				param.ActionStack = param.ActionStack.Tail
-			}
 			return functions.State{
 				Value: bodyOutputState.Value,
 				Stack: inputState.Stack,
@@ -248,13 +260,21 @@ func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*f
 	// add parameter functions for use in the body
 	bodyFunctionStack := functionStack
 	for _, param := range x.Params {
+		var Id interface{} = param
 		bodyFunctionStack = bodyFunctionStack.Push(functions.Function{
 			InputType:  param.InputType,
 			Name:       param.Name,
 			Params:     param.Params,
 			OutputType: param.OutputType,
 			Action: func(inputState functions.State, args []functions.Action) functions.State {
-				return param.ActionStack.Head(inputState, args)
+				stack := inputState.Stack
+				for stack != nil {
+					if stack.Head.Id == Id {
+						return stack.Head.Action(inputState, args)
+					}
+					stack = stack.Tail
+				}
+				panic("action not found")
 			},
 		})
 	}
@@ -277,9 +297,9 @@ func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*f
 		Type:          inputShape.Type,
 		FunctionStack: functionStack,
 	}
-	// define action
+	// define action (crucially, setting body input stack)
 	action := func(inputState functions.State, args []functions.Action) functions.State {
-		bodyInputStack = inputState.Stack
+		bodyInputStackStub = inputState.Stack
 		return inputState
 	}
 	// return
