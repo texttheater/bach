@@ -227,7 +227,7 @@ func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*f
 		return nullShape, nil, errors.E("type", x.Pos, "definition expression does not take parameters")
 	}
 	// variables for body input stack, action (will be set later)
-	var bodyInputStackStub *functions.Stack = nil
+	var bodyInputStackStub *functions.VariableStack = nil
 	var bodyAction functions.Action = nil
 	// add the function defined here to the function stack
 	functionStack := inputShape.FunctionStack.Push(functions.Function{

@@ -6,16 +6,16 @@ import (
 
 type State struct {
 	Value values.Value
-	Stack *Stack
+	Stack *VariableStack
 }
 
-type Stack struct {
+type VariableStack struct {
 	Head Variable
-	Tail *Stack
+	Tail *VariableStack
 }
 
-func (s *Stack) Push(element Variable) *Stack {
-	return &Stack{
+func (s *VariableStack) Push(element Variable) *VariableStack {
+	return &VariableStack{
 		Head: element,
 		Tail: s,
 	}
