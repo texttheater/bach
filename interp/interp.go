@@ -5,8 +5,8 @@ import (
 	//"os"
 
 	"github.com/texttheater/bach/builtin"
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/grammar"
-	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/values"
 )
 
@@ -24,7 +24,7 @@ func InterpretString(program string) (values.Value, error) {
 		return nil, err
 	}
 	// evaluate
-	outputState := action(states.InitialState, nil) // TODO error handling
+	outputState := action(functions.InitialState, nil) // TODO error handling
 	//fmt.Fprintf(os.Stderr, "Variables in output state:\n")
 	//stack := outputState.Stack
 	//for stack != nil {

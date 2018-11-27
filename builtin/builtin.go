@@ -2,14 +2,13 @@ package builtin
 
 import (
 	"github.com/texttheater/bach/functions"
-	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/types"
 )
 
 var InitialShape = initialShape()
 
-func initialShape() shapes.Shape {
-	shape := shapes.Shape{&types.AnyType{}, nil}
+func initialShape() functions.Shape {
+	shape := functions.Shape{&types.AnyType{}, nil}
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
 		&types.NumberType{},
 		"+",

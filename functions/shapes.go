@@ -1,7 +1,6 @@
-package shapes
+package functions
 
 import (
-	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
 )
 
@@ -11,10 +10,10 @@ type Shape struct {
 }
 
 type FunctionStack struct {
-	Head functions.Function
+	Head Function
 	Tail *FunctionStack
 }
 
-func (s *FunctionStack) Push(function functions.Function) *FunctionStack {
+func (s *FunctionStack) Push(function Function) *FunctionStack {
 	return &FunctionStack{function, s}
 }

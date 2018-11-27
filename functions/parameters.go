@@ -1,10 +1,9 @@
-package parameters
+package functions
 
 import (
 	"fmt"
 	"strings"
 
-	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
@@ -44,11 +43,11 @@ func (p *Parameter) String() string {
 }
 
 type ActionStack struct {
-	Head states.Action
+	Head Action
 	Tail *ActionStack
 }
 
-func (s *ActionStack) Push(action states.Action) *ActionStack {
+func (s *ActionStack) Push(action Action) *ActionStack {
 	return &ActionStack{
 		Head: action,
 		Tail: s,

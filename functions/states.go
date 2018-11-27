@@ -1,4 +1,4 @@
-package states
+package functions
 
 import (
 	"github.com/texttheater/bach/values"
@@ -22,7 +22,7 @@ func (s *Stack) Push(element Variable) *Stack {
 }
 
 type Variable struct {
-	Name  string
+	Name   string
 	Action Action
 }
 
