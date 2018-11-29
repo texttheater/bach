@@ -22,11 +22,11 @@ func (s *VariableStack) Push(element Variable) *VariableStack {
 }
 
 type Variable struct {
-	Id     interface{}
+	ID     interface{}
 	Action Action
 }
 
-var InitialState State = State{
+var InitialState = State{
 	Value: &values.NullValue{},
 	Stack: nil,
 }

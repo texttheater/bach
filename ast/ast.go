@@ -155,7 +155,7 @@ func (x *AssignmentExpression) Typecheck(inputShape functions.Shape, params []*f
 	if len(params) > 0 {
 		return nullShape, nil, errors.E("type", x.Pos, "assignment expression does not take parameters")
 	}
-	var Id interface{} = x
+	var id interface{} = x
 	outputShape := functions.Shape{inputShape.Type, inputShape.FunctionStack.Push(functions.Function{
 		InputType:  &types.AnyType{},
 		Name:       x.Name,
@@ -164,7 +164,7 @@ func (x *AssignmentExpression) Typecheck(inputShape functions.Shape, params []*f
 		Action: func(inputState functions.State, args []functions.Action) functions.State {
 			stack := inputState.Stack
 			for stack != nil {
-				if stack.Head.Id == Id {
+				if stack.Head.ID == id {
 					return functions.State{
 						Value: stack.Head.Action(functions.InitialState, nil).Value,
 						Stack: inputState.Stack,
@@ -179,7 +179,7 @@ func (x *AssignmentExpression) Typecheck(inputShape functions.Shape, params []*f
 		return functions.State{
 			Value: inputState.Value,
 			Stack: inputState.Stack.Push(functions.Variable{
-				Id: Id,
+				ID: id,
 				Action: func(i functions.State, as []functions.Action) functions.State {
 					return functions.State{
 						Value: inputState.Value,
@@ -213,22 +213,13 @@ type DefinitionExpression struct {
 }
 
 func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
-	// This function is responsible for interpreting function definitions,
-	// and as such it is probably the most complicated function in the Bach
-	// interpreter. All the shapes, states, parameters, stacks, and actions
-	// have to be wired so that recursion, closures, and parameters work as
-	// expected. Everything has to happen in a counterintuitve order due to
-	// recursion (the function needs to know how to call itself before it
-	// is defined) and parameters (their actions change from call to call).
-	// TODO: untangle and document everything more thoroughly.
-
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return nullShape, nil, errors.E("type", x.Pos, "definition expression does not take parameters")
 	}
-	// variables for body input stack, action (will be set later)
-	var bodyInputStackStub *functions.VariableStack = nil
-	var bodyAction functions.Action = nil
+	// variables for body input stack, action (will be set at runtime)
+	var bodyInputStackStub *functions.VariableStack
+	var bodyAction functions.Action
 	// add the function defined here to the function stack
 	functionStack := inputShape.FunctionStack.Push(functions.Function{
 		InputType:  x.InputType,
@@ -240,9 +231,9 @@ func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*f
 			// Variable objects to the body input state.
 			bodyInputStack := bodyInputStackStub
 			for i, param := range x.Params {
-				var Id interface{} = param
+				var id interface{} = param
 				bodyInputStack = bodyInputStack.Push(functions.Variable{
-					Id:     Id,
+					ID:     id,
 					Action: args[i],
 				})
 			}
@@ -260,7 +251,7 @@ func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*f
 	// add parameter functions for use in the body
 	bodyFunctionStack := functionStack
 	for _, param := range x.Params {
-		var Id interface{} = param
+		var id interface{} = param
 		bodyFunctionStack = bodyFunctionStack.Push(functions.Function{
 			InputType:  param.InputType,
 			Name:       param.Name,
@@ -269,7 +260,7 @@ func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*f
 			Action: func(inputState functions.State, args []functions.Action) functions.State {
 				stack := inputState.Stack
 				for stack != nil {
-					if stack.Head.Id == Id {
+					if stack.Head.ID == id {
 						return stack.Head.Action(inputState, args)
 					}
 					stack = stack.Tail

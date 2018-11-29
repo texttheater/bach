@@ -19,8 +19,8 @@ type Definition struct {
 }
 
 func (g *Definition) Ast() ast.Expression {
-	var name *string = g.Name
-	var params []*functions.Parameter = nil
+	var name = g.Name
+	var params []*functions.Parameter
 	if g.NameParlist != nil {
 		name = &g.NameParlist.NameLpar.Name
 		params = g.NameParlist.Ast()
@@ -72,7 +72,7 @@ func (g *Param) Ast() *functions.Parameter {
 		inputType = &types.AnyType{}
 	}
 	var name string
-	var params []*functions.Parameter = nil
+	var params []*functions.Parameter
 	if g.Name1 != nil {
 		name = *g.Name1
 	} else if g.NameParlist != nil {
