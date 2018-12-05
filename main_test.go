@@ -70,6 +70,12 @@ func TestInterp(t *testing.T) {
 		{`"abc"`, &values.StringValue{"abc"}, ""},
 		{`"\"\\abc\""`, &values.StringValue{`"\abc"`}, ""},
 		{`1 "abc"`, &values.StringValue{"abc"}, ""},
+		// arrays
+		{`[]`, &values.ArrayValue{[]values.Value{}}, ""},
+		{`[1]`, &values.ArrayValue{[]values.Value{&values.NumberValue{1}}}, ""},
+		{`[1, 2, 3]`, &values.ArrayValue{[]values.Value{&values.NumberValue{1}, &values.NumberValue{2}, &values.NumberValue{3}}}, ""},
+		{`[1, "a"]`, &values.ArrayValue{[]values.Value{&values.NumberValue{1}, &values.StringValue{"a"}}}, ""},
+		{`[[1, 2], ["a", "b"]]`, &values.ArrayValue{[]values.Value{&values.ArrayValue{[]values.Value{&values.NumberValue{1}, &values.NumberValue{2}}}, &values.ArrayValue{[]values.Value{&values.StringValue{"a"}, &values.StringValue{"b"}}}}}, ""},
 		// function definitions
 		{`for Num def plusOne Num as +1 ok 1 plusOne`, &values.NumberValue{2}, ""},
 		{`for Num def plusOne Num as +1 ok 1 plusOne plusOne`, &values.NumberValue{3}, ""},
