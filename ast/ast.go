@@ -53,6 +53,45 @@ func (x *ConstantExpression) Typecheck(inputShape functions.Shape, params []*fun
 
 ///////////////////////////////////////////////////////////////////////////////
 
+type ArrayExpression struct {
+	Pos      lexer.Position
+	Elements []Expression
+}
+
+func (x *ArrayExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+	if len(params) > 0 {
+		return nullShape, nil, errors.E("type", x.Pos, "array expression does not take parameters")
+	}
+	var elementType types.Type = &types.AnyType{}
+	elementActions := make([]functions.Action, 0, len(x.Elements))
+	for _, elExpression := range x.Elements {
+		elOutputShape, elAction, err := elExpression.Typecheck(inputShape, nil)
+		if err != nil {
+			return nullShape, nil, err
+		}
+		elementType = types.Disjoin(elementType, elOutputShape.Type)
+		elementActions = append(elementActions, elAction)
+	}
+	outputShape := functions.Shape{
+		Type:          &types.ArrayType{elementType},
+		FunctionStack: inputShape.FunctionStack,
+	}
+	action := func(inputState functions.State, args []functions.Action) functions.State {
+		elementValues := make([]values.Value, 0, len(elementActions))
+		for _, elAction := range elementActions {
+			elValue := elAction(inputState, nil).Value
+			elementValues = append(elementValues, elValue)
+		}
+		return functions.State{
+			Value: &values.ArrayValue{elementValues},
+			Stack: inputState.Stack,
+		}
+	}
+	return outputShape, action, nil
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 type CompositionExpression struct {
 	Pos   lexer.Position
 	Left  Expression
