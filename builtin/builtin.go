@@ -121,5 +121,12 @@ func initialShape() functions.Shape {
 		&types.BooleanType{},
 		BooleanEqual,
 	))
+	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+		&types.AnyType{},
+		"null",
+		nil,
+		&types.NullType{},
+		Null,
+	))
 	return shape
 }
