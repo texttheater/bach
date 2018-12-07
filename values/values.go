@@ -1,6 +1,7 @@
 package values
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
 )
@@ -48,6 +49,26 @@ type StringValue struct {
 
 func (v *StringValue) String() string {
 	return fmt.Sprintf("%q", v.Value)
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+type ArrayValue struct {
+	ElementValues []Value
+}
+
+func (v *ArrayValue) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString("[")
+	if len(v.ElementValues) > 0 {
+		buffer.WriteString(v.ElementValues[0].String())
+		for _, elValue := range v.ElementValues[1:] {
+			buffer.WriteString(", ")
+			buffer.WriteString(elValue.String())
+		}
+	}
+	buffer.WriteString("]")
+	return buffer.String()
 }
 
 ///////////////////////////////////////////////////////////////////////////////

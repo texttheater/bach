@@ -24,6 +24,8 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Name>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Comma>,)` +
 		`|(?P<Rpar>\))` +
+		`|(?P<Lbrack>\[)` +
+		`|(?P<Rbrack>])` +
 		// the following will be scanned as Name, but mapped to the appropriate token types by name2keyword (see below)
 		`|(?P<Keyword>for|def|as|ok|if|then|elif|else)` +
 		`|(?P<Type>Num|Str|Bool|Null|Any)`,
@@ -97,6 +99,7 @@ type Component struct {
 	Pos         lexer.Position
 	Number      *float64     `  @Number`
 	String      *string      `| @String`
+	Array       *Array       `| @@`
 	Call        *Call        `| @@`
 	Assignment  *Assignment  `| @Assignment`
 	Definition  *Definition  `| @@`
@@ -117,6 +120,9 @@ func (g *Component) Ast() ast.Expression {
 			Type:  &types.StringType{},
 			Value: &values.StringValue{*g.String},
 		}
+	}
+	if g.Array != nil {
+		return g.Array.Ast()
 	}
 	if g.Call != nil {
 		return g.Call.Ast()

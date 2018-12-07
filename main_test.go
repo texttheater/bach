@@ -61,6 +61,8 @@ func TestInterp(t *testing.T) {
 		{"false ==false", &values.BooleanValue{true}, ""},
 		{"false ==true", &values.BooleanValue{false}, ""},
 		{"1 +1 ==2 and(2 +2 ==5 not)", &values.BooleanValue{true}, ""},
+		// null
+		{"1 null", &values.NullValue{}, ""},
 		// assignment
 		{"1 +1 =a 3 *2 +a", &values.NumberValue{8}, ""},
 		{"1 +1 ==2 =p 1 +1 ==1 =q p ==q not", &values.BooleanValue{true}, ""},
@@ -68,6 +70,12 @@ func TestInterp(t *testing.T) {
 		{`"abc"`, &values.StringValue{"abc"}, ""},
 		{`"\"\\abc\""`, &values.StringValue{`"\abc"`}, ""},
 		{`1 "abc"`, &values.StringValue{"abc"}, ""},
+		// arrays
+		{`[]`, &values.ArrayValue{[]values.Value{}}, ""},
+		{`[1]`, &values.ArrayValue{[]values.Value{&values.NumberValue{1}}}, ""},
+		{`[1, 2, 3]`, &values.ArrayValue{[]values.Value{&values.NumberValue{1}, &values.NumberValue{2}, &values.NumberValue{3}}}, ""},
+		{`[1, "a"]`, &values.ArrayValue{[]values.Value{&values.NumberValue{1}, &values.StringValue{"a"}}}, ""},
+		{`[[1, 2], ["a", "b"]]`, &values.ArrayValue{[]values.Value{&values.ArrayValue{[]values.Value{&values.NumberValue{1}, &values.NumberValue{2}}}, &values.ArrayValue{[]values.Value{&values.StringValue{"a"}, &values.StringValue{"b"}}}}}, ""},
 		// function definitions
 		{`for Num def plusOne Num as +1 ok 1 plusOne`, &values.NumberValue{2}, ""},
 		{`for Num def plusOne Num as +1 ok 1 plusOne plusOne`, &values.NumberValue{3}, ""},
