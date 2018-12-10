@@ -13,28 +13,31 @@ import (
 
 var LexerDefinition = lexer.Must(lexer.Regexp(
 	`([\s]+)` +
-		`|(?P<Number>(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-		`|(?P<String>"(?:\\.|[^"])*")` +
-		`|(?P<Op1Number>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-		`|(?P<Op2Number>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
+		`|(?P<Num>(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
+		`|(?P<Str>"(?:\\.|[^"])*")` +
+		`|(?P<Op1Num>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
+		`|(?P<Op2Num>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op1Name>[+\-*/%<>](?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Op2Name>(?:==|<=|>=)(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Assignment>=(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
+		`|(?P<TypeKeywordLangle>(?:Null|Bool|Num|Str|Seq|Arr|Any)<)` +
 		`|(?P<Name>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Comma>,)` +
 		`|(?P<Rpar>\))` +
 		`|(?P<Lbrack>\[)` +
 		`|(?P<Rbrack>])` +
+		`|(?P<Langle><)` +
+		`|(?P<Rangle>>)` +
 		// the following will be scanned as Name, but mapped to the appropriate token types by name2keyword (see below)
 		`|(?P<Keyword>for|def|as|ok|if|then|elif|else)` +
-		`|(?P<Type>Num|Str|Bool|Null|Any)`,
+		`|(?P<TypeKeyword>Null|Bool|Num|Str|Seq|Arr|Any)`,
 ))
 
 ///////////////////////////////////////////////////////////////////////////////
 
 func Parse(input string) (ast.Expression, error) {
-	parser, err := participle.Build(&Composition{}, participle.Lexer(LexerDefinition), participle.Unquote(LexerDefinition, "String"), participle.Map(Name2keyword))
+	parser, err := participle.Build(&Composition{}, participle.Lexer(LexerDefinition), participle.Unquote(LexerDefinition, "Str"), participle.Map(Name2keyword))
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {
 			return nil, errors.E("syntax", lexerError.Pos, lexerError.Message)
@@ -66,8 +69,9 @@ func Name2keyword(t lexer.Token) lexer.Token {
 }
 
 func isTypeKeyword(name string) bool {
-	return name == "Num" || name == "Str" || name == "Bool" ||
-		name == "Null" || name == "Any"
+	return name == "Null" || name == "Bool" || name == "Num" ||
+		name == "Str" || name == "Seq" || name == "Arr" ||
+		name == "Any"
 }
 
 func isKeyword(name string) bool {
@@ -97,8 +101,8 @@ func (g *Composition) Ast() ast.Expression {
 
 type Component struct {
 	Pos         lexer.Position
-	Number      *float64     `  @Number`
-	String      *string      `| @String`
+	Num         *float64     `  @Num`
+	Str         *string      `| @Str`
 	Array       *Array       `| @@`
 	Call        *Call        `| @@`
 	Assignment  *Assignment  `| @Assignment`
@@ -107,18 +111,18 @@ type Component struct {
 }
 
 func (g *Component) Ast() ast.Expression {
-	if g.Number != nil {
+	if g.Num != nil {
 		return &ast.ConstantExpression{
 			Pos:   g.Pos,
-			Type:  &types.NumberType{},
-			Value: &values.NumberValue{*g.Number},
+			Type:  &types.NumType{},
+			Value: &values.NumValue{*g.Num},
 		}
 	}
-	if g.String != nil {
+	if g.Str != nil {
 		return &ast.ConstantExpression{
 			Pos:   g.Pos,
-			Type:  &types.StringType{},
-			Value: &values.StringValue{*g.String},
+			Type:  &types.StrType{},
+			Value: &values.StrValue{*g.Str},
 		}
 	}
 	if g.Array != nil {

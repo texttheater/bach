@@ -5,32 +5,32 @@ import (
 )
 
 func True(inputValue values.Value, argumentValues []values.Value) values.Value {
-	return &values.BooleanValue{true}
+	return &values.BoolValue{true}
 }
 
 func False(inputValue values.Value, argumentValues []values.Value) values.Value {
-	return &values.BooleanValue{false}
+	return &values.BoolValue{false}
 }
 
 func And(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputBoolean := inputValue.(*values.BooleanValue)
-	argumentBoolean := argumentValues[0].(*values.BooleanValue)
-	return &values.BooleanValue{inputBoolean.Value && argumentBoolean.Value}
+	inputBool := inputValue.(*values.BoolValue)
+	argumentBool := argumentValues[0].(*values.BoolValue)
+	return &values.BoolValue{inputBool.Value && argumentBool.Value}
 }
 
 func Or(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputBoolean := inputValue.(*values.BooleanValue)
-	argumentBoolean := argumentValues[0].(*values.BooleanValue)
-	return &values.BooleanValue{inputBoolean.Value || argumentBoolean.Value}
+	inputBool := inputValue.(*values.BoolValue)
+	argumentBool := argumentValues[0].(*values.BoolValue)
+	return &values.BoolValue{inputBool.Value || argumentBool.Value}
 }
 
 func Not(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputBoolean := inputValue.(*values.BooleanValue)
-	return &values.BooleanValue{!inputBoolean.Value}
+	inputBool := inputValue.(*values.BoolValue)
+	return &values.BoolValue{!inputBool.Value}
 }
 
-func BooleanEqual(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputBoolean := inputValue.(*values.BooleanValue)
-	argumentBoolean := argumentValues[0].(*values.BooleanValue)
-	return &values.BooleanValue{inputBoolean.Value == argumentBoolean.Value}
+func BoolEqual(inputValue values.Value, argumentValues []values.Value) values.Value {
+	inputBool := inputValue.(*values.BoolValue)
+	argumentBool := argumentValues[0].(*values.BoolValue)
+	return &values.BoolValue{inputBool.Value == argumentBool.Value}
 }

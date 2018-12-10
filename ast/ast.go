@@ -21,7 +21,7 @@ import (
 
 var nullShape = functions.Shape{}
 
-var booleanType = types.BooleanType{}
+var booleanType = types.BoolType{}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -53,27 +53,31 @@ func (x *ConstantExpression) Typecheck(inputShape functions.Shape, params []*fun
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type ArrayExpression struct {
+type ArrExpression struct {
 	Pos      lexer.Position
 	Elements []Expression
 }
 
-func (x *ArrayExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x *ArrExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	if len(params) > 0 {
 		return nullShape, nil, errors.E("type", x.Pos, "array expression does not take parameters")
 	}
 	var elementType types.Type = &types.AnyType{}
 	elementActions := make([]functions.Action, 0, len(x.Elements))
-	for _, elExpression := range x.Elements {
+	for i, elExpression := range x.Elements {
 		elOutputShape, elAction, err := elExpression.Typecheck(inputShape, nil)
 		if err != nil {
 			return nullShape, nil, err
 		}
-		elementType = types.Disjoin(elementType, elOutputShape.Type)
+		if i == 0 {
+			elementType = elOutputShape.Type // HACK
+		} else {
+			elementType = types.Disjoin(elementType, elOutputShape.Type)
+		}
 		elementActions = append(elementActions, elAction)
 	}
 	outputShape := functions.Shape{
-		Type:          &types.ArrayType{elementType},
+		Type:          &types.ArrType{elementType},
 		FunctionStack: inputShape.FunctionStack,
 	}
 	action := func(inputState functions.State, args []functions.Action) functions.State {
@@ -83,7 +87,7 @@ func (x *ArrayExpression) Typecheck(inputShape functions.Shape, params []*functi
 			elementValues = append(elementValues, elValue)
 		}
 		return functions.State{
-			Value: &values.ArrayValue{elementValues},
+			Value: &values.ArrValue{elementValues},
 			Stack: inputState.Stack,
 		}
 	}
@@ -392,7 +396,7 @@ func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*
 	outputType = types.Disjoin(outputType, alternativeOutputShape.Type)
 	action := func(inputState functions.State, args []functions.Action) functions.State {
 		conditionState := conditionAction(inputState, nil)
-		boolConditionValue, _ := conditionState.Value.(*values.BooleanValue)
+		boolConditionValue, _ := conditionState.Value.(*values.BoolValue)
 		if boolConditionValue.Value {
 			consequentInputState := functions.State{
 				Value: inputState.Value,
@@ -406,7 +410,7 @@ func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*
 		}
 		for i := range elifConditionActions {
 			conditionState = elifConditionActions[i](inputState, nil)
-			boolConditionValue, _ = conditionState.Value.(*values.BooleanValue)
+			boolConditionValue, _ = conditionState.Value.(*values.BoolValue)
 			if boolConditionValue.Value {
 				consequentInputState := functions.State{
 					Value: inputState.Value,

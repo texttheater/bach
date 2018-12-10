@@ -7,61 +7,61 @@ import (
 )
 
 func Add(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputNumber := inputValue.(*values.NumberValue)
-	argumentNumber := argumentValues[0].(*values.NumberValue)
-	return &values.NumberValue{inputNumber.Value + argumentNumber.Value}
+	inputNum := inputValue.(*values.NumValue)
+	argumentNum := argumentValues[0].(*values.NumValue)
+	return &values.NumValue{inputNum.Value + argumentNum.Value}
 }
 
 func Subtract(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputNumber := inputValue.(*values.NumberValue)
-	argumentNumber := argumentValues[0].(*values.NumberValue)
-	return &values.NumberValue{inputNumber.Value - argumentNumber.Value}
+	inputNum := inputValue.(*values.NumValue)
+	argumentNum := argumentValues[0].(*values.NumValue)
+	return &values.NumValue{inputNum.Value - argumentNum.Value}
 }
 
 func Multiply(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputNumber := inputValue.(*values.NumberValue)
-	argumentNumber := argumentValues[0].(*values.NumberValue)
-	return &values.NumberValue{inputNumber.Value * argumentNumber.Value}
+	inputNum := inputValue.(*values.NumValue)
+	argumentNum := argumentValues[0].(*values.NumValue)
+	return &values.NumValue{inputNum.Value * argumentNum.Value}
 }
 
 func Divide(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputNumber := inputValue.(*values.NumberValue)
-	argumentNumber := argumentValues[0].(*values.NumberValue)
-	return &values.NumberValue{inputNumber.Value / argumentNumber.Value}
+	inputNum := inputValue.(*values.NumValue)
+	argumentNum := argumentValues[0].(*values.NumValue)
+	return &values.NumValue{inputNum.Value / argumentNum.Value}
 }
 
 func Modulo(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputNumber := inputValue.(*values.NumberValue)
-	argumentNumber := argumentValues[0].(*values.NumberValue)
-	return &values.NumberValue{math.Mod(inputNumber.Value, argumentNumber.Value)}
+	inputNum := inputValue.(*values.NumValue)
+	argumentNum := argumentValues[0].(*values.NumValue)
+	return &values.NumValue{math.Mod(inputNum.Value, argumentNum.Value)}
 }
 
 func LessThan(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputNumber := inputValue.(*values.NumberValue)
-	argumentNumber := argumentValues[0].(*values.NumberValue)
-	return &values.BooleanValue{inputNumber.Value < argumentNumber.Value}
+	inputNum := inputValue.(*values.NumValue)
+	argumentNum := argumentValues[0].(*values.NumValue)
+	return &values.BoolValue{inputNum.Value < argumentNum.Value}
 }
 
 func GreaterThan(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputNumber := inputValue.(*values.NumberValue)
-	argumentNumber := argumentValues[0].(*values.NumberValue)
-	return &values.BooleanValue{inputNumber.Value > argumentNumber.Value}
+	inputNum := inputValue.(*values.NumValue)
+	argumentNum := argumentValues[0].(*values.NumValue)
+	return &values.BoolValue{inputNum.Value > argumentNum.Value}
 }
 
 func Equal(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputNumber := inputValue.(*values.NumberValue)
-	argumentNumber := argumentValues[0].(*values.NumberValue)
-	return &values.BooleanValue{inputNumber.Value == argumentNumber.Value}
+	inputNum := inputValue.(*values.NumValue)
+	argumentNum := argumentValues[0].(*values.NumValue)
+	return &values.BoolValue{inputNum.Value == argumentNum.Value}
 }
 
 func LessEqual(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputNumber := inputValue.(*values.NumberValue)
-	argumentNumber := argumentValues[0].(*values.NumberValue)
-	return &values.BooleanValue{inputNumber.Value <= argumentNumber.Value}
+	inputNum := inputValue.(*values.NumValue)
+	argumentNum := argumentValues[0].(*values.NumValue)
+	return &values.BoolValue{inputNum.Value <= argumentNum.Value}
 }
 
 func GreaterEqual(inputValue values.Value, argumentValues []values.Value) values.Value {
-	inputNumber := inputValue.(*values.NumberValue)
-	argumentNumber := argumentValues[0].(*values.NumberValue)
-	return &values.BooleanValue{inputNumber.Value >= argumentNumber.Value}
+	inputNum := inputValue.(*values.NumValue)
+	argumentNum := argumentValues[0].(*values.NumValue)
+	return &values.BoolValue{inputNum.Value >= argumentNum.Value}
 }

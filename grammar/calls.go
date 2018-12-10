@@ -13,8 +13,8 @@ import (
 
 type Call struct {
 	Pos         lexer.Position
-	Op1Number   *Op1Number   `  @Op1Number`
-	Op2Number   *Op2Number   `| @Op2Number`
+	Op1Num      *Op1Num      `  @Op1Num`
+	Op2Num      *Op2Num      `| @Op2Num`
 	Op1Name     *Op1Name     `| @Op1Name`
 	Op2Name     *Op2Name     `| @Op2Name`
 	NameArglist *NameArglist `| @@`
@@ -22,11 +22,11 @@ type Call struct {
 }
 
 func (g *Call) Ast() ast.Expression {
-	if g.Op1Number != nil {
-		return g.Op1Number.Ast()
+	if g.Op1Num != nil {
+		return g.Op1Num.Ast()
 	}
-	if g.Op2Number != nil {
-		return g.Op2Number.Ast()
+	if g.Op2Num != nil {
+		return g.Op2Num.Ast()
 	}
 	if g.Op1Name != nil {
 		return g.Op1Name.Ast()
@@ -45,31 +45,31 @@ func (g *Call) Ast() ast.Expression {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type Op1Number struct {
-	Pos    lexer.Position
-	Op     string
-	Number float64
+type Op1Num struct {
+	Pos lexer.Position
+	Op  string
+	Num float64
 }
 
-func (g *Op1Number) Capture(values []string) error {
+func (g *Op1Num) Capture(values []string) error {
 	g.Op = string(values[0][:1])
 	f, err := strconv.ParseFloat(values[0][1:], 64)
 	if err != nil {
 		return err
 	}
-	g.Number = f
+	g.Num = f
 	return nil
 }
 
-func (g *Op1Number) Ast() ast.Expression {
+func (g *Op1Num) Ast() ast.Expression {
 	return &ast.CallExpression{
 		Pos:  g.Pos,
 		Name: g.Op,
 		Args: []ast.Expression{
 			&ast.ConstantExpression{
 				Pos:   g.Pos,
-				Type:  &types.NumberType{},
-				Value: &values.NumberValue{g.Number},
+				Type:  &types.NumType{},
+				Value: &values.NumValue{g.Num},
 			},
 		},
 	}
@@ -77,31 +77,31 @@ func (g *Op1Number) Ast() ast.Expression {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type Op2Number struct {
-	Pos    lexer.Position
-	Op     string
-	Number float64
+type Op2Num struct {
+	Pos lexer.Position
+	Op  string
+	Num float64
 }
 
-func (g *Op2Number) Capture(values []string) error {
+func (g *Op2Num) Capture(values []string) error {
 	g.Op = string(values[0][:2])
 	f, err := strconv.ParseFloat(values[0][2:], 64)
 	if err != nil {
 		return err
 	}
-	g.Number = f
+	g.Num = f
 	return nil
 }
 
-func (g *Op2Number) Ast() ast.Expression {
+func (g *Op2Num) Ast() ast.Expression {
 	return &ast.CallExpression{
 		Pos:  g.Pos,
 		Name: g.Op,
 		Args: []ast.Expression{
 			&ast.ConstantExpression{
 				Pos:   g.Pos,
-				Type:  &types.NumberType{},
-				Value: &values.NumberValue{g.Number},
+				Type:  &types.NumType{},
+				Value: &values.NumValue{g.Num},
 			},
 		},
 	}

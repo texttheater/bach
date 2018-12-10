@@ -23,41 +23,41 @@ func (v *NullValue) String() string {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type BooleanValue struct {
+type BoolValue struct {
 	Value bool
 }
 
-func (v *BooleanValue) String() string {
+func (v *BoolValue) String() string {
 	return strconv.FormatBool(v.Value)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type NumberValue struct {
+type NumValue struct {
 	Value float64
 }
 
-func (v *NumberValue) String() string {
+func (v *NumValue) String() string {
 	return strconv.FormatFloat(v.Value, 'f', -1, 64)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type StringValue struct {
+type StrValue struct {
 	Value string
 }
 
-func (v *StringValue) String() string {
+func (v *StrValue) String() string {
 	return fmt.Sprintf("%q", v.Value)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type ArrayValue struct {
+type ArrValue struct {
 	ElementValues []Value
 }
 
-func (v *ArrayValue) String() string {
+func (v *ArrValue) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("[")
 	if len(v.ElementValues) > 0 {

@@ -27,43 +27,43 @@ func (t *NullType) String() string {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type BooleanType struct {
+type BoolType struct {
 }
 
-func (t *BooleanType) Subsumes(other Type) bool {
-	_, ok := other.(*BooleanType)
+func (t *BoolType) Subsumes(other Type) bool {
+	_, ok := other.(*BoolType)
 	return ok
 }
 
-func (t *BooleanType) String() string {
+func (t *BoolType) String() string {
 	return "Bool"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type NumberType struct {
+type NumType struct {
 }
 
-func (t *NumberType) Subsumes(other Type) bool {
-	_, ok := other.(*NumberType)
+func (t *NumType) Subsumes(other Type) bool {
+	_, ok := other.(*NumType)
 	return ok
 }
 
-func (t *NumberType) String() string {
+func (t *NumType) String() string {
 	return "Num"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type StringType struct {
+type StrType struct {
 }
 
-func (t *StringType) Subsumes(other Type) bool {
-	_, ok := other.(*StringType)
+func (t *StrType) Subsumes(other Type) bool {
+	_, ok := other.(*StrType)
 	return ok
 }
 
-func (t *StringType) String() string {
+func (t *StrType) String() string {
 	return "Str"
 }
 
@@ -75,10 +75,14 @@ type SeqType struct {
 
 func (t *SeqType) Subsumes(other Type) bool {
 	otherSeqType, ok := other.(*SeqType)
-	if !ok {
-		return false
+	if ok {
+		return t.ElementType.Subsumes(otherSeqType.ElementType)
 	}
-	return t.ElementType.Subsumes(otherSeqType.ElementType)
+	otherArrType, ok := other.(*ArrType)
+	if ok {
+		return t.ElementType.Subsumes(otherArrType.ElementType)
+	}
+	return false
 }
 
 func (t *SeqType) String() string {
@@ -87,45 +91,20 @@ func (t *SeqType) String() string {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type ArrayType struct {
+type ArrType struct {
 	ElementType Type
 }
 
-func (t *ArrayType) Subsumes(other Type) bool {
-	otherArrayType, ok := other.(*ArrayType)
+func (t *ArrType) Subsumes(other Type) bool {
+	otherArrType, ok := other.(*ArrType)
 	if !ok {
 		return false
 	}
-	return t.ElementType.Subsumes(otherArrayType.ElementType)
+	return t.ElementType.Subsumes(otherArrType.ElementType)
 }
 
-func (t ArrayType) String() string {
+func (t ArrType) String() string {
 	return fmt.Sprintf("Arr<%s>", t.ElementType)
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type ObjectType struct {
-	fieldTypeMap map[string]Type
-}
-
-func (t *ObjectType) Subsumes(other Type) bool {
-	otherObjectType, ok := other.(*ObjectType)
-	if !ok {
-		return false
-	}
-	for field, b := range otherObjectType.fieldTypeMap {
-		if a, ok := t.fieldTypeMap[field]; ok {
-			if !a.Subsumes(b) {
-				return false
-			}
-		}
-	}
-	return true
-}
-
-func (t *ObjectType) String() string {
-	return "Obj" // TODO be more specific
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -20,5 +20,5 @@ func (g *Array) Ast() ast.Expression {
 			elements = append(elements, element.Ast())
 		}
 	}
-	return &ast.ArrayExpression{g.Pos, elements}
+	return &ast.ArrExpression{g.Pos, elements}
 }

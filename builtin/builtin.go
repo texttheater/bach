@@ -10,116 +10,116 @@ var InitialShape = initialShape()
 func initialShape() functions.Shape {
 	shape := functions.Shape{&types.AnyType{}, nil}
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.NumberType{},
+		&types.NumType{},
 		"+",
-		[]types.Type{&types.NumberType{}},
-		&types.NumberType{},
+		[]types.Type{&types.NumType{}},
+		&types.NumType{},
 		Add,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.NumberType{},
+		&types.NumType{},
 		"-",
-		[]types.Type{&types.NumberType{}},
-		&types.NumberType{},
+		[]types.Type{&types.NumType{}},
+		&types.NumType{},
 		Subtract,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.NumberType{},
+		&types.NumType{},
 		"*",
-		[]types.Type{&types.NumberType{}},
-		&types.NumberType{},
+		[]types.Type{&types.NumType{}},
+		&types.NumType{},
 		Multiply,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.NumberType{},
+		&types.NumType{},
 		"/",
-		[]types.Type{&types.NumberType{}},
-		&types.NumberType{},
+		[]types.Type{&types.NumType{}},
+		&types.NumType{},
 		Divide,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.NumberType{},
+		&types.NumType{},
 		"%",
-		[]types.Type{&types.NumberType{}},
-		&types.NumberType{},
+		[]types.Type{&types.NumType{}},
+		&types.NumType{},
 		Modulo,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.NumberType{},
+		&types.NumType{},
 		"<",
-		[]types.Type{&types.NumberType{}},
-		&types.BooleanType{},
+		[]types.Type{&types.NumType{}},
+		&types.BoolType{},
 		LessThan,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.NumberType{},
+		&types.NumType{},
 		">",
-		[]types.Type{&types.NumberType{}},
-		&types.BooleanType{},
+		[]types.Type{&types.NumType{}},
+		&types.BoolType{},
 		GreaterThan,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.NumberType{},
+		&types.NumType{},
 		"==",
-		[]types.Type{&types.NumberType{}},
-		&types.BooleanType{},
+		[]types.Type{&types.NumType{}},
+		&types.BoolType{},
 		Equal,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.NumberType{},
+		&types.NumType{},
 		"<=",
-		[]types.Type{&types.NumberType{}},
-		&types.BooleanType{},
+		[]types.Type{&types.NumType{}},
+		&types.BoolType{},
 		LessEqual,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.NumberType{},
+		&types.NumType{},
 		">=",
-		[]types.Type{&types.NumberType{}},
-		&types.BooleanType{},
+		[]types.Type{&types.NumType{}},
+		&types.BoolType{},
 		GreaterEqual,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
 		&types.AnyType{},
 		"true",
 		nil,
-		&types.BooleanType{},
+		&types.BoolType{},
 		True,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
 		&types.AnyType{},
 		"false",
 		nil,
-		&types.BooleanType{},
+		&types.BoolType{},
 		False,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.BooleanType{},
+		&types.BoolType{},
 		"and",
-		[]types.Type{&types.BooleanType{}},
-		&types.BooleanType{},
+		[]types.Type{&types.BoolType{}},
+		&types.BoolType{},
 		And,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.BooleanType{},
+		&types.BoolType{},
 		"or",
-		[]types.Type{&types.BooleanType{}},
-		&types.BooleanType{},
+		[]types.Type{&types.BoolType{}},
+		&types.BoolType{},
 		Or,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.BooleanType{},
+		&types.BoolType{},
 		"not",
 		nil,
-		&types.BooleanType{},
+		&types.BoolType{},
 		Not,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
-		&types.BooleanType{},
+		&types.BoolType{},
 		"==",
-		[]types.Type{&types.BooleanType{}},
-		&types.BooleanType{},
-		BooleanEqual,
+		[]types.Type{&types.BoolType{}},
+		&types.BoolType{},
+		BoolEqual,
 	))
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
 		&types.AnyType{},

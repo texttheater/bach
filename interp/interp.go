@@ -7,6 +7,7 @@ import (
 	"github.com/texttheater/bach/builtin"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/grammar"
+	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
@@ -32,4 +33,18 @@ func InterpretString(program string) (values.Value, error) {
 	//	stack = stack.Tail
 	//}
 	return outputState.Value, nil
+}
+
+func TypecheckString(program string) (types.Type, error) {
+	// parse
+	x, err := grammar.Parse(program)
+	if err != nil {
+		return nil, err
+	}
+	// type-check
+	shape, _, err := x.Typecheck(builtin.InitialShape, nil)
+	if err != nil {
+		return nil, err
+	}
+	return shape.Type, nil
 }

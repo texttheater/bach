@@ -11,10 +11,10 @@ import (
 
 type Definition struct {
 	Pos         lexer.Position
-	InputType   *string      `"for" @Type`
+	InputType   *Type        `"for" @@`
 	NameParlist *NameParlist `"def" ( @@`
 	Name        *string      `      | @Name)`
-	OutputType  *string      `@Type`
+	OutputType  *Type        `@@`
 	Body        *Composition `"as" @@ "ok"`
 }
 
@@ -27,10 +27,10 @@ func (g *Definition) Ast() ast.Expression {
 	}
 	return &ast.DefinitionExpression{
 		Pos:        g.Pos,
-		InputType:  string2type(*g.InputType),
+		InputType:  g.InputType.Ast(),
 		Name:       *name,
 		Params:     params,
-		OutputType: string2type(*g.OutputType),
+		OutputType: g.OutputType.Ast(),
 		Body:       g.Body.Ast(),
 	}
 }
@@ -58,16 +58,16 @@ func (g *NameParlist) Ast() []*functions.Parameter {
 type Param struct {
 	Pos         lexer.Position
 	Name1       *string      `( @Name`
-	InputType   *string      `| "for" @Type`
+	InputType   *Type        `| "for" @@`
 	NameParlist *NameParlist `  ( @@`
 	Name2       *string      `  | @Name) )`
-	OutputType  *string      `@Type`
+	OutputType  *Type        `@@`
 }
 
 func (g *Param) Ast() *functions.Parameter {
 	var inputType types.Type
 	if g.InputType != nil {
-		inputType = string2type(*g.InputType)
+		inputType = g.InputType.Ast()
 	} else {
 		inputType = &types.AnyType{}
 	}
@@ -89,29 +89,8 @@ func (g *Param) Ast() *functions.Parameter {
 		InputType:  inputType,
 		Name:       name,
 		Params:     params,
-		OutputType: string2type(*g.OutputType),
+		OutputType: g.OutputType.Ast(),
 	}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-func string2type(s string) types.Type {
-	if s == "Num" {
-		return &types.NumberType{}
-	}
-	if s == "Str" {
-		return &types.StringType{}
-	}
-	if s == "Bool" {
-		return &types.BooleanType{}
-	}
-	if s == "Null" {
-		return &types.NullType{}
-	}
-	if s == "Any" {
-		return &types.AnyType{}
-	}
-	panic("invalid type")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
