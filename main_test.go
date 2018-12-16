@@ -111,6 +111,31 @@ func TestValue(t *testing.T) {
 		{`for Num def connectSelf(for Num f(for Any g Num) Num) Num as =x f(x) ok 1 connectSelf(+)`, &values.NumValue{2}, ""},
 		{`for Num def connectSelf(for Num f(for Any g Num) Num) Num as =x f(x) ok 1 connectSelf(+) 3 connectSelf(*)`, &values.NumValue{9}, ""},
 		{`for Num def connectSelf(for Num f(g Num) Num) Num as =x f(x) ok 1 connectSelf(+)`, &values.NumValue{2}, ""},
+		// bad function calls - TODO need finer-grained error values
+		{`for Num def f Num as =x x ok for Str def f Str as =x x ok`, &values.NullValue{}, ""},
+		{`for Num def f Num as =x x ok for Str def f Str as =x x ok f(2)`, nil, "type"}, // no such function (input type Any, name f, 1 parameters)
+		{`for Num def f Num as =x x ok for Str def f Str as =x x ok 2 f`, &values.NumValue{2}, ""},
+		{`for Num def f Num as =x x ok for Str def f Str as =x x ok f`, nil, "type"}, // no such function (input type Any, name f, 0 parameters)
+		{`for Any def f(x Num) Num as x ok`, &values.NullValue{}, ""},
+		{`for Any def f(x Num) Num as x ok f(1)`, &values.NumValue{1}, ""},
+		{`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok`, &values.NullValue{}, ""},
+		{`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok 1 f`, nil, "type"}, // no such function (input type Num, name f, 0 parameters
+		{`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok f(1)`, nil, "type"}, // argument #0 has wrong output type (expected Str, got Num)
+		{`for Any def f(for Num g Num) Num as 1 g ok`, &values.NullValue{}, ""},
+		{`for Any def f(for Num g Num) Num as 1 g ok f(g)`, nil, "type"}, // no such function (input type Num, name g, 0 parameters)
+		{`for Any def f(for Num g Num) Num as 1 g ok f(1)`, &values.NumValue{1}, ""},
+		{`for Any def f(for Num g Num) Num as 1 g ok f(+1)`, &values.NumValue{2}, ""},
+		{`for Any def f(for Num g Num) Num as 1 g ok f(+2)`, &values.NumValue{3}, ""},
+		{`for Any def f(for Num g Num) Num as 1 g ok f(*10)`, &values.NumValue{10}, ""},
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g ok`, nil, "type"}, // no such function (input type Num, name g, 0 parameters
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok`, &values.NullValue{}, ""},
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok f(+)`, &values.NumValue{3}, ""},
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok f(*)`, &values.NumValue{2}, ""},
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok f(/)`, &values.NumValue{0.5}, ""},
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok f(+1)`, nil, "type"}, // no such function (input type Num, name +, 2 parameters)
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok`, &values.NullValue{}, ""},
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok f(g)`, nil, "type"}, // argument #0 does not match parameters (expected x Num, got x Str)
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(for Str x Num) Num as "abc" x ok f(g)`, nil, "type"}, // argument #0 does not match parameter (expected x Num, got for Str x Num)
 		// conditionals
 		{`if true then 2 else 3 ok`, &values.NumValue{2}, ""},
 		{`for Num def heart Bool as if <3 then true else false ok ok 2 heart`, &values.BoolValue{true}, ""},

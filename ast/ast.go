@@ -134,11 +134,10 @@ func (x *CallExpression) Typecheck(inputShape functions.Shape, params []*functio
 	// Go down the function stack and find the function invoked by this
 	// call
 	stack := inputShape.FunctionStack
-Entries:
 	for {
 		// Reached bottom of stack without finding a matching function
 		if stack == nil {
-			return nullShape, nil, errors.E("type", x.Pos, "no such function")
+			return nullShape, nil, errors.E("type", x.Pos, "no such function (input type %s, name %s, %v parameters)", inputShape.Type, x.Name, len(x.Args)+len(params))
 		}
 		// Try the function on top of the stack
 		function := stack.Head
@@ -165,12 +164,10 @@ Entries:
 			argInputShape := functions.Shape{param.InputType, inputShape.FunctionStack}
 			argOutputShape, argAction, err := x.Args[i].Typecheck(argInputShape, param.Params)
 			if err != nil {
-				stack = stack.Tail
-				continue Entries
+				return nullShape, nil, err
 			}
 			if !param.OutputType.Subsumes(argOutputShape.Type) {
-				stack = stack.Tail
-				continue Entries
+				return nullShape, nil, errors.E("type", x.Pos, "argument #%v has wrong output type (expected %s, got %s)", i, param.OutputType, argOutputShape.Type)
 			}
 			action = action.SetArg(argAction)
 		}
@@ -178,8 +175,7 @@ Entries:
 		// to function to call)
 		for i := 0; i < len(params); i++ {
 			if !params[i].Subsumes(function.Params[len(x.Args)+i]) {
-				stack = stack.Tail
-				continue Entries
+				return nullShape, nil, errors.E("type", x.Pos, "argument #%v does not match parameter (expected %s, got %s)", i, params[i], function.Params[len(x.Args)+i])
 			}
 		}
 		// Return result
