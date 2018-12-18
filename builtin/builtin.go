@@ -8,7 +8,7 @@ import (
 var InitialShape = initialShape()
 
 func initialShape() functions.Shape {
-	shape := functions.Shape{&types.AnyType{}, nil}
+	shape := functions.Shape{&types.NullType{}, nil}
 	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
 		&types.NumType{},
 		"+",
