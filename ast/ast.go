@@ -21,7 +21,7 @@ import (
 
 var nullShape = functions.Shape{}
 
-var booleanType = types.BoolType{}
+var boolType = &types.BoolType{}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +39,10 @@ type ConstantExpression struct {
 
 func (x *ConstantExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	if len(params) > 0 {
-		return nullShape, nil, errors.E("type", x.Pos, "number expression does not take parameters")
+		return nullShape, nil, errors.E(
+			errors.Kind(errors.ParamsNotAllowed),
+			errors.Pos(x.Pos),
+		)
 	}
 	outputShape := functions.Shape{x.Type, inputShape.FunctionStack}
 	action := func(inputState functions.State, args []functions.Action) functions.State {
@@ -60,7 +63,10 @@ type ArrExpression struct {
 
 func (x *ArrExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	if len(params) > 0 {
-		return nullShape, nil, errors.E("type", x.Pos, "array expression does not take parameters")
+		return nullShape, nil, errors.E(
+			errors.Kind(errors.ParamsNotAllowed),
+			errors.Pos(x.Pos),
+		)
 	}
 	var elementType types.Type = &types.AnyType{}
 	elementActions := make([]functions.Action, 0, len(x.Elements))
@@ -104,7 +110,10 @@ type CompositionExpression struct {
 
 func (x *CompositionExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	if len(params) > 0 {
-		return nullShape, nil, errors.E("type", x.Pos, "composition expression does not take parameters")
+		return nullShape, nil, errors.E(
+			errors.Kind(errors.ParamsNotAllowed),
+			errors.Pos(x.Pos),
+		)
 	}
 	middleShape, lAction, err := x.Left.Typecheck(inputShape, nil)
 	if err != nil {
@@ -137,7 +146,13 @@ func (x *CallExpression) Typecheck(inputShape functions.Shape, params []*functio
 	for {
 		// Reached bottom of stack without finding a matching function
 		if stack == nil {
-			return nullShape, nil, errors.E("type", x.Pos, "no such function (input type %s, name %s, %v parameters)", inputShape.Type, x.Name, len(x.Args)+len(params))
+			return nullShape, nil, errors.E(
+				errors.Kind(errors.NoSuchFunction),
+				errors.Pos(x.Pos),
+				errors.InputType(inputShape.Type),
+				errors.Name(x.Name),
+				errors.NumParams(len(x.Args)+len(params)),
+			)
 		}
 		// Try the function on top of the stack
 		function := stack.Head
@@ -167,7 +182,13 @@ func (x *CallExpression) Typecheck(inputShape functions.Shape, params []*functio
 				return nullShape, nil, err
 			}
 			if !param.OutputType.Subsumes(argOutputShape.Type) {
-				return nullShape, nil, errors.E("type", x.Pos, "argument #%v has wrong output type (expected %s, got %s)", i, param.OutputType, argOutputShape.Type)
+				return nullShape, nil, errors.E(
+					errors.Kind(errors.ArgHasWrongOutputType),
+					errors.Pos(x.Pos),
+					errors.ArgNum(i),
+					errors.WantType(param.OutputType),
+					errors.GotType(argOutputShape.Type),
+				)
 			}
 			action = action.SetArg(argAction)
 		}
@@ -175,7 +196,13 @@ func (x *CallExpression) Typecheck(inputShape functions.Shape, params []*functio
 		// to function to call)
 		for i := 0; i < len(params); i++ {
 			if !params[i].Subsumes(function.Params[len(x.Args)+i]) {
-				return nullShape, nil, errors.E("type", x.Pos, "argument #%v does not match parameter (expected %s, got %s)", i, params[i], function.Params[len(x.Args)+i])
+				return nullShape, nil, errors.E(
+					errors.Kind(errors.ParamDoesNotMatch),
+					errors.Pos(x.Pos),
+					errors.ParamNum(i),
+					errors.WantParam(params[i]),
+					errors.GotParam(function.Params[len(x.Args)+i]),
+				)
 			}
 		}
 		// Return result
@@ -192,7 +219,10 @@ type AssignmentExpression struct {
 
 func (x *AssignmentExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	if len(params) > 0 {
-		return nullShape, nil, errors.E("type", x.Pos, "assignment expression does not take parameters")
+		return nullShape, nil, errors.E(
+			errors.Kind(errors.ParamsNotAllowed),
+			errors.Pos(x.Pos),
+		)
 	}
 	var id interface{} = x
 	outputShape := functions.Shape{inputShape.Type, inputShape.FunctionStack.Push(functions.Function{
@@ -254,7 +284,10 @@ type DefinitionExpression struct {
 func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return nullShape, nil, errors.E("type", x.Pos, "definition expression does not take parameters")
+		return nullShape, nil, errors.E(
+			errors.Kind(errors.ParamsNotAllowed),
+			errors.Pos(x.Pos),
+		)
 	}
 	// variables for body input stack, action (will be set at runtime)
 	var bodyInputStackStub *functions.VariableStack
@@ -320,7 +353,12 @@ func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*f
 	}
 	// check body output type
 	if !x.OutputType.Subsumes(bodyOutputShape.Type) {
-		return nullShape, nil, errors.E("type", x.Pos, "expected function body output type %s, got %s", x.OutputType, bodyOutputShape.Type)
+		return nullShape, nil, errors.E(
+			errors.Kind(errors.FunctionBodyHasWrongOutputType),
+			errors.Pos(x.Pos),
+			errors.WantType(x.OutputType),
+			errors.GotType(bodyOutputShape.Type),
+		)
 	}
 	// define output context
 	outputShape := functions.Shape{
@@ -348,12 +386,25 @@ type ConditionalExpression struct {
 }
 
 func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+	// make sure we got no parameters
+	if len(params) > 0 {
+		return nullShape, nil, errors.E(
+			errors.Kind(errors.ParamsNotAllowed),
+			errors.Pos(x.Pos),
+		)
+	}
+	// typecheck condition
 	conditionOutputShape, conditionAction, err := x.Condition.Typecheck(inputShape, nil)
 	if err != nil {
 		return nullShape, nil, err
 	}
-	if !booleanType.Subsumes(conditionOutputShape.Type) {
-		return nullShape, nil, errors.E("type", x.Pos, "condition must be boolean")
+	if !boolType.Subsumes(conditionOutputShape.Type) {
+		return nullShape, nil, errors.E(
+			errors.Kind(errors.ConditionMustBeBool),
+			errors.Pos(x.Pos),
+			errors.WantType(boolType),
+			errors.GotType(conditionOutputShape.Type),
+		)
 	}
 	// context is the shared input context for all conditions and consequents.
 	// Each condition may add to the FunctionStack. Type always stays the same.
@@ -373,8 +424,13 @@ func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*
 		if err != nil {
 			return nullShape, nil, err
 		}
-		if !booleanType.Subsumes(conditionOutputShape.Type) {
-			return nullShape, nil, errors.E("type", x.Pos, "condition must be boolean")
+		if !boolType.Subsumes(conditionOutputShape.Type) {
+			return nullShape, nil, errors.E(
+				errors.Kind(errors.ConditionMustBeBool),
+				errors.Pos(x.Pos),
+				errors.WantType(boolType),
+				errors.GotType(conditionOutputShape.Type),
+			)
 		}
 		shape.FunctionStack = conditionOutputShape.FunctionStack
 		elifConditionActions = append(elifConditionActions, elifConditionAction)

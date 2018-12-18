@@ -40,7 +40,11 @@ func Parse(input string) (ast.Expression, error) {
 	parser, err := participle.Build(&Composition{}, participle.Lexer(LexerDefinition), participle.Unquote(LexerDefinition, "Str"), participle.Map(Name2keyword))
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {
-			return nil, errors.E("syntax", lexerError.Pos, lexerError.Message)
+			return nil, errors.E(
+				errors.Kind(errors.Syntax),
+				errors.Pos(lexerError.Pos),
+				errors.Message(lexerError.Message),
+			)
 		}
 		return nil, err
 	}
@@ -48,7 +52,11 @@ func Parse(input string) (ast.Expression, error) {
 	err = parser.ParseString(input, composition)
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {
-			return nil, errors.E("syntax", lexerError.Pos, lexerError.Message)
+			return nil, errors.E(
+				errors.Kind(errors.Syntax),
+				errors.Pos(lexerError.Pos),
+				errors.Message(lexerError.Message),
+			)
 		}
 		return nil, err
 	}

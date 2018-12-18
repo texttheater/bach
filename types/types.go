@@ -111,7 +111,7 @@ func (t ArrType) String() string {
 ///////////////////////////////////////////////////////////////////////////////
 
 type DisjunctiveType struct {
-	disjuncts []Type
+	Disjuncts []Type
 }
 
 func (t *DisjunctiveType) Subsumes(other Type) bool {
@@ -123,7 +123,7 @@ func (t *DisjunctiveType) Subsumes(other Type) bool {
 }
 
 func (t *DisjunctiveType) subsumesDisj(other *DisjunctiveType) bool {
-	for _, disjunct := range other.disjuncts {
+	for _, disjunct := range other.Disjuncts {
 		if !t.subsumesNonDisj(disjunct) {
 			return false
 		}
@@ -132,7 +132,7 @@ func (t *DisjunctiveType) subsumesDisj(other *DisjunctiveType) bool {
 }
 
 func (t *DisjunctiveType) subsumesNonDisj(other Type) bool {
-	for _, disjunct := range t.disjuncts {
+	for _, disjunct := range t.Disjuncts {
 		if disjunct.Subsumes(other) {
 			return true
 		}
@@ -142,8 +142,8 @@ func (t *DisjunctiveType) subsumesNonDisj(other Type) bool {
 
 func (t *DisjunctiveType) String() string {
 	buffer := bytes.Buffer{}
-	buffer.WriteString(fmt.Sprintf("%s", t.disjuncts[0]))
-	for _, disjunct := range t.disjuncts[1:] {
+	buffer.WriteString(fmt.Sprintf("%s", t.Disjuncts[0]))
+	for _, disjunct := range t.Disjuncts[1:] {
 		buffer.WriteString("|")
 		buffer.WriteString(fmt.Sprintf("%s", disjunct))
 	}
@@ -178,20 +178,20 @@ func (t *DisjunctiveType) disjoin(other Type) Type {
 
 func (t *DisjunctiveType) disjoinDisj(other *DisjunctiveType) Type {
 	result := t
-	for _, disjunct := range other.disjuncts {
+	for _, disjunct := range other.Disjuncts {
 		result = result.disjoinNonDisj(disjunct)
 	}
 	return result
 }
 
 func (t *DisjunctiveType) disjoinNonDisj(other Type) *DisjunctiveType {
-	for _, disjunct := range t.disjuncts {
+	for _, disjunct := range t.Disjuncts {
 		if disjunct.Subsumes(other) {
 			return t
 		}
 	}
-	newDisjuncts := make([]Type, 0, len(t.disjuncts)+1)
-	for _, disjunct := range t.disjuncts {
+	newDisjuncts := make([]Type, 0, len(t.Disjuncts)+1)
+	for _, disjunct := range t.Disjuncts {
 		if !other.Subsumes(disjunct) {
 			newDisjuncts = append(newDisjuncts, disjunct)
 		}
