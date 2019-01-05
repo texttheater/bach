@@ -3,7 +3,6 @@ package grammar
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/ast"
-	//	"github.com/texttheater/bach/ast"
 )
 
 type Conditional struct {

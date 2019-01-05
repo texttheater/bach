@@ -85,7 +85,8 @@ func isTypeKeyword(name string) bool {
 func isKeyword(name string) bool {
 	return name == "for" || name == "def" || name == "as" ||
 		name == "ok" || name == "if" || name == "then" ||
-		name == "elif" || name == "else"
+		name == "elif" || name == "else" || name == "each" ||
+		name == "all"
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -116,6 +117,7 @@ type Component struct {
 	Assignment  *Assignment  `| @Assignment`
 	Definition  *Definition  `| @@`
 	Conditional *Conditional `| @@`
+	Mapping     *Mapping     `| @@`
 }
 
 func (g *Component) Ast() ast.Expression {
@@ -147,6 +149,9 @@ func (g *Component) Ast() ast.Expression {
 	}
 	if g.Conditional != nil {
 		return g.Conditional.Ast()
+	}
+	if g.Mapping != nil {
+		return g.Mapping.Ast()
 	}
 	panic("invalid component")
 }

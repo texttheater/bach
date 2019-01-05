@@ -24,6 +24,7 @@ const (
 	ParamDoesNotMatch
 	FunctionBodyHasWrongOutputType
 	ConditionMustBeBool
+	MappingRequiresSeqType
 )
 
 func (kind ErrorKind) String() string {
@@ -40,6 +41,8 @@ func (kind ErrorKind) String() string {
 		return "FunctionBodyHasWrongOutputType"
 	case ConditionMustBeBool:
 		return "ConditionMustBeBool"
+	case MappingRequiresSeqType:
+		return "MappingRequiresSeqType"
 	}
 	return "Unknown"
 }
@@ -60,6 +63,8 @@ func (kind ErrorKind) DefaultMessage() string {
 		return "The function body has the wrong output type."
 	case ConditionMustBeBool:
 		return "The condition must be boolean."
+	case MappingRequiresSeqType:
+		return "The input to a mapping must be a sequence."
 	}
 	return "unknown error"
 }
