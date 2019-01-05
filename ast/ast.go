@@ -519,7 +519,7 @@ func (x *MappingExpression) Typecheck(inputShape functions.Shape, params []*func
 		Type:          inputShape.Type.ElementType(),
 		FunctionStack: inputShape.FunctionStack,
 	}
-	bodyOutputShape, _, err := x.Body.Typecheck(bodyInputShape, nil)
+	bodyOutputShape, bodyAction, err := x.Body.Typecheck(bodyInputShape, nil)
 	if err != nil {
 		return zeroShape, nil, err
 	}
@@ -528,7 +528,26 @@ func (x *MappingExpression) Typecheck(inputShape functions.Shape, params []*func
 		Type:          &types.SeqType{bodyOutputShape.Type},
 		FunctionStack: inputShape.FunctionStack,
 	}
-	// create action TODO
-	var action functions.Action = nil
+	// create action
+	action := func(inputState functions.State, args []functions.Action) functions.State {
+		channel := make(chan values.Value)
+		go func() {
+			for el := range inputState.Value.Iter() {
+				bodyInputState := functions.State{
+					Value: el,
+					Stack: inputState.Stack,
+				}
+				bodyOutputState := bodyAction(bodyInputState, nil)
+				channel <- bodyOutputState.Value
+			}
+			close(channel)
+		}()
+		return functions.State{
+			Value: &values.SeqValue{channel},
+			Stack: inputState.Stack,
+		}
+	}
 	return outputShape, action, nil
 }
+
+///////////////////////////////////////////////////////////////////////////////

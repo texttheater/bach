@@ -100,3 +100,18 @@ func (v *ArrValue) Iter() <-chan Value {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+type SeqValue struct {
+	Channel chan Value
+}
+
+func (v *SeqValue) String() string {
+	return "[sequence]"
+}
+
+func (v *SeqValue) Iter() <-chan Value {
+	// TODO safeguard against iterating twice?
+	return v.Channel
+}
+
+///////////////////////////////////////////////////////////////////////////////
