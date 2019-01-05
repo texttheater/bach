@@ -10,6 +10,7 @@ import (
 
 type Value interface {
 	String() string
+	Iter() <-chan Value
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,6 +20,10 @@ type NullValue struct {
 
 func (v *NullValue) String() string {
 	return "null"
+}
+
+func (v *NullValue) Iter() <-chan Value {
+	panic(fmt.Sprintf("%s is not a sequence", v))
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,6 +36,10 @@ func (v *BoolValue) String() string {
 	return strconv.FormatBool(v.Value)
 }
 
+func (v *BoolValue) Iter() <-chan Value {
+	panic(fmt.Sprintf("%s is not a sequence", v))
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 type NumValue struct {
@@ -41,6 +50,10 @@ func (v *NumValue) String() string {
 	return strconv.FormatFloat(v.Value, 'f', -1, 64)
 }
 
+func (v *NumValue) Iter() <-chan Value {
+	panic(fmt.Sprintf("%s is not a sequence", v))
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 type StrValue struct {
@@ -49,6 +62,10 @@ type StrValue struct {
 
 func (v *StrValue) String() string {
 	return fmt.Sprintf("%q", v.Value)
+}
+
+func (v *StrValue) Iter() <-chan Value {
+	panic(fmt.Sprintf("%s is not a sequence", v))
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -69,6 +86,17 @@ func (v *ArrValue) String() string {
 	}
 	buffer.WriteString("]")
 	return buffer.String()
+}
+
+func (v *ArrValue) Iter() <-chan Value {
+	channel := make(chan Value)
+	go func() {
+		for _, el := range v.ElementValues {
+			channel <- el
+		}
+		close(channel)
+	}()
+	return channel
 }
 
 ///////////////////////////////////////////////////////////////////////////////
