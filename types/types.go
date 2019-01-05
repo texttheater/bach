@@ -10,6 +10,7 @@ import (
 type Type interface {
 	Subsumes(Type) bool
 	String() string
+	ElementType() Type
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,6 +27,10 @@ func (t *NullType) String() string {
 	return "Null"
 }
 
+func (t *NullType) ElementType() Type {
+	panic("Null is not a sequence type")
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 type BoolType struct {
@@ -38,6 +43,10 @@ func (t *BoolType) Subsumes(other Type) bool {
 
 func (t *BoolType) String() string {
 	return "Bool"
+}
+
+func (t *BoolType) ElementType() Type {
+	panic("Bool is not a sequence type")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,6 +63,10 @@ func (t *NumType) String() string {
 	return "Num"
 }
 
+func (t *NumType) ElementType() Type {
+	panic("Num is not a sequence type")
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 type StrType struct {
@@ -68,20 +81,24 @@ func (t *StrType) String() string {
 	return "Str"
 }
 
+func (t *StrType) ElementType() Type {
+	panic("Str is not a sequence type")
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 type SeqType struct {
-	ElementType Type
+	ElType Type
 }
 
 func (t *SeqType) Subsumes(other Type) bool {
 	otherSeqType, ok := other.(*SeqType)
 	if ok {
-		return t.ElementType.Subsumes(otherSeqType.ElementType)
+		return t.ElType.Subsumes(otherSeqType.ElType)
 	}
 	otherArrType, ok := other.(*ArrType)
 	if ok {
-		return t.ElementType.Subsumes(otherArrType.ElementType)
+		return t.ElType.Subsumes(otherArrType.ElType)
 	}
 	return false
 }
@@ -90,10 +107,14 @@ func (t *SeqType) String() string {
 	return fmt.Sprintf("Seq<%s>", t.ElementType)
 }
 
+func (t *SeqType) ElementType() Type {
+	return t.ElType
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 type ArrType struct {
-	ElementType Type
+	ElType Type
 }
 
 func (t *ArrType) Subsumes(other Type) bool {
@@ -101,11 +122,15 @@ func (t *ArrType) Subsumes(other Type) bool {
 	if !ok {
 		return false
 	}
-	return t.ElementType.Subsumes(otherArrType.ElementType)
+	return t.ElType.Subsumes(otherArrType.ElType)
 }
 
 func (t ArrType) String() string {
-	return fmt.Sprintf("Arr<%s>", t.ElementType)
+	return fmt.Sprintf("Arr<%s>", t.ElType)
+}
+
+func (t *ArrType) ElementType() Type {
+	return t.ElType
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -120,6 +145,10 @@ func (t *DisjunctiveType) Subsumes(other Type) bool {
 		return t.subsumesDisj(otherDisj)
 	}
 	return t.subsumesNonDisj(other)
+}
+
+func (t *DisjunctiveType) ElementType() Type {
+	panic(t.String() + " is not a sequence type")
 }
 
 func (t *DisjunctiveType) subsumesDisj(other *DisjunctiveType) bool {
@@ -211,6 +240,10 @@ func (t *AnyType) Subsumes(other Type) bool {
 
 func (t *AnyType) String() string {
 	return "Any"
+}
+
+func (t *AnyType) ElementType() Type {
+	panic("Any is not a sequence type")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
