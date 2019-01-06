@@ -5,15 +5,15 @@ import (
 )
 
 type Shape struct {
-	Type          types.Type
-	FunctionStack *FunctionStack
+	Type        types.Type
+	FuncerStack *FuncerStack
 }
 
-type FunctionStack struct {
-	Head Function
-	Tail *FunctionStack
+type FuncerStack struct {
+	Head Funcer
+	Tail *FuncerStack
 }
 
-func (s *FunctionStack) Push(function Function) *FunctionStack {
-	return &FunctionStack{function, s}
+func (s *FuncerStack) Push(funcer Funcer) *FuncerStack {
+	return &FuncerStack{funcer, s}
 }

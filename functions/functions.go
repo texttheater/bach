@@ -5,27 +5,12 @@ import (
 	"github.com/texttheater/bach/values"
 )
 
-type Function struct {
-	InputType  types.Type
-	Name       string
-	Params     []*Parameter
-	OutputType types.Type
-	Action     Action
-}
-
-func (f Function) Signature() *Parameter {
-	return &Parameter{
-		InputType:  f.InputType,
-		Name:       f.Name,
-		Params:     f.Params,
-		OutputType: f.OutputType,
-	}
-}
+type Funcer func(gotInputType types.Type, gotName string, gotNumArgs int) (params []*Parameter, outputType types.Type, action Action, ok bool)
 
 type Kernel func(inputValue values.Value, argValues []values.Value) values.Value
 
-func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
-	outputType types.Type, kernel Kernel) Function {
+func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, kernel Kernel) Funcer {
+	// make parameters from argument types
 	params := make([]*Parameter, 0, len(argTypes))
 	for _, argType := range argTypes {
 		params = append(params, &Parameter{
@@ -35,12 +20,18 @@ func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
 			OutputType: argType,
 		})
 	}
-	return Function{
-		InputType:  inputType,
-		Name:       name,
-		Params:     params,
-		OutputType: outputType,
-		Action: func(inputState State, args []Action) State {
+	// make funcer
+	return func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*Parameter, types.Type, Action, bool) {
+		if !wantInputType.Subsumes(gotInputType) {
+			return nil, nil, nil, false
+		}
+		if gotName != wantName {
+			return nil, nil, nil, false
+		}
+		if gotNumArgs != len(argTypes) {
+			return nil, nil, nil, false
+		}
+		action := func(inputState State, args []Action) State {
 			argValues := make([]values.Value, 0, len(argTypes))
 			argInputState := State{
 				Value: &values.NullValue{},
@@ -53,6 +44,7 @@ func SimpleFunction(inputType types.Type, name string, argTypes []types.Type,
 				Value: kernel(inputState.Value, argValues),
 				Stack: inputState.Stack,
 			}
-		},
+		}
+		return params, outputType, action, true
 	}
 }

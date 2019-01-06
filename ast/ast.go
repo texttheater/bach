@@ -46,7 +46,7 @@ func (x *ConstantExpression) Typecheck(inputShape functions.Shape, params []*fun
 			errors.Pos(x.Pos),
 		)
 	}
-	outputShape := functions.Shape{x.Type, inputShape.FunctionStack}
+	outputShape := functions.Shape{x.Type, inputShape.FuncerStack}
 	action := func(inputState functions.State, args []functions.Action) functions.State {
 		return functions.State{
 			Value: x.Value,
@@ -85,8 +85,8 @@ func (x *ArrExpression) Typecheck(inputShape functions.Shape, params []*function
 		elementActions = append(elementActions, elAction)
 	}
 	outputShape := functions.Shape{
-		Type:          &types.ArrType{elementType},
-		FunctionStack: inputShape.FunctionStack,
+		Type:        &types.ArrType{elementType},
+		FuncerStack: inputShape.FuncerStack,
 	}
 	action := func(inputState functions.State, args []functions.Action) functions.State {
 		elementValues := make([]values.Value, 0, len(elementActions))
@@ -144,7 +144,7 @@ type CallExpression struct {
 func (x *CallExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	// Go down the function stack and find the function invoked by this
 	// call
-	stack := inputShape.FunctionStack
+	stack := inputShape.FuncerStack
 	for {
 		// Reached bottom of stack without finding a matching function
 		if stack == nil {
@@ -156,29 +156,19 @@ func (x *CallExpression) Typecheck(inputShape functions.Shape, params []*functio
 				errors.NumParams(len(x.Args)+len(params)),
 			)
 		}
-		// Try the function on top of the stack
-		function := stack.Head
-		// Check function name
-		if function.Name != x.Name {
-			stack = stack.Tail
-			continue
-		}
-		// Check number of params
-		if len(function.Params) != len(x.Args)+len(params) {
-			stack = stack.Tail
-			continue
-		}
-		// Check input type
-		if !function.InputType.Subsumes(inputShape.Type) {
+		// Try the funcer on top of the stack
+		funcer := stack.Head
+		funParams, funOutputType, funAction, ok := funcer(inputShape.Type, x.Name, len(x.Args)+len(params))
+		if !ok {
 			stack = stack.Tail
 			continue
 		}
 		// Prepare action:
-		action := function.Action
+		action := funAction
 		// Check function params filled by this call
 		for i := 0; i < len(x.Args); i++ {
-			param := function.Params[i]
-			argInputShape := functions.Shape{param.InputType, inputShape.FunctionStack}
+			param := funParams[i]
+			argInputShape := functions.Shape{param.InputType, inputShape.FuncerStack}
 			argOutputShape, argAction, err := x.Args[i].Typecheck(argInputShape, param.Params)
 			if err != nil {
 				return zeroShape, nil, err
@@ -197,18 +187,18 @@ func (x *CallExpression) Typecheck(inputShape functions.Shape, params []*functio
 		// Check function params *not* filled by this call (thus left
 		// to function to call)
 		for i := 0; i < len(params); i++ {
-			if !params[i].Subsumes(function.Params[len(x.Args)+i]) {
+			if !params[i].Subsumes(funParams[len(x.Args)+i]) {
 				return zeroShape, nil, errors.E(
 					errors.Kind(errors.ParamDoesNotMatch),
 					errors.Pos(x.Pos),
 					errors.ParamNum(i),
 					errors.WantParam(params[i]),
-					errors.GotParam(function.Params[len(x.Args)+i]),
+					errors.GotParam(funParams[len(x.Args)+i]),
 				)
 			}
 		}
 		// Return result
-		return functions.Shape{function.OutputType, inputShape.FunctionStack}, action, nil
+		return functions.Shape{funOutputType, inputShape.FuncerStack}, action, nil
 	}
 }
 
@@ -227,12 +217,14 @@ func (x *AssignmentExpression) Typecheck(inputShape functions.Shape, params []*f
 		)
 	}
 	var id interface{} = x
-	outputShape := functions.Shape{inputShape.Type, inputShape.FunctionStack.Push(functions.Function{
-		InputType:  &types.AnyType{},
-		Name:       x.Name,
-		Params:     nil,
-		OutputType: inputShape.Type,
-		Action: func(inputState functions.State, args []functions.Action) functions.State {
+	varFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, functions.Action, bool) {
+		if gotName != x.Name {
+			return nil, nil, nil, false
+		}
+		if gotNumArgs != 0 {
+			return nil, nil, nil, false
+		}
+		varAction := func(inputState functions.State, args []functions.Action) functions.State {
 			stack := inputState.Stack
 			for stack != nil {
 				if stack.Head.ID == id {
@@ -244,8 +236,10 @@ func (x *AssignmentExpression) Typecheck(inputShape functions.Shape, params []*f
 				stack = stack.Tail
 			}
 			panic(fmt.Sprintf("variable %s not found", x.Name))
-		},
-	})}
+		}
+		return nil, inputShape.Type, varAction, true
+	}
+	outputShape := functions.Shape{inputShape.Type, inputShape.FuncerStack.Push(varFuncer)}
 	action := func(inputState functions.State, args []functions.Action) functions.State {
 		return functions.State{
 			Value: inputState.Value,
@@ -294,13 +288,18 @@ func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*f
 	// variables for body input stack, action (will be set at runtime)
 	var bodyInputStackStub *functions.VariableStack
 	var bodyAction functions.Action
-	// add the function defined here to the function stack
-	functionStack := inputShape.FunctionStack.Push(functions.Function{
-		InputType:  x.InputType,
-		Name:       x.Name,
-		Params:     x.Params,
-		OutputType: x.OutputType,
-		Action: func(inputState functions.State, args []functions.Action) functions.State {
+	// make a funcer for the defined function, add it to the function stack
+	funFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, functions.Action, bool) {
+		if !x.InputType.Subsumes(gotInputType) {
+			return nil, nil, nil, false
+		}
+		if gotName != x.Name {
+			return nil, nil, nil, false
+		}
+		if gotNumArgs != len(x.Params) {
+			return nil, nil, nil, false
+		}
+		funAction := func(inputState functions.State, args []functions.Action) functions.State {
 			// Bind parameters to arguments by adding corresponding
 			// Variable objects to the body input state.
 			bodyInputStack := bodyInputStackStub
@@ -320,18 +319,25 @@ func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*f
 				Value: bodyOutputState.Value,
 				Stack: inputState.Stack,
 			}
-		},
-	})
-	// add parameter functions for use in the body
-	bodyFunctionStack := functionStack
+		}
+		return x.Params, x.OutputType, funAction, true
+	}
+	functionStack := inputShape.FuncerStack.Push(funFuncer)
+	// add parameter funcers for use in the body
+	bodyFuncerStack := functionStack
 	for _, param := range x.Params {
 		var id interface{} = param
-		bodyFunctionStack = bodyFunctionStack.Push(functions.Function{
-			InputType:  param.InputType,
-			Name:       param.Name,
-			Params:     param.Params,
-			OutputType: param.OutputType,
-			Action: func(inputState functions.State, args []functions.Action) functions.State {
+		paramFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, functions.Action, bool) {
+			if !param.InputType.Subsumes(gotInputType) {
+				return nil, nil, nil, false
+			}
+			if gotName != param.Name {
+				return nil, nil, nil, false
+			}
+			if gotNumArgs != len(param.Params) {
+				return nil, nil, nil, false
+			}
+			paramAction := func(inputState functions.State, args []functions.Action) functions.State {
 				stack := inputState.Stack
 				for stack != nil {
 					if stack.Head.ID == id {
@@ -340,13 +346,16 @@ func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*f
 					stack = stack.Tail
 				}
 				panic("action not found")
-			},
-		})
+			}
+			return param.Params, param.OutputType, paramAction, true
+		}
+
+		bodyFuncerStack = bodyFuncerStack.Push(paramFuncer)
 	}
 	// define body input context
 	bodyInputShape := functions.Shape{
-		Type:          x.InputType,
-		FunctionStack: bodyFunctionStack,
+		Type:        x.InputType,
+		FuncerStack: bodyFuncerStack,
 	}
 	// typecheck body (crucially, setting body action)
 	bodyOutputShape, bodyAction, err := x.Body.Typecheck(bodyInputShape, nil)
@@ -364,8 +373,8 @@ func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*f
 	}
 	// define output context
 	outputShape := functions.Shape{
-		Type:          inputShape.Type,
-		FunctionStack: functionStack,
+		Type:        inputShape.Type,
+		FuncerStack: functionStack,
 	}
 	// define action (crucially, setting body input stack)
 	action := func(inputState functions.State, args []functions.Action) functions.State {
@@ -409,10 +418,10 @@ func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*
 		)
 	}
 	// context is the shared input context for all conditions and consequents.
-	// Each condition may add to the FunctionStack. Type always stays the same.
+	// Each condition may add to the FuncerStack. Type always stays the same.
 	shape := functions.Shape{
-		Type:          inputShape.Type,
-		FunctionStack: conditionOutputShape.FunctionStack,
+		Type:        inputShape.Type,
+		FuncerStack: conditionOutputShape.FuncerStack,
 	}
 	consequentOutputShape, consequentAction, err := x.Consequent.Typecheck(shape, nil)
 	if err != nil {
@@ -434,7 +443,7 @@ func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*
 				errors.GotType(conditionOutputShape.Type),
 			)
 		}
-		shape.FunctionStack = conditionOutputShape.FunctionStack
+		shape.FuncerStack = conditionOutputShape.FuncerStack
 		elifConditionActions = append(elifConditionActions, elifConditionAction)
 		consequentOutputShape, elifConsequentAction, err := x.ElifConsequents[i].Typecheck(shape, nil)
 		if err != nil {
@@ -484,8 +493,8 @@ func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*
 		}
 	}
 	outputShape := functions.Shape{
-		Type:          outputType,
-		FunctionStack: inputShape.FunctionStack,
+		Type:        outputType,
+		FuncerStack: inputShape.FuncerStack,
 	}
 	return outputShape, action, nil
 }
@@ -516,8 +525,8 @@ func (x *MappingExpression) Typecheck(inputShape functions.Shape, params []*func
 	}
 	// typecheck body
 	bodyInputShape := functions.Shape{
-		Type:          inputShape.Type.ElementType(),
-		FunctionStack: inputShape.FunctionStack,
+		Type:        inputShape.Type.ElementType(),
+		FuncerStack: inputShape.FuncerStack,
 	}
 	bodyOutputShape, bodyAction, err := x.Body.Typecheck(bodyInputShape, nil)
 	if err != nil {
@@ -525,8 +534,8 @@ func (x *MappingExpression) Typecheck(inputShape functions.Shape, params []*func
 	}
 	// create output shape
 	outputShape := functions.Shape{
-		Type:          &types.SeqType{bodyOutputShape.Type},
-		FunctionStack: inputShape.FunctionStack,
+		Type:        &types.SeqType{bodyOutputShape.Type},
+		FuncerStack: inputShape.FuncerStack,
 	}
 	// create action
 	action := func(inputState functions.State, args []functions.Action) functions.State {

@@ -9,119 +9,119 @@ var InitialShape = initialShape()
 
 func initialShape() functions.Shape {
 	shape := functions.Shape{&types.NullType{}, nil}
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.NumType{},
 		"+",
 		[]types.Type{&types.NumType{}},
 		&types.NumType{},
 		Add,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.NumType{},
 		"-",
 		[]types.Type{&types.NumType{}},
 		&types.NumType{},
 		Subtract,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.NumType{},
 		"*",
 		[]types.Type{&types.NumType{}},
 		&types.NumType{},
 		Multiply,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.NumType{},
 		"/",
 		[]types.Type{&types.NumType{}},
 		&types.NumType{},
 		Divide,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.NumType{},
 		"%",
 		[]types.Type{&types.NumType{}},
 		&types.NumType{},
 		Modulo,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.NumType{},
 		"<",
 		[]types.Type{&types.NumType{}},
 		&types.BoolType{},
 		LessThan,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.NumType{},
 		">",
 		[]types.Type{&types.NumType{}},
 		&types.BoolType{},
 		GreaterThan,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.NumType{},
 		"==",
 		[]types.Type{&types.NumType{}},
 		&types.BoolType{},
 		Equal,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.NumType{},
 		"<=",
 		[]types.Type{&types.NumType{}},
 		&types.BoolType{},
 		LessEqual,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.NumType{},
 		">=",
 		[]types.Type{&types.NumType{}},
 		&types.BoolType{},
 		GreaterEqual,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.AnyType{},
 		"true",
 		nil,
 		&types.BoolType{},
 		True,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.AnyType{},
 		"false",
 		nil,
 		&types.BoolType{},
 		False,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.BoolType{},
 		"and",
 		[]types.Type{&types.BoolType{}},
 		&types.BoolType{},
 		And,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.BoolType{},
 		"or",
 		[]types.Type{&types.BoolType{}},
 		&types.BoolType{},
 		Or,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.BoolType{},
 		"not",
 		nil,
 		&types.BoolType{},
 		Not,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.BoolType{},
 		"==",
 		[]types.Type{&types.BoolType{}},
 		&types.BoolType{},
 		BoolEqual,
 	))
-	shape.FunctionStack = shape.FunctionStack.Push(functions.SimpleFunction(
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.AnyType{},
 		"null",
 		nil,
