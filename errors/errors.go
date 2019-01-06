@@ -239,12 +239,12 @@ func (err *e) Error() string {
 func Explain(err error, program string) {
 	e, ok := err.(*e)
 	if !ok {
-		fmt.Fprintln(os.Stderr, "ERROR")
+		fmt.Fprintln(os.Stderr, "Unknown error")
 		fmt.Fprintln(os.Stderr, "Message:   ", err.Error())
 		return
 	}
 	// header and position
-	fmt.Fprint(os.Stderr, "ERROR")
+	fmt.Fprintf(os.Stderr, "%s error", e.Kind)
 	if e.Pos != no.Pos {
 		fmt.Fprintln(os.Stderr, " at", e.Pos)
 		lines := strings.SplitAfter(program, "\n")
