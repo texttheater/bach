@@ -9,6 +9,7 @@ var InitialShape = initialShape()
 
 func initialShape() functions.Shape {
 	shape := functions.Shape{&types.NullType{}, nil}
+	// math functions
 	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.NumType{},
 		"+",
@@ -79,6 +80,7 @@ func initialShape() functions.Shape {
 		&types.BoolType{},
 		GreaterEqual,
 	))
+	// logic functions
 	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.AnyType{},
 		"true",
@@ -121,6 +123,7 @@ func initialShape() functions.Shape {
 		&types.BoolType{},
 		BoolEqual,
 	))
+	// null functions
 	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.AnyType{},
 		"null",
