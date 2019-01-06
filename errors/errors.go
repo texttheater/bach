@@ -309,7 +309,7 @@ var no = e{
 // errors in tests. The arguments must both have underlying type *e or
 // Match will return false. Otherwise it returns true iff every non-none
 // element of the first error is equal to the corresponding element of the
-// second.  Elements that are in the second argument but not present in the
+// second. Elements that are in the second argument but not present in the
 // first are ignored.
 //
 // Adapted from: https://github.com/upspin/upspin/blob/master/errors/errors.go
