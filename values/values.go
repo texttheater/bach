@@ -10,6 +10,7 @@ import (
 
 type Value interface {
 	String() string
+	Out() string
 	Iter() <-chan Value
 }
 
@@ -20,6 +21,10 @@ type NullValue struct {
 
 func (v *NullValue) String() string {
 	return "null"
+}
+
+func (v *NullValue) Out() string {
+	return v.String()
 }
 
 func (v *NullValue) Iter() <-chan Value {
@@ -36,6 +41,10 @@ func (v *BoolValue) String() string {
 	return strconv.FormatBool(v.Value)
 }
 
+func (v *BoolValue) Out() string {
+	return v.String()
+}
+
 func (v *BoolValue) Iter() <-chan Value {
 	panic(fmt.Sprintf("%s is not a sequence", v))
 }
@@ -50,6 +59,10 @@ func (v *NumValue) String() string {
 	return strconv.FormatFloat(v.Value, 'f', -1, 64)
 }
 
+func (v *NumValue) Out() string {
+	return v.String()
+}
+
 func (v *NumValue) Iter() <-chan Value {
 	panic(fmt.Sprintf("%s is not a sequence", v))
 }
@@ -62,6 +75,10 @@ type StrValue struct {
 
 func (v *StrValue) String() string {
 	return fmt.Sprintf("%q", v.Value)
+}
+
+func (v *StrValue) Out() string {
+	return v.Value
 }
 
 func (v *StrValue) Iter() <-chan Value {
@@ -88,6 +105,10 @@ func (v *ArrValue) String() string {
 	return buffer.String()
 }
 
+func (v *ArrValue) Out() string {
+	return v.String()
+}
+
 func (v *ArrValue) Iter() <-chan Value {
 	channel := make(chan Value)
 	go func() {
@@ -106,7 +127,11 @@ type SeqValue struct {
 }
 
 func (v *SeqValue) String() string {
-	return "[sequence]"
+	return "<sequence>"
+}
+
+func (v *SeqValue) Out() string {
+	return v.String()
 }
 
 func (v *SeqValue) Iter() <-chan Value {
