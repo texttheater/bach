@@ -23,5 +23,16 @@ func InterpretString(program string) (types.Type, values.Value, error) {
 	}
 	// evaluate
 	outputState := action(functions.InitialState, nil) // TODO error handling
+	drain(outputShape.Type, outputState.Value)
 	return outputShape.Type, outputState.Value, nil
+}
+
+func drain(t types.Type, v values.Value) {
+	if !(&types.SeqType{&types.AnyType{}}).Subsumes(t) {
+		return
+	}
+	eType := t.ElementType()
+	for e := range v.Iter() {
+		drain(eType, e)
+	}
 }
