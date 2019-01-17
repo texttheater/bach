@@ -1,0 +1,18 @@
+package builtin
+
+import (
+	"github.com/texttheater/bach/values"
+)
+
+func Range(inputValue values.Value, argumentValues []values.Value) values.Value {
+	start := argumentValues[0].(*values.NumValue).Value
+	end := argumentValues[1].(*values.NumValue).Value
+	channel := make(chan values.Value)
+	go func() {
+		for i := start; i < end; i++ {
+			channel <- &values.NumValue{i}
+		}
+		close(channel)
+	}()
+	return &values.SeqValue{channel}
+}

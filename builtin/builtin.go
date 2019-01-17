@@ -137,6 +137,14 @@ func initialShape() functions.Shape {
 		&types.NullType{},
 		Null,
 	))
+	// sequence functions
+	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
+		&types.AnyType{},
+		"range",
+		[]types.Type{&types.NumType{}, &types.NumType{}},
+		&types.SeqType{&types.NumType{}},
+		Range,
+	))
 	// conversion functions
 	shape.FuncerStack = shape.FuncerStack.Push(func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, functions.Action, bool) {
 		if !seqType.Subsumes(gotInputType) {
@@ -186,6 +194,19 @@ func initialShape() functions.Shape {
 		outputType := gotInputType
 		action := func(inputState functions.State, args []functions.Action) functions.State {
 			fmt.Fprintln(os.Stderr, inputState.Value)
+			return inputState
+		}
+		return nil, outputType, action, true
+	})
+	shape.FuncerStack = shape.FuncerStack.Push(func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, functions.Action, bool) {
+		if gotName!= "id" {
+			return nil, nil, nil, false
+		}
+		if gotNumArgs != 0 {
+			return nil, nil, nil, false
+		}
+		outputType := gotInputType
+		action := func(inputState functions.State, args []functions.Action) functions.State {
 			return inputState
 		}
 		return nil, outputType, action, true
