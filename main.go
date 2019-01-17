@@ -18,10 +18,9 @@ func main() {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
-	_, v, err := interp.InterpretString(e)
+	_, _, err := interp.InterpretString(e)
 	if err != nil {
 		errors.Explain(err, e)
 		os.Exit(1)
 	}
-	fmt.Println(v.String())
 }
