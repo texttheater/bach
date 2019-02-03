@@ -69,7 +69,7 @@ func (g *Op1Num) Ast() ast.Expression {
 			&ast.ConstantExpression{
 				Pos:   g.Pos,
 				Type:  &types.NumType{},
-				Value: &values.NumValue{g.Num},
+				Value: values.NumValue(g.Num),
 			},
 		},
 	}
@@ -101,7 +101,7 @@ func (g *Op2Num) Ast() ast.Expression {
 			&ast.ConstantExpression{
 				Pos:   g.Pos,
 				Type:  &types.NumType{},
-				Value: &values.NumValue{g.Num},
+				Value: values.NumValue(g.Num),
 			},
 		},
 	}

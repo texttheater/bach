@@ -163,7 +163,7 @@ func initialShape() functions.Shape {
 				array = append(array, el)
 			}
 			outputState := functions.State{
-				Value: &values.ArrValue{array},
+				Value: values.ArrValue(array),
 				Stack: inputState.Stack,
 			}
 			return outputState

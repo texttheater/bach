@@ -125,14 +125,14 @@ func (g *Component) Ast() ast.Expression {
 		return &ast.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  &types.NumType{},
-			Value: &values.NumValue{*g.Num},
+			Value: values.NumValue(*g.Num),
 		}
 	}
 	if g.Str != nil {
 		return &ast.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  &types.StrType{},
-			Value: &values.StrValue{*g.Str},
+			Value: values.StrValue(*g.Str),
 		}
 	}
 	if g.Array != nil {

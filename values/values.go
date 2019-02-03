@@ -49,12 +49,10 @@ func (v BoolValue) Iter() <-chan Value {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type NumValue struct {
-	Value float64
-}
+type NumValue float64
 
 func (v NumValue) String() string {
-	return strconv.FormatFloat(v.Value, 'f', -1, 64)
+	return strconv.FormatFloat(float64(v), 'f', -1, 64)
 }
 
 func (v NumValue) Out() string {
@@ -67,16 +65,14 @@ func (v NumValue) Iter() <-chan Value {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type StrValue struct {
-	Value string
-}
+type StrValue string
 
 func (v StrValue) String() string {
-	return fmt.Sprintf("%q", v.Value)
+	return fmt.Sprintf("%q", v)
 }
 
 func (v StrValue) Out() string {
-	return v.Value
+	return string(v)
 }
 
 func (v StrValue) Iter() <-chan Value {
@@ -85,16 +81,14 @@ func (v StrValue) Iter() <-chan Value {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type ArrValue struct {
-	ElementValues []Value
-}
+type ArrValue []Value
 
 func (v ArrValue) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("[")
-	if len(v.ElementValues) > 0 {
-		buffer.WriteString(v.ElementValues[0].String())
-		for _, elValue := range v.ElementValues[1:] {
+	if len(v) > 0 {
+		buffer.WriteString(v[0].String())
+		for _, elValue := range v[1:] {
 			buffer.WriteString(", ")
 			buffer.WriteString(elValue.String())
 		}
@@ -110,7 +104,7 @@ func (v ArrValue) Out() string {
 func (v ArrValue) Iter() <-chan Value {
 	channel := make(chan Value)
 	go func() {
-		for _, el := range v.ElementValues {
+		for _, el := range v {
 			channel <- el
 		}
 		close(channel)
@@ -120,9 +114,7 @@ func (v ArrValue) Iter() <-chan Value {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type SeqValue struct {
-	Channel chan Value
-}
+type SeqValue chan Value
 
 func (v SeqValue) String() string {
 	return "<sequence>"
@@ -132,9 +124,10 @@ func (v SeqValue) Out() string {
 	return v.String()
 }
 
+// TODO this method is no longer needed, callers should just typecast to chan Value.
 func (v SeqValue) Iter() <-chan Value {
 	// TODO safeguard against iterating twice?
-	return v.Channel
+	return v
 }
 
 ///////////////////////////////////////////////////////////////////////////////

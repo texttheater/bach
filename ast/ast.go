@@ -95,7 +95,7 @@ func (x *ArrExpression) Typecheck(inputShape functions.Shape, params []*function
 			elementValues = append(elementValues, elValue)
 		}
 		return functions.State{
-			Value: &values.ArrValue{elementValues},
+			Value: values.ArrValue(elementValues),
 			Stack: inputState.Stack,
 		}
 	}
@@ -552,7 +552,7 @@ func (x *MappingExpression) Typecheck(inputShape functions.Shape, params []*func
 			close(channel)
 		}()
 		return functions.State{
-			Value: &values.SeqValue{channel},
+			Value: values.SeqValue(channel),
 			Stack: inputState.Stack,
 		}
 	}
