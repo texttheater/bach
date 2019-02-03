@@ -124,7 +124,6 @@ func (v SeqValue) Out() string {
 	return v.String()
 }
 
-// TODO this method is no longer needed, callers should just typecast to chan Value.
 func (v SeqValue) Iter() <-chan Value {
 	// TODO safeguard against iterating twice?
 	return v
