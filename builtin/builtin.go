@@ -14,7 +14,7 @@ var InitialShape = initialShape()
 var seqType = &types.SeqType{&types.AnyType{}}
 
 func initialShape() functions.Shape {
-	shape := functions.Shape{&types.NullType{}, nil}
+	shape := functions.Shape{types.NullType, nil}
 	// math functions
 	shape.FuncerStack = shape.FuncerStack.Push(functions.SimpleFuncer(
 		&types.NumType{},
@@ -134,7 +134,7 @@ func initialShape() functions.Shape {
 		&types.AnyType{},
 		"null",
 		nil,
-		&types.NullType{},
+		types.NullType,
 		Null,
 	))
 	// sequence functions

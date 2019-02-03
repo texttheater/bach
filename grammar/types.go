@@ -46,7 +46,7 @@ type NullType struct {
 }
 
 func (g *NullType) Ast() types.Type {
-	return &types.NullType{}
+	return types.NullType
 }
 
 type BoolType struct {

@@ -15,19 +15,21 @@ type Type interface {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type NullType struct {
+var NullType = &nullType{}
+
+type nullType struct {
 }
 
-func (t *NullType) Subsumes(other Type) bool {
-	_, ok := other.(*NullType)
+func (t *nullType) Subsumes(other Type) bool {
+	_, ok := other.(*nullType)
 	return ok
 }
 
-func (t *NullType) String() string {
+func (t *nullType) String() string {
 	return "Null"
 }
 
-func (t *NullType) ElementType() Type {
+func (t *nullType) ElementType() Type {
 	panic("Null is not a sequence type")
 }
 
