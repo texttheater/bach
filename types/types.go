@@ -35,55 +35,61 @@ func (t *nullType) ElementType() Type {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type BoolType struct {
+var BoolType = &boolType{}
+
+type boolType struct {
 }
 
-func (t *BoolType) Subsumes(other Type) bool {
-	_, ok := other.(*BoolType)
+func (t *boolType) Subsumes(other Type) bool {
+	_, ok := other.(*boolType)
 	return ok
 }
 
-func (t *BoolType) String() string {
+func (t *boolType) String() string {
 	return "Bool"
 }
 
-func (t *BoolType) ElementType() Type {
+func (t *boolType) ElementType() Type {
 	panic("Bool is not a sequence type")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type NumType struct {
+var NumType = &numType{}
+
+type numType struct {
 }
 
-func (t *NumType) Subsumes(other Type) bool {
-	_, ok := other.(*NumType)
+func (t *numType) Subsumes(other Type) bool {
+	_, ok := other.(*numType)
 	return ok
 }
 
-func (t *NumType) String() string {
+func (t *numType) String() string {
 	return "Num"
 }
 
-func (t *NumType) ElementType() Type {
+func (t *numType) ElementType() Type {
 	panic("Num is not a sequence type")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type StrType struct {
+var StrType = &strType{}
+
+type strType struct {
 }
 
-func (t *StrType) Subsumes(other Type) bool {
-	_, ok := other.(*StrType)
+func (t *strType) Subsumes(other Type) bool {
+	_, ok := other.(*strType)
 	return ok
 }
 
-func (t *StrType) String() string {
+func (t *strType) String() string {
 	return "Str"
 }
 
-func (t *StrType) ElementType() Type {
+func (t *strType) ElementType() Type {
 	panic("Str is not a sequence type")
 }
 
@@ -127,7 +133,7 @@ func (t *ArrType) Subsumes(other Type) bool {
 	return t.ElType.Subsumes(otherArrType.ElType)
 }
 
-func (t ArrType) String() string {
+func (t *ArrType) String() string {
 	return fmt.Sprintf("Arr<%s>", t.ElType)
 }
 
@@ -233,18 +239,20 @@ func (t *DisjunctiveType) disjoinNonDisj(other Type) *DisjunctiveType {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type AnyType struct {
+var AnyType = &anyType{}
+
+type anyType struct {
 }
 
-func (t *AnyType) Subsumes(other Type) bool {
+func (t *anyType) Subsumes(other Type) bool {
 	return true
 }
 
-func (t *AnyType) String() string {
+func (t *anyType) String() string {
 	return "Any"
 }
 
-func (t *AnyType) ElementType() Type {
+func (t *anyType) ElementType() Type {
 	panic("Any is not a sequence type")
 }
 

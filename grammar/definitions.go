@@ -69,7 +69,7 @@ func (g *Param) Ast() *functions.Parameter {
 	if g.InputType != nil {
 		inputType = g.InputType.Ast()
 	} else {
-		inputType = &types.AnyType{}
+		inputType = types.AnyType
 	}
 	var name string
 	var params []*functions.Parameter

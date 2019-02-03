@@ -21,9 +21,7 @@ import (
 
 var zeroShape = functions.Shape{}
 
-var boolType = &types.BoolType{}
-
-var seqType = &types.SeqType{&types.AnyType{}}
+var seqType = &types.SeqType{types.AnyType}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -70,7 +68,7 @@ func (x *ArrExpression) Typecheck(inputShape functions.Shape, params []*function
 			errors.Pos(x.Pos),
 		)
 	}
-	var elementType types.Type = &types.AnyType{}
+	var elementType types.Type = types.AnyType
 	elementActions := make([]functions.Action, 0, len(x.Elements))
 	for i, elExpression := range x.Elements {
 		elOutputShape, elAction, err := elExpression.Typecheck(inputShape, nil)
@@ -409,11 +407,11 @@ func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*
 	if err != nil {
 		return zeroShape, nil, err
 	}
-	if !boolType.Subsumes(conditionOutputShape.Type) {
+	if !types.BoolType.Subsumes(conditionOutputShape.Type) {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.ConditionMustBeBool),
 			errors.Pos(x.Pos),
-			errors.WantType(boolType),
+			errors.WantType(types.BoolType),
 			errors.GotType(conditionOutputShape.Type),
 		)
 	}
@@ -435,11 +433,11 @@ func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*
 		if err != nil {
 			return zeroShape, nil, err
 		}
-		if !boolType.Subsumes(conditionOutputShape.Type) {
+		if !types.BoolType.Subsumes(conditionOutputShape.Type) {
 			return zeroShape, nil, errors.E(
 				errors.Kind(errors.ConditionMustBeBool),
 				errors.Pos(x.Pos),
-				errors.WantType(boolType),
+				errors.WantType(types.BoolType),
 				errors.GotType(conditionOutputShape.Type),
 			)
 		}

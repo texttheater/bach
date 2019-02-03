@@ -54,7 +54,7 @@ type BoolType struct {
 }
 
 func (g *BoolType) Ast() types.Type {
-	return &types.BoolType{}
+	return types.BoolType
 }
 
 type NumType struct {
@@ -62,7 +62,7 @@ type NumType struct {
 }
 
 func (g *NumType) Ast() types.Type {
-	return &types.NumType{}
+	return types.NumType
 }
 
 type StrType struct {
@@ -70,7 +70,7 @@ type StrType struct {
 }
 
 func (g *StrType) Ast() types.Type {
-	return &types.StrType{}
+	return types.StrType
 }
 
 type SeqType struct {
@@ -96,5 +96,5 @@ type AnyType struct {
 }
 
 func (g *AnyType) Ast() types.Type {
-	return &types.AnyType{}
+	return types.AnyType
 }

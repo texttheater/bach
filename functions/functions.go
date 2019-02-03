@@ -14,7 +14,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 	params := make([]*Parameter, 0, len(argTypes))
 	for _, argType := range argTypes {
 		params = append(params, &Parameter{
-			InputType:  &types.AnyType{},
+			InputType:  types.AnyType,
 			Name:       "", // TODO ?
 			Params:     nil,
 			OutputType: argType,

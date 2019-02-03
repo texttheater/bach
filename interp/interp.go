@@ -28,7 +28,7 @@ func InterpretString(program string) (types.Type, values.Value, error) {
 }
 
 func drain(t types.Type, v values.Value) {
-	if !(&types.SeqType{&types.AnyType{}}).Subsumes(t) {
+	if !(&types.SeqType{types.AnyType}).Subsumes(t) {
 		return
 	}
 	eType := t.ElementType()
