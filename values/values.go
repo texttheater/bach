@@ -33,12 +33,10 @@ func (v NullValue) Iter() <-chan Value {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type BoolValue struct {
-	Value bool
-}
+type BoolValue bool
 
 func (v BoolValue) String() string {
-	return strconv.FormatBool(v.Value)
+	return strconv.FormatBool(bool(v))
 }
 
 func (v BoolValue) Out() string {

@@ -199,7 +199,7 @@ func initialShape() functions.Shape {
 		return nil, outputType, action, true
 	})
 	shape.FuncerStack = shape.FuncerStack.Push(func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, functions.Action, bool) {
-		if gotName!= "id" {
+		if gotName != "id" {
 			return nil, nil, nil, false
 		}
 		if gotNumArgs != 0 {

@@ -459,8 +459,8 @@ func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*
 	outputType = types.Disjoin(outputType, alternativeOutputShape.Type)
 	action := func(inputState functions.State, args []functions.Action) functions.State {
 		conditionState := conditionAction(inputState, nil)
-		boolConditionValue, _ := conditionState.Value.(*values.BoolValue)
-		if boolConditionValue.Value {
+		boolConditionValue, _ := conditionState.Value.(values.BoolValue)
+		if boolConditionValue {
 			consequentInputState := functions.State{
 				Value: inputState.Value,
 				Stack: conditionState.Stack,
@@ -473,8 +473,8 @@ func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*
 		}
 		for i := range elifConditionActions {
 			conditionState = elifConditionActions[i](inputState, nil)
-			boolConditionValue, _ = conditionState.Value.(*values.BoolValue)
-			if boolConditionValue.Value {
+			boolConditionValue, _ = conditionState.Value.(values.BoolValue)
+			if boolConditionValue {
 				consequentInputState := functions.State{
 					Value: inputState.Value,
 					Stack: conditionState.Stack,
