@@ -68,7 +68,7 @@ func (v NumValue) Iter() <-chan Value {
 type StrValue string
 
 func (v StrValue) String() string {
-	return fmt.Sprintf("%q", v)
+	return fmt.Sprintf("%q", string(v))
 }
 
 func (v StrValue) Out() string {
