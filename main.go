@@ -11,16 +11,28 @@ import (
 
 func main() {
 	var e string
+	var o string
 	flag.StringVar(&e, "e", "", "function to evaluate")
+	flag.StringVar(&o, "o", "", "function to evaluate, output result")
 	flag.Parse()
-	if e == "" {
+	if (e == "") == (o == "") { // exactly one must be given
 		fmt.Fprintln(os.Stderr, "Usage:")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
-	_, _, err := interp.InterpretString(e)
+	var program string
+	if e != "" {
+		program = e
+	}
+	if o != "" {
+		program = o
+	}
+	_, value, err := interp.InterpretString(program)
 	if err != nil {
-		errors.Explain(err, e)
+		errors.Explain(err, program)
 		os.Exit(1)
+	}
+	if o != "" {
+		fmt.Println(value)
 	}
 }
