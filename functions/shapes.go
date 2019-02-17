@@ -17,3 +17,10 @@ type FuncerStack struct {
 func (s *FuncerStack) Push(funcer Funcer) *FuncerStack {
 	return &FuncerStack{funcer, s}
 }
+
+func (s *FuncerStack) PushAll(funcers []Funcer) *FuncerStack {
+	for i := len(funcers) - 1; i >= 0; i-- {
+		s = s.Push(funcers[i])
+	}
+	return s
+}

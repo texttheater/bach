@@ -1,9 +1,21 @@
 package builtin
 
 import (
+	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
-func Null(inputValue values.Value, argumentValues []values.Value) values.Value {
-	return &values.NullValue{}
+func initNull() {
+	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]functions.Funcer{
+		functions.SimpleFuncer(
+			types.AnyType,
+			"null",
+			nil,
+			types.NullType,
+			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+				return &values.NullValue{}
+			},
+		),
+	})
 }
