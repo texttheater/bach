@@ -21,8 +21,6 @@ import (
 
 var zeroShape = functions.Shape{}
 
-var seqType = &types.SeqType{types.AnyType}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 type Expression interface {
@@ -513,11 +511,11 @@ func (x *MappingExpression) Typecheck(inputShape functions.Shape, params []*func
 		)
 	}
 	// make sure the input type is a sequence type
-	if !seqType.Subsumes(inputShape.Type) {
+	if !types.AnySeqType.Subsumes(inputShape.Type) {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.MappingRequiresSeqType),
 			errors.Pos(x.Pos),
-			errors.WantType(seqType),
+			errors.WantType(types.AnySeqType),
 			errors.GotType(inputShape.Type),
 		)
 	}

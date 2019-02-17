@@ -11,8 +11,6 @@ import (
 
 var InitialShape = initialShape()
 
-var seqType = &types.SeqType{types.AnyType}
-
 func initialShape() functions.Shape {
 	shape := functions.Shape{types.NullType, nil}
 	// math functions
@@ -147,7 +145,7 @@ func initialShape() functions.Shape {
 	))
 	// conversion functions
 	shape.FuncerStack = shape.FuncerStack.Push(func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, functions.Action, bool) {
-		if !seqType.Subsumes(gotInputType) {
+		if !types.AnySeqType.Subsumes(gotInputType) {
 			return nil, nil, nil, false
 		}
 		if gotName != "arr" {
