@@ -79,7 +79,7 @@ type SeqType struct {
 }
 
 func (g *SeqType) Ast() types.Type {
-	return &types.SeqType{g.ElementType.Ast()}
+	return types.SeqType(g.ElementType.Ast())
 }
 
 type ArrType struct {
@@ -88,7 +88,7 @@ type ArrType struct {
 }
 
 func (g *ArrType) Ast() types.Type {
-	return &types.ArrType{g.ElementType.Ast()}
+	return types.ArrType(g.ElementType.Ast())
 }
 
 type AnyType struct {

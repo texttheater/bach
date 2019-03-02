@@ -96,59 +96,67 @@ func (t *strType) ElementType() Type {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type SeqType struct {
-	ElType Type
+func SeqType(elementType Type) Type {
+	return &seqType{elementType}
+}
+
+type seqType struct {
+	elementType Type
 }
 
 // AnySeqType represents Seq<Any>, the type of sequences with any type of
 // element. It is provided as a package variable for convenience.
-var AnySeqType = &SeqType{AnyType}
+var AnySeqType = SeqType(AnyType)
 
-func (t *SeqType) Subsumes(other Type) bool {
-	otherSeqType, ok := other.(*SeqType)
+func (t *seqType) Subsumes(other Type) bool {
+	otherSeqType, ok := other.(*seqType)
 	if ok {
-		return t.ElType.Subsumes(otherSeqType.ElType)
+		return t.elementType.Subsumes(otherSeqType.elementType)
 	}
-	otherArrType, ok := other.(*ArrType)
+	otherArrType, ok := other.(*arrType)
 	if ok {
-		return t.ElType.Subsumes(otherArrType.ElType)
+		return t.elementType.Subsumes(otherArrType.elementType)
 	}
 	return false
 }
 
-func (t *SeqType) String() string {
-	return fmt.Sprintf("Seq<%v>", t.ElType)
+func (t *seqType) String() string {
+	return fmt.Sprintf("Seq<%v>", t.elementType)
 }
 
-func (t *SeqType) ElementType() Type {
-	return t.ElType
+func (t *seqType) ElementType() Type {
+	return t.elementType
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type ArrType struct {
-	ElType Type
+func ArrType(elementType Type) Type {
+	return &arrType{elementType}
 }
 
-func (t *ArrType) Subsumes(other Type) bool {
-	otherArrType, ok := other.(*ArrType)
+type arrType struct {
+	elementType Type
+}
+
+func (t *arrType) Subsumes(other Type) bool {
+	otherArrType, ok := other.(*arrType)
 	if !ok {
 		return false
 	}
-	return t.ElType.Subsumes(otherArrType.ElType)
+	return t.elementType.Subsumes(otherArrType.elementType)
 }
 
-func (t *ArrType) String() string {
-	return fmt.Sprintf("Arr<%s>", t.ElType)
+func (t *arrType) String() string {
+	return fmt.Sprintf("Arr<%s>", t.elementType)
 }
 
-func (t *ArrType) ElementType() Type {
-	return t.ElType
+func (t *arrType) ElementType() Type {
+	return t.elementType
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-func NewObjType(propTypeMap map[string]Type) Type {
+func ObjType(propTypeMap map[string]Type) Type {
 	props := make([]string, 0, len(propTypeMap))
 	for k := range propTypeMap {
 		props = append(props, k)
@@ -202,61 +210,17 @@ func (t *objType) String() string {
 }
 
 func (t *objType) ElementType() Type {
-	panic(fmt.Sprintf("%s is not a sequence type", t))
+	panic(t.String() + " is not a sequence type")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type DisjunctiveType struct {
-	Disjuncts []Type
-}
-
-func (t *DisjunctiveType) Subsumes(other Type) bool {
-	otherDisj, ok := other.(*DisjunctiveType)
-	if ok {
-		return t.subsumesDisj(otherDisj)
-	}
-	return t.subsumesNonDisj(other)
-}
-
-func (t *DisjunctiveType) ElementType() Type {
-	panic(t.String() + " is not a sequence type")
-}
-
-func (t *DisjunctiveType) subsumesDisj(other *DisjunctiveType) bool {
-	for _, disjunct := range other.Disjuncts {
-		if !t.subsumesNonDisj(disjunct) {
-			return false
-		}
-	}
-	return true
-}
-
-func (t *DisjunctiveType) subsumesNonDisj(other Type) bool {
-	for _, disjunct := range t.Disjuncts {
-		if disjunct.Subsumes(other) {
-			return true
-		}
-	}
-	return false
-}
-
-func (t *DisjunctiveType) String() string {
-	buffer := bytes.Buffer{}
-	buffer.WriteString(fmt.Sprintf("%s", t.Disjuncts[0]))
-	for _, disjunct := range t.Disjuncts[1:] {
-		buffer.WriteString("|")
-		buffer.WriteString(fmt.Sprintf("%s", disjunct))
-	}
-	return buffer.String()
-}
-
 func Disjoin(a Type, b Type) Type {
-	aDisj, ok := a.(*DisjunctiveType)
+	aDisj, ok := a.(*disjunctiveType)
 	if ok {
 		return aDisj.disjoin(b)
 	}
-	bDisj, ok := b.(*DisjunctiveType)
+	bDisj, ok := b.(*disjunctiveType)
 	if ok {
 		return bDisj.disjoin(a)
 	}
@@ -266,39 +230,83 @@ func Disjoin(a Type, b Type) Type {
 	if b.Subsumes(a) {
 		return b
 	}
-	return &DisjunctiveType{[]Type{a, b}}
+	return &disjunctiveType{[]Type{a, b}}
 }
 
-func (t *DisjunctiveType) disjoin(other Type) Type {
-	otherDisj, ok := other.(*DisjunctiveType)
+type disjunctiveType struct {
+	disjuncts []Type
+}
+
+func (t *disjunctiveType) Subsumes(other Type) bool {
+	otherDisj, ok := other.(*disjunctiveType)
+	if ok {
+		return t.subsumesDisj(otherDisj)
+	}
+	return t.subsumesNonDisj(other)
+}
+
+func (t *disjunctiveType) String() string {
+	buffer := bytes.Buffer{}
+	buffer.WriteString(fmt.Sprintf("%s", t.disjuncts[0]))
+	for _, disjunct := range t.disjuncts[1:] {
+		buffer.WriteString("|")
+		buffer.WriteString(fmt.Sprintf("%s", disjunct))
+	}
+	return buffer.String()
+}
+
+func (t *disjunctiveType) ElementType() Type {
+	panic(t.String() + " is not a sequence type")
+}
+
+func (t *disjunctiveType) subsumesDisj(other *disjunctiveType) bool {
+	for _, disjunct := range other.disjuncts {
+		if !t.subsumesNonDisj(disjunct) {
+			return false
+		}
+	}
+	return true
+}
+
+func (t *disjunctiveType) subsumesNonDisj(other Type) bool {
+	for _, disjunct := range t.disjuncts {
+		if disjunct.Subsumes(other) {
+			return true
+		}
+	}
+	return false
+}
+
+func (t *disjunctiveType) disjoin(other Type) Type {
+	otherDisj, ok := other.(*disjunctiveType)
 	if ok {
 		return t.disjoinDisj(otherDisj)
 	}
 	return t.disjoinNonDisj(other)
 }
 
-func (t *DisjunctiveType) disjoinDisj(other *DisjunctiveType) Type {
+func (t *disjunctiveType) disjoinDisj(other *disjunctiveType) Type {
 	result := t
-	for _, disjunct := range other.Disjuncts {
+	for _, disjunct := range other.disjuncts {
 		result = result.disjoinNonDisj(disjunct)
 	}
 	return result
 }
 
-func (t *DisjunctiveType) disjoinNonDisj(other Type) *DisjunctiveType {
-	for _, disjunct := range t.Disjuncts {
+func (t *disjunctiveType) disjoinNonDisj(other Type) *disjunctiveType {
+	for _, disjunct := range t.disjuncts {
 		if disjunct.Subsumes(other) {
 			return t
 		}
 	}
-	newDisjuncts := make([]Type, 0, len(t.Disjuncts)+1)
-	for _, disjunct := range t.Disjuncts {
+	newDisjuncts := make([]Type, 0, len(t.disjuncts)+1)
+	for _, disjunct := range t.disjuncts {
 		if !other.Subsumes(disjunct) {
 			newDisjuncts = append(newDisjuncts, disjunct)
 		}
 	}
 	newDisjuncts = append(newDisjuncts, other)
-	return &DisjunctiveType{newDisjuncts}
+	return &disjunctiveType{newDisjuncts}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

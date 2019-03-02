@@ -12,7 +12,7 @@ func initSeq() {
 			types.AnyType,
 			"range",
 			[]types.Type{types.NumType, types.NumType},
-			&types.SeqType{types.NumType},
+			types.SeqType(types.NumType),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				start := argumentValues[0].(values.NumValue)
 				end := argumentValues[1].(values.NumValue)

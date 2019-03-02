@@ -81,7 +81,7 @@ func (x *ArrExpression) Typecheck(inputShape functions.Shape, params []*function
 		elementActions = append(elementActions, elAction)
 	}
 	outputShape := functions.Shape{
-		Type:        &types.ArrType{elementType},
+		Type:        types.ArrType(elementType),
 		FuncerStack: inputShape.FuncerStack,
 	}
 	action := func(inputState functions.State, args []functions.Action) functions.State {
@@ -530,7 +530,7 @@ func (x *MappingExpression) Typecheck(inputShape functions.Shape, params []*func
 	}
 	// create output shape
 	outputShape := functions.Shape{
-		Type:        &types.SeqType{bodyOutputShape.Type},
+		Type:        types.SeqType(bodyOutputShape.Type),
 		FuncerStack: inputShape.FuncerStack,
 	}
 	// create action

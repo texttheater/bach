@@ -72,11 +72,11 @@ func TestInterp(t *testing.T) {
 		{`"\"\\abc\""`, types.StrType, values.StrValue(`"\abc"`), nil},
 		{`1 "abc"`, types.StrType, values.StrValue("abc"), nil},
 		// arrays
-		{`[]`, &types.ArrType{types.AnyType}, values.ArrValue([]values.Value{}), nil},
-		{`[1]`, &types.ArrType{types.NumType}, values.ArrValue([]values.Value{values.NumValue(1)}), nil},
-		{`[1, 2, 3]`, &types.ArrType{types.NumType}, values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2), values.NumValue(3)}), nil},
-		{`[1, "a"]`, &types.ArrType{&types.DisjunctiveType{[]types.Type{types.NumType, types.StrType}}}, values.ArrValue([]values.Value{values.NumValue(1), values.StrValue("a")}), nil},
-		{`[[1, 2], ["a", "b"]]`, &types.ArrType{&types.DisjunctiveType{[]types.Type{&types.ArrType{types.NumType}, &types.ArrType{types.StrType}}}}, values.ArrValue([]values.Value{values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2)}), values.ArrValue([]values.Value{values.StrValue("a"), values.StrValue("b")})}), nil},
+		{`[]`, types.ArrType(types.AnyType), values.ArrValue([]values.Value{}), nil},
+		{`[1]`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1)}), nil},
+		{`[1, 2, 3]`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2), values.NumValue(3)}), nil},
+		{`[1, "a"]`, types.ArrType(types.Disjoin(types.NumType, types.StrType)), values.ArrValue([]values.Value{values.NumValue(1), values.StrValue("a")}), nil},
+		{`[[1, 2], ["a", "b"]]`, types.ArrType(types.Disjoin(types.ArrType(types.NumType), types.ArrType(types.StrType))), values.ArrValue([]values.Value{values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2)}), values.ArrValue([]values.Value{values.StrValue("a"), values.StrValue("b")})}), nil},
 		// function definitions
 		{`for Num def plusOne Num as +1 ok 1 plusOne`, types.NumType, values.NumValue(2), nil},
 		{`for Num def plusOne Num as +1 ok 1 plusOne plusOne`, types.NumType, values.NumValue(3), nil},
@@ -124,8 +124,8 @@ func TestInterp(t *testing.T) {
 		// closures
 		{`1 =a for Any def f Num as a ok f 2 =a f`, types.NumType, values.NumValue(1), nil},
 		// sequences
-		{`for Seq<Num> def f Seq<Num> as =x x ok [1, 2, 3] f`, &types.SeqType{types.NumType}, values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2), values.NumValue(3)}), nil},
-		{`[1, 2, 3] each *2 all arr`, &types.ArrType{types.NumType}, values.ArrValue([]values.Value{values.NumValue(2), values.NumValue(4), values.NumValue(6)}), nil},
+		{`for Seq<Num> def f Seq<Num> as =x x ok [1, 2, 3] f`, types.SeqType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2), values.NumValue(3)}), nil},
+		{`[1, 2, 3] each *2 all arr`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(2), values.NumValue(4), values.NumValue(6)}), nil},
 		{`1 each *2 all`, nil, nil, errors.E(errors.Kind(errors.MappingRequiresSeqType))},
 	}
 	for _, c := range cases {
