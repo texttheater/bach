@@ -89,7 +89,7 @@ type errorAttribute func(err *e)
 //    WantParam
 //    GotParam
 func E(atts ...errorAttribute) error {
-	err := no
+	err := e{}
 	e := &err
 	for _, att := range atts {
 		att(e)
@@ -99,19 +99,19 @@ func E(atts ...errorAttribute) error {
 
 func Kind(kind ErrorKind) errorAttribute {
 	return func(err *e) {
-		err.Kind = kind
+		err.Kind = &kind
 	}
 }
 
 func Pos(pos lexer.Position) errorAttribute {
 	return func(err *e) {
-		err.Pos = pos
+		err.Pos = &pos
 	}
 }
 
 func Message(message string) errorAttribute {
 	return func(err *e) {
-		err.Message = message
+		err.Message = &message
 	}
 }
 
@@ -135,25 +135,25 @@ func InputType(inputType types.Type) errorAttribute {
 
 func Name(name string) errorAttribute {
 	return func(err *e) {
-		err.Name = name
+		err.Name = &name
 	}
 }
 
 func ArgNum(argNum int) errorAttribute {
 	return func(err *e) {
-		err.ArgNum = argNum
+		err.ArgNum = &argNum
 	}
 }
 
 func NumParams(numParams int) errorAttribute {
 	return func(err *e) {
-		err.NumParams = numParams
+		err.NumParams = &numParams
 	}
 }
 
-func ParamNum(numParams int) errorAttribute {
+func ParamNum(paramNum int) errorAttribute {
 	return func(err *e) {
-		err.ParamNum = numParams
+		err.ParamNum = &paramNum
 	}
 }
 
@@ -175,56 +175,56 @@ func GotParam(gotParam *functions.Parameter) errorAttribute {
 // may have a "none" value, which is Go's zero value except for int fields
 // where it's -1.
 type e struct {
-	Kind      ErrorKind
-	Pos       lexer.Position
-	Message   string
+	Kind      *ErrorKind
+	Pos       *lexer.Position
+	Message   *string
 	WantType  types.Type
 	GotType   types.Type
 	InputType types.Type
-	Name      string
-	ArgNum    int
-	NumParams int
-	ParamNum  int
+	Name      *string
+	ArgNum    *int
+	NumParams *int
+	ParamNum  *int
 	WantParam *functions.Parameter
 	GotParam  *functions.Parameter
 }
 
 func (err *e) Error() string {
 	m := make(map[string]interface{})
-	if err.Kind != no.Kind {
+	if err.Kind != nil {
 		m["Kind"] = err.Kind.String()
 	}
-	if err.Pos != no.Pos {
+	if err.Pos != nil {
 		m["Pos"] = err.Pos.String()
 	}
-	if err.Message != no.Message {
-		m["Message"] = err.Message
+	if err.Message != nil {
+		m["Message"] = *err.Message
 	}
-	if err.WantType != no.WantType {
+	if err.WantType != nil {
 		m["WantType"] = err.WantType.String()
 	}
-	if err.GotType != no.GotType {
+	if err.GotType != nil {
 		m["GotType"] = err.GotType.String()
 	}
-	if err.InputType != no.InputType {
+	if err.InputType != nil {
 		m["InputType"] = err.InputType.String()
 	}
-	if err.Name != no.Name {
-		m["Name"] = err.Name
+	if err.Name != nil {
+		m["Name"] = *err.Name
 	}
-	if err.ArgNum != no.ArgNum {
-		m["ArgNum"] = err.ArgNum
+	if err.ArgNum != nil {
+		m["ArgNum"] = *err.ArgNum
 	}
-	if err.NumParams != no.NumParams {
-		m["NumParams"] = err.NumParams
+	if err.NumParams != nil {
+		m["NumParams"] = *err.NumParams
 	}
-	if err.ParamNum != no.ParamNum {
-		m["ParamNum"] = err.ParamNum
+	if err.ParamNum != nil {
+		m["ParamNum"] = *err.ParamNum
 	}
-	if err.WantParam != no.WantParam {
+	if err.WantParam != nil  {
 		m["WantParam"] = err.WantParam.String()
 	}
-	if err.GotParam != no.GotParam {
+	if err.GotParam != nil {
 		m["GotParam"] = err.GotParam.String()
 	}
 	out, err2 := json.Marshal(m)
@@ -245,7 +245,7 @@ func Explain(err error, program string) {
 	}
 	// header and position
 	fmt.Fprintf(os.Stderr, "%s error", e.Kind)
-	if e.Pos != no.Pos {
+	if e.Pos != nil {
 		fmt.Fprintln(os.Stderr, " at", e.Pos)
 		lines := strings.SplitAfter(program, "\n")
 		line := lines[e.Pos.Line-1]
@@ -261,46 +261,38 @@ func Explain(err error, program string) {
 		fmt.Fprintln(os.Stderr, "")
 	}
 	// attributes
-	if e.Message == no.Message {
+	if e.Message == nil {
 		fmt.Fprintln(os.Stderr, "Message:   ", e.Kind.DefaultMessage())
 	} else {
-		fmt.Fprintln(os.Stderr, "Message:   ", e.Message)
+		fmt.Fprintln(os.Stderr, "Message:   ", *e.Message)
 	}
-	if e.WantType != no.WantType {
+	if e.WantType != nil {
 		fmt.Fprintln(os.Stderr, "Want type: ", e.WantType)
 	}
-	if e.GotType != no.GotType {
+	if e.GotType != nil {
 		fmt.Fprintln(os.Stderr, "Got type:  ", e.GotType)
 	}
-	if e.InputType != no.InputType {
+	if e.InputType != nil {
 		fmt.Fprintln(os.Stderr, "Input type:", e.InputType)
 	}
-	if e.Name != no.Name {
-		fmt.Fprintln(os.Stderr, "Name:      ", e.Name)
+	if e.Name != nil {
+		fmt.Fprintln(os.Stderr, "Name:      ", *e.Name)
 	}
-	if e.ArgNum != no.ArgNum {
-		fmt.Fprintln(os.Stderr, "Arg #:     ", e.ArgNum)
+	if e.ArgNum != nil {
+		fmt.Fprintln(os.Stderr, "Arg #:     ", *e.ArgNum)
 	}
-	if e.NumParams != no.NumParams {
-		fmt.Fprintln(os.Stderr, "# params:  ", e.NumParams)
+	if e.NumParams != nil {
+		fmt.Fprintln(os.Stderr, "# params:  ", *e.NumParams)
 	}
-	if e.ParamNum != no.ParamNum {
-		fmt.Fprintln(os.Stderr, "Param #:   ", e.ParamNum)
+	if e.ParamNum != nil {
+		fmt.Fprintln(os.Stderr, "Param #:   ", *e.ParamNum)
 	}
-	if e.WantParam != no.WantParam {
-		fmt.Fprintln(os.Stderr, "Want param:", e.WantParam)
+	if e.WantParam != nil {
+		fmt.Fprintln(os.Stderr, "Want param:", *e.WantParam)
 	}
-	if e.GotParam != no.GotParam {
-		fmt.Fprintln(os.Stderr, "Got param: ", e.GotParam)
+	if e.GotParam != nil {
+		fmt.Fprintln(os.Stderr, "Got param: ", *e.GotParam)
 	}
-}
-
-// no is an e where every field has its "none" value, for convenience.
-var no = e{
-	Kind:      -1,
-	ArgNum:    -1,
-	NumParams: -1,
-	ParamNum:  -1,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -322,40 +314,40 @@ func Match(err1, err2 error) bool {
 	if !ok {
 		return false
 	}
-	if e1.Kind != no.Kind && e2.Kind != e1.Kind {
+	if e1.Kind != nil && *e2.Kind != *e1.Kind {
 		return false
 	}
-	if e1.Pos != no.Pos && e2.Pos != e1.Pos {
+	if e1.Pos != nil && *e2.Pos != *e1.Pos {
 		return false
 	}
-	if e1.Message != no.Message && e2.Message != e1.Message {
+	if e1.Message != nil && *e2.Message != *e1.Message {
 		return false
 	}
-	if e1.WantType != no.WantType && !reflect.DeepEqual(e1.WantType, e1.WantType) {
+	if e1.WantType != nil && !reflect.DeepEqual(e1.WantType, e1.WantType) {
 		return false
 	}
-	if e1.GotType != no.GotType && !reflect.DeepEqual(e1.GotType, e2.GotType) {
+	if e1.GotType != nil && !reflect.DeepEqual(e1.GotType, e2.GotType) {
 		return false
 	}
-	if e1.InputType != no.InputType && !reflect.DeepEqual(e1.InputType, e2.InputType) {
+	if e1.InputType != nil && !reflect.DeepEqual(e1.InputType, e2.InputType) {
 		return false
 	}
-	if e1.Name != no.Name && e2.Name != e1.Name {
+	if e1.Name != nil && *e2.Name != *e1.Name {
 		return false
 	}
-	if e1.ArgNum != no.ArgNum && e2.ArgNum != e1.ArgNum {
+	if e1.ArgNum != nil && *e2.ArgNum != *e1.ArgNum {
 		return false
 	}
-	if e1.NumParams != no.NumParams && e2.NumParams != e1.NumParams {
+	if e1.NumParams != nil && *e2.NumParams != *e1.NumParams {
 		return false
 	}
-	if e1.ParamNum != no.ParamNum && e2.ParamNum != e1.ParamNum {
+	if e1.ParamNum != nil && *e2.ParamNum != *e1.ParamNum {
 		return false
 	}
-	if e1.WantParam != no.WantParam && !reflect.DeepEqual(e1.WantParam, e2.WantParam) {
+	if e1.WantParam != nil && !reflect.DeepEqual(e1.WantParam, e2.WantParam) {
 		return false
 	}
-	if e1.GotParam != no.GotParam && !reflect.DeepEqual(e1.GotParam, e2.GotParam) {
+	if e1.GotParam != nil && !reflect.DeepEqual(e1.GotParam, e2.GotParam) {
 		return false
 	}
 	return true
