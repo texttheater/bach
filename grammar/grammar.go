@@ -32,6 +32,7 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Lbrace>{)` +
 		`|(?P<Rbrace>})` +
 		`|(?P<Colon>:)` +
+		`|(?P<Pipe>\|)` +
 		// the following will be scanned as Name, but mapped to the
 		// appropriate token types by name2keyword (see below)
 		`|(?P<Keyword>for|def|as|ok|if|then|elif|else)` +

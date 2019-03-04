@@ -6,6 +6,20 @@ import (
 )
 
 type Type struct {
+	Pos                lexer.Position
+	NonDisjunctiveType *NonDisjunctiveType   `  @@`
+	Disjuncts          []*NonDisjunctiveType `{ "|" @@ }`
+}
+
+func (g *Type) Ast() types.Type {
+	result := g.NonDisjunctiveType.Ast()
+	for _, d := range g.Disjuncts {
+		result = types.Disjoin(result, d.Ast())
+	}
+	return result
+}
+
+type NonDisjunctiveType struct {
 	Pos      lexer.Position
 	NullType *NullType `  @@`
 	BoolType *BoolType `| @@`
@@ -14,11 +28,10 @@ type Type struct {
 	SeqType  *SeqType  `| @@`
 	ArrType  *ArrType  `| @@`
 	ObjType  *ObjType  `| @@`
-	//DisjunctiveType *DisjunctiveType `| @@` // FIXME parser doesn't handle them
-	AnyType *AnyType `| @@`
+	AnyType  *AnyType  `| @@`
 }
 
-func (g *Type) Ast() types.Type {
+func (g *NonDisjunctiveType) Ast() types.Type {
 	if g.NullType != nil {
 		return g.NullType.Ast()
 	}
@@ -40,9 +53,6 @@ func (g *Type) Ast() types.Type {
 	if g.ObjType != nil {
 		return g.ObjType.Ast()
 	}
-	//if g.DisjunctiveType != nil {
-	//	return g.DisjunctiveType.Ast()
-	//}
 	if g.AnyType != nil {
 		return g.AnyType.Ast()
 	}
@@ -116,21 +126,6 @@ func (g *ObjType) Ast() types.Type {
 		}
 	}
 	return types.ObjType(propTypeMap)
-}
-
-type DisjunctiveType struct {
-	Pos   lexer.Position
-	Type1 *Type   `    @@`
-	Type2 *Type   `"|" @@`
-	Types []*Type `{ "|" @@ }`
-}
-
-func (g *DisjunctiveType) Ast() types.Type {
-	result := types.Disjoin(g.Type1.Ast(), g.Type2.Ast())
-	for _, t := range g.Types {
-		result = types.Disjoin(result, t.Ast())
-	}
-	return result
 }
 
 type AnyType struct {
