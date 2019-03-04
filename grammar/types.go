@@ -13,7 +13,9 @@ type Type struct {
 	StrType  *StrType  `| @@`
 	SeqType  *SeqType  `| @@`
 	ArrType  *ArrType  `| @@`
-	AnyType  *AnyType  `| @@`
+	ObjType  *ObjType  `| @@`
+	//DisjunctiveType *DisjunctiveType `| @@` // FIXME parser doesn't handle them
+	AnyType *AnyType `| @@`
 }
 
 func (g *Type) Ast() types.Type {
@@ -35,6 +37,12 @@ func (g *Type) Ast() types.Type {
 	if g.ArrType != nil {
 		return g.ArrType.Ast()
 	}
+	if g.ObjType != nil {
+		return g.ObjType.Ast()
+	}
+	//if g.DisjunctiveType != nil {
+	//	return g.DisjunctiveType.Ast()
+	//}
 	if g.AnyType != nil {
 		return g.AnyType.Ast()
 	}
@@ -89,6 +97,40 @@ type ArrType struct {
 
 func (g *ArrType) Ast() types.Type {
 	return types.ArrType(g.ElementType.Ast())
+}
+
+type ObjType struct {
+	Pos      lexer.Position `"Obj<"`
+	Prop     *string        `[ @Name`
+	ValType  *Type          `  ":" @@`
+	Props    []string       `  { @Name`
+	ValTypes []*Type        `     ":" @@ } ] ">"`
+}
+
+func (g *ObjType) Ast() types.Type {
+	propTypeMap := make(map[string]types.Type)
+	if g.Prop != nil {
+		propTypeMap[*g.Prop] = g.ValType.Ast()
+		for i := range g.Props {
+			propTypeMap[g.Props[i]] = g.ValTypes[i].Ast()
+		}
+	}
+	return types.ObjType(propTypeMap)
+}
+
+type DisjunctiveType struct {
+	Pos   lexer.Position
+	Type1 *Type   `    @@`
+	Type2 *Type   `"|" @@`
+	Types []*Type `{ "|" @@ }`
+}
+
+func (g *DisjunctiveType) Ast() types.Type {
+	result := types.Disjoin(g.Type1.Ast(), g.Type2.Ast())
+	for _, t := range g.Types {
+		result = types.Disjoin(result, t.Ast())
+	}
+	return result
 }
 
 type AnyType struct {
