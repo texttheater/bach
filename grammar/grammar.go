@@ -21,7 +21,7 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Op2Name>(?:==|<=|>=)(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Assignment>=(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
-		`|(?P<TypeKeywordLangle>(?:Null|Bool|Num|Str|Seq|Arr|Any)<)` +
+		`|(?P<TypeKeywordLangle>(?:Null|Bool|Num|Str|Seq|Arr|Obj|Any)<)` +
 		`|(?P<Prop>[\p{L}_][\p{L}_0-9]*)` +
 		`|(?P<Op1>[+\-*/%<>=])` +
 		`|(?P<Op2>==|<=|>=)` +
@@ -37,7 +37,7 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		// the following will be scanned as Name, but mapped to the
 		// appropriate token types by name2keyword (see below)
 		`|(?P<Keyword>for|def|as|ok|if|then|elif|else)` +
-		`|(?P<TypeKeyword>Null|Bool|Num|Str|Seq|Arr|Any)`,
+		`|(?P<TypeKeyword>Null|Bool|Num|Str|Seq|Arr|Obj|Any)`,
 ))
 
 ///////////////////////////////////////////////////////////////////////////////
