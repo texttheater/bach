@@ -29,7 +29,11 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Rbrack>])` +
 		`|(?P<Langle><)` +
 		`|(?P<Rangle>>)` +
-		// the following will be scanned as Name, but mapped to the appropriate token types by name2keyword (see below)
+		`|(?P<Lbrace>{)` +
+		`|(?P<Rbrace>})` +
+		`|(?P<Colon>:)` +
+		// the following will be scanned as Name, but mapped to the
+		// appropriate token types by name2keyword (see below)
 		`|(?P<Keyword>for|def|as|ok|if|then|elif|else)` +
 		`|(?P<TypeKeyword>Null|Bool|Num|Str|Seq|Arr|Any)`,
 ))
@@ -113,6 +117,7 @@ type Component struct {
 	Num         *float64     `  @Num`
 	Str         *string      `| @Str`
 	Array       *Array       `| @@`
+	Object      *Object      `| @@`
 	Call        *Call        `| @@`
 	Assignment  *Assignment  `| @Assignment`
 	Definition  *Definition  `| @@`
