@@ -81,6 +81,23 @@ func (v StrValue) Iter() <-chan Value {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+type SeqValue chan Value
+
+func (v SeqValue) String() string {
+	return "<sequence>"
+}
+
+func (v SeqValue) Out() string {
+	return v.String()
+}
+
+func (v SeqValue) Iter() <-chan Value {
+	// TODO safeguard against iterating twice?
+	return v
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 type ArrValue []Value
 
 func (v ArrValue) String() string {
@@ -110,23 +127,6 @@ func (v ArrValue) Iter() <-chan Value {
 		close(channel)
 	}()
 	return channel
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type SeqValue chan Value
-
-func (v SeqValue) String() string {
-	return "<sequence>"
-}
-
-func (v SeqValue) Out() string {
-	return v.String()
-}
-
-func (v SeqValue) Iter() <-chan Value {
-	// TODO safeguard against iterating twice?
-	return v
 }
 
 ///////////////////////////////////////////////////////////////////////////////
