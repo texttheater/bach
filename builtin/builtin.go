@@ -12,6 +12,8 @@ func init() {
 	initLogic()
 	initNull()
 	initSeq()
-	initConv()
 	initIO()
+	initConv()
+	initTypes()
+	initValues()
 }

@@ -6,26 +6,20 @@ import (
 	"github.com/texttheater/bach/values"
 )
 
-func initConv() {
+func initTypes() {
 	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]functions.Funcer{
 		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, functions.Action, bool) {
-			if !types.AnySeqType.Subsumes(gotInputType) {
-				return nil, nil, nil, false
-			}
-			if gotName != "arr" {
+			if gotName != "type" {
 				return nil, nil, nil, false
 			}
 			if gotNumArgs != 0 {
 				return nil, nil, nil, false
 			}
-			outputType := types.ArrType(gotInputType.ElementType())
+			outputType := types.StrType
 			action := func(inputState functions.State, args []functions.Action) functions.State {
-				array := make([]values.Value, 0)
-				for el := range inputState.Value.Iter() {
-					array = append(array, el)
-				}
+				outputValue := values.StrValue(gotInputType.String())
 				outputState := functions.State{
-					Value: values.ArrValue(array),
+					Value: outputValue,
 					Stack: inputState.Stack,
 				}
 				return outputState
