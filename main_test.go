@@ -21,15 +21,18 @@ func TestInterp(t *testing.T) {
 	}{
 		// syntax errors
 		{"&", nil, nil, errors.E(errors.Kind(errors.Syntax))},
+
 		// type errors
 		{"-1 *2", nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.NullType), errors.Name("-"), errors.NumParams(1))},
 		{"3 <2 +1", nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.BoolType), errors.Name("+"), errors.NumParams(1))},
 		{"+", nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.NullType), errors.Name("+"), errors.NumParams(0))},
 		{"hurz", nil, nil, errors.E(errors.Kind(errors.NoSuchFunction))},
+
 		// literals
 		{"1", types.NumType, values.NumValue(1), nil},
 		{"1 2", types.NumType, values.NumValue(2), nil},
 		{"1 2 3.5", types.NumType, values.NumValue(3.5), nil},
+
 		// math
 		{"1 +1", types.NumType, values.NumValue(2), nil},
 		{"1 +2 *3", types.NumType, values.NumValue(9), nil},
@@ -44,6 +47,7 @@ func TestInterp(t *testing.T) {
 		{"1 +1 ==2", types.BoolType, values.BoolValue(true), nil},
 		{"1 +1 >=2", types.BoolType, values.BoolValue(true), nil},
 		{"1 +1 <=2", types.BoolType, values.BoolValue(true), nil},
+
 		// logic
 		{"true", types.BoolType, values.BoolValue(true), nil},
 		{"false", types.BoolType, values.BoolValue(false), nil},
@@ -62,21 +66,26 @@ func TestInterp(t *testing.T) {
 		{"false ==false", types.BoolType, values.BoolValue(true), nil},
 		{"false ==true", types.BoolType, values.BoolValue(false), nil},
 		{"1 +1 ==2 and(2 +2 ==5 not)", types.BoolType, values.BoolValue(true), nil},
+
 		// null
 		{"1 null", types.NullType, &values.NullValue{}, nil},
+
 		// assignment
 		{"1 +1 =a 3 *2 +a", types.NumType, values.NumValue(8), nil},
 		{"1 +1 ==2 =p 1 +1 ==1 =q p ==q not", types.BoolType, values.BoolValue(true), nil},
+
 		// strings
 		{`"abc"`, types.StrType, values.StrValue("abc"), nil},
 		{`"\"\\abc\""`, types.StrType, values.StrValue(`"\abc"`), nil},
 		{`1 "abc"`, types.StrType, values.StrValue("abc"), nil},
+
 		// arrays
 		{`[]`, types.ArrType(types.AnyType), values.ArrValue([]values.Value{}), nil},
 		{`[1]`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1)}), nil},
 		{`[1, 2, 3]`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2), values.NumValue(3)}), nil},
 		{`[1, "a"]`, types.ArrType(types.Disjoin(types.NumType, types.StrType)), values.ArrValue([]values.Value{values.NumValue(1), values.StrValue("a")}), nil},
 		{`[[1, 2], ["a", "b"]]`, types.ArrType(types.Disjoin(types.ArrType(types.NumType), types.ArrType(types.StrType))), values.ArrValue([]values.Value{values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2)}), values.ArrValue([]values.Value{values.StrValue("a"), values.StrValue("b")})}), nil},
+
 		// function definitions
 		{`for Num def plusOne Num as +1 ok 1 plusOne`, types.NumType, values.NumValue(2), nil},
 		{`for Num def plusOne Num as +1 ok 1 plusOne plusOne`, types.NumType, values.NumValue(3), nil},
@@ -109,6 +118,7 @@ func TestInterp(t *testing.T) {
 		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok`, types.NullType, &values.NullValue{}, nil},
 		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok f(g)`, nil, nil, errors.E(errors.Kind(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&functions.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.NumType}), errors.GotParam(&functions.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.StrType}))},
 		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(for Str x Num) Num as "abc" x ok f(g)`, nil, nil, errors.E(errors.Kind(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&functions.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.NumType}), errors.GotParam(&functions.Parameter{InputType: types.StrType, Name: "x", Params: nil, OutputType: types.NumType}))},
+
 		// conditionals
 		{`if true then 2 else 3 ok`, types.NumType, values.NumValue(2), nil},
 		{`for Num def heart Bool as if <3 then true else false ok ok 2 heart`,  types.BoolType, values.BoolValue(true), nil},
@@ -116,17 +126,52 @@ func TestInterp(t *testing.T) {
 		{`for Num def expand Num as if <0 then -1 elif >0 then +1 else 0 ok ok 0 -1 expand`, types.NumType, values.NumValue(-2), nil},
 		{`for Num def expand Num as if <0 then -1 elif >0 then +1 else 0 ok ok 1 expand`, types.NumType, values.NumValue(2), nil},
 		{`for Num def expand Num as if <0 then -1 elif >0 then +1 else 0 ok ok 0 expand`, types.NumType, values.NumValue(0), nil},
+
 		// recursion
 		{`for Num def fac Num as if ==0 then 1 else =n -1 fac *n ok ok 3 fac`, types.NumType, values.NumValue(6), nil},
+
 		// overloading
 		{`for Bool def f Num as 1 ok for Num def f Num as 2 ok true f`, types.NumType, values.NumValue(1), nil},
 		{`for Bool def f Num as 1 ok for Num def f Num as 2 ok 1 f`, types.NumType, values.NumValue(2), nil},
+
 		// closures
 		{`1 =a for Any def f Num as a ok f 2 =a f`, types.NumType, values.NumValue(1), nil},
+
 		// sequences
 		{`for Seq<Num> def f Seq<Num> as =x x ok [1, 2, 3] f`, types.SeqType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2), values.NumValue(3)}), nil},
 		{`[1, 2, 3] each *2 all arr`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(2), values.NumValue(4), values.NumValue(6)}), nil},
 		{`1 each *2 all`, nil, nil, errors.E(errors.Kind(errors.MappingRequiresSeqType))},
+
+		// simple types
+		{`null type`, types.StrType, values.StrValue("Null"), nil},
+		{`true type`, types.StrType, values.StrValue("Bool"), nil},
+		{`1 type`, types.StrType, values.StrValue("Num"), nil},
+		{`"abc" type`, types.StrType, values.StrValue("Str"), nil},
+
+		// sequence types
+		{`range(0, 5) type`, types.StrType, values.StrValue("Seq<Num>"), nil},
+
+		// array types
+		{`[] type`, types.StrType, values.StrValue("Arr<Any>"), nil},
+		{`["dog", "cat"] type`, types.StrType, values.StrValue("Arr<Str>"), nil},
+		{`["dog", 1] type`, types.StrType, values.StrValue("Arr<Str|Num>"), nil},
+		{`["dog", 1, {}] type`, types.StrType, values.StrValue("Arr<Str|Num|Obj<>>"), nil},
+		{`["dog", 1, {}, 2] type`, types.StrType, values.StrValue("Arr<Str|Num|Obj<>>"), nil},
+
+		// object types
+		{`{} type`, types.StrType, values.StrValue("Obj<>"), nil},
+		{`{a: null} type`, types.StrType, values.StrValue("Obj<a: Null>"), nil},
+		{`{b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool>"), nil},
+		{`{c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num>"), nil},
+		{`{d: "", c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num, d: Str>"), nil},
+		{`{e: [], d: "", c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num, d: Str, e: Arr<Any>>"), nil},
+		{`{f: {}, e: [], d: "", c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num, d: Str, e: Arr<Any>, f: Obj<>>"), nil},
+
+		// disjunctive types
+		{`for Num def f Num|Str as if ==1 then 1 else "abc" ok ok 1 f type`, types.StrType, values.StrValue("Num|Str"), nil},
+
+		// the Any type
+		{`for Any def f Any as null ok f type`, types.StrType, values.StrValue("Any"), nil},
 	}
 	for _, c := range cases {
 		gotType, gotValue, gotErr := interp.InterpretString(c.program)
