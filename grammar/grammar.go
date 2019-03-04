@@ -29,8 +29,6 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Rpar>\))` +
 		`|(?P<Lbrack>\[)` +
 		`|(?P<Rbrack>])` +
-		`|(?P<Langle><)` +
-		`|(?P<Rangle>>)` +
 		`|(?P<Lbrace>{)` +
 		`|(?P<Rbrace>})` +
 		`|(?P<Colon>:)` +
