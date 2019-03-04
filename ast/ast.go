@@ -112,8 +112,8 @@ func (x *ObjExpression) Typecheck(inputShape functions.Shape, params []*function
 			errors.Pos(x.Pos),
 		)
 	}
-	var keyTypeMap map[string]types.Type
-	var keyActionMap map[string]functions.Action
+	keyTypeMap := make(map[string]types.Type)
+	keyActionMap := make(map[string]functions.Action)
 	for key, valExpression := range x.PropValMap {
 		keyOutputShape, keyAction, err := valExpression.Typecheck(inputShape, nil)
 		if err != nil {
@@ -127,7 +127,7 @@ func (x *ObjExpression) Typecheck(inputShape functions.Shape, params []*function
 		FuncerStack: inputShape.FuncerStack,
 	}
 	action := func(inputState functions.State, args []functions.Action) functions.State {
-		var propValMap map[string]values.Value
+		propValMap := make(map[string]values.Value)
 		for key, valAction := range keyActionMap {
 			valValue := valAction(inputState, nil).Value
 			propValMap[key] = valValue

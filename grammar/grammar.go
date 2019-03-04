@@ -143,6 +143,9 @@ func (g *Component) Ast() ast.Expression {
 	if g.Array != nil {
 		return g.Array.Ast()
 	}
+	if g.Object != nil {
+		return g.Object.Ast()
+	}
 	if g.Call != nil {
 		return g.Call.Ast()
 	}

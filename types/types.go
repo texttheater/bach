@@ -197,7 +197,7 @@ func (t objType) String() string {
 		buffer.WriteString(t.props[0])
 		buffer.WriteString(": ")
 		buffer.WriteString(t.propTypeMap[t.props[0]].String())
-		for _, prop := range t.props {
+		for _, prop := range t.props[1:] {
 			typ := t.propTypeMap[prop]
 			buffer.WriteString(", ")
 			buffer.WriteString(prop)

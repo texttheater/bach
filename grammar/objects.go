@@ -8,13 +8,13 @@ import (
 type Object struct {
 	Pos    lexer.Position `"{"`
 	Name   *string        `[ @Name`
-	Value  *Composition   `  @@`
+	Value  *Composition   `  ":" @@`
 	Names  []string       `  { "," @Name`
 	Values []*Composition `    ":" @@ } ] "}"`
 }
 
 func (g *Object) Ast() ast.Expression {
-	var propValMap map[string]ast.Expression
+	propValMap := make(map[string]ast.Expression)
 	if g.Name != nil {
 		propValMap[*g.Name] = g.Value.Ast()
 		for i := range g.Names {
