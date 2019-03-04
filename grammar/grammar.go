@@ -41,7 +41,12 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 ///////////////////////////////////////////////////////////////////////////////
 
 func Parse(input string) (ast.Expression, error) {
-	parser, err := participle.Build(&Composition{}, participle.Lexer(LexerDefinition), participle.Unquote(LexerDefinition, "Str"), participle.Map(Name2keyword))
+	parser, err := participle.Build(
+		&Composition{},
+		participle.Lexer(LexerDefinition),
+		participle.Unquote("Str"),
+		participle.Map(ToKeyword, "Prop"),
+	)
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {
 			return nil, errors.E(
@@ -67,17 +72,14 @@ func Parse(input string) (ast.Expression, error) {
 	return composition.Ast(), nil
 }
 
-func Name2keyword(t lexer.Token) lexer.Token {
-	if t.Type != LexerDefinition.Symbols()["Name"] {
-		return t
-	}
+func ToKeyword(t lexer.Token) (lexer.Token, error) {
 	if isTypeKeyword(t.Value) {
 		t.Type = LexerDefinition.Symbols()["Type"]
 	}
 	if isKeyword(t.Value) {
 		t.Type = LexerDefinition.Symbols()["Keyword"]
 	}
-	return t
+	return t, nil
 }
 
 func isTypeKeyword(name string) bool {
