@@ -221,7 +221,7 @@ func (err *e) Error() string {
 	if err.ParamNum != nil {
 		m["ParamNum"] = *err.ParamNum
 	}
-	if err.WantParam != nil  {
+	if err.WantParam != nil {
 		m["WantParam"] = err.WantParam.String()
 	}
 	if err.GotParam != nil {
