@@ -13,7 +13,7 @@ type Definition struct {
 	Pos         lexer.Position
 	InputType   *Type        `"for" @@`
 	NameParlist *NameParlist `"def" ( @@`
-	Name        *string      `      | @Name)`
+	Name        *string      `      | ( @Prop | @Op1 | @Op2 ) )`
 	OutputType  *Type        `@@`
 	Body        *Composition `"as" @@ "ok"`
 }
@@ -57,10 +57,10 @@ func (g *NameParlist) Ast() []*functions.Parameter {
 
 type Param struct {
 	Pos         lexer.Position
-	Name1       *string      `( @Name`
+	Name1       *string      `( ( @Prop | @Op1 | @Op2 )`
 	InputType   *Type        `| "for" @@`
 	NameParlist *NameParlist `  ( @@`
-	Name2       *string      `  | @Name) )`
+	Name2       *string      `  | ( @Prop | @Op1 | @Op2 ) ) )`
 	OutputType  *Type        `@@`
 }
 

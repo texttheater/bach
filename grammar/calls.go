@@ -18,7 +18,7 @@ type Call struct {
 	Op1Name     *Op1Name     `| @Op1Name`
 	Op2Name     *Op2Name     `| @Op2Name`
 	NameArglist *NameArglist `| @@`
-	Name        *string      `| @Name`
+	Name        *string      `| ( @Prop | @Op1 | @Op2 )`
 }
 
 func (g *Call) Ast() ast.Expression {

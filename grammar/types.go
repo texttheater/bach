@@ -101,9 +101,9 @@ func (g *ArrType) Ast() types.Type {
 
 type ObjType struct {
 	Pos      lexer.Position `"Obj<"`
-	Prop     *string        `[ @Name`
+	Prop     *string        `[ @Prop`
 	ValType  *Type          `  ":" @@`
-	Props    []string       `  { @Name`
+	Props    []string       `  { @Prop`
 	ValTypes []*Type        `     ":" @@ } ] ">"`
 }
 

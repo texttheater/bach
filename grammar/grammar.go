@@ -22,7 +22,9 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Assignment>=(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
 		`|(?P<TypeKeywordLangle>(?:Null|Bool|Num|Str|Seq|Arr|Any)<)` +
-		`|(?P<Name>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
+		`|(?P<Prop>[\p{L}_][\p{L}_0-9]*)` +
+		`|(?P<Op1>[+\-*/%<>=])` +
+		`|(?P<Op2>==|<=|>=)` +
 		`|(?P<Comma>,)` +
 		`|(?P<Rpar>\))` +
 		`|(?P<Lbrack>\[)` +
