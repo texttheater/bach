@@ -17,8 +17,8 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Str>"(?:\\.|[^"])*")` +
 		`|(?P<Op1Num>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op2Num>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-		`|(?P<Op1Name>[+\-*/%<>](?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
-		`|(?P<Op2Name>(?:==|<=|>=)(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
+		`|(?P<Op1Name>[+\-*/%<>](?:[\p{L}_][\p{L}_0-9]*))` +
+		`|(?P<Op2Name>(?:==|<=|>=)(?:[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Assignment>=(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
 		`|(?P<TypeKeywordLangle>(?:Null|Bool|Num|Str|Seq|Arr|Obj|Any)<)` +
@@ -47,6 +47,7 @@ func Parse(input string) (ast.Expression, error) {
 		participle.Lexer(LexerDefinition),
 		participle.Unquote("Str"),
 		participle.Map(ToKeyword, "Prop"),
+		participle.UseLookahead(0),
 	)
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {
