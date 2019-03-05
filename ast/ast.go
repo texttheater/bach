@@ -66,18 +66,14 @@ func (x *ArrExpression) Typecheck(inputShape functions.Shape, params []*function
 			errors.Pos(x.Pos),
 		)
 	}
-	var elementType types.Type = types.AnyType
+	var elementType types.Type = types.VoidType
 	elementActions := make([]functions.Action, 0, len(x.Elements))
-	for i, elExpression := range x.Elements {
+	for _, elExpression := range x.Elements {
 		elOutputShape, elAction, err := elExpression.Typecheck(inputShape, nil)
 		if err != nil {
 			return zeroShape, nil, err
 		}
-		if i == 0 {
-			elementType = elOutputShape.Type // HACK
-		} else {
-			elementType = types.Disjoin(elementType, elOutputShape.Type)
-		}
+		elementType = types.Disjoin(elementType, elOutputShape.Type)
 		elementActions = append(elementActions, elAction)
 	}
 	outputShape := functions.Shape{

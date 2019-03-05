@@ -80,7 +80,7 @@ func TestInterp(t *testing.T) {
 		{`1 "abc"`, types.StrType, values.StrValue("abc"), nil},
 
 		// arrays
-		{`[]`, types.ArrType(types.AnyType), values.ArrValue([]values.Value{}), nil},
+		{`[]`, types.ArrType(types.VoidType), values.ArrValue([]values.Value{}), nil},
 		{`[1]`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1)}), nil},
 		{`[1, 2, 3]`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2), values.NumValue(3)}), nil},
 		{`[1, "a"]`, types.ArrType(types.Disjoin(types.NumType, types.StrType)), values.ArrValue([]values.Value{values.NumValue(1), values.StrValue("a")}), nil},
@@ -152,7 +152,7 @@ func TestInterp(t *testing.T) {
 		{`range(0, 5) type`, types.StrType, values.StrValue("Seq<Num>"), nil},
 
 		// array types
-		{`[] type`, types.StrType, values.StrValue("Arr<Any>"), nil},
+		{`[] type`, types.StrType, values.StrValue("Arr<Void>"), nil},
 		{`["dog", "cat"] type`, types.StrType, values.StrValue("Arr<Str>"), nil},
 		{`["dog", 1] type`, types.StrType, values.StrValue("Arr<Str|Num>"), nil},
 		{`["dog", 1, {}] type`, types.StrType, values.StrValue("Arr<Str|Num|Obj<>>"), nil},
@@ -164,11 +164,14 @@ func TestInterp(t *testing.T) {
 		{`{b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool>"), nil},
 		{`{c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num>"), nil},
 		{`{d: "", c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num, d: Str>"), nil},
-		{`{e: [], d: "", c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num, d: Str, e: Arr<Any>>"), nil},
-		{`{f: {}, e: [], d: "", c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num, d: Str, e: Arr<Any>, f: Obj<>>"), nil},
+		{`{e: [], d: "", c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num, d: Str, e: Arr<Void>>"), nil},
+		{`{f: {}, e: [], d: "", c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num, d: Str, e: Arr<Void>, f: Obj<>>"), nil},
 
 		// disjunctive types
 		{`for Num def f Num|Str as if ==1 then 1 else "abc" ok ok 1 f type`, types.StrType, values.StrValue("Num|Str"), nil},
+		{`for Any def f Num|Str as 1 ok f type`, types.StrType, values.StrValue("Num|Str"), nil},
+		{`for Any def f Void|Num as 1 ok f type`, types.StrType, values.StrValue("Num"), nil},
+		{`for Any def f Num|Any as 1 ok f type`, types.StrType, values.StrValue("Any"), nil},
 
 		// the Any type
 		{`for Any def f Any as null ok f type`, types.StrType, values.StrValue("Any"), nil},

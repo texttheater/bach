@@ -21,7 +21,8 @@ func (g *Type) Ast() types.Type {
 
 type NonDisjunctiveType struct {
 	Pos      lexer.Position
-	NullType *NullType `  @@`
+	VoidType *VoidType `  @@`
+	NullType *NullType `| @@`
 	BoolType *BoolType `| @@`
 	NumType  *NumType  `| @@`
 	StrType  *StrType  `| @@`
@@ -32,6 +33,9 @@ type NonDisjunctiveType struct {
 }
 
 func (g *NonDisjunctiveType) Ast() types.Type {
+	if g.VoidType != nil {
+		return g.VoidType.Ast()
+	}
 	if g.NullType != nil {
 		return g.NullType.Ast()
 	}
@@ -57,6 +61,14 @@ func (g *NonDisjunctiveType) Ast() types.Type {
 		return g.AnyType.Ast()
 	}
 	panic("invalid type")
+}
+
+type VoidType struct {
+	Pos lexer.Position `"Void"`
+}
+
+func (g *VoidType) Ast() types.Type {
+	return types.VoidType
 }
 
 type NullType struct {

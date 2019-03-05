@@ -16,12 +16,35 @@ type Type interface {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+var VoidType = voidType{}
+
+type voidType struct {
+}
+
+func (t voidType) Subsumes(other Type) bool {
+	_, ok := other.(voidType)
+	return ok
+}
+
+func (t voidType) String() string {
+	return "Void"
+}
+
+func (t voidType) ElementType() Type {
+	panic("Void is not a sequence type")
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 var NullType = nullType{}
 
 type nullType struct {
 }
 
 func (t nullType) Subsumes(other Type) bool {
+	if VoidType.Subsumes(other) {
+		return true
+	}
 	_, ok := other.(nullType)
 	return ok
 }
@@ -42,6 +65,9 @@ type boolType struct {
 }
 
 func (t boolType) Subsumes(other Type) bool {
+	if VoidType.Subsumes(other) {
+		return true
+	}
 	_, ok := other.(boolType)
 	return ok
 }
@@ -62,6 +88,9 @@ type numType struct {
 }
 
 func (t numType) Subsumes(other Type) bool {
+	if VoidType.Subsumes(other) {
+		return true
+	}
 	_, ok := other.(numType)
 	return ok
 }
@@ -82,6 +111,9 @@ type strType struct {
 }
 
 func (t strType) Subsumes(other Type) bool {
+	if VoidType.Subsumes(other) {
+		return true
+	}
 	_, ok := other.(strType)
 	return ok
 }
@@ -109,6 +141,9 @@ type seqType struct {
 var AnySeqType = SeqType(AnyType)
 
 func (t seqType) Subsumes(other Type) bool {
+	if VoidType.Subsumes(other) {
+		return true
+	}
 	otherSeqType, ok := other.(seqType)
 	if ok {
 		return t.elementType.Subsumes(otherSeqType.elementType)
@@ -139,6 +174,9 @@ type arrType struct {
 }
 
 func (t arrType) Subsumes(other Type) bool {
+	if VoidType.Subsumes(other) {
+		return true
+	}
 	otherArrType, ok := other.(arrType)
 	if !ok {
 		return false
@@ -174,6 +212,9 @@ type objType struct {
 }
 
 func (t objType) Subsumes(other Type) bool {
+	if VoidType.Subsumes(other) {
+		return true
+	}
 	otherObjType, ok := other.(objType)
 	if !ok {
 		return false
