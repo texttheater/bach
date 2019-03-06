@@ -11,14 +11,14 @@ type Kernel func(inputValue values.Value, argValues []values.Value) values.Value
 
 func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, kernel Kernel) Funcer {
 	// make parameters from argument types
-	params := make([]*Parameter, 0, len(argTypes))
-	for _, argType := range argTypes {
-		params = append(params, &Parameter{
+	params := make([]*Parameter, len(argTypes))
+	for i, argType := range argTypes {
+		params[i] = &Parameter{
 			InputType:  types.AnyType,
 			Name:       "", // TODO ?
 			Params:     nil,
 			OutputType: argType,
-		})
+		}
 	}
 	// make funcer
 	return func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*Parameter, types.Type, Action, bool) {
@@ -32,13 +32,13 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 			return nil, nil, nil, false
 		}
 		action := func(inputState State, args []Action) State {
-			argValues := make([]values.Value, 0, len(argTypes))
+			argValues := make([]values.Value, len(argTypes))
 			argInputState := State{
 				Value: &values.NullValue{},
 				Stack: inputState.Stack,
 			}
-			for _, arg := range args {
-				argValues = append(argValues, arg(argInputState, nil).Value)
+			for i, arg := range args {
+				argValues[i] = arg(argInputState, nil).Value
 			}
 			return State{
 				Value: kernel(inputState.Value, argValues),

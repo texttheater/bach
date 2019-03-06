@@ -67,24 +67,24 @@ func (x *ArrExpression) Typecheck(inputShape functions.Shape, params []*function
 		)
 	}
 	var elementType types.Type = types.VoidType
-	elementActions := make([]functions.Action, 0, len(x.Elements))
-	for _, elExpression := range x.Elements {
+	elementActions := make([]functions.Action, len(x.Elements))
+	for i, elExpression := range x.Elements {
 		elOutputShape, elAction, err := elExpression.Typecheck(inputShape, nil)
 		if err != nil {
 			return zeroShape, nil, err
 		}
 		elementType = types.Disjoin(elementType, elOutputShape.Type)
-		elementActions = append(elementActions, elAction)
+		elementActions[i] = elAction
 	}
 	outputShape := functions.Shape{
 		Type:        types.ArrType(elementType),
 		FuncerStack: inputShape.FuncerStack,
 	}
 	action := func(inputState functions.State, args []functions.Action) functions.State {
-		elementValues := make([]values.Value, 0, len(elementActions))
-		for _, elAction := range elementActions {
+		elementValues := make([]values.Value, len(elementActions))
+		for i, elAction := range elementActions {
 			elValue := elAction(inputState, nil).Value
-			elementValues = append(elementValues, elValue)
+			elementValues[i] = elValue
 		}
 		return functions.State{
 			Value: values.ArrValue(elementValues),
@@ -462,8 +462,8 @@ func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*
 		return zeroShape, nil, err
 	}
 	outputType := consequentOutputShape.Type
-	elifConditionActions := make([]functions.Action, 0, len(x.ElifConditions))
-	elifConsequentActions := make([]functions.Action, 0, len(x.ElifConsequents))
+	elifConditionActions := make([]functions.Action, len(x.ElifConditions))
+	elifConsequentActions := make([]functions.Action, len(x.ElifConsequents))
 	for i := range x.ElifConditions {
 		conditionOutputShape, elifConditionAction, err := x.ElifConditions[i].Typecheck(shape, nil)
 		if err != nil {
@@ -478,12 +478,12 @@ func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*
 			)
 		}
 		shape.FuncerStack = conditionOutputShape.FuncerStack
-		elifConditionActions = append(elifConditionActions, elifConditionAction)
+		elifConditionActions[i] = elifConditionAction
 		consequentOutputShape, elifConsequentAction, err := x.ElifConsequents[i].Typecheck(shape, nil)
 		if err != nil {
 			return zeroShape, nil, err
 		}
-		elifConsequentActions = append(elifConsequentActions, elifConsequentAction)
+		elifConsequentActions[i] = elifConsequentAction
 		outputType = types.Disjoin(outputType, consequentOutputShape.Type)
 	}
 	alternativeOutputShape, alternativeAction, err := x.Alternative.Typecheck(shape, nil)

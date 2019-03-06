@@ -14,10 +14,10 @@ type Array struct {
 func (g *Array) Ast() ast.Expression {
 	var elements []ast.Expression
 	if g.Element != nil {
-		elements = make([]ast.Expression, 0, 1+len(g.Elements))
-		elements = append(elements, g.Element.Ast())
-		for _, element := range g.Elements {
-			elements = append(elements, element.Ast())
+		elements = make([]ast.Expression, 1+len(g.Elements))
+		elements[0] = g.Element.Ast()
+		for i, element := range g.Elements {
+			elements[i+1] = element.Ast()
 		}
 	}
 	return &ast.ArrExpression{g.Pos, elements}

@@ -195,9 +195,11 @@ func (t arrType) ElementType() Type {
 ///////////////////////////////////////////////////////////////////////////////
 
 func ObjType(propTypeMap map[string]Type) Type {
-	props := make([]string, 0, len(propTypeMap))
+	props := make([]string, len(propTypeMap))
+	i := 0
 	for k := range propTypeMap {
-		props = append(props, k)
+		props[i] = k
+		i++
 	}
 	sort.Strings(props)
 	return objType{
@@ -340,13 +342,13 @@ func (t disjunctiveType) disjoinNonDisj(other Type) disjunctiveType {
 			return t
 		}
 	}
-	newDisjuncts := make([]Type, 0, len(t.disjuncts)+1)
-	for _, disjunct := range t.disjuncts {
+	newDisjuncts := make([]Type, len(t.disjuncts)+1)
+	for i, disjunct := range t.disjuncts {
 		if !other.Subsumes(disjunct) {
-			newDisjuncts = append(newDisjuncts, disjunct)
+			newDisjuncts[i] = disjunct
 		}
 	}
-	newDisjuncts = append(newDisjuncts, other)
+	newDisjuncts[len(t.disjuncts)] = other
 	return disjunctiveType{newDisjuncts}
 }
 

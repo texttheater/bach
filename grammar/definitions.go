@@ -45,10 +45,10 @@ type NameParlist struct {
 }
 
 func (g *NameParlist) Ast() []*functions.Parameter {
-	params := make([]*functions.Parameter, 0, 1+len(g.Params))
-	params = append(params, g.Param.Ast())
-	for _, param := range g.Params {
-		params = append(params, param.Ast())
+	params := make([]*functions.Parameter, 1+len(g.Params))
+	params[0] = g.Param.Ast()
+	for i, param := range g.Params {
+		params[i+1] = param.Ast()
 	}
 	return params
 }
@@ -77,10 +77,10 @@ func (g *Param) Ast() *functions.Parameter {
 		name = *g.Name1
 	} else if g.NameParlist != nil {
 		name = g.NameParlist.NameLpar.Name
-		params = make([]*functions.Parameter, 0, len(g.NameParlist.Params)+1)
-		params = append(params, g.NameParlist.Param.Ast())
-		for _, param := range g.NameParlist.Params {
-			params = append(params, param.Ast())
+		params = make([]*functions.Parameter, len(g.NameParlist.Params)+1)
+		params[0] = g.NameParlist.Param.Ast()
+		for i, param := range g.NameParlist.Params {
+			params[i+1] = param.Ast()
 		}
 	} else {
 		name = *g.Name2

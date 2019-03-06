@@ -15,11 +15,11 @@ type Conditional struct {
 }
 
 func (g *Conditional) Ast() ast.Expression {
-	elifConditions := make([]ast.Expression, 0, len(g.ElifConditions))
-	elifConsequents := make([]ast.Expression, 0, len(g.ElifConsequents))
+	elifConditions := make([]ast.Expression, len(g.ElifConditions))
+	elifConsequents := make([]ast.Expression, len(g.ElifConsequents))
 	for i := range g.ElifConditions {
-		elifConditions = append(elifConditions, g.ElifConditions[i].Ast())
-		elifConsequents = append(elifConsequents, g.ElifConsequents[i].Ast())
+		elifConditions[i] = g.ElifConditions[i].Ast()
+		elifConsequents[i] = g.ElifConsequents[i].Ast()
 	}
 	return &ast.ConditionalExpression{
 		Pos:             g.Pos,
