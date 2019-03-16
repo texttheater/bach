@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/interpreter"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -15,9 +15,9 @@ import (
 func TestInterp(t *testing.T) {
 	cases := []struct {
 		program   string
-		wantType types.Type
-		wantValue      values.Value
-		wantErr error
+		wantType  types.Type
+		wantValue values.Value
+		wantErr   error
 	}{
 		// syntax errors
 		{"&", nil, nil, errors.E(errors.Kind(errors.Syntax))},
@@ -116,12 +116,12 @@ func TestInterp(t *testing.T) {
 		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok f(/)`, types.NumType, values.NumValue(0.5), nil},
 		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok f(+1)`, nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.NumType), errors.Name("+"), errors.NumParams(2))},
 		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok`, types.NullType, &values.NullValue{}, nil},
-		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok f(g)`, nil, nil, errors.E(errors.Kind(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&functions.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.NumType}), errors.GotParam(&functions.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.StrType}))},
-		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(for Str x Num) Num as "abc" x ok f(g)`, nil, nil, errors.E(errors.Kind(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&functions.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.NumType}), errors.GotParam(&functions.Parameter{InputType: types.StrType, Name: "x", Params: nil, OutputType: types.NumType}))},
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok f(g)`, nil, nil, errors.E(errors.Kind(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&parameters.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.NumType}), errors.GotParam(&parameters.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.StrType}))},
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(for Str x Num) Num as "abc" x ok f(g)`, nil, nil, errors.E(errors.Kind(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&parameters.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.NumType}), errors.GotParam(&parameters.Parameter{InputType: types.StrType, Name: "x", Params: nil, OutputType: types.NumType}))},
 
 		// conditionals
 		{`if true then 2 else 3 ok`, types.NumType, values.NumValue(2), nil},
-		{`for Num def heart Bool as if <3 then true else false ok ok 2 heart`,  types.BoolType, values.BoolValue(true), nil},
+		{`for Num def heart Bool as if <3 then true else false ok ok 2 heart`, types.BoolType, values.BoolValue(true), nil},
 		{`for Num def heart Bool as if <3 then true else false ok ok 4 heart`, types.BoolType, values.BoolValue(false), nil},
 		{`for Num def expand Num as if <0 then -1 elif >0 then +1 else 0 ok ok 0 -1 expand`, types.NumType, values.NumValue(-2), nil},
 		{`for Num def expand Num as if <0 then -1 elif >0 then +1 else 0 ok ok 1 expand`, types.NumType, values.NumValue(2), nil},

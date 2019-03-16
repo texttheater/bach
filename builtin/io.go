@@ -5,13 +5,14 @@ import (
 	"os"
 
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
 func initIO() {
 	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]functions.Funcer{
-		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, states.Action, bool) {
+		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*parameters.Parameter, types.Type, states.Action, bool) {
 			if gotName != "out" {
 				return nil, nil, nil, false
 			}
@@ -25,7 +26,7 @@ func initIO() {
 			}
 			return nil, outputType, action, true
 		},
-		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, states.Action, bool) {
+		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*parameters.Parameter, types.Type, states.Action, bool) {
 			if gotName != "err" {
 				return nil, nil, nil, false
 			}

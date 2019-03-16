@@ -4,6 +4,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 )
 
@@ -13,7 +14,7 @@ type CallExpression struct {
 	Args []Expression
 }
 
-func (x CallExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, states.Action, error) {
+func (x CallExpression) Typecheck(inputShape functions.Shape, params []*parameters.Parameter) (functions.Shape, states.Action, error) {
 	// Go down the function stack and find the function invoked by this
 	// call
 	stack := inputShape.FuncerStack
