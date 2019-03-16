@@ -5,37 +5,80 @@ import (
 	"fmt"
 )
 
-func Disjoin(a Type, b Type) Type {
-	aDisj, ok := a.(disjunctiveType)
-	if ok {
-		return aDisj.disjoin(b)
-	}
-	bDisj, ok := b.(disjunctiveType)
-	if ok {
-		return bDisj.disjoin(a)
-	}
+func Union(a Type, b Type) Type {
 	if a.Subsumes(b) {
 		return a
 	}
 	if b.Subsumes(a) {
 		return b
 	}
-	return disjunctiveType{[]Type{a, b}}
+	aDisjuncts := disjuncts(a)
+	bDisjuncts := disjuncts(b)
+	var disjuncts []Type
+	added := make([]bool, len(bDisjuncts))
+aLoop:
+	for _, aDisjunct := range aDisjuncts {
+		for i, bDisjunct := range bDisjuncts {
+			if added[i] {
+				continue
+			}
+			if bDisjunct.Subsumes(aDisjunct) {
+				disjuncts = append(disjuncts, bDisjunct)
+				added[i] = true
+				continue aLoop
+			}
+		}
+		disjuncts = append(disjuncts, aDisjunct)
+	}
+	for i, a := range added {
+		if !a {
+			disjuncts = append(disjuncts, bDisjuncts[i])
+		}
+	}
+	return unionType{disjuncts}
 }
 
-type disjunctiveType struct {
+func disjuncts(t Type) []Type {
+	tUnion, ok := t.(unionType)
+	if ok {
+		return tUnion.disjuncts
+	}
+	return []Type{t}
+}
+
+type unionType struct {
 	disjuncts []Type
 }
 
-func (t disjunctiveType) Subsumes(other Type) bool {
-	otherDisj, ok := other.(disjunctiveType)
+func (t unionType) Subsumes(u Type) bool {
+	uUnion, ok := u.(unionType)
 	if ok {
-		return t.subsumesDisj(otherDisj)
+	uLoop:
+		for _, uDisjunct := range uUnion.disjuncts {
+			// find a subsumer for uDisjunct among t.disjuncts
+			for _, tDisjunct := range t.disjuncts {
+				if tDisjunct.Subsumes(uDisjunct) {
+					// subsumer found, check next uDisjunct
+					continue uLoop
+				}
+			}
+			// no subsumer found
+			return false
+		}
+		// all uDisjuncts checked
+		return true
 	}
-	return t.subsumesNonDisj(other)
+	// find a subsumer for u
+	for _, tDisjunct := range t.disjuncts {
+		if tDisjunct.Subsumes(u) {
+			return true
+		}
+	}
+	// no subsumer found
+	return false
 }
 
-func (t disjunctiveType) String() string {
+func (t unionType) String() string {
 	buffer := bytes.Buffer{}
 	buffer.WriteString(fmt.Sprintf("%s", t.disjuncts[0]))
 	for _, disjunct := range t.disjuncts[1:] {
@@ -45,56 +88,6 @@ func (t disjunctiveType) String() string {
 	return buffer.String()
 }
 
-func (t disjunctiveType) ElementType() Type {
+func (t unionType) ElementType() Type {
 	panic(t.String() + " is not a sequence type")
-}
-
-func (t disjunctiveType) subsumesDisj(other disjunctiveType) bool {
-	for _, disjunct := range other.disjuncts {
-		if !t.subsumesNonDisj(disjunct) {
-			return false
-		}
-	}
-	return true
-}
-
-func (t disjunctiveType) subsumesNonDisj(other Type) bool {
-	for _, disjunct := range t.disjuncts {
-		if disjunct.Subsumes(other) {
-			return true
-		}
-	}
-	return false
-}
-
-func (t disjunctiveType) disjoin(other Type) Type {
-	otherDisj, ok := other.(disjunctiveType)
-	if ok {
-		return t.disjoinDisj(otherDisj)
-	}
-	return t.disjoinNonDisj(other)
-}
-
-func (t disjunctiveType) disjoinDisj(other disjunctiveType) Type {
-	result := t
-	for _, disjunct := range other.disjuncts {
-		result = result.disjoinNonDisj(disjunct)
-	}
-	return result
-}
-
-func (t disjunctiveType) disjoinNonDisj(other Type) disjunctiveType {
-	for _, disjunct := range t.disjuncts {
-		if disjunct.Subsumes(other) {
-			return t
-		}
-	}
-	newDisjuncts := make([]Type, len(t.disjuncts)+1)
-	for i, disjunct := range t.disjuncts {
-		if !other.Subsumes(disjunct) {
-			newDisjuncts[i] = disjunct
-		}
-	}
-	newDisjuncts[len(t.disjuncts)] = other
-	return disjunctiveType{newDisjuncts}
 }

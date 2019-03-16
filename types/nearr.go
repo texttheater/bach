@@ -31,7 +31,7 @@ func (t nearrType) Subsumes(other Type) bool {
 }
 
 func (t nearrType) ElementType() Type {
-	return Disjoin(t.headType, t.tailType.ElementType())
+	return Union(t.headType, t.tailType.ElementType())
 }
 
 func (t nearrType) String() string {

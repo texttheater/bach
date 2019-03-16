@@ -73,7 +73,7 @@ func (x *ArrExpression) Typecheck(inputShape functions.Shape, params []*function
 		if err != nil {
 			return zeroShape, nil, err
 		}
-		elementType = types.Disjoin(elementType, elOutputShape.Type)
+		elementType = types.Union(elementType, elOutputShape.Type)
 		elementActions[i] = elAction
 	}
 	outputShape := functions.Shape{
@@ -484,13 +484,13 @@ func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*
 			return zeroShape, nil, err
 		}
 		elifConsequentActions[i] = elifConsequentAction
-		outputType = types.Disjoin(outputType, consequentOutputShape.Type)
+		outputType = types.Union(outputType, consequentOutputShape.Type)
 	}
 	alternativeOutputShape, alternativeAction, err := x.Alternative.Typecheck(shape, nil)
 	if err != nil {
 		return zeroShape, nil, err
 	}
-	outputType = types.Disjoin(outputType, alternativeOutputShape.Type)
+	outputType = types.Union(outputType, alternativeOutputShape.Type)
 	action := func(inputState functions.State, args []functions.Action) functions.State {
 		conditionState := conditionAction(inputState, nil)
 		boolConditionValue, _ := conditionState.Value.(values.BoolValue)

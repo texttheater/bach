@@ -14,7 +14,7 @@ type Type struct {
 func (g *Type) Ast() types.Type {
 	result := g.NonDisjunctiveType.Ast()
 	for _, d := range g.Disjuncts {
-		result = types.Disjoin(result, d.Ast())
+		result = types.Union(result, d.Ast())
 	}
 	return result
 }

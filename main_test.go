@@ -83,8 +83,8 @@ func TestInterp(t *testing.T) {
 		{`[]`, types.ArrType(types.VoidType), values.ArrValue([]values.Value{}), nil},
 		{`[1]`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1)}), nil},
 		{`[1, 2, 3]`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2), values.NumValue(3)}), nil},
-		{`[1, "a"]`, types.ArrType(types.Disjoin(types.NumType, types.StrType)), values.ArrValue([]values.Value{values.NumValue(1), values.StrValue("a")}), nil},
-		{`[[1, 2], ["a", "b"]]`, types.ArrType(types.Disjoin(types.ArrType(types.NumType), types.ArrType(types.StrType))), values.ArrValue([]values.Value{values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2)}), values.ArrValue([]values.Value{values.StrValue("a"), values.StrValue("b")})}), nil},
+		{`[1, "a"]`, types.ArrType(types.Union(types.NumType, types.StrType)), values.ArrValue([]values.Value{values.NumValue(1), values.StrValue("a")}), nil},
+		{`[[1, 2], ["a", "b"]]`, types.ArrType(types.Union(types.ArrType(types.NumType), types.ArrType(types.StrType))), values.ArrValue([]values.Value{values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2)}), values.ArrValue([]values.Value{values.StrValue("a"), values.StrValue("b")})}), nil},
 
 		// function definitions
 		{`for Num def plusOne Num as +1 ok 1 plusOne`, types.NumType, values.NumValue(2), nil},
