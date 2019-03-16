@@ -24,9 +24,8 @@ func (t seqType) Subsumes(other Type) bool {
 	if ok {
 		return t.elementType.Subsumes(otherSeqType.elementType)
 	}
-	otherArrType, ok := other.(arrType)
-	if ok {
-		return t.elementType.Subsumes(otherArrType.elementType)
+	if ArrType(t.elementType).Subsumes(other) {
+		return true
 	}
 	return false
 }
