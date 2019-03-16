@@ -6,47 +6,50 @@ import (
 )
 
 func Union(a Type, b Type) Type {
+	aUnion, ok := a.(unionType)
+	if ok {
+		bUnion, ok := b.(unionType)
+		if ok {
+			for _, bDisjunct := range bUnion {
+				aUnion = typeAppend(aUnion, bDisjunct)
+			}
+			return aUnion
+		}
+		return typeAppend(aUnion, b)
+	}
 	if a.Subsumes(b) {
 		return a
 	}
 	if b.Subsumes(a) {
 		return b
 	}
-	aDisjuncts := disjuncts(a)
-	bDisjuncts := disjuncts(b)
-	var disjuncts []Type
-	added := make([]bool, len(bDisjuncts))
-aLoop:
-	for _, aDisjunct := range aDisjuncts {
-		for i, bDisjunct := range bDisjuncts {
-			if added[i] {
-				continue
-			}
-			if bDisjunct.Subsumes(aDisjunct) {
-				disjuncts = append(disjuncts, bDisjunct)
-				added[i] = true
-				continue aLoop
-			}
-		}
-		disjuncts = append(disjuncts, aDisjunct)
-	}
-	for i, a := range added {
-		if !a {
-			disjuncts = append(disjuncts, bDisjuncts[i])
-		}
-	}
-	return unionType(disjuncts)
-}
-
-func disjuncts(t Type) []Type {
-	tUnion, ok := t.(unionType)
-	if ok {
-		return tUnion
-	}
-	return []Type{t}
+	return unionType([]Type{a, b})
 }
 
 type unionType []Type
+
+func typeAppend(t unionType, u Type) unionType {
+	for i, disjunct := range t {
+		// case 1: a disjunct subsumes u already, no change needed
+		if disjunct.Subsumes(u) {
+			return t
+		}
+		// case 2: u subsumes a disjunct, need to rebuild slice
+		if u.Subsumes(disjunct) {
+			newT := make([]Type, i)
+			copy(t, newT)
+			newT = append(newT, u)
+			for j := i + 1; j < len(t); j++ {
+				if !u.Subsumes(t[j]) {
+					newT = append(newT, t[j])
+				}
+			}
+			return newT
+		}
+	}
+	// case 3: u is completely new, just append it
+	return append(t, u)
+}
 
 func (t unionType) Subsumes(u Type) bool {
 	uUnion, ok := u.(unionType)
