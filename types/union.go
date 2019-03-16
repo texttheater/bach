@@ -35,28 +35,26 @@ aLoop:
 			disjuncts = append(disjuncts, bDisjuncts[i])
 		}
 	}
-	return unionType{disjuncts}
+	return unionType(disjuncts)
 }
 
 func disjuncts(t Type) []Type {
 	tUnion, ok := t.(unionType)
 	if ok {
-		return tUnion.disjuncts
+		return tUnion
 	}
 	return []Type{t}
 }
 
-type unionType struct {
-	disjuncts []Type
-}
+type unionType []Type
 
 func (t unionType) Subsumes(u Type) bool {
 	uUnion, ok := u.(unionType)
 	if ok {
 	uLoop:
-		for _, uDisjunct := range uUnion.disjuncts {
-			// find a subsumer for uDisjunct among t.disjuncts
-			for _, tDisjunct := range t.disjuncts {
+		for _, uDisjunct := range uUnion {
+			// find a subsumer for uDisjunct among t
+			for _, tDisjunct := range t {
 				if tDisjunct.Subsumes(uDisjunct) {
 					// subsumer found, check next uDisjunct
 					continue uLoop
@@ -69,7 +67,7 @@ func (t unionType) Subsumes(u Type) bool {
 		return true
 	}
 	// find a subsumer for u
-	for _, tDisjunct := range t.disjuncts {
+	for _, tDisjunct := range t {
 		if tDisjunct.Subsumes(u) {
 			return true
 		}
@@ -80,8 +78,8 @@ func (t unionType) Subsumes(u Type) bool {
 
 func (t unionType) String() string {
 	buffer := bytes.Buffer{}
-	buffer.WriteString(fmt.Sprintf("%s", t.disjuncts[0]))
-	for _, disjunct := range t.disjuncts[1:] {
+	buffer.WriteString(fmt.Sprintf("%s", t[0]))
+	for _, disjunct := range t[1:] {
 		buffer.WriteString("|")
 		buffer.WriteString(fmt.Sprintf("%s", disjunct))
 	}
