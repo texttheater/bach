@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
 func initIO() {
-	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]functions.Funcer{
+	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]shapes.Funcer{
 		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*parameters.Parameter, types.Type, states.Action, bool) {
 			if gotName != "out" {
 				return nil, nil, nil, false

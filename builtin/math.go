@@ -3,14 +3,14 @@ package builtin
 import (
 	"math"
 
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
 func initMath() {
-	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]functions.Funcer{
-		functions.SimpleFuncer(
+	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]shapes.Funcer{
+		shapes.SimpleFuncer(
 			types.NumType,
 			"+",
 			[]types.Type{types.NumType},
@@ -21,7 +21,7 @@ func initMath() {
 				return values.NumValue(inputNum + argumentNum)
 			},
 		),
-		functions.SimpleFuncer(
+		shapes.SimpleFuncer(
 			types.NumType,
 			"-",
 			[]types.Type{types.NumType},
@@ -32,7 +32,7 @@ func initMath() {
 				return values.NumValue(inputNum - argumentNum)
 			},
 		),
-		functions.SimpleFuncer(
+		shapes.SimpleFuncer(
 			types.NumType,
 			"*",
 			[]types.Type{types.NumType},
@@ -43,7 +43,7 @@ func initMath() {
 				return values.NumValue(inputNum * argumentNum)
 			},
 		),
-		functions.SimpleFuncer(
+		shapes.SimpleFuncer(
 			types.NumType,
 			"/",
 			[]types.Type{types.NumType},
@@ -54,7 +54,7 @@ func initMath() {
 				return values.NumValue(inputNum / argumentNum)
 			},
 		),
-		functions.SimpleFuncer(
+		shapes.SimpleFuncer(
 			types.NumType,
 			"%",
 			[]types.Type{types.NumType},
@@ -65,7 +65,7 @@ func initMath() {
 				return values.NumValue(math.Mod(float64(inputNum), float64(argumentNum)))
 			},
 		),
-		functions.SimpleFuncer(
+		shapes.SimpleFuncer(
 			types.NumType,
 			"<",
 			[]types.Type{types.NumType},
@@ -76,7 +76,7 @@ func initMath() {
 				return values.BoolValue(inputNum < argumentNum)
 			},
 		),
-		functions.SimpleFuncer(
+		shapes.SimpleFuncer(
 			types.NumType,
 			">",
 			[]types.Type{types.NumType},
@@ -87,7 +87,7 @@ func initMath() {
 				return values.BoolValue(inputNum > argumentNum)
 			},
 		),
-		functions.SimpleFuncer(
+		shapes.SimpleFuncer(
 			types.NumType,
 			"==",
 			[]types.Type{types.NumType},
@@ -98,7 +98,7 @@ func initMath() {
 				return values.BoolValue(inputNum == argumentNum)
 			},
 		),
-		functions.SimpleFuncer(
+		shapes.SimpleFuncer(
 			types.NumType,
 			"<=",
 			[]types.Type{types.NumType},
@@ -109,7 +109,7 @@ func initMath() {
 				return values.BoolValue(inputNum <= argumentNum)
 			},
 		),
-		functions.SimpleFuncer(
+		shapes.SimpleFuncer(
 			types.NumType,
 			">=",
 			[]types.Type{types.NumType},

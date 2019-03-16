@@ -3,8 +3,8 @@ package expressions
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -18,7 +18,7 @@ type DefinitionExpression struct {
 	Body       Expression
 }
 
-func (x DefinitionExpression) Typecheck(inputShape functions.Shape, params []*parameters.Parameter) (functions.Shape, states.Action, error) {
+func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (shapes.Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
@@ -94,7 +94,7 @@ func (x DefinitionExpression) Typecheck(inputShape functions.Shape, params []*pa
 		bodyFuncerStack = bodyFuncerStack.Push(paramFuncer)
 	}
 	// define body input context
-	bodyInputShape := functions.Shape{
+	bodyInputShape := shapes.Shape{
 		Type:        x.InputType,
 		FuncerStack: bodyFuncerStack,
 	}
@@ -113,7 +113,7 @@ func (x DefinitionExpression) Typecheck(inputShape functions.Shape, params []*pa
 		)
 	}
 	// define output context
-	outputShape := functions.Shape{
+	outputShape := shapes.Shape{
 		Type:        inputShape.Type,
 		FuncerStack: functionStack,
 	}

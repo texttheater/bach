@@ -5,8 +5,8 @@ import (
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
@@ -17,7 +17,7 @@ type AssignmentExpression struct {
 	Name string
 }
 
-func (x AssignmentExpression) Typecheck(inputShape functions.Shape, params []*parameters.Parameter) (functions.Shape, states.Action, error) {
+func (x AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (shapes.Shape, states.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.ParamsNotAllowed),
@@ -47,7 +47,7 @@ func (x AssignmentExpression) Typecheck(inputShape functions.Shape, params []*pa
 		}
 		return nil, inputShape.Type, varAction, true
 	}
-	outputShape := functions.Shape{inputShape.Type, inputShape.FuncerStack.Push(varFuncer)}
+	outputShape := shapes.Shape{inputShape.Type, inputShape.FuncerStack.Push(varFuncer)}
 	action := func(inputState states.State, args []states.Action) states.State {
 		return states.State{
 			Value: inputState.Value,

@@ -1,4 +1,4 @@
-package functions
+package shapes
 
 import (
 	"github.com/texttheater/bach/types"

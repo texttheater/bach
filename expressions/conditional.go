@@ -3,8 +3,8 @@ package expressions
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
@@ -19,7 +19,7 @@ type ConditionalExpression struct {
 	Alternative     Expression
 }
 
-func (x ConditionalExpression) Typecheck(inputShape functions.Shape, params []*parameters.Parameter) (functions.Shape, states.Action, error) {
+func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (shapes.Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
@@ -42,7 +42,7 @@ func (x ConditionalExpression) Typecheck(inputShape functions.Shape, params []*p
 	}
 	// context is the shared input context for all conditions and consequents.
 	// Each condition may add to the FuncerStack. Type always stays the same.
-	shape := functions.Shape{
+	shape := shapes.Shape{
 		Type:        inputShape.Type,
 		FuncerStack: conditionOutputShape.FuncerStack,
 	}
@@ -115,7 +115,7 @@ func (x ConditionalExpression) Typecheck(inputShape functions.Shape, params []*p
 			Stack: inputState.Stack,
 		}
 	}
-	outputShape := functions.Shape{
+	outputShape := shapes.Shape{
 		Type:        outputType,
 		FuncerStack: inputShape.FuncerStack,
 	}

@@ -3,8 +3,8 @@ package expressions
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 )
 
@@ -14,7 +14,7 @@ type CallExpression struct {
 	Args []Expression
 }
 
-func (x CallExpression) Typecheck(inputShape functions.Shape, params []*parameters.Parameter) (functions.Shape, states.Action, error) {
+func (x CallExpression) Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (shapes.Shape, states.Action, error) {
 	// Go down the function stack and find the function invoked by this
 	// call
 	stack := inputShape.FuncerStack
@@ -41,7 +41,7 @@ func (x CallExpression) Typecheck(inputShape functions.Shape, params []*paramete
 		// Check function params filled by this call
 		for i := 0; i < len(x.Args); i++ {
 			param := funParams[i]
-			argInputShape := functions.Shape{param.InputType, inputShape.FuncerStack}
+			argInputShape := shapes.Shape{param.InputType, inputShape.FuncerStack}
 			argOutputShape, argAction, err := x.Args[i].Typecheck(argInputShape, param.Params)
 			if err != nil {
 				return zeroShape, nil, err
@@ -71,6 +71,6 @@ func (x CallExpression) Typecheck(inputShape functions.Shape, params []*paramete
 			}
 		}
 		// Return result
-		return functions.Shape{funOutputType, inputShape.FuncerStack}, action, nil
+		return shapes.Shape{funOutputType, inputShape.FuncerStack}, action, nil
 	}
 }
