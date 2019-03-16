@@ -26,6 +26,10 @@ func Union(a Type, b Type) Type {
 	return unionType([]Type{a, b})
 }
 
+// A unionType is a slice of types, representing their union. The elements are
+// called "disjuncts". The following invariants must be maintained: for every
+// unionType, 1) no disjunct subsumes another, 2) no disjunct is itself a union
+// type.
 type unionType []Type
 
 func typeAppend(t unionType, u Type) unionType {
