@@ -1,6 +1,6 @@
 package functions
 
-type Action func(inputState State, outerArgs []Action) State
+type Action func(inputState State, args []Action) State
 
 func (a Action) SetArg(arg Action) Action {
 	return func(inputState State, outerArgs []Action) State {
