@@ -17,7 +17,7 @@ type ConditionalExpression struct {
 	Alternative     Expression
 }
 
-func (x *ConditionalExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x ConditionalExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(

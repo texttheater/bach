@@ -15,7 +15,7 @@ type AssignmentExpression struct {
 	Name string
 }
 
-func (x *AssignmentExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x AssignmentExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.ParamsNotAllowed),

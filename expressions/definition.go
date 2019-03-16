@@ -16,7 +16,7 @@ type DefinitionExpression struct {
 	Body       Expression
 }
 
-func (x *DefinitionExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x DefinitionExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(

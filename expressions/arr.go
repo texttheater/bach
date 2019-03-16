@@ -13,7 +13,7 @@ type ArrExpression struct {
 	Elements []Expression
 }
 
-func (x *ArrExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x ArrExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.ParamsNotAllowed),

@@ -12,7 +12,7 @@ type CompositionExpression struct {
 	Right Expression
 }
 
-func (x *CompositionExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x CompositionExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.ParamsNotAllowed),

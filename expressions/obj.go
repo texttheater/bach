@@ -13,7 +13,7 @@ type ObjExpression struct {
 	PropValMap map[string]Expression
 }
 
-func (x *ObjExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x ObjExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.ParamsNotAllowed),

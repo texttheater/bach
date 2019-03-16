@@ -14,7 +14,7 @@ type ConstantExpression struct {
 	Value values.Value
 }
 
-func (x *ConstantExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x ConstantExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.ParamsNotAllowed),

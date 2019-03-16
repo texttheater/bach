@@ -12,7 +12,7 @@ type CallExpression struct {
 	Args []Expression
 }
 
-func (x *CallExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x CallExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
 	// Go down the function stack and find the function invoked by this
 	// call
 	stack := inputShape.FuncerStack
