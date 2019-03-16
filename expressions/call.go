@@ -60,7 +60,7 @@ func (x CallExpression) Typecheck(inputShape shapes.Shape, params []*parameters.
 		// Check function params *not* filled by this call (thus left
 		// to function to call)
 		for i := 0; i < len(params); i++ {
-			if !params[i].Subsumes(funParams[len(x.Args)+i]) {
+			if !params[i].Subsumes(*funParams[len(x.Args)+i]) {
 				return zeroShape, nil, errors.E(
 					errors.Kind(errors.ParamDoesNotMatch),
 					errors.Pos(x.Pos),

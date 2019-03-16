@@ -13,25 +13,25 @@ type Parameter struct {
 	OutputType types.Type
 }
 
-func (this *Parameter) Subsumes(that *Parameter) bool {
-	if len(this.Params) != len(that.Params) {
+func (p Parameter) Subsumes(other Parameter) bool {
+	if len(p.Params) != len(other.Params) {
 		return false
 	}
-	if !that.InputType.Subsumes(this.InputType) {
+	if !other.InputType.Subsumes(p.InputType) {
 		return false
 	}
-	if !this.OutputType.Subsumes(that.OutputType) {
+	if !p.OutputType.Subsumes(other.OutputType) {
 		return false
 	}
-	for i, thatParam := range that.Params {
-		if !thatParam.Subsumes(this.Params[i]) {
+	for i, otherParam := range other.Params {
+		if !otherParam.Subsumes(*p.Params[i]) {
 			return false
 		}
 	}
 	return true
 }
 
-func (p *Parameter) String() string {
+func (p Parameter) String() string {
 	buffer := bytes.Buffer{}
 	if !p.InputType.Subsumes(types.AnyType) || len(p.Params) > 0 {
 		buffer.WriteString("for ")
