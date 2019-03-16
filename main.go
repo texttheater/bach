@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/interp"
+	"github.com/texttheater/bach/interpreter"
 )
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 	if o != "" {
 		program = o
 	}
-	_, value, err := interp.InterpretString(program)
+	_, value, err := interpreter.InterpretString(program)
 	if err != nil {
 		errors.Explain(err, program)
 		os.Exit(1)

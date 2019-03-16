@@ -7,7 +7,7 @@ import (
 
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
-	"github.com/texttheater/bach/interp"
+	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -177,7 +177,7 @@ func TestInterp(t *testing.T) {
 		{`for Any def f Any as null ok f type`, types.StrType, values.StrValue("Any"), nil},
 	}
 	for _, c := range cases {
-		gotType, gotValue, gotErr := interp.InterpretString(c.program)
+		gotType, gotValue, gotErr := interpreter.InterpretString(c.program)
 		if c.wantErr != nil {
 			if gotErr == nil {
 				t.Log("ERROR: Expected error but program succeeded.")

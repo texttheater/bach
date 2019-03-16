@@ -1,9 +1,9 @@
-package interp
+package interpreter
 
 import (
 	"github.com/texttheater/bach/builtin"
 	"github.com/texttheater/bach/functions"
-	"github.com/texttheater/bach/grammar"
+	"github.com/texttheater/bach/parser"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -12,7 +12,7 @@ import (
 // the result type and value.
 func InterpretString(program string) (types.Type, values.Value, error) {
 	// parse
-	x, err := grammar.Parse(program)
+	x, err := parser.Parse(program)
 	if err != nil {
 		return nil, nil, err
 	}
