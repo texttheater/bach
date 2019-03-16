@@ -2,7 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/ast"
+	"github.com/texttheater/bach/expressions"
 )
 
 type Object struct {
@@ -13,13 +13,13 @@ type Object struct {
 	Values []*Composition `    ":" @@ } ] "}"`
 }
 
-func (g *Object) Ast() ast.Expression {
-	propValMap := make(map[string]ast.Expression)
+func (g *Object) Ast() expressions.Expression {
+	propValMap := make(map[string]expressions.Expression)
 	if g.Prop != nil {
 		propValMap[*g.Prop] = g.Value.Ast()
 		for i := range g.Props {
 			propValMap[g.Props[i]] = g.Values[i].Ast()
 		}
 	}
-	return &ast.ObjExpression{g.Pos, propValMap}
+	return &expressions.ObjExpression{g.Pos, propValMap}
 }

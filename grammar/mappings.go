@@ -2,7 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/ast"
+	"github.com/texttheater/bach/expressions"
 )
 
 type Mapping struct {
@@ -10,8 +10,8 @@ type Mapping struct {
 	Body *Composition `"each" @@ "all"`
 }
 
-func (g *Mapping) Ast() ast.Expression {
-	return &ast.MappingExpression{
+func (g *Mapping) Ast() expressions.Expression {
+	return &expressions.MappingExpression{
 		Pos:  g.Pos,
 		Body: g.Body.Ast(),
 	}

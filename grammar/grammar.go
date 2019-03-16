@@ -3,8 +3,8 @@ package grammar
 import (
 	"github.com/alecthomas/participle"
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/ast"
 	"github.com/texttheater/bach/errors"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -41,7 +41,7 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-func Parse(input string) (ast.Expression, error) {
+func Parse(input string) (expressions.Expression, error) {
 	parser, err := participle.Build(
 		&Composition{},
 		participle.Lexer(LexerDefinition),
@@ -105,11 +105,11 @@ type Composition struct {
 	Components []*Component `{ @@ }`
 }
 
-func (g *Composition) Ast() ast.Expression {
+func (g *Composition) Ast() expressions.Expression {
 	pos := g.Component.Pos
 	e := g.Component.Ast()
 	for _, comp := range g.Components {
-		e = &ast.CompositionExpression{pos, e, comp.Ast()}
+		e = &expressions.CompositionExpression{pos, e, comp.Ast()}
 	}
 	return e
 }
@@ -129,16 +129,16 @@ type Component struct {
 	Mapping     *Mapping     `| @@`
 }
 
-func (g *Component) Ast() ast.Expression {
+func (g *Component) Ast() expressions.Expression {
 	if g.Num != nil {
-		return &ast.ConstantExpression{
+		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.NumType,
 			Value: values.NumValue(*g.Num),
 		}
 	}
 	if g.Str != nil {
-		return &ast.ConstantExpression{
+		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.StrType,
 			Value: values.StrValue(*g.Str),

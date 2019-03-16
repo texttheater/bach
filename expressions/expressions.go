@@ -1,14 +1,7 @@
-/*
-Package ast implements Bach's abstract syntax trees.
-
-An alternative name for this package would be: expressions. Because that's what
-an AST is, an expression consisting of subexpressions.
-*/
-package ast
+package expressions
 
 import (
 	"fmt"
-	//"os"
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"

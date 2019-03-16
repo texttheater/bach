@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/ast"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -21,7 +21,7 @@ type Call struct {
 	Name        *string      `| ( @Prop | @Op1 | @Op2 )`
 }
 
-func (g *Call) Ast() ast.Expression {
+func (g *Call) Ast() expressions.Expression {
 	if g.Op1Num != nil {
 		return g.Op1Num.Ast()
 	}
@@ -38,7 +38,7 @@ func (g *Call) Ast() ast.Expression {
 		return g.NameArglist.Ast()
 	}
 	if g.Name != nil {
-		return &ast.CallExpression{g.Pos, *g.Name, []ast.Expression{}}
+		return &expressions.CallExpression{g.Pos, *g.Name, []expressions.Expression{}}
 	}
 	panic("invalid call")
 }
@@ -61,12 +61,12 @@ func (g *Op1Num) Capture(values []string) error {
 	return nil
 }
 
-func (g *Op1Num) Ast() ast.Expression {
-	return &ast.CallExpression{
+func (g *Op1Num) Ast() expressions.Expression {
+	return &expressions.CallExpression{
 		Pos:  g.Pos,
 		Name: g.Op,
-		Args: []ast.Expression{
-			&ast.ConstantExpression{
+		Args: []expressions.Expression{
+			&expressions.ConstantExpression{
 				Pos:   g.Pos,
 				Type:  types.NumType,
 				Value: values.NumValue(g.Num),
@@ -93,12 +93,12 @@ func (g *Op2Num) Capture(values []string) error {
 	return nil
 }
 
-func (g *Op2Num) Ast() ast.Expression {
-	return &ast.CallExpression{
+func (g *Op2Num) Ast() expressions.Expression {
+	return &expressions.CallExpression{
 		Pos:  g.Pos,
 		Name: g.Op,
-		Args: []ast.Expression{
-			&ast.ConstantExpression{
+		Args: []expressions.Expression{
+			&expressions.ConstantExpression{
 				Pos:   g.Pos,
 				Type:  types.NumType,
 				Value: values.NumValue(g.Num),
@@ -121,8 +121,8 @@ func (g *Op1Name) Capture(values []string) error {
 	return nil
 }
 
-func (g *Op1Name) Ast() ast.Expression {
-	return &ast.CallExpression{g.Pos, g.Op, []ast.Expression{&ast.CallExpression{g.Pos, g.Name, []ast.Expression{}}}}
+func (g *Op1Name) Ast() expressions.Expression {
+	return &expressions.CallExpression{g.Pos, g.Op, []expressions.Expression{&expressions.CallExpression{g.Pos, g.Name, []expressions.Expression{}}}}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -139,8 +139,8 @@ func (g *Op2Name) Capture(values []string) error {
 	return nil
 }
 
-func (g *Op2Name) Ast() ast.Expression {
-	return &ast.CallExpression{g.Pos, g.Op, []ast.Expression{&ast.CallExpression{g.Pos, g.Name, []ast.Expression{}}}}
+func (g *Op2Name) Ast() expressions.Expression {
+	return &expressions.CallExpression{g.Pos, g.Op, []expressions.Expression{&expressions.CallExpression{g.Pos, g.Name, []expressions.Expression{}}}}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -152,13 +152,13 @@ type NameArglist struct {
 	Args     []*Composition `{ "," @@ } ")"`
 }
 
-func (g *NameArglist) Ast() ast.Expression {
-	args := make([]ast.Expression, len(g.Args)+1)
+func (g *NameArglist) Ast() expressions.Expression {
+	args := make([]expressions.Expression, len(g.Args)+1)
 	args[0] = g.Arg.Ast()
 	for i, Arg := range g.Args {
 		args[i+1] = Arg.Ast()
 	}
-	return &ast.CallExpression{g.Pos, g.NameLpar.Name, args}
+	return &expressions.CallExpression{g.Pos, g.NameLpar.Name, args}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
