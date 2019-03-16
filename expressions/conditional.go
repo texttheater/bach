@@ -4,6 +4,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -17,7 +18,7 @@ type ConditionalExpression struct {
 	Alternative     Expression
 }
 
-func (x ConditionalExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x ConditionalExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
@@ -49,8 +50,8 @@ func (x ConditionalExpression) Typecheck(inputShape functions.Shape, params []*f
 		return zeroShape, nil, err
 	}
 	outputType := consequentOutputShape.Type
-	elifConditionActions := make([]functions.Action, len(x.ElifConditions))
-	elifConsequentActions := make([]functions.Action, len(x.ElifConsequents))
+	elifConditionActions := make([]states.Action, len(x.ElifConditions))
+	elifConsequentActions := make([]states.Action, len(x.ElifConsequents))
 	for i := range x.ElifConditions {
 		conditionOutputShape, elifConditionAction, err := x.ElifConditions[i].Typecheck(shape, nil)
 		if err != nil {
@@ -78,16 +79,16 @@ func (x ConditionalExpression) Typecheck(inputShape functions.Shape, params []*f
 		return zeroShape, nil, err
 	}
 	outputType = types.Union(outputType, alternativeOutputShape.Type)
-	action := func(inputState functions.State, args []functions.Action) functions.State {
+	action := func(inputState states.State, args []states.Action) states.State {
 		conditionState := conditionAction(inputState, nil)
 		boolConditionValue, _ := conditionState.Value.(values.BoolValue)
 		if boolConditionValue {
-			consequentInputState := functions.State{
+			consequentInputState := states.State{
 				Value: inputState.Value,
 				Stack: conditionState.Stack,
 			}
 			consequentOutputState := consequentAction(consequentInputState, nil)
-			return functions.State{
+			return states.State{
 				Value: consequentOutputState.Value,
 				Stack: inputState.Stack,
 			}
@@ -96,19 +97,19 @@ func (x ConditionalExpression) Typecheck(inputShape functions.Shape, params []*f
 			conditionState = elifConditionActions[i](inputState, nil)
 			boolConditionValue, _ = conditionState.Value.(values.BoolValue)
 			if boolConditionValue {
-				consequentInputState := functions.State{
+				consequentInputState := states.State{
 					Value: inputState.Value,
 					Stack: conditionState.Stack,
 				}
 				consequentOutputState := elifConsequentActions[i](consequentInputState, nil)
-				return functions.State{
+				return states.State{
 					Value: consequentOutputState.Value,
 					Stack: inputState.Stack,
 				}
 			}
 		}
 		alternativeOutputState := alternativeAction(inputState, nil)
-		return functions.State{
+		return states.State{
 			Value: alternativeOutputState.Value,
 			Stack: inputState.Stack,
 		}

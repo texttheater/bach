@@ -1,11 +1,12 @@
 package functions
 
 import (
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
-type Funcer func(gotInputType types.Type, gotName string, gotNumArgs int) (params []*Parameter, outputType types.Type, action Action, ok bool)
+type Funcer func(gotInputType types.Type, gotName string, gotNumArgs int) (params []*Parameter, outputType types.Type, action states.Action, ok bool)
 
 type Kernel func(inputValue values.Value, argValues []values.Value) values.Value
 
@@ -21,7 +22,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 		}
 	}
 	// make funcer
-	return func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*Parameter, types.Type, Action, bool) {
+	return func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*Parameter, types.Type, states.Action, bool) {
 		if !wantInputType.Subsumes(gotInputType) {
 			return nil, nil, nil, false
 		}
@@ -31,16 +32,16 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 		if gotNumArgs != len(argTypes) {
 			return nil, nil, nil, false
 		}
-		action := func(inputState State, args []Action) State {
+		action := func(inputState states.State, args []states.Action) states.State {
 			argValues := make([]values.Value, len(argTypes))
-			argInputState := State{
+			argInputState := states.State{
 				Value: &values.NullValue{},
 				Stack: inputState.Stack,
 			}
 			for i, arg := range args {
 				argValues[i] = arg(argInputState, nil).Value
 			}
-			return State{
+			return states.State{
 				Value: kernel(inputState.Value, argValues),
 				Stack: inputState.Stack,
 			}

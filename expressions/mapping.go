@@ -4,6 +4,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -13,7 +14,7 @@ type MappingExpression struct {
 	Body Expression
 }
 
-func (x MappingExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x MappingExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
@@ -45,11 +46,11 @@ func (x MappingExpression) Typecheck(inputShape functions.Shape, params []*funct
 		FuncerStack: inputShape.FuncerStack,
 	}
 	// create action
-	action := func(inputState functions.State, args []functions.Action) functions.State {
+	action := func(inputState states.State, args []states.Action) states.State {
 		channel := make(chan values.Value)
 		go func() {
 			for el := range inputState.Value.Iter() {
-				bodyInputState := functions.State{
+				bodyInputState := states.State{
 					Value: el,
 					Stack: inputState.Stack,
 				}
@@ -58,7 +59,7 @@ func (x MappingExpression) Typecheck(inputShape functions.Shape, params []*funct
 			}
 			close(channel)
 		}()
-		return functions.State{
+		return states.State{
 			Value: values.SeqValue(channel),
 			Stack: inputState.Stack,
 		}

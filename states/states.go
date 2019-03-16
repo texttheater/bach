@@ -1,4 +1,4 @@
-package functions
+package states
 
 import (
 	"github.com/texttheater/bach/values"

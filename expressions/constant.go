@@ -4,6 +4,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -14,7 +15,7 @@ type ConstantExpression struct {
 	Value values.Value
 }
 
-func (x ConstantExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x ConstantExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, states.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.ParamsNotAllowed),
@@ -22,8 +23,8 @@ func (x ConstantExpression) Typecheck(inputShape functions.Shape, params []*func
 		)
 	}
 	outputShape := functions.Shape{x.Type, inputShape.FuncerStack}
-	action := func(inputState functions.State, args []functions.Action) functions.State {
-		return functions.State{
+	action := func(inputState states.State, args []states.Action) states.State {
+		return states.State{
 			Value: x.Value,
 			Stack: inputState.Stack,
 		}

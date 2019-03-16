@@ -2,8 +2,8 @@ package interpreter
 
 import (
 	"github.com/texttheater/bach/builtin"
-	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/parser"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -22,7 +22,7 @@ func InterpretString(program string) (types.Type, values.Value, error) {
 		return nil, nil, err
 	}
 	// evaluate
-	outputState := action(functions.InitialState, nil) // TODO error handling
+	outputState := action(states.InitialState, nil) // TODO error handling
 	drain(outputShape.Type, outputState.Value)
 	return outputShape.Type, outputState.Value, nil
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -13,7 +14,7 @@ type ObjExpression struct {
 	PropValMap map[string]Expression
 }
 
-func (x ObjExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x ObjExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, states.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.ParamsNotAllowed),
@@ -21,7 +22,7 @@ func (x ObjExpression) Typecheck(inputShape functions.Shape, params []*functions
 		)
 	}
 	keyTypeMap := make(map[string]types.Type)
-	keyActionMap := make(map[string]functions.Action)
+	keyActionMap := make(map[string]states.Action)
 	for key, valExpression := range x.PropValMap {
 		keyOutputShape, keyAction, err := valExpression.Typecheck(inputShape, nil)
 		if err != nil {
@@ -34,13 +35,13 @@ func (x ObjExpression) Typecheck(inputShape functions.Shape, params []*functions
 		Type:        types.ObjType(keyTypeMap),
 		FuncerStack: inputShape.FuncerStack,
 	}
-	action := func(inputState functions.State, args []functions.Action) functions.State {
+	action := func(inputState states.State, args []states.Action) states.State {
 		propValMap := make(map[string]values.Value)
 		for key, valAction := range keyActionMap {
 			valValue := valAction(inputState, nil).Value
 			propValMap[key] = valValue
 		}
-		return functions.State{
+		return states.State{
 			Value: values.ObjValue(propValMap),
 			Stack: inputState.Stack,
 		}

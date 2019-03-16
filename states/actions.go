@@ -1,4 +1,4 @@
-package functions
+package states
 
 type Action func(inputState State, args []Action) State
 

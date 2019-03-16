@@ -6,6 +6,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -15,7 +16,7 @@ type AssignmentExpression struct {
 	Name string
 }
 
-func (x AssignmentExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x AssignmentExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, states.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.ParamsNotAllowed),
@@ -23,19 +24,19 @@ func (x AssignmentExpression) Typecheck(inputShape functions.Shape, params []*fu
 		)
 	}
 	var id interface{} = x
-	varFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, functions.Action, bool) {
+	varFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, states.Action, bool) {
 		if gotName != x.Name {
 			return nil, nil, nil, false
 		}
 		if gotNumArgs != 0 {
 			return nil, nil, nil, false
 		}
-		varAction := func(inputState functions.State, args []functions.Action) functions.State {
+		varAction := func(inputState states.State, args []states.Action) states.State {
 			stack := inputState.Stack
 			for stack != nil {
 				if stack.Head.ID == id {
-					return functions.State{
-						Value: stack.Head.Action(functions.InitialState, nil).Value,
+					return states.State{
+						Value: stack.Head.Action(states.InitialState, nil).Value,
 						Stack: inputState.Stack,
 					}
 				}
@@ -46,13 +47,13 @@ func (x AssignmentExpression) Typecheck(inputShape functions.Shape, params []*fu
 		return nil, inputShape.Type, varAction, true
 	}
 	outputShape := functions.Shape{inputShape.Type, inputShape.FuncerStack.Push(varFuncer)}
-	action := func(inputState functions.State, args []functions.Action) functions.State {
-		return functions.State{
+	action := func(inputState states.State, args []states.Action) states.State {
+		return states.State{
 			Value: inputState.Value,
-			Stack: inputState.Stack.Push(functions.Variable{
+			Stack: inputState.Stack.Push(states.Variable{
 				ID: id,
-				Action: func(i functions.State, as []functions.Action) functions.State {
-					return functions.State{
+				Action: func(i states.State, as []states.Action) states.State {
+					return states.State{
 						Value: inputState.Value,
 						Stack: i.Stack,
 					}

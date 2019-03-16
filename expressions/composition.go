@@ -4,6 +4,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 )
 
 type CompositionExpression struct {
@@ -12,7 +13,7 @@ type CompositionExpression struct {
 	Right Expression
 }
 
-func (x CompositionExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x CompositionExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, states.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.ParamsNotAllowed),
@@ -27,7 +28,7 @@ func (x CompositionExpression) Typecheck(inputShape functions.Shape, params []*f
 	if err != nil {
 		return zeroShape, nil, err
 	}
-	action := func(inputState functions.State, args []functions.Action) functions.State {
+	action := func(inputState states.State, args []states.Action) states.State {
 		middleState := lAction(inputState, nil)
 		outputState := rAction(middleState, nil)
 		return outputState

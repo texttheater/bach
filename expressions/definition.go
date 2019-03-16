@@ -4,6 +4,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
@@ -16,7 +17,7 @@ type DefinitionExpression struct {
 	Body       Expression
 }
 
-func (x DefinitionExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, functions.Action, error) {
+func (x DefinitionExpression) Typecheck(inputShape functions.Shape, params []*functions.Parameter) (functions.Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
@@ -25,10 +26,10 @@ func (x DefinitionExpression) Typecheck(inputShape functions.Shape, params []*fu
 		)
 	}
 	// variables for body input stack, action (will be set at runtime)
-	var bodyInputStackStub *functions.VariableStack
-	var bodyAction functions.Action
+	var bodyInputStackStub *states.VariableStack
+	var bodyAction states.Action
 	// make a funcer for the defined function, add it to the function stack
-	funFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, functions.Action, bool) {
+	funFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, states.Action, bool) {
 		if !x.InputType.Subsumes(gotInputType) {
 			return nil, nil, nil, false
 		}
@@ -38,23 +39,23 @@ func (x DefinitionExpression) Typecheck(inputShape functions.Shape, params []*fu
 		if gotNumArgs != len(x.Params) {
 			return nil, nil, nil, false
 		}
-		funAction := func(inputState functions.State, args []functions.Action) functions.State {
+		funAction := func(inputState states.State, args []states.Action) states.State {
 			// Bind parameters to arguments by adding corresponding
 			// Variable objects to the body input state.
 			bodyInputStack := bodyInputStackStub
 			for i, param := range x.Params {
 				var id interface{} = param
-				bodyInputStack = bodyInputStack.Push(functions.Variable{
+				bodyInputStack = bodyInputStack.Push(states.Variable{
 					ID:     id,
 					Action: args[i],
 				})
 			}
-			bodyInputState := functions.State{
+			bodyInputState := states.State{
 				Value: inputState.Value,
 				Stack: bodyInputStack,
 			}
 			bodyOutputState := bodyAction(bodyInputState, nil)
-			return functions.State{
+			return states.State{
 				Value: bodyOutputState.Value,
 				Stack: inputState.Stack,
 			}
@@ -66,7 +67,7 @@ func (x DefinitionExpression) Typecheck(inputShape functions.Shape, params []*fu
 	bodyFuncerStack := functionStack
 	for _, param := range x.Params {
 		var id interface{} = param
-		paramFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, functions.Action, bool) {
+		paramFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*functions.Parameter, types.Type, states.Action, bool) {
 			if !param.InputType.Subsumes(gotInputType) {
 				return nil, nil, nil, false
 			}
@@ -76,7 +77,7 @@ func (x DefinitionExpression) Typecheck(inputShape functions.Shape, params []*fu
 			if gotNumArgs != len(param.Params) {
 				return nil, nil, nil, false
 			}
-			paramAction := func(inputState functions.State, args []functions.Action) functions.State {
+			paramAction := func(inputState states.State, args []states.Action) states.State {
 				stack := inputState.Stack
 				for stack != nil {
 					if stack.Head.ID == id {
@@ -116,7 +117,7 @@ func (x DefinitionExpression) Typecheck(inputShape functions.Shape, params []*fu
 		FuncerStack: functionStack,
 	}
 	// define action (crucially, setting body input stack)
-	action := func(inputState functions.State, args []functions.Action) functions.State {
+	action := func(inputState states.State, args []states.Action) states.State {
 		bodyInputStackStub = inputState.Stack
 		return inputState
 	}
