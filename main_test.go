@@ -93,6 +93,7 @@ func TestInterp(t *testing.T) {
 		{`for Num def connectSelf(for Num f(for Any g Num) Num) Num as =x f(x) ok 1 connectSelf(+)`, types.NumType, values.NumValue(2), nil},
 		{`for Num def connectSelf(for Num f(for Any g Num) Num) Num as =x f(x) ok 1 connectSelf(+) 3 connectSelf(*)`, types.NumType, values.NumValue(9), nil},
 		{`for Num def connectSelf(for Num f(g Num) Num) Num as =x f(x) ok 1 connectSelf(+)`, types.NumType, values.NumValue(2), nil},
+
 		// bad function calls
 		{`for Num def f Num as =x x ok for Str def f Str as =x x ok`, types.NullType, &values.NullValue{}, nil},
 		{`for Num def f Num as =x x ok for Str def f Str as =x x ok f(2)`, nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.NullType), errors.Name("f"), errors.NumParams(1))},
