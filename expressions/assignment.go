@@ -5,7 +5,6 @@ import (
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -17,7 +16,7 @@ type AssignmentExpression struct {
 	Name string
 }
 
-func (x AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (shapes.Shape, states.Action, error) {
+func (x AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.ParamsNotAllowed),
@@ -25,7 +24,7 @@ func (x AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*param
 		)
 	}
 	var id interface{} = x
-	varFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*parameters.Parameter, types.Type, states.Action, bool) {
+	varFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {
 		if gotName != x.Name {
 			return nil, nil, nil, false
 		}

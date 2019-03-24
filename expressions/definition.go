@@ -3,7 +3,6 @@ package expressions
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -13,12 +12,12 @@ type DefinitionExpression struct {
 	Pos        lexer.Position
 	InputType  types.Type
 	Name       string
-	Params     []*parameters.Parameter
+	Params     []*shapes.Parameter
 	OutputType types.Type
 	Body       Expression
 }
 
-func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (shapes.Shape, states.Action, error) {
+func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
@@ -30,7 +29,7 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*param
 	var bodyInputStackStub *states.VariableStack
 	var bodyAction states.Action
 	// make a funcer for the defined function, add it to the function stack
-	funFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*parameters.Parameter, types.Type, states.Action, bool) {
+	funFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {
 		if !x.InputType.Subsumes(gotInputType) {
 			return nil, nil, nil, false
 		}
@@ -68,7 +67,7 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*param
 	bodyFuncerStack := functionStack
 	for _, param := range x.Params {
 		var id interface{} = param
-		paramFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*parameters.Parameter, types.Type, states.Action, bool) {
+		paramFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {
 			if !param.InputType.Subsumes(gotInputType) {
 				return nil, nil, nil, false
 			}

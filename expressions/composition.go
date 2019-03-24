@@ -3,7 +3,6 @@ package expressions
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 )
@@ -14,7 +13,7 @@ type CompositionExpression struct {
 	Right Expression
 }
 
-func (x CompositionExpression) Typecheck(inputShape shapes.Shape, params []*parameters.Parameter) (shapes.Shape, states.Action, error) {
+func (x CompositionExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
 			errors.Kind(errors.ParamsNotAllowed),

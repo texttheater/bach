@@ -3,7 +3,7 @@ package grammar
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/expressions"
-	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/types"
 )
 
@@ -20,7 +20,7 @@ type Definition struct {
 
 func (g *Definition) Ast() expressions.Expression {
 	var name = g.Name
-	var params []*parameters.Parameter
+	var params []*shapes.Parameter
 	if g.NameParlist != nil {
 		name = &g.NameParlist.NameLpar.Name
 		params = g.NameParlist.Ast()
@@ -44,8 +44,8 @@ type NameParlist struct {
 	Params   []*Param  `{ "," @@ } ")"`
 }
 
-func (g *NameParlist) Ast() []*parameters.Parameter {
-	params := make([]*parameters.Parameter, 1+len(g.Params))
+func (g *NameParlist) Ast() []*shapes.Parameter {
+	params := make([]*shapes.Parameter, 1+len(g.Params))
 	params[0] = g.Param.Ast()
 	for i, param := range g.Params {
 		params[i+1] = param.Ast()
@@ -64,7 +64,7 @@ type Param struct {
 	OutputType  *Type        `@@`
 }
 
-func (g *Param) Ast() *parameters.Parameter {
+func (g *Param) Ast() *shapes.Parameter {
 	var inputType types.Type
 	if g.InputType != nil {
 		inputType = g.InputType.Ast()
@@ -72,12 +72,12 @@ func (g *Param) Ast() *parameters.Parameter {
 		inputType = types.AnyType
 	}
 	var name string
-	var params []*parameters.Parameter
+	var params []*shapes.Parameter
 	if g.Name1 != nil {
 		name = *g.Name1
 	} else if g.NameParlist != nil {
 		name = g.NameParlist.NameLpar.Name
-		params = make([]*parameters.Parameter, len(g.NameParlist.Params)+1)
+		params = make([]*shapes.Parameter, len(g.NameParlist.Params)+1)
 		params[0] = g.NameParlist.Param.Ast()
 		for i, param := range g.NameParlist.Params {
 			params[i+1] = param.Ast()
@@ -85,7 +85,7 @@ func (g *Param) Ast() *parameters.Parameter {
 	} else {
 		name = *g.Name2
 	}
-	return &parameters.Parameter{
+	return &shapes.Parameter{
 		InputType:  inputType,
 		Name:       name,
 		Params:     params,

@@ -1,7 +1,6 @@
 package builtin
 
 import (
-	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -10,7 +9,7 @@ import (
 
 func initTypes() {
 	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]shapes.Funcer{
-		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*parameters.Parameter, types.Type, states.Action, bool) {
+		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {
 			if gotName != "type" {
 				return nil, nil, nil, false
 			}
