@@ -29,7 +29,7 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		// the following will be scanned as Name, but mapped to the
 		// appropriate token types by ToKeyword (see below)
 		`|(?P<Keyword>for|def|as|ok|if|then|elif|else)` +
-		`|(?P<TypeKeyword>Void|Null|Bool|Num|Str|Seq|Arr|Obj|Any)`,
+		`|(?P<TypeKeyword>Void|Null|Reader|Bool|Num|Str|Seq|Arr|Obj|Any)`,
 ))
 
 func ToKeyword(t lexer.Token) (lexer.Token, error) {
@@ -45,7 +45,7 @@ func ToKeyword(t lexer.Token) (lexer.Token, error) {
 func isTypeKeyword(name string) bool {
 	return name == "Void" || name == "Null" || name == "Bool" ||
 		name == "Num" || name == "Str" || name == "Seq" ||
-		name == "Arr" || name == "Any"
+		name == "Arr" || name == "Any" || name == "Reader"
 }
 
 func isKeyword(name string) bool {

@@ -23,6 +23,7 @@ type NonDisjunctiveType struct {
 	Pos      lexer.Position
 	VoidType *VoidType `  @@`
 	NullType *NullType `| @@`
+	ReaderType *ReaderType `| @@`
 	BoolType *BoolType `| @@`
 	NumType  *NumType  `| @@`
 	StrType  *StrType  `| @@`
@@ -38,6 +39,9 @@ func (g *NonDisjunctiveType) Ast() types.Type {
 	}
 	if g.NullType != nil {
 		return g.NullType.Ast()
+	}
+	if g.ReaderType != nil {
+		return g.ReaderType.Ast()
 	}
 	if g.BoolType != nil {
 		return g.BoolType.Ast()
@@ -77,6 +81,14 @@ type NullType struct {
 
 func (g *NullType) Ast() types.Type {
 	return types.NullType
+}
+
+type ReaderType struct {
+	Pos lexer.Position `"Reader"`
+}
+
+func (g *ReaderType) Ast() types.Type {
+	return types.ReaderType
 }
 
 type BoolType struct {
