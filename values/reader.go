@@ -10,7 +10,7 @@ type ReaderValue struct {
 }
 
 func (v ReaderValue) String() string {
-	return fmt.Sprintf("%s", v.Reader)
+	return "<reader>"
 }
 
 func (v ReaderValue) Out() string {

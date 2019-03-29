@@ -3,7 +3,7 @@ package values
 type SeqValue chan Value
 
 func (v SeqValue) String() string {
-	return "<sequence>"
+	return "<seq>"
 }
 
 func (v SeqValue) Out() string {
