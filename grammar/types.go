@@ -20,17 +20,17 @@ func (g *Type) Ast() types.Type {
 }
 
 type NonDisjunctiveType struct {
-	Pos      lexer.Position
-	VoidType *VoidType `  @@`
-	NullType *NullType `| @@`
+	Pos        lexer.Position
+	VoidType   *VoidType   `  @@`
+	NullType   *NullType   `| @@`
 	ReaderType *ReaderType `| @@`
-	BoolType *BoolType `| @@`
-	NumType  *NumType  `| @@`
-	StrType  *StrType  `| @@`
-	SeqType  *SeqType  `| @@`
-	ArrType  *ArrType  `| @@`
-	ObjType  *ObjType  `| @@`
-	AnyType  *AnyType  `| @@`
+	BoolType   *BoolType   `| @@`
+	NumType    *NumType    `| @@`
+	StrType    *StrType    `| @@`
+	SeqType    *SeqType    `| @@`
+	ArrType    *ArrType    `| @@`
+	ObjType    *ObjType    `| @@`
+	AnyType    *AnyType    `| @@`
 }
 
 func (g *NonDisjunctiveType) Ast() types.Type {
