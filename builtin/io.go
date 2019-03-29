@@ -31,7 +31,7 @@ func initIO() {
 			}
 			outputType := gotInputType
 			action := func(inputState states.State, args []states.Action) states.State {
-				fmt.Println(inputState.Value)
+				fmt.Println(inputState.Value.Out())
 				return inputState
 			}
 			return nil, outputType, action, true
