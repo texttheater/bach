@@ -120,5 +120,22 @@ func initMath() {
 				return values.BoolValue(inputNum >= argumentNum)
 			},
 		),
+		shapes.SimpleFuncer(
+			types.SeqType(types.NumType),
+			"average",
+			nil,
+			types.NumType,
+			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+				seq := inputValue.(values.SeqValue)
+				sum := 0.0
+				count := 0.0
+				for numValue := range seq {
+					num, _ := numValue.(values.NumValue)
+					sum += float64(num)
+					count += 1.0
+				}
+				return values.NumValue(sum / count)
+			},
+		),
 	})
 }
