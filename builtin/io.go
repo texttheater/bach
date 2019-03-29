@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 
@@ -21,7 +22,26 @@ func initIO() {
 				return values.ReaderValue{
 					os.Stdin,
 				}
-			}),
+			},
+		),
+		shapes.SimpleFuncer(
+			types.ReaderType,
+			"lines",
+			nil,
+			types.SeqType(types.StrType),
+			func(inputValue values.Value, argValues []values.Value) values.Value {
+				reader, _ := inputValue.(values.ReaderValue)
+				lines := make(chan values.Value)
+				scanner := bufio.NewScanner(reader.Reader)
+				go func() {
+					for scanner.Scan() {
+						lines <- values.StrValue(scanner.Text())
+					}
+					close(lines)
+				}()
+				return values.SeqValue(lines)
+			},
+		),
 		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {
 			if gotName != "out" {
 				return nil, nil, nil, false
