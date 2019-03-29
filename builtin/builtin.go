@@ -8,11 +8,12 @@ import (
 var InitialShape shapes.Shape = shapes.Shape{types.NullType, nil}
 
 func init() {
-	initMath()
-	initLogic()
 	initNull()
-	initSeq()
 	initIO()
+	initLogic()
+	initMath()
+	initText()
+	initSeq()
 	initConv()
 	initTypes()
 	initValues()
