@@ -21,7 +21,7 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*shape
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
-			errors.Kind(errors.ParamsNotAllowed),
+			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
@@ -105,7 +105,7 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*shape
 	// check body output type
 	if !x.OutputType.Subsumes(bodyOutputShape.Type) {
 		return zeroShape, nil, errors.E(
-			errors.Kind(errors.FunctionBodyHasWrongOutputType),
+			errors.Code(errors.FunctionBodyHasWrongOutputType),
 			errors.Pos(x.Pos),
 			errors.WantType(x.OutputType),
 			errors.GotType(bodyOutputShape.Type),

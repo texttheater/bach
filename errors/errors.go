@@ -14,10 +14,10 @@ import (
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type ErrorKind int
+type ErrorCode int
 
 const (
-	Syntax ErrorKind = iota
+	Syntax ErrorCode = iota
 	ParamsNotAllowed
 	NoSuchFunction
 	ArgHasWrongOutputType
@@ -27,8 +27,8 @@ const (
 	MappingRequiresSeqType
 )
 
-func (kind ErrorKind) String() string {
-	switch kind {
+func (code ErrorCode) String() string {
+	switch code {
 	case Syntax:
 		return "Syntax"
 	case ParamsNotAllowed:
@@ -47,8 +47,8 @@ func (kind ErrorKind) String() string {
 	return "Unknown"
 }
 
-func (kind ErrorKind) DefaultMessage() string {
-	switch kind {
+func (code ErrorCode) DefaultMessage() string {
+	switch code {
 	case Syntax:
 		return "syntax error"
 	case ParamsNotAllowed:
@@ -69,6 +69,28 @@ func (kind ErrorKind) DefaultMessage() string {
 	return "unknown error"
 }
 
+func (code ErrorCode) Kind() string {
+	switch code {
+	case Syntax:
+		return "Syntax error"
+	case ParamsNotAllowed:
+		return "Type error"
+	case NoSuchFunction:
+		return "Type error"
+	case ArgHasWrongOutputType:
+		return "Type error"
+	case ParamDoesNotMatch:
+		return "Type error"
+	case FunctionBodyHasWrongOutputType:
+		return "Type error"
+	case ConditionMustBeBool:
+		return "Type error"
+	case MappingRequiresSeqType:
+		return "Type error"
+	}
+	return "unknown error"
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 type errorAttribute func(err *e)
@@ -76,7 +98,7 @@ type errorAttribute func(err *e)
 // E builds an error value from a number of error attributes. The following
 // functions can be used to create error attributes:
 //
-//    Kind
+//    Code
 //    Pos
 //    Message
 //    WantType
@@ -97,9 +119,9 @@ func E(atts ...errorAttribute) error {
 	return e
 }
 
-func Kind(kind ErrorKind) errorAttribute {
+func Code(code ErrorCode) errorAttribute {
 	return func(err *e) {
-		err.Kind = &kind
+		err.Code = &code
 	}
 }
 
@@ -171,11 +193,11 @@ func GotParam(gotParam *shapes.Parameter) errorAttribute {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// An e represents any kind of Bach error, or error template. Every field
+// An e represents any code of Bach error, or error template. Every field
 // may have a "none" value, which is Go's zero value except for int fields
 // where it's -1.
 type e struct {
-	Kind      *ErrorKind
+	Code      *ErrorCode
 	Pos       *lexer.Position
 	Message   *string
 	WantType  types.Type
@@ -191,8 +213,8 @@ type e struct {
 
 func (err *e) Error() string {
 	m := make(map[string]interface{})
-	if err.Kind != nil {
-		m["Kind"] = err.Kind.String()
+	if err.Code != nil {
+		m["Code"] = err.Code.String()
 	}
 	if err.Pos != nil {
 		m["Pos"] = err.Pos.String()
@@ -244,7 +266,7 @@ func Explain(err error, program string) {
 		return
 	}
 	// header and position
-	fmt.Fprintf(os.Stderr, "%s error", e.Kind)
+	fmt.Fprint(os.Stderr, e.Code.Kind())
 	if e.Pos != nil {
 		fmt.Fprintln(os.Stderr, " at", e.Pos)
 		lines := strings.SplitAfter(program, "\n")
@@ -261,8 +283,9 @@ func Explain(err error, program string) {
 		fmt.Fprintln(os.Stderr, "")
 	}
 	// attributes
+	fmt.Fprintln(os.Stderr, "Code:      ", e.Code.String())
 	if e.Message == nil {
-		fmt.Fprintln(os.Stderr, "Message:   ", e.Kind.DefaultMessage())
+		fmt.Fprintln(os.Stderr, "Message:   ", e.Code.DefaultMessage())
 	} else {
 		fmt.Fprintln(os.Stderr, "Message:   ", *e.Message)
 	}
@@ -314,7 +337,7 @@ func Match(err1, err2 error) bool {
 	if !ok {
 		return false
 	}
-	if e1.Kind != nil && *e2.Kind != *e1.Kind {
+	if e1.Code != nil && *e2.Code != *e1.Code {
 		return false
 	}
 	if e1.Pos != nil && *e2.Pos != *e1.Pos {

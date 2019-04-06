@@ -20,13 +20,13 @@ func TestInterp(t *testing.T) {
 		wantErr   error
 	}{
 		// syntax errors
-		{"&", nil, nil, errors.E(errors.Kind(errors.Syntax))},
+		{"&", nil, nil, errors.E(errors.Code(errors.Syntax))},
 
 		// type errors
-		{"-1 *2", nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.NullType), errors.Name("-"), errors.NumParams(1))},
-		{"3 <2 +1", nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.BoolType), errors.Name("+"), errors.NumParams(1))},
-		{"+", nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.NullType), errors.Name("+"), errors.NumParams(0))},
-		{"hurz", nil, nil, errors.E(errors.Kind(errors.NoSuchFunction))},
+		{"-1 *2", nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NullType), errors.Name("-"), errors.NumParams(1))},
+		{"3 <2 +1", nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.BoolType), errors.Name("+"), errors.NumParams(1))},
+		{"+", nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NullType), errors.Name("+"), errors.NumParams(0))},
+		{"hurz", nil, nil, errors.E(errors.Code(errors.NoSuchFunction))},
 
 		// literals
 		{"1", types.NumType, values.NumValue(1), nil},
@@ -96,29 +96,29 @@ func TestInterp(t *testing.T) {
 
 		// bad function calls
 		{`for Num def f Num as =x x ok for Str def f Str as =x x ok`, types.NullType, &values.NullValue{}, nil},
-		{`for Num def f Num as =x x ok for Str def f Str as =x x ok f(2)`, nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.NullType), errors.Name("f"), errors.NumParams(1))},
+		{`for Num def f Num as =x x ok for Str def f Str as =x x ok f(2)`, nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NullType), errors.Name("f"), errors.NumParams(1))},
 		{`for Num def f Num as =x x ok for Str def f Str as =x x ok 2 f`, types.NumType, values.NumValue(2), nil},
-		{`for Num def f Num as =x x ok for Str def f Str as =x x ok f`, nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.NullType), errors.Name("f"), errors.NumParams(0))},
+		{`for Num def f Num as =x x ok for Str def f Str as =x x ok f`, nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NullType), errors.Name("f"), errors.NumParams(0))},
 		{`for Any def f(x Num) Num as x ok`, types.NullType, &values.NullValue{}, nil},
 		{`for Any def f(x Num) Num as x ok f(1)`, types.NumType, values.NumValue(1), nil},
 		{`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok`, types.NullType, &values.NullValue{}, nil},
-		{`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok 1 f`, nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.NumType), errors.Name("f"), errors.NumParams(0))},
-		{`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok f(1)`, nil, nil, errors.E(errors.Kind(errors.ArgHasWrongOutputType), errors.ArgNum(0), errors.WantType(types.StrType), errors.GotType(types.NumType))},
+		{`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok 1 f`, nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NumType), errors.Name("f"), errors.NumParams(0))},
+		{`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok f(1)`, nil, nil, errors.E(errors.Code(errors.ArgHasWrongOutputType), errors.ArgNum(0), errors.WantType(types.StrType), errors.GotType(types.NumType))},
 		{`for Any def f(for Num g Num) Num as 1 g ok`, types.NullType, &values.NullValue{}, nil},
-		{`for Any def f(for Num g Num) Num as 1 g ok f(g)`, nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.NumType), errors.Name("g"), errors.NumParams(0))},
+		{`for Any def f(for Num g Num) Num as 1 g ok f(g)`, nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NumType), errors.Name("g"), errors.NumParams(0))},
 		{`for Any def f(for Num g Num) Num as 1 g ok f(1)`, types.NumType, values.NumValue(1), nil},
 		{`for Any def f(for Num g Num) Num as 1 g ok f(+1)`, types.NumType, values.NumValue(2), nil},
 		{`for Any def f(for Num g Num) Num as 1 g ok f(+2)`, types.NumType, values.NumValue(3), nil},
 		{`for Any def f(for Num g Num) Num as 1 g ok f(*10)`, types.NumType, values.NumValue(10), nil},
-		{`for Any def f(for Num g(x Num) Num) Num as 1 g ok`, nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.NumType), errors.Name("g"), errors.NumParams(0))},
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g ok`, nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NumType), errors.Name("g"), errors.NumParams(0))},
 		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok`, types.NullType, &values.NullValue{}, nil},
 		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok f(+)`, types.NumType, values.NumValue(3), nil},
 		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok f(*)`, types.NumType, values.NumValue(2), nil},
 		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok f(/)`, types.NumType, values.NumValue(0.5), nil},
-		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok f(+1)`, nil, nil, errors.E(errors.Kind(errors.NoSuchFunction), errors.InputType(types.NumType), errors.Name("+"), errors.NumParams(2))},
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok f(+1)`, nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NumType), errors.Name("+"), errors.NumParams(2))},
 		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok`, types.NullType, &values.NullValue{}, nil},
-		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok f(g)`, nil, nil, errors.E(errors.Kind(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&shapes.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.NumType}), errors.GotParam(&shapes.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.StrType}))},
-		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(for Str x Num) Num as "abc" x ok f(g)`, nil, nil, errors.E(errors.Kind(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&shapes.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.NumType}), errors.GotParam(&shapes.Parameter{InputType: types.StrType, Name: "x", Params: nil, OutputType: types.NumType}))},
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok f(g)`, nil, nil, errors.E(errors.Code(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&shapes.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.NumType}), errors.GotParam(&shapes.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.StrType}))},
+		{`for Any def f(for Num g(x Num) Num) Num as 1 g(2) ok for Any def g(for Str x Num) Num as "abc" x ok f(g)`, nil, nil, errors.E(errors.Code(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&shapes.Parameter{InputType: types.AnyType, Name: "x", Params: nil, OutputType: types.NumType}), errors.GotParam(&shapes.Parameter{InputType: types.StrType, Name: "x", Params: nil, OutputType: types.NumType}))},
 
 		// conditionals
 		{`if true then 2 else 3 ok`, types.NumType, values.NumValue(2), nil},
@@ -141,7 +141,7 @@ func TestInterp(t *testing.T) {
 		// sequences
 		{`for Seq<Num> def f Seq<Num> as =x x ok [1, 2, 3] f`, types.SeqType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2), values.NumValue(3)}), nil},
 		{`[1, 2, 3] each *2 all arr`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(2), values.NumValue(4), values.NumValue(6)}), nil},
-		{`1 each *2 all`, nil, nil, errors.E(errors.Kind(errors.MappingRequiresSeqType))},
+		{`1 each *2 all`, nil, nil, errors.E(errors.Code(errors.MappingRequiresSeqType))},
 
 		// simple types
 		{`null type`, types.StrType, values.StrValue("Null"), nil},

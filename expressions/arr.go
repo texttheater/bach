@@ -17,7 +17,7 @@ type ArrExpression struct {
 func (x ArrExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
-			errors.Kind(errors.ParamsNotAllowed),
+			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}

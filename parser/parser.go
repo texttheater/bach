@@ -19,7 +19,7 @@ func Parse(input string) (expressions.Expression, error) {
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {
 			return nil, errors.E(
-				errors.Kind(errors.Syntax),
+				errors.Code(errors.Syntax),
 				errors.Pos(lexerError.Pos),
 				errors.Message(lexerError.Message),
 			)
@@ -31,7 +31,7 @@ func Parse(input string) (expressions.Expression, error) {
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {
 			return nil, errors.E(
-				errors.Kind(errors.Syntax),
+				errors.Code(errors.Syntax),
 				errors.Pos(lexerError.Pos),
 				errors.Message(lexerError.Message),
 			)

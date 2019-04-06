@@ -21,7 +21,7 @@ func (x CallExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Para
 		// Reached bottom of stack without finding a matching function
 		if stack == nil {
 			return zeroShape, nil, errors.E(
-				errors.Kind(errors.NoSuchFunction),
+				errors.Code(errors.NoSuchFunction),
 				errors.Pos(x.Pos),
 				errors.InputType(inputShape.Type),
 				errors.Name(x.Name),
@@ -47,7 +47,7 @@ func (x CallExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Para
 			}
 			if !param.OutputType.Subsumes(argOutputShape.Type) {
 				return zeroShape, nil, errors.E(
-					errors.Kind(errors.ArgHasWrongOutputType),
+					errors.Code(errors.ArgHasWrongOutputType),
 					errors.Pos(x.Pos),
 					errors.ArgNum(i),
 					errors.WantType(param.OutputType),
@@ -61,7 +61,7 @@ func (x CallExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Para
 		for i := 0; i < len(params); i++ {
 			if !params[i].Subsumes(*funParams[len(x.Args)+i]) {
 				return zeroShape, nil, errors.E(
-					errors.Kind(errors.ParamDoesNotMatch),
+					errors.Code(errors.ParamDoesNotMatch),
 					errors.Pos(x.Pos),
 					errors.ParamNum(i),
 					errors.WantParam(params[i]),

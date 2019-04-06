@@ -16,7 +16,7 @@ type CompositionExpression struct {
 func (x CompositionExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
-			errors.Kind(errors.ParamsNotAllowed),
+			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}

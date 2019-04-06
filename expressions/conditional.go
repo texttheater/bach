@@ -22,7 +22,7 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
-			errors.Kind(errors.ParamsNotAllowed),
+			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
@@ -33,7 +33,7 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 	}
 	if !types.BoolType.Subsumes(conditionOutputShape.Type) {
 		return zeroShape, nil, errors.E(
-			errors.Kind(errors.ConditionMustBeBool),
+			errors.Code(errors.ConditionMustBeBool),
 			errors.Pos(x.Pos),
 			errors.WantType(types.BoolType),
 			errors.GotType(conditionOutputShape.Type),
@@ -59,7 +59,7 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 		}
 		if !types.BoolType.Subsumes(conditionOutputShape.Type) {
 			return zeroShape, nil, errors.E(
-				errors.Kind(errors.ConditionMustBeBool),
+				errors.Code(errors.ConditionMustBeBool),
 				errors.Pos(x.Pos),
 				errors.WantType(types.BoolType),
 				errors.GotType(conditionOutputShape.Type),

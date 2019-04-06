@@ -18,14 +18,14 @@ func (x MappingExpression) Typecheck(inputShape shapes.Shape, params []*shapes.P
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return zeroShape, nil, errors.E(
-			errors.Kind(errors.ParamsNotAllowed),
+			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
 	// make sure the input type is a sequence type
 	if !types.AnySeqType.Subsumes(inputShape.Type) {
 		return zeroShape, nil, errors.E(
-			errors.Kind(errors.MappingRequiresSeqType),
+			errors.Code(errors.MappingRequiresSeqType),
 			errors.Pos(x.Pos),
 			errors.WantType(types.AnySeqType),
 			errors.GotType(inputShape.Type),
