@@ -191,6 +191,12 @@ func GotParam(gotParam *shapes.Parameter) errorAttribute {
 	}
 }
 
+func Hint(hint string) errorAttribute {
+	return func(err *e) {
+		err.Hint = &hint
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 // An e represents any code of Bach error, or error template. Every field
@@ -209,6 +215,7 @@ type e struct {
 	ParamNum  *int
 	WantParam *shapes.Parameter
 	GotParam  *shapes.Parameter
+	Hint      *string
 }
 
 func (err *e) Error() string {
