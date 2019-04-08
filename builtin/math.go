@@ -122,6 +122,20 @@ func initMath() {
 		),
 		shapes.SimpleFuncer(
 			types.SeqType(types.NumType),
+			"sum",
+			nil,
+			types.NumType,
+			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+				sum := 0.0
+				for numValue := range inputValue.Iter() {
+					num, _ := numValue.(values.NumValue)
+					sum += float64(num)
+				}
+				return values.NumValue(sum)
+			},
+		),
+		shapes.SimpleFuncer(
+			types.SeqType(types.NumType),
 			"average",
 			nil,
 			types.NumType,
