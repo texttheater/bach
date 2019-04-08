@@ -126,10 +126,9 @@ func initMath() {
 			nil,
 			types.NumType,
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				seq := inputValue.(values.SeqValue)
 				sum := 0.0
 				count := 0.0
-				for numValue := range seq {
+				for numValue := range inputValue.Iter() {
 					num, _ := numValue.(values.NumValue)
 					sum += float64(num)
 					count += 1.0
