@@ -7,8 +7,8 @@ import (
 
 type Type struct {
 	Pos                lexer.Position
-	NonDisjunctiveType *NonDisjunctiveType   `  @@`
-	Disjuncts          []*NonDisjunctiveType `{ "|" @@ }`
+	NonDisjunctiveType *NonDisjunctiveType   `@@`
+	Disjuncts          []*NonDisjunctiveType `( "|" @@ )*`
 }
 
 func (g *Type) Ast() types.Type {
@@ -154,10 +154,10 @@ func (g *NearrType) Ast() types.Type {
 
 type ObjType struct {
 	Pos      lexer.Position `"Obj<"`
-	Prop     *string        `[ @Prop`
+	Prop     *string        `( @Prop`
 	ValType  *Type          `  ":" @@`
-	Props    []string       `  { @Prop`
-	ValTypes []*Type        `     ":" @@ } ] ">"`
+	Props    []string       `  ( @Prop`
+	ValTypes []*Type        `     ":" @@ )* )? ">"`
 }
 
 func (g *ObjType) Ast() types.Type {

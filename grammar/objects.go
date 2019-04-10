@@ -7,10 +7,10 @@ import (
 
 type Object struct {
 	Pos    lexer.Position `"{"`
-	Prop   *string        `[ @Prop`
+	Prop   *string        `( @Prop`
 	Value  *Composition   `  ":" @@`
-	Props  []string       `  { "," @Prop`
-	Values []*Composition `    ":" @@ } ] "}"`
+	Props  []string       `  ( "," @Prop`
+	Values []*Composition `    ":" @@ )* )? "}"`
 }
 
 func (g *Object) Ast() expressions.Expression {

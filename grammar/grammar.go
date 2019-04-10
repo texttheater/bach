@@ -10,7 +10,7 @@ import (
 type Composition struct {
 	Pos        lexer.Position
 	Component  *Component   `@@`
-	Components []*Component `{ @@ }`
+	Components []*Component `( @@ )*`
 }
 
 func (g *Composition) Ast() expressions.Expression {

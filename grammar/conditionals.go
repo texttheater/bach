@@ -9,8 +9,8 @@ type Conditional struct {
 	Pos             lexer.Position
 	Condition       *Composition   `"if" @@`
 	Consequent      *Composition   `"then" @@`
-	ElifConditions  []*Composition `{ "elif" @@`
-	ElifConsequents []*Composition `  "then" @@ }`
+	ElifConditions  []*Composition `( "elif" @@`
+	ElifConsequents []*Composition `  "then" @@ )*`
 	Alternative     *Composition   `"else" @@ "ok"`
 }
 

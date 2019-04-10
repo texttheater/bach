@@ -7,8 +7,8 @@ import (
 
 type Array struct {
 	Pos      lexer.Position `"["`
-	Element  *Composition   `[ @@`
-	Elements []*Composition `  { "," @@ } ] "]"`
+	Element  *Composition   `( @@`
+	Elements []*Composition `  ( "," @@ )* )? "]"`
 }
 
 func (g *Array) Ast() expressions.Expression {

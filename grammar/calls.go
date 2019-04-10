@@ -149,7 +149,7 @@ type NameArglist struct {
 	Pos      lexer.Position
 	NameLpar *NameLpar      `@NameLpar`
 	Arg      *Composition   `@@`
-	Args     []*Composition `{ "," @@ } ")"`
+	Args     []*Composition `( "," @@ )* ")"`
 }
 
 func (g *NameArglist) Ast() expressions.Expression {

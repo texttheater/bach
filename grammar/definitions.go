@@ -41,7 +41,7 @@ type NameParlist struct {
 	Pos      lexer.Position
 	NameLpar *NameLpar `@NameLpar`
 	Param    *Param    `@@`
-	Params   []*Param  `{ "," @@ } ")"`
+	Params   []*Param  `( "," @@ )* ")"`
 }
 
 func (g *NameParlist) Ast() []*shapes.Parameter {
