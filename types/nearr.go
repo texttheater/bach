@@ -44,6 +44,23 @@ func (t *nearrType) ElementType() Type {
 
 func (t *nearrType) String() string {
 	buffer := bytes.Buffer{}
+	buffer.WriteString("Tup<")
+	buffer.WriteString(t.headType.String())
+	tailType := t.tailType
+	for {
+		if VoidArrType.Subsumes(tailType) {
+			buffer.WriteString(">")
+			return buffer.String()
+		}
+		nearrTailType, ok := tailType.(*nearrType)
+		if !ok {
+			break
+		}
+		buffer.WriteString(", ")
+		buffer.WriteString(nearrTailType.headType.String())
+		tailType = nearrTailType.tailType
+	}
+	buffer.Reset()
 	buffer.WriteString("Nearr<")
 	buffer.WriteString(t.headType.String())
 	buffer.WriteString(", ")

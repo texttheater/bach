@@ -41,6 +41,9 @@ func (t arrType) Subsumes(u Type) bool {
 }
 
 func (t arrType) String() string {
+	if VoidType.Subsumes(t.elementType) {
+		return "Tup<>"
+	}
 	return fmt.Sprintf("Arr<%s>", t.elementType)
 }
 
