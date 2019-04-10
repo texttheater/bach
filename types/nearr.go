@@ -20,8 +20,7 @@ func (t nearrType) Subsumes(other Type) bool {
 	if VoidType.Subsumes(other) {
 		return true
 	}
-	otherNearrType, ok := other.(nearrType)
-	if ok {
+	if otherNearrType, ok := other.(*nearrType); ok {
 		if !t.headType.Subsumes(otherNearrType.headType) {
 			return false
 		}
