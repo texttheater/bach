@@ -81,10 +81,10 @@ func TestInterp(t *testing.T) {
 
 		// arrays
 		{`[]`, types.VoidArrType, values.ArrValue([]values.Value{}), nil},
-		{`[1]`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1)}), nil},
-		{`[1, 2, 3]`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2), values.NumValue(3)}), nil},
-		{`[1, "a"]`, types.ArrType(types.Union(types.NumType, types.StrType)), values.ArrValue([]values.Value{values.NumValue(1), values.StrValue("a")}), nil},
-		{`[[1, 2], ["a", "b"]]`, types.ArrType(types.Union(types.ArrType(types.NumType), types.ArrType(types.StrType))), values.ArrValue([]values.Value{values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2)}), values.ArrValue([]values.Value{values.StrValue("a"), values.StrValue("b")})}), nil},
+		{`[1]`, types.TupType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1)}), nil},
+		{`[1, 2, 3]`, types.TupType(types.NumType, types.NumType, types.NumType), values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2), values.NumValue(3)}), nil},
+		{`[1, "a"]`, types.TupType(types.NumType, types.StrType), values.ArrValue([]values.Value{values.NumValue(1), values.StrValue("a")}), nil},
+		{`[[1, 2], ["a", "b"]]`, types.TupType(types.TupType(types.NumType, types.NumType), types.TupType(types.StrType, types.StrType)), values.ArrValue([]values.Value{values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2)}), values.ArrValue([]values.Value{values.StrValue("a"), values.StrValue("b")})}), nil},
 
 		// function definitions
 		{`for Num def plusOne Num as +1 ok 1 plusOne`, types.NumType, values.NumValue(2), nil},
@@ -153,11 +153,11 @@ func TestInterp(t *testing.T) {
 		{`range(0, 5) type`, types.StrType, values.StrValue("Seq<Num>"), nil},
 
 		// array types
-		{`[] type`, types.StrType, values.StrValue("Arr<Void>"), nil},
-		{`["dog", "cat"] type`, types.StrType, values.StrValue("Arr<Str>"), nil},
-		{`["dog", 1] type`, types.StrType, values.StrValue("Arr<Str|Num>"), nil},
-		{`["dog", 1, {}] type`, types.StrType, values.StrValue("Arr<Str|Num|Obj<>>"), nil},
-		{`["dog", 1, {}, 2] type`, types.StrType, values.StrValue("Arr<Str|Num|Obj<>>"), nil},
+		{`[] type`, types.StrType, values.StrValue("Tup<>"), nil},
+		{`["dog", "cat"] type`, types.StrType, values.StrValue("Tup<Str, Str>"), nil},
+		{`["dog", 1] type`, types.StrType, values.StrValue("Tup<Str, Num>"), nil},
+		{`["dog", 1, {}] type`, types.StrType, values.StrValue("Tup<Str, Num, Obj<>>"), nil},
+		{`["dog", 1, {}, 2] type`, types.StrType, values.StrValue("Tup<Str, Num, Obj<>, Num>"), nil},
 
 		// object types
 		{`{} type`, types.StrType, values.StrValue("Obj<>"), nil},
@@ -165,8 +165,8 @@ func TestInterp(t *testing.T) {
 		{`{b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool>"), nil},
 		{`{c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num>"), nil},
 		{`{d: "", c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num, d: Str>"), nil},
-		{`{e: [], d: "", c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num, d: Str, e: Arr<Void>>"), nil},
-		{`{f: {}, e: [], d: "", c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num, d: Str, e: Arr<Void>, f: Obj<>>"), nil},
+		{`{e: [], d: "", c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num, d: Str, e: Tup<>>"), nil},
+		{`{f: {}, e: [], d: "", c: 0, b: false, a: null} type`, types.StrType, values.StrValue("Obj<a: Null, b: Bool, c: Num, d: Str, e: Tup<>, f: Obj<>>"), nil},
 
 		// disjunctive types
 		{`for Num def f Num|Str as if ==1 then 1 else "abc" ok ok 1 f type`, types.StrType, values.StrValue("Num|Str"), nil},
