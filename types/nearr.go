@@ -16,7 +16,7 @@ type nearrType struct {
 	tailType Type
 }
 
-func (t nearrType) Subsumes(other Type) bool {
+func (t *nearrType) Subsumes(other Type) bool {
 	if VoidType.Subsumes(other) {
 		return true
 	}
@@ -38,11 +38,11 @@ func (t nearrType) Subsumes(other Type) bool {
 	return false
 }
 
-func (t nearrType) ElementType() Type {
+func (t *nearrType) ElementType() Type {
 	return Union(t.headType, t.tailType.ElementType())
 }
 
-func (t nearrType) String() string {
+func (t *nearrType) String() string {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("Nearr<")
 	buffer.WriteString(t.headType.String())
