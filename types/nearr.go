@@ -40,6 +40,6 @@ func (t nearrType) String() string {
 	buffer.WriteString(t.headType.String())
 	buffer.WriteString(", ")
 	buffer.WriteString(t.tailType.String())
-	buffer.WriteString(")")
+	buffer.WriteString(">")
 	return buffer.String()
 }
