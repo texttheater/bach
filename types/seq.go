@@ -20,15 +20,13 @@ func (t seqType) Subsumes(other Type) bool {
 	if VoidType.Subsumes(other) {
 		return true
 	}
-	otherSeqType, ok := other.(seqType)
-	if ok {
+	if otherSeqType, ok := other.(seqType); ok {
 		return t.elementType.Subsumes(otherSeqType.elementType)
 	}
 	if ArrType(t.elementType).Subsumes(other) {
 		return true
 	}
-	otherUnionType, ok := other.(unionType)
-	if ok {
+	if otherUnionType, ok := other.(unionType); ok {
 		for _, disjunct := range otherUnionType {
 			if !t.Subsumes(disjunct) {
 				return false

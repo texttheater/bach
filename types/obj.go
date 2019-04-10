@@ -28,8 +28,7 @@ func (t objType) Subsumes(other Type) bool {
 	if VoidType.Subsumes(other) {
 		return true
 	}
-	otherObjType, ok := other.(objType)
-	if ok {
+	if otherObjType, ok := other.(objType); ok {
 		for k, v1 := range t.propTypeMap {
 			v2, ok := otherObjType.propTypeMap[k]
 			if !ok {
@@ -41,8 +40,7 @@ func (t objType) Subsumes(other Type) bool {
 		}
 		return true
 	}
-	otherUnionType, ok := other.(unionType)
-	if ok {
+	if otherUnionType, ok := other.(unionType); ok {
 		for _, disjunct := range otherUnionType {
 			if !t.Subsumes(disjunct) {
 				return false

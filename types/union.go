@@ -6,10 +6,8 @@ import (
 )
 
 func Union(a Type, b Type) Type {
-	aUnion, ok := a.(unionType)
-	if ok {
-		bUnion, ok := b.(unionType)
-		if ok {
+	if aUnion, ok := a.(unionType); ok {
+		if bUnion, ok := b.(unionType); ok {
 			for _, bDisjunct := range bUnion {
 				aUnion = typeAppend(aUnion, bDisjunct)
 			}
@@ -56,8 +54,7 @@ func typeAppend(t unionType, u Type) unionType {
 }
 
 func (t unionType) Subsumes(u Type) bool {
-	uUnion, ok := u.(unionType)
-	if ok {
+	if uUnion, ok := u.(unionType); ok {
 	uLoop:
 		for _, uDisjunct := range uUnion {
 			// find a subsumer for uDisjunct among t

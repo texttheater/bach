@@ -26,8 +26,7 @@ func (t *nearrType) Subsumes(other Type) bool {
 		}
 		return t.tailType.Subsumes(otherNearrType.tailType)
 	}
-	otherUnionType, ok := other.(unionType)
-	if ok {
+	if otherUnionType, ok := other.(unionType); ok {
 		for _, disjunct := range otherUnionType {
 			if !t.Subsumes(disjunct) {
 				return false

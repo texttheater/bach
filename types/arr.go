@@ -20,19 +20,16 @@ func (t arrType) Subsumes(other Type) bool {
 	if VoidType.Subsumes(other) {
 		return true
 	}
-	otherArrType, ok := other.(arrType)
-	if ok {
+	if otherArrType, ok := other.(arrType); ok {
 		return t.elementType.Subsumes(otherArrType.elementType)
 	}
-	otherNearrType, ok := other.(*nearrType)
-	if ok {
+	if otherNearrType, ok := other.(*nearrType); ok {
 		if !t.elementType.Subsumes(otherNearrType.headType) {
 			return false
 		}
 		return t.Subsumes(otherNearrType.tailType)
 	}
-	otherUnionType, ok := other.(unionType)
-	if ok {
+	if otherUnionType, ok := other.(unionType); ok {
 		for _, disjunct := range otherUnionType {
 			if !t.Subsumes(disjunct) {
 				return false
