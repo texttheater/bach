@@ -16,25 +16,26 @@ type seqType struct {
 // element. It is provided as a package variable for convenience.
 var AnySeqType = SeqType(AnyType)
 
-func (t seqType) Subsumes(other Type) bool {
-	if VoidType.Subsumes(other) {
+func (t seqType) Subsumes(u Type) bool {
+	if VoidType.Subsumes(u) {
 		return true
 	}
-	if otherSeqType, ok := other.(seqType); ok {
-		return t.elementType.Subsumes(otherSeqType.elementType)
-	}
-	if ArrType(t.elementType).Subsumes(other) {
+	if ArrType(t.elementType).Subsumes(u) {
 		return true
 	}
-	if otherUnionType, ok := other.(unionType); ok {
-		for _, disjunct := range otherUnionType {
+	switch u := u.(type) {
+	case seqType:
+		return t.elementType.Subsumes(u.elementType)
+	case unionType:
+		for _, disjunct := range u {
 			if !t.Subsumes(disjunct) {
 				return false
 			}
 		}
 		return true
+	default:
+		return false
 	}
-	return false
 }
 
 func (t seqType) String() string {

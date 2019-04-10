@@ -16,28 +16,28 @@ type arrType struct {
 	elementType Type
 }
 
-func (t arrType) Subsumes(other Type) bool {
-	if VoidType.Subsumes(other) {
+func (t arrType) Subsumes(u Type) bool {
+	if VoidType.Subsumes(u) {
 		return true
 	}
-	if otherArrType, ok := other.(arrType); ok {
-		return t.elementType.Subsumes(otherArrType.elementType)
-	}
-	if otherNearrType, ok := other.(*nearrType); ok {
-		if !t.elementType.Subsumes(otherNearrType.headType) {
+	switch u := u.(type) {
+	case arrType:
+		return t.elementType.Subsumes(u.elementType)
+	case *nearrType:
+		if !t.elementType.Subsumes(u.headType) {
 			return false
 		}
-		return t.Subsumes(otherNearrType.tailType)
-	}
-	if otherUnionType, ok := other.(unionType); ok {
-		for _, disjunct := range otherUnionType {
+		return t.Subsumes(u.tailType)
+	case unionType:
+		for _, disjunct := range u {
 			if !t.Subsumes(disjunct) {
 				return false
 			}
 		}
 		return true
+	default:
+		return false
 	}
-	return false
 }
 
 func (t arrType) String() string {

@@ -16,25 +16,26 @@ type nearrType struct {
 	tailType Type
 }
 
-func (t *nearrType) Subsumes(other Type) bool {
-	if VoidType.Subsumes(other) {
+func (t *nearrType) Subsumes(u Type) bool {
+	if VoidType.Subsumes(u) {
 		return true
 	}
-	if otherNearrType, ok := other.(*nearrType); ok {
-		if !t.headType.Subsumes(otherNearrType.headType) {
+	switch u := u.(type) {
+	case *nearrType:
+		if !t.headType.Subsumes(u.headType) {
 			return false
 		}
-		return t.tailType.Subsumes(otherNearrType.tailType)
-	}
-	if otherUnionType, ok := other.(unionType); ok {
-		for _, disjunct := range otherUnionType {
+		return t.tailType.Subsumes(u.tailType)
+	case unionType:
+		for _, disjunct := range u {
 			if !t.Subsumes(disjunct) {
 				return false
 			}
 		}
 		return true
+	default:
+		return false
 	}
-	return false
 }
 
 func (t *nearrType) ElementType() Type {

@@ -24,13 +24,14 @@ type objType struct {
 	propTypeMap map[string]Type
 }
 
-func (t objType) Subsumes(other Type) bool {
-	if VoidType.Subsumes(other) {
+func (t objType) Subsumes(u Type) bool {
+	if VoidType.Subsumes(u) {
 		return true
 	}
-	if otherObjType, ok := other.(objType); ok {
+	switch u := u.(type) {
+	case objType:
 		for k, v1 := range t.propTypeMap {
-			v2, ok := otherObjType.propTypeMap[k]
+			v2, ok := u.propTypeMap[k]
 			if !ok {
 				return false
 			}
@@ -39,16 +40,16 @@ func (t objType) Subsumes(other Type) bool {
 			}
 		}
 		return true
-	}
-	if otherUnionType, ok := other.(unionType); ok {
-		for _, disjunct := range otherUnionType {
+	case unionType:
+		for _, disjunct := range u {
 			if !t.Subsumes(disjunct) {
 				return false
 			}
 		}
 		return true
+	default:
+		return false
 	}
-	return false
 }
 
 func (t objType) String() string {
