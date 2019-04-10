@@ -30,6 +30,7 @@ type NonDisjunctiveType struct {
 	SeqType    *SeqType    `| @@`
 	ArrType    *ArrType    `| @@`
 	NearrType  *NearrType  `| @@`
+	TupType    *TupType    `| @@`
 	ObjType    *ObjType    `| @@`
 	AnyType    *AnyType    `| @@`
 }
@@ -61,6 +62,9 @@ func (g *NonDisjunctiveType) Ast() types.Type {
 	}
 	if g.NearrType != nil {
 		return g.NearrType.Ast()
+	}
+	if g.TupType != nil {
+		return g.TupType.Ast()
 	}
 	if g.ObjType != nil {
 		return g.ObjType.Ast()
@@ -150,6 +154,23 @@ func (g *NearrType) Ast() types.Type {
 		// FIXME return error
 	}
 	return types.NearrType(headType, tailType)
+}
+
+type TupType struct {
+	Pos   lexer.Position `"Tup<"`
+	Type  *Type          `( @@`
+	Types []*Type        `  ( "," @@ )* )? ">"`
+}
+
+func (g *TupType) Ast() types.Type {
+	t := types.VoidArrType
+	for i := len(g.Types) - 1; i >= 0; i-- {
+		t = types.NearrType(g.Types[i].Ast(), t)
+	}
+	if g.Type != nil {
+		t = types.NearrType(g.Type.Ast(), t)
+	}
+	return t
 }
 
 type ObjType struct {
