@@ -24,7 +24,7 @@ func (t arrType) Subsumes(other Type) bool {
 	if ok {
 		return t.elementType.Subsumes(otherArrType.elementType)
 	}
-	otherNearrType, ok := other.(nearrType)
+	otherNearrType, ok := other.(*nearrType)
 	if ok {
 		if !t.elementType.Subsumes(otherNearrType.headType) {
 			return false
