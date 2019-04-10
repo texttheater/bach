@@ -1,2 +1,2 @@
 fmt :
-	for file in */*.go; do go fmt $$file; done
+	for file in *.go */*.go; do go fmt $$file; done
