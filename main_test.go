@@ -80,7 +80,7 @@ func TestInterp(t *testing.T) {
 		{`1 "abc"`, types.StrType, values.StrValue("abc"), nil},
 
 		// arrays
-		{`[]`, types.ArrType(types.VoidType), values.ArrValue([]values.Value{}), nil},
+		{`[]`, types.VoidArrType, values.ArrValue([]values.Value{}), nil},
 		{`[1]`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1)}), nil},
 		{`[1, 2, 3]`, types.ArrType(types.NumType), values.ArrValue([]values.Value{values.NumValue(1), values.NumValue(2), values.NumValue(3)}), nil},
 		{`[1, "a"]`, types.ArrType(types.Union(types.NumType, types.StrType)), values.ArrValue([]values.Value{values.NumValue(1), values.StrValue("a")}), nil},

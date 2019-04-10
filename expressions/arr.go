@@ -21,7 +21,7 @@ func (x ArrExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Param
 			errors.Pos(x.Pos),
 		)
 	}
-	arrType := types.ArrType(types.VoidType)
+	arrType := types.VoidArrType
 	elementActions := make([]states.Action, len(x.Elements))
 	for i := len(x.Elements) - 1; i >= 0; i-- {
 		elExpression := x.Elements[i]
