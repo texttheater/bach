@@ -21,18 +21,19 @@ func (x ArrExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Param
 			errors.Pos(x.Pos),
 		)
 	}
-	var elementType types.Type = types.VoidType
+	arrType := types.ArrType(types.VoidType)
 	elementActions := make([]states.Action, len(x.Elements))
-	for i, elExpression := range x.Elements {
+	for i := len(x.Elements) - 1; i >= 0; i-- {
+		elExpression := x.Elements[i]
 		elOutputShape, elAction, err := elExpression.Typecheck(inputShape, nil)
 		if err != nil {
 			return zeroShape, nil, err
 		}
-		elementType = types.Union(elementType, elOutputShape.Type)
+		arrType = types.NearrType(elOutputShape.Type, arrType)
 		elementActions[i] = elAction
 	}
 	outputShape := shapes.Shape{
-		Type:        types.ArrType(elementType),
+		Type:        arrType,
 		FuncerStack: inputShape.FuncerStack,
 	}
 	action := func(inputState states.State, args []states.Action) states.State {
