@@ -21,13 +21,22 @@ func (t nearrType) Subsumes(other Type) bool {
 		return true
 	}
 	otherNearrType, ok := other.(nearrType)
-	if !ok {
-		return false
+	if ok {
+		if !t.headType.Subsumes(otherNearrType.headType) {
+			return false
+		}
+		return t.tailType.Subsumes(otherNearrType.tailType)
 	}
-	if !t.headType.Subsumes(otherNearrType.headType) {
-		return false
+	otherUnionType, ok := other.(unionType)
+	if ok {
+		for _, disjunct := range otherUnionType {
+			if !t.Subsumes(disjunct) {
+				return false
+			}
+		}
+		return true
 	}
-	return t.tailType.Subsumes(otherNearrType.tailType)
+	return false
 }
 
 func (t nearrType) ElementType() Type {

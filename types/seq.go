@@ -27,6 +27,15 @@ func (t seqType) Subsumes(other Type) bool {
 	if ArrType(t.elementType).Subsumes(other) {
 		return true
 	}
+	otherUnionType, ok := other.(unionType)
+	if ok {
+		for _, disjunct := range otherUnionType {
+			if !t.Subsumes(disjunct) {
+				return false
+			}
+		}
+		return true
+	}
 	return false
 }
 

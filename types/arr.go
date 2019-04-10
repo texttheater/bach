@@ -31,6 +31,15 @@ func (t arrType) Subsumes(other Type) bool {
 		}
 		return t.Subsumes(otherNearrType.tailType)
 	}
+	otherUnionType, ok := other.(unionType)
+	if ok {
+		for _, disjunct := range otherUnionType {
+			if !t.Subsumes(disjunct) {
+				return false
+			}
+		}
+		return true
+	}
 	return false
 }
 

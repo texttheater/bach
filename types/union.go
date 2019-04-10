@@ -94,5 +94,9 @@ func (t unionType) String() string {
 }
 
 func (t unionType) ElementType() Type {
-	panic(t.String() + " is not a sequence type")
+	var elType Type = VoidType
+	for _, disjunct := range t {
+		elType = Union(elType, disjunct.ElementType())
+	}
+	return elType
 }

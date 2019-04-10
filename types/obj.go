@@ -29,19 +29,28 @@ func (t objType) Subsumes(other Type) bool {
 		return true
 	}
 	otherObjType, ok := other.(objType)
-	if !ok {
-		return false
-	}
-	for k, v1 := range t.propTypeMap {
-		v2, ok := otherObjType.propTypeMap[k]
-		if !ok {
-			return false
+	if ok {
+		for k, v1 := range t.propTypeMap {
+			v2, ok := otherObjType.propTypeMap[k]
+			if !ok {
+				return false
+			}
+			if !v1.Subsumes(v2) {
+				return false
+			}
 		}
-		if !v1.Subsumes(v2) {
-			return false
-		}
+		return true
 	}
-	return true
+	otherUnionType, ok := other.(unionType)
+	if ok {
+		for _, disjunct := range otherUnionType {
+			if !t.Subsumes(disjunct) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
 }
 
 func (t objType) String() string {
