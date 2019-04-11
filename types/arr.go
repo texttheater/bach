@@ -5,7 +5,7 @@ import (
 )
 
 func ArrType(elementType Type) Type {
-	return arrType{elementType}
+	return &arrType{elementType}
 }
 
 var AnyArrType = ArrType(AnyType)
@@ -16,12 +16,12 @@ type arrType struct {
 	elementType Type
 }
 
-func (t arrType) Subsumes(u Type) bool {
+func (t *arrType) Subsumes(u Type) bool {
 	if VoidType.Subsumes(u) {
 		return true
 	}
 	switch u := u.(type) {
-	case arrType:
+	case *arrType:
 		return t.elementType.Subsumes(u.elementType)
 	case *nearrType:
 		if !t.elementType.Subsumes(u.headType) {
@@ -40,13 +40,13 @@ func (t arrType) Subsumes(u Type) bool {
 	}
 }
 
-func (t arrType) String() string {
+func (t *arrType) String() string {
 	if VoidType.Subsumes(t.elementType) {
 		return "Tup<>"
 	}
 	return fmt.Sprintf("Arr<%s>", t.elementType)
 }
 
-func (t arrType) ElementType() Type {
+func (t *arrType) ElementType() Type {
 	return t.elementType
 }
