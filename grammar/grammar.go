@@ -13,13 +13,20 @@ type Composition struct {
 	Components []*Component `( @@ )*`
 }
 
-func (g *Composition) Ast() expressions.Expression {
+func (g *Composition) Ast() (expressions.Expression, error) {
 	pos := g.Component.Pos
-	e := g.Component.Ast()
-	for _, comp := range g.Components {
-		e = &expressions.CompositionExpression{pos, e, comp.Ast()}
+	e, err := g.Component.Ast()
+	if err != nil {
+		return nil, err
 	}
-	return e
+	for _, comp := range g.Components {
+		compAst, err := comp.Ast()
+		if err != nil {
+			return nil, err
+		}
+		e = &expressions.CompositionExpression{pos, e, compAst}
+	}
+	return e, nil
 }
 
 type Component struct {
@@ -35,20 +42,20 @@ type Component struct {
 	Mapping     *Mapping     `| @@`
 }
 
-func (g *Component) Ast() expressions.Expression {
+func (g *Component) Ast() (expressions.Expression, error) {
 	if g.Num != nil {
 		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.NumType,
 			Value: values.NumValue(*g.Num),
-		}
+		}, nil
 	}
 	if g.Str != nil {
 		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.StrType,
 			Value: values.StrValue(*g.Str),
-		}
+		}, nil
 	}
 	if g.Array != nil {
 		return g.Array.Ast()
@@ -60,7 +67,7 @@ func (g *Component) Ast() expressions.Expression {
 		return g.Call.Ast()
 	}
 	if g.Assignment != nil {
-		return g.Assignment.Ast()
+		return g.Assignment.Ast(), nil
 	}
 	if g.Definition != nil {
 		return g.Definition.Ast()

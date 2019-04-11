@@ -13,13 +13,20 @@ type Object struct {
 	Values []*Composition `    ":" @@ )* )? "}"`
 }
 
-func (g *Object) Ast() expressions.Expression {
+func (g *Object) Ast() (expressions.Expression, error) {
 	propValMap := make(map[string]expressions.Expression)
 	if g.Prop != nil {
-		propValMap[*g.Prop] = g.Value.Ast()
+		var err error
+		propValMap[*g.Prop], err = g.Value.Ast()
+		if err != nil {
+			return nil, err
+		}
 		for i := range g.Props {
-			propValMap[g.Props[i]] = g.Values[i].Ast()
+			propValMap[g.Props[i]], err = g.Values[i].Ast()
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-	return &expressions.ObjExpression{g.Pos, propValMap}
+	return &expressions.ObjExpression{g.Pos, propValMap}, nil
 }

@@ -10,9 +10,13 @@ type Mapping struct {
 	Body *Composition `"each" @@ "all"`
 }
 
-func (g *Mapping) Ast() expressions.Expression {
+func (g *Mapping) Ast() (expressions.Expression, error) {
+	body, err := g.Body.Ast()
+	if err != nil {
+		return nil, err
+	}
 	return &expressions.MappingExpression{
 		Pos:  g.Pos,
-		Body: g.Body.Ast(),
-	}
+		Body: body,
+	}, nil
 }

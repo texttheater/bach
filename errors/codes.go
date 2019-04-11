@@ -11,6 +11,7 @@ const (
 	FunctionBodyHasWrongOutputType
 	ConditionMustBeBool
 	MappingRequiresSeqType
+	TailRequiresArrType
 )
 
 func (code ErrorCode) String() string {
@@ -29,8 +30,11 @@ func (code ErrorCode) String() string {
 		return "ConditionMustBeBool"
 	case MappingRequiresSeqType:
 		return "MappingRequiresSeqType"
+	case TailRequiresArrType:
+		return "TailRequiresArrType"
+	default:
+		return "Unknown"
 	}
-	return "Unknown"
 }
 
 func (code ErrorCode) DefaultMessage() string {
@@ -51,6 +55,8 @@ func (code ErrorCode) DefaultMessage() string {
 		return "The condition must be boolean."
 	case MappingRequiresSeqType:
 		return "The input to a mapping must be a sequence."
+	case TailRequiresArrType:
+		return "The tail type of a Nearr type must be an array type."
 	}
 	return "unknown error"
 }
@@ -72,6 +78,8 @@ func (code ErrorCode) Kind() string {
 	case ConditionMustBeBool:
 		return "Type error"
 	case MappingRequiresSeqType:
+		return "Type error"
+	case TailRequiresArrType:
 		return "Type error"
 	}
 	return "unknown error"

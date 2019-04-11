@@ -20,7 +20,11 @@ type Definition struct {
 	Body       *Composition `"as" @@ "ok"`
 }
 
-func (g *Definition) Ast() expressions.Expression {
+func (g *Definition) Ast() (expressions.Expression, error) {
+	inputType, err := g.InputType.Ast()
+	if err != nil {
+		return nil, err
+	}
 	var name = g.Name
 	var params []*shapes.Parameter
 	var paramNames []string
@@ -28,22 +32,36 @@ func (g *Definition) Ast() expressions.Expression {
 		name = g.NameLpar.Name
 		params = make([]*shapes.Parameter, len(g.Params)+1)
 		paramNames = make([]string, len(g.ParamNames)+1)
-		params[0] = g.Parameter.Ast()
+		params[0], err = g.Parameter.Ast()
+		if err != nil {
+			return nil, err
+		}
 		paramNames[0] = *g.ParamName
 		for i, param := range g.Params {
-			params[i+1] = param.Ast()
+			params[i+1], err = param.Ast()
+			if err != nil {
+				return nil, err
+			}
 			paramNames[i+1] = g.ParamNames[i+1]
 		}
 	}
+	outputType, err := g.OutputType.Ast()
+	if err != nil {
+		return nil, err
+	}
+	body, err := g.Body.Ast()
+	if err != nil {
+		return nil, err
+	}
 	return &expressions.DefinitionExpression{
 		Pos:        g.Pos,
-		InputType:  g.InputType.Ast(),
+		InputType:  inputType,
 		Name:       name,
 		Params:     params,
 		ParamNames: paramNames,
-		OutputType: g.OutputType.Ast(),
-		Body:       g.Body.Ast(),
-	}
+		OutputType: outputType,
+		Body:       body,
+	}, nil
 }
 
 type Parameter struct {
@@ -54,24 +72,39 @@ type Parameter struct {
 	OutputType *Type        `@@`
 }
 
-func (g *Parameter) Ast() *shapes.Parameter {
+func (g *Parameter) Ast() (*shapes.Parameter, error) {
 	var inputType types.Type
 	if g.InputType != nil {
-		inputType = g.InputType.Ast()
+		var err error
+		inputType, err = g.InputType.Ast()
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		inputType = types.AnyType
 	}
 	var params []*shapes.Parameter
 	if g.Parameter != nil {
 		params = make([]*shapes.Parameter, len(g.Params)+1)
-		params[0] = g.Parameter.Ast()
-		for i, param := range g.Params {
-			params[i+1] = param.Ast()
+		var err error
+		params[0], err = g.Parameter.Ast()
+		if err != nil {
+			return nil, err
 		}
+		for i, param := range g.Params {
+			params[i+1], err = param.Ast()
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	outputType, err := g.OutputType.Ast()
+	if err != nil {
+		return nil, err
 	}
 	return &shapes.Parameter{
 		InputType:  inputType,
 		Params:     params,
-		OutputType: g.OutputType.Ast(),
-	}
+		OutputType: outputType,
+	}, nil
 }

@@ -21,24 +21,24 @@ type Call struct {
 	Name        *string      `| ( @Prop | @Op1 | @Op2 )`
 }
 
-func (g *Call) Ast() expressions.Expression {
+func (g *Call) Ast() (expressions.Expression, error) {
 	if g.Op1Num != nil {
-		return g.Op1Num.Ast()
+		return g.Op1Num.Ast(), nil
 	}
 	if g.Op2Num != nil {
-		return g.Op2Num.Ast()
+		return g.Op2Num.Ast(), nil
 	}
 	if g.Op1Name != nil {
-		return g.Op1Name.Ast()
+		return g.Op1Name.Ast(), nil
 	}
 	if g.Op2Name != nil {
-		return g.Op2Name.Ast()
+		return g.Op2Name.Ast(), nil
 	}
 	if g.NameArglist != nil {
 		return g.NameArglist.Ast()
 	}
 	if g.Name != nil {
-		return &expressions.CallExpression{g.Pos, *g.Name, []expressions.Expression{}}
+		return &expressions.CallExpression{g.Pos, *g.Name, []expressions.Expression{}}, nil
 	}
 	panic("invalid call")
 }
@@ -152,13 +152,20 @@ type NameArglist struct {
 	Args     []*Composition `( "," @@ )* ")"`
 }
 
-func (g *NameArglist) Ast() expressions.Expression {
+func (g *NameArglist) Ast() (expressions.Expression, error) {
 	args := make([]expressions.Expression, len(g.Args)+1)
-	args[0] = g.Arg.Ast()
-	for i, Arg := range g.Args {
-		args[i+1] = Arg.Ast()
+	var err error
+	args[0], err = g.Arg.Ast()
+	if err != nil {
+		return nil, err
 	}
-	return &expressions.CallExpression{g.Pos, g.NameLpar.Name, args}
+	for i, Arg := range g.Args {
+		args[i+1], err = Arg.Ast()
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &expressions.CallExpression{g.Pos, g.NameLpar.Name, args}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////

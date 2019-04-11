@@ -2,6 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/types"
 )
 
@@ -11,12 +12,19 @@ type Type struct {
 	Disjuncts          []*NonDisjunctiveType `( "|" @@ )*`
 }
 
-func (g *Type) Ast() types.Type {
-	result := g.NonDisjunctiveType.Ast()
-	for _, d := range g.Disjuncts {
-		result = types.Union(result, d.Ast())
+func (g *Type) Ast() (types.Type, error) {
+	result, err := g.NonDisjunctiveType.Ast()
+	if err != nil {
+		return nil, err
 	}
-	return result
+	for _, d := range g.Disjuncts {
+		t, err := d.Ast()
+		if err != nil {
+			return nil, err
+		}
+		result = types.Union(result, t)
+	}
+	return result, nil
 }
 
 type NonDisjunctiveType struct {
@@ -35,24 +43,24 @@ type NonDisjunctiveType struct {
 	AnyType    *AnyType    `| @@`
 }
 
-func (g *NonDisjunctiveType) Ast() types.Type {
+func (g *NonDisjunctiveType) Ast() (types.Type, error) {
 	if g.VoidType != nil {
-		return g.VoidType.Ast()
+		return g.VoidType.Ast(), nil
 	}
 	if g.NullType != nil {
-		return g.NullType.Ast()
+		return g.NullType.Ast(), nil
 	}
 	if g.ReaderType != nil {
-		return g.ReaderType.Ast()
+		return g.ReaderType.Ast(), nil
 	}
 	if g.BoolType != nil {
-		return g.BoolType.Ast()
+		return g.BoolType.Ast(), nil
 	}
 	if g.NumType != nil {
-		return g.NumType.Ast()
+		return g.NumType.Ast(), nil
 	}
 	if g.StrType != nil {
-		return g.StrType.Ast()
+		return g.StrType.Ast(), nil
 	}
 	if g.SeqType != nil {
 		return g.SeqType.Ast()
@@ -61,7 +69,11 @@ func (g *NonDisjunctiveType) Ast() types.Type {
 		return g.ArrType.Ast()
 	}
 	if g.NearrType != nil {
-		return g.NearrType.Ast()
+		ast, err := g.NearrType.Ast()
+		if err != nil {
+			return nil, err
+		}
+		return ast, nil
 	}
 	if g.TupType != nil {
 		return g.TupType.Ast()
@@ -70,7 +82,7 @@ func (g *NonDisjunctiveType) Ast() types.Type {
 		return g.ObjType.Ast()
 	}
 	if g.AnyType != nil {
-		return g.AnyType.Ast()
+		return g.AnyType.Ast(), nil
 	}
 	panic("invalid type")
 }
@@ -128,8 +140,12 @@ type SeqType struct {
 	ElementType *Type          `@@ ">"`
 }
 
-func (g *SeqType) Ast() types.Type {
-	return types.SeqType(g.ElementType.Ast())
+func (g *SeqType) Ast() (types.Type, error) {
+	elType, err := g.ElementType.Ast()
+	if err != nil {
+		return nil, err
+	}
+	return types.SeqType(elType), nil
 }
 
 type ArrType struct {
@@ -137,8 +153,12 @@ type ArrType struct {
 	ElementType *Type          `@@ ">"`
 }
 
-func (g *ArrType) Ast() types.Type {
-	return types.ArrType(g.ElementType.Ast())
+func (g *ArrType) Ast() (types.Type, error) {
+	elType, err := g.ElementType.Ast()
+	if err != nil {
+		return nil, err
+	}
+	return types.ArrType(elType), nil
 }
 
 type NearrType struct {
@@ -147,13 +167,24 @@ type NearrType struct {
 	TailType *Type          `@@ ">"`
 }
 
-func (g *NearrType) Ast() types.Type {
-	headType := g.HeadType.Ast()
-	tailType := g.TailType.Ast()
-	if !types.AnyArrType.Subsumes(tailType) {
-		// FIXME return error
+func (g *NearrType) Ast() (types.Type, error) {
+	headType, err := g.HeadType.Ast()
+	if err != nil {
+		return nil, err
 	}
-	return types.NearrType(headType, tailType)
+	tailType, err := g.TailType.Ast()
+	if err != nil {
+		return nil, err
+	}
+	if !types.AnyArrType.Subsumes(tailType) {
+		return nil, errors.E(
+			errors.Code(errors.TailRequiresArrType),
+			errors.Pos(g.Pos),
+			errors.WantType(types.AnyArrType),
+			errors.GotType(tailType),
+		)
+	}
+	return types.NearrType(headType, tailType), nil
 }
 
 type TupType struct {
@@ -162,15 +193,23 @@ type TupType struct {
 	Types []*Type        `  ( "," @@ )* )? ">"`
 }
 
-func (g *TupType) Ast() types.Type {
+func (g *TupType) Ast() (types.Type, error) {
 	t := types.VoidArrType
 	for i := len(g.Types) - 1; i >= 0; i-- {
-		t = types.NearrType(g.Types[i].Ast(), t)
+		headType, err := g.Types[i].Ast()
+		if err != nil {
+			return nil, err
+		}
+		t = types.NearrType(headType, t)
 	}
 	if g.Type != nil {
-		t = types.NearrType(g.Type.Ast(), t)
+		headType, err := g.Type.Ast()
+		if err != nil {
+			return nil, err
+		}
+		t = types.NearrType(headType, t)
 	}
-	return t
+	return t, nil
 }
 
 type ObjType struct {
@@ -181,15 +220,22 @@ type ObjType struct {
 	ValTypes []*Type        `     ":" @@ )* )? ">"`
 }
 
-func (g *ObjType) Ast() types.Type {
+func (g *ObjType) Ast() (types.Type, error) {
 	propTypeMap := make(map[string]types.Type)
 	if g.Prop != nil {
-		propTypeMap[*g.Prop] = g.ValType.Ast()
+		var err error
+		propTypeMap[*g.Prop], err = g.ValType.Ast()
+		if err != nil {
+			return nil, err
+		}
 		for i := range g.Props {
-			propTypeMap[g.Props[i]] = g.ValTypes[i].Ast()
+			propTypeMap[g.Props[i]], err = g.ValTypes[i].Ast()
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-	return types.ObjType(propTypeMap)
+	return types.ObjType(propTypeMap), nil
 }
 
 type AnyType struct {

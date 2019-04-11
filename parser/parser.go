@@ -38,5 +38,5 @@ func Parse(input string) (expressions.Expression, error) {
 		}
 		return nil, err
 	}
-	return composition.Ast(), nil
+	return composition.Ast()
 }

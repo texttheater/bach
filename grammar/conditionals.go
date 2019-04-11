@@ -14,19 +14,38 @@ type Conditional struct {
 	Alternative     *Composition   `"else" @@ "ok"`
 }
 
-func (g *Conditional) Ast() expressions.Expression {
+func (g *Conditional) Ast() (expressions.Expression, error) {
 	elifConditions := make([]expressions.Expression, len(g.ElifConditions))
 	elifConsequents := make([]expressions.Expression, len(g.ElifConsequents))
 	for i := range g.ElifConditions {
-		elifConditions[i] = g.ElifConditions[i].Ast()
-		elifConsequents[i] = g.ElifConsequents[i].Ast()
+		var err error
+		elifConditions[i], err = g.ElifConditions[i].Ast()
+		if err != nil {
+			return nil, err
+		}
+		elifConsequents[i], err = g.ElifConsequents[i].Ast()
+		if err != nil {
+			return nil, err
+		}
+	}
+	condition, err := g.Condition.Ast()
+	if err != nil {
+		return nil, err
+	}
+	consequent, err := g.Consequent.Ast()
+	if err != nil {
+		return nil, err
+	}
+	alternative, err := g.Alternative.Ast()
+	if err != nil {
+		return nil, err
 	}
 	return &expressions.ConditionalExpression{
 		Pos:             g.Pos,
-		Condition:       g.Condition.Ast(),
-		Consequent:      g.Consequent.Ast(),
+		Condition:       condition,
+		Consequent:      consequent,
 		ElifConditions:  elifConditions,
 		ElifConsequents: elifConsequents,
-		Alternative:     g.Alternative.Ast(),
-	}
+		Alternative:     alternative,
+	}, nil
 }
