@@ -8,7 +8,6 @@ import (
 
 type Parameter struct {
 	InputType  types.Type
-	Name       string
 	Params     []*Parameter
 	OutputType types.Type
 }
@@ -38,7 +37,6 @@ func (p Parameter) String() string {
 		buffer.WriteString(p.InputType.String())
 		buffer.WriteString(" ")
 	}
-	buffer.WriteString(p.Name)
 	if len(p.Params) > 0 {
 		buffer.WriteString("(")
 		buffer.WriteString(p.Params[0].String())

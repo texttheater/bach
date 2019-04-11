@@ -19,6 +19,7 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Op1>[+\-*/%<>=])` +
 		`|(?P<Op2>==|<=|>=)` +
 		`|(?P<Comma>,)` +
+		`|(?P<Lpar>\()` +
 		`|(?P<Rpar>\))` +
 		`|(?P<Lbrack>\[)` +
 		`|(?P<Rbrack>])` +

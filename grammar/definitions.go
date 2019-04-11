@@ -7,90 +7,71 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-///////////////////////////////////////////////////////////////////////////////
-
 type Definition struct {
-	Pos         lexer.Position
-	InputType   *Type        `"for" @@`
-	NameParlist *NameParlist `"def" ( @@`
-	Name        *string      `      | ( @Prop | @Op1 | @Op2 ) )`
-	OutputType  *Type        `@@`
-	Body        *Composition `"as" @@ "ok"`
+	Pos        lexer.Position
+	InputType  *Type        `"for" @@`
+	Name       string       `"def" ( ( @Prop | @Op1 | @Op2 )`
+	NameLpar   *NameLpar    `      | @NameLpar`
+	ParamName  *string      `        ( @Prop | @Op1 | @Op2 )`
+	Parameter  *Parameter   `        @@`
+	ParamNames []string     `        ( "," ( @Prop | @Op1 | @Op2 )`
+	Params     []*Parameter `          @@ )* ")" )`
+	OutputType *Type        `@@`
+	Body       *Composition `"as" @@ "ok"`
 }
 
 func (g *Definition) Ast() expressions.Expression {
 	var name = g.Name
 	var params []*shapes.Parameter
-	if g.NameParlist != nil {
-		name = &g.NameParlist.NameLpar.Name
-		params = g.NameParlist.Ast()
+	var paramNames []string
+	if g.NameLpar != nil {
+		name = g.NameLpar.Name
+		params = make([]*shapes.Parameter, len(g.Params)+1)
+		paramNames = make([]string, len(g.ParamNames)+1)
+		params[0] = g.Parameter.Ast()
+		paramNames[0] = *g.ParamName
+		for i, param := range g.Params {
+			params[i+1] = param.Ast()
+			paramNames[i+1] = g.ParamNames[i+1]
+		}
 	}
 	return &expressions.DefinitionExpression{
 		Pos:        g.Pos,
 		InputType:  g.InputType.Ast(),
-		Name:       *name,
+		Name:       name,
 		Params:     params,
+		ParamNames: paramNames,
 		OutputType: g.OutputType.Ast(),
 		Body:       g.Body.Ast(),
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-type NameParlist struct {
-	Pos      lexer.Position
-	NameLpar *NameLpar `@NameLpar`
-	Param    *Param    `@@`
-	Params   []*Param  `( "," @@ )* ")"`
+type Parameter struct {
+	Pos        lexer.Position
+	InputType  *Type        `( "for" @@`
+	Parameter  *Parameter   `  ( "(" @@`
+	Params     []*Parameter `    ( "," @@ )* ")" )? )?`
+	OutputType *Type        `@@`
 }
 
-func (g *NameParlist) Ast() []*shapes.Parameter {
-	params := make([]*shapes.Parameter, 1+len(g.Params))
-	params[0] = g.Param.Ast()
-	for i, param := range g.Params {
-		params[i+1] = param.Ast()
-	}
-	return params
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-type Param struct {
-	Pos         lexer.Position
-	Name1       *string      `( ( @Prop | @Op1 | @Op2 )`
-	InputType   *Type        `| "for" @@`
-	NameParlist *NameParlist `  ( @@`
-	Name2       *string      `  | ( @Prop | @Op1 | @Op2 ) ) )`
-	OutputType  *Type        `@@`
-}
-
-func (g *Param) Ast() *shapes.Parameter {
+func (g *Parameter) Ast() *shapes.Parameter {
 	var inputType types.Type
 	if g.InputType != nil {
 		inputType = g.InputType.Ast()
 	} else {
 		inputType = types.AnyType
 	}
-	var name string
 	var params []*shapes.Parameter
-	if g.Name1 != nil {
-		name = *g.Name1
-	} else if g.NameParlist != nil {
-		name = g.NameParlist.NameLpar.Name
-		params = make([]*shapes.Parameter, len(g.NameParlist.Params)+1)
-		params[0] = g.NameParlist.Param.Ast()
-		for i, param := range g.NameParlist.Params {
+	if g.Parameter != nil {
+		params = make([]*shapes.Parameter, len(g.Params)+1)
+		params[0] = g.Parameter.Ast()
+		for i, param := range g.Params {
 			params[i+1] = param.Ast()
 		}
-	} else {
-		name = *g.Name2
 	}
 	return &shapes.Parameter{
 		InputType:  inputType,
-		Name:       name,
 		Params:     params,
 		OutputType: g.OutputType.Ast(),
 	}
 }
-
-///////////////////////////////////////////////////////////////////////////////

@@ -13,6 +13,7 @@ type DefinitionExpression struct {
 	InputType  types.Type
 	Name       string
 	Params     []*shapes.Parameter
+	ParamNames []string
 	OutputType types.Type
 	Body       Expression
 }
@@ -65,13 +66,13 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*shape
 	functionStack := inputShape.FuncerStack.Push(funFuncer)
 	// add parameter funcers for use in the body
 	bodyFuncerStack := functionStack
-	for _, param := range x.Params {
+	for i, param := range x.Params {
 		var id interface{} = param
 		paramFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {
 			if !param.InputType.Subsumes(gotInputType) {
 				return nil, nil, nil, false
 			}
-			if gotName != param.Name {
+			if gotName != x.ParamNames[i] {
 				return nil, nil, nil, false
 			}
 			if gotNumArgs != len(param.Params) {
