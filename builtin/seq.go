@@ -9,13 +9,13 @@ import (
 func initSeq() {
 	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]shapes.Funcer{
 		shapes.SimpleFuncer(
-			types.AnyType,
+			types.AnyType(),
 			"range",
-			[]types.Type{types.NumType, types.NumType},
-			types.SeqType(types.NumType),
+			[]types.Type{types.NumType(), types.NumType()},
+			types.SeqType(types.NumType()),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				start := argumentValues[0].(values.NumValue)
-				end := argumentValues[1].(values.NumValue)
+				start := argumentValues[0].Num()
+				end := argumentValues[1].Num()
 				channel := make(chan values.Value)
 				go func() {
 					for i := start; i < end; i++ {
@@ -23,7 +23,7 @@ func initSeq() {
 					}
 					close(channel)
 				}()
-				return values.SeqValue(channel)
+				return values.SeqValue(types.NumType(), channel)
 			},
 		),
 	})

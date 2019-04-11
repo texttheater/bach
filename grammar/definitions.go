@@ -81,7 +81,7 @@ func (g *Parameter) Ast() (*shapes.Parameter, error) {
 			return nil, err
 		}
 	} else {
-		inputType = types.AnyType
+		inputType = types.AnyType()
 	}
 	var params []*shapes.Parameter
 	if g.Parameter != nil {

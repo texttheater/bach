@@ -14,32 +14,30 @@ import (
 func initIO() {
 	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]shapes.Funcer{
 		shapes.SimpleFuncer(
-			types.AnyType,
+			types.AnyType(),
 			"in",
 			nil,
-			types.ReaderType,
+			types.ReaderType(),
 			func(inputValue values.Value, argValues []values.Value) values.Value {
-				return values.ReaderValue{
-					os.Stdin,
-				}
+				return values.ReaderValue(os.Stdin)
 			},
 		),
 		shapes.SimpleFuncer(
-			types.ReaderType,
+			types.ReaderType(),
 			"lines",
 			nil,
 			types.SeqType(types.StrType),
 			func(inputValue values.Value, argValues []values.Value) values.Value {
-				reader, _ := inputValue.(values.ReaderValue)
+				reader := inputValue.Reader()
 				lines := make(chan values.Value)
-				scanner := bufio.NewScanner(reader.Reader)
+				scanner := bufio.NewScanner(reader)
 				go func() {
 					for scanner.Scan() {
 						lines <- values.StrValue(scanner.Text())
 					}
 					close(lines)
 				}()
-				return values.SeqValue(lines)
+				return values.SeqValue(types.StrType, lines)
 			},
 		),
 		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {

@@ -14,7 +14,7 @@ type seqType struct {
 
 // AnySeqType represents Seq<Any>, the type of sequences with any type of
 // element. It is provided as a package variable for convenience.
-var AnySeqType = SeqType(AnyType)
+var AnySeqType = SeqType(AnyType())
 
 func (t seqType) Subsumes(u Type) bool {
 	if VoidType.Subsumes(u) {

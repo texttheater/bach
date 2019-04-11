@@ -15,7 +15,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 	params := make([]*Parameter, len(argTypes))
 	for i, argType := range argTypes {
 		params[i] = &Parameter{
-			InputType:  types.AnyType,
+			InputType:  types.AnyType(),
 			Params:     nil,
 			OutputType: argType,
 		}
@@ -34,7 +34,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 		action := func(inputState states.State, args []states.Action) states.State {
 			argValues := make([]values.Value, len(argTypes))
 			argInputState := states.State{
-				Value: &values.NullValue{},
+				Value: values.NullValue(),
 				Stack: inputState.Stack,
 			}
 			for i, arg := range args {

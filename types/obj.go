@@ -19,6 +19,8 @@ func ObjType(propTypeMap map[string]Type) Type {
 	}
 }
 
+var AnyObjType = ObjType(make(map[string]Type))
+
 type objType struct {
 	props       []string
 	propTypeMap map[string]Type

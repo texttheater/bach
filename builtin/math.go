@@ -11,140 +11,118 @@ import (
 func initMath() {
 	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]shapes.Funcer{
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType(),
 			"+",
-			[]types.Type{types.NumType},
-			types.NumType,
+			[]types.Type{types.NumType()},
+			types.NumType(),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(inputNum + argumentNum)
+				return values.NumValue(inputValue.Num() + argumentValues[0].Num())
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType(),
 			"-",
-			[]types.Type{types.NumType},
-			types.NumType,
+			[]types.Type{types.NumType()},
+			types.NumType(),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(inputNum - argumentNum)
+				return values.NumValue(inputValue.Num() - argumentValues[0].Num())
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType(),
 			"*",
-			[]types.Type{types.NumType},
-			types.NumType,
+			[]types.Type{types.NumType()},
+			types.NumType(),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(inputNum * argumentNum)
+				return values.NumValue(inputValue.Num() * argumentValues[0].Num())
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType(),
 			"/",
-			[]types.Type{types.NumType},
-			types.NumType,
+			[]types.Type{types.NumType()},
+			types.NumType(),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(inputNum / argumentNum)
+				return values.NumValue(inputValue.Num() / argumentValues[0].Num())
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType(),
 			"%",
-			[]types.Type{types.NumType},
-			types.NumType,
+			[]types.Type{types.NumType()},
+			types.NumType(),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(math.Mod(float64(inputNum), float64(argumentNum)))
+				return values.NumValue(math.Mod(float64(inputValue.Num()), float64(argumentValues[0].Num())))
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType(),
 			"<",
-			[]types.Type{types.NumType},
-			types.BoolType,
+			[]types.Type{types.NumType()},
+			types.BoolType(),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum < argumentNum)
+				return values.BoolValue(inputValue.Num() < argumentValues[0].Num())
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType(),
 			">",
-			[]types.Type{types.NumType},
-			types.BoolType,
+			[]types.Type{types.NumType()},
+			types.BoolType(),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum > argumentNum)
+				return values.BoolValue(inputValue.Num() > argumentValues[0].Num())
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType(),
 			"==",
-			[]types.Type{types.NumType},
-			types.BoolType,
+			[]types.Type{types.NumType()},
+			types.BoolType(),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum == argumentNum)
+				return values.BoolValue(inputValue.Num() == argumentValues[0].Num())
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType(),
 			"<=",
-			[]types.Type{types.NumType},
-			types.BoolType,
+			[]types.Type{types.NumType()},
+			types.BoolType(),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum <= argumentNum)
+				return values.BoolValue(inputValue.Num() <= argumentValues[0].Num())
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType(),
 			">=",
-			[]types.Type{types.NumType},
-			types.BoolType,
+			[]types.Type{types.NumType()},
+			types.BoolType(),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum >= argumentNum)
+				return values.BoolValue(inputValue.Num() >= argumentValues[0].Num())
 			},
 		),
 		shapes.SimpleFuncer(
-			types.SeqType(types.NumType),
+			types.SeqType(types.NumType()),
 			"sum",
 			nil,
-			types.NumType,
+			types.NumType(),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				sum := 0.0
-				for numValue := range inputValue.Iter() {
-					num, _ := numValue.(values.NumValue)
-					sum += float64(num)
+				for value := range inputValue.Iter() {
+					sum += value.Num()
 				}
 				return values.NumValue(sum)
 			},
 		),
 		shapes.SimpleFuncer(
-			types.SeqType(types.NumType),
+			types.SeqType(types.NumType()),
 			"average",
 			nil,
-			types.NumType,
+			types.NumType(),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				sum := 0.0
 				count := 0.0
-				for numValue := range inputValue.Iter() {
-					num, _ := numValue.(values.NumValue)
-					sum += float64(num)
+				for value := range inputValue.Iter() {
+					sum += value.Num()
 					count += 1.0
 				}
 				return values.NumValue(sum / count)

@@ -1,6 +1,10 @@
 package types
 
-var BoolType = boolType{}
+func BoolType() Type {
+	return theBoolType
+}
+
+var theBoolType = boolType{}
 
 type boolType struct {
 }

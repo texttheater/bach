@@ -9,12 +9,12 @@ import (
 func initNull() {
 	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]shapes.Funcer{
 		shapes.SimpleFuncer(
-			types.AnyType,
+			types.AnyType(),
 			"null",
 			nil,
-			types.NullType,
+			types.NullType(),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				return &values.NullValue{}
+				return values.NullValue()
 			},
 		),
 	})
