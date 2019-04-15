@@ -16,7 +16,8 @@ func initText() {
 			nil,
 			types.ArrType(types.StrType),
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				fields := strings.Fields(inputValue.Str())
+				str, _ := inputValue.(values.StrValue)
+				fields := strings.Fields(string(str))
 				fieldsValue := make([]values.Value, len(fields))
 				for i, field := range fields {
 					fieldsValue[i] = values.StrValue(field)

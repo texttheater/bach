@@ -1,10 +1,6 @@
 package types
 
-func AnyType() Type {
-	return theAnyType
-}
-
-var theAnyType = anyType{}
+var AnyType = anyType{}
 
 type anyType struct {
 }

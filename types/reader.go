@@ -1,10 +1,6 @@
 package types
 
-func ReaderType() Type {
-	return theReaderType
-}
-
-var theReaderType = readerType{}
+var ReaderType = readerType{}
 
 type readerType struct {
 }

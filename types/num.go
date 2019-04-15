@@ -1,10 +1,6 @@
 package types
 
-func NumType() Type {
-	return theNumType
-}
-
-var theNumType = numType{}
+var NumType = numType{}
 
 type numType struct {
 }

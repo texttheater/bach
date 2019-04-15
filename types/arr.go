@@ -8,7 +8,7 @@ func ArrType(elementType Type) Type {
 	return &arrType{elementType}
 }
 
-var AnyArrType = ArrType(AnyType())
+var AnyArrType = ArrType(AnyType)
 
 var VoidArrType = ArrType(VoidType)
 

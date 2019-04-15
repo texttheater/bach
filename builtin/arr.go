@@ -12,10 +12,11 @@ func initArr() {
 			types.AnyArrType,
 			"length",
 			nil,
-			types.NumType(),
+			types.NumType,
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				length := len(inputValue.Arr())
-				return values.NumValue(float64(length))
+				arr, _ := inputValue.(values.ArrValue)
+				length := len(arr)
+				return values.NumValue(length)
 			},
 		),
 	})

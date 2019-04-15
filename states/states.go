@@ -27,6 +27,6 @@ type Variable struct {
 }
 
 var InitialState = State{
-	Value: values.NullValue(),
+	Value: &values.NullValue{},
 	Stack: nil,
 }

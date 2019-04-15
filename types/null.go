@@ -1,10 +1,6 @@
 package types
 
-func NullType() Type {
-	return theNullType
-}
-
-var theNullType Type = nullType{}
+var NullType = nullType{}
 
 type nullType struct {
 }

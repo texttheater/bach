@@ -100,7 +100,7 @@ type NullType struct {
 }
 
 func (g *NullType) Ast() types.Type {
-	return types.NullType()
+	return types.NullType
 }
 
 type ReaderType struct {
@@ -108,7 +108,7 @@ type ReaderType struct {
 }
 
 func (g *ReaderType) Ast() types.Type {
-	return types.ReaderType()
+	return types.ReaderType
 }
 
 type BoolType struct {
@@ -116,7 +116,7 @@ type BoolType struct {
 }
 
 func (g *BoolType) Ast() types.Type {
-	return types.BoolType()
+	return types.BoolType
 }
 
 type NumType struct {
@@ -124,7 +124,7 @@ type NumType struct {
 }
 
 func (g *NumType) Ast() types.Type {
-	return types.NumType()
+	return types.NumType
 }
 
 type StrType struct {
@@ -243,5 +243,5 @@ type AnyType struct {
 }
 
 func (g *AnyType) Ast() types.Type {
-	return types.AnyType()
+	return types.AnyType
 }

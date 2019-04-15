@@ -6,6 +6,7 @@ import (
 	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
+	"github.com/texttheater/bach/values"
 )
 
 type ConditionalExpression struct {
@@ -30,11 +31,11 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 	if err != nil {
 		return zeroShape, nil, err
 	}
-	if !types.BoolType().Subsumes(conditionOutputShape.Type) {
+	if !types.BoolType.Subsumes(conditionOutputShape.Type) {
 		return zeroShape, nil, errors.E(
 			errors.Code(errors.ConditionMustBeBool),
 			errors.Pos(x.Pos),
-			errors.WantType(types.BoolType()),
+			errors.WantType(types.BoolType),
 			errors.GotType(conditionOutputShape.Type),
 		)
 	}
@@ -56,11 +57,11 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 		if err != nil {
 			return zeroShape, nil, err
 		}
-		if !types.BoolType().Subsumes(conditionOutputShape.Type) {
+		if !types.BoolType.Subsumes(conditionOutputShape.Type) {
 			return zeroShape, nil, errors.E(
 				errors.Code(errors.ConditionMustBeBool),
 				errors.Pos(x.Pos),
-				errors.WantType(types.BoolType()),
+				errors.WantType(types.BoolType),
 				errors.GotType(conditionOutputShape.Type),
 			)
 		}
@@ -80,7 +81,7 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 	outputType = types.Union(outputType, alternativeOutputShape.Type)
 	action := func(inputState states.State, args []states.Action) states.State {
 		conditionState := conditionAction(inputState, nil)
-		boolConditionValue := conditionState.Value.Bool()
+		boolConditionValue, _ := conditionState.Value.(values.BoolValue)
 		if boolConditionValue {
 			consequentInputState := states.State{
 				Value: inputState.Value,
@@ -94,7 +95,7 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 		}
 		for i := range elifConditionActions {
 			conditionState = elifConditionActions[i](inputState, nil)
-			boolConditionValue = conditionState.Value.Bool()
+			boolConditionValue, _ = conditionState.Value.(values.BoolValue)
 			if boolConditionValue {
 				consequentInputState := states.State{
 					Value: inputState.Value,

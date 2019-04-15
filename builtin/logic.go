@@ -9,63 +9,63 @@ import (
 func initLogic() {
 	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]shapes.Funcer{
 		shapes.SimpleFuncer(
-			types.AnyType(),
+			types.AnyType,
 			"true",
 			nil,
-			types.BoolType(),
+			types.BoolType,
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				return values.BoolValue(true)
 			},
 		),
 		shapes.SimpleFuncer(
-			types.AnyType(),
+			types.AnyType,
 			"false",
 			nil,
-			types.BoolType(),
+			types.BoolType,
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				return values.BoolValue(false)
 			},
 		),
 		shapes.SimpleFuncer(
-			types.BoolType(),
+			types.BoolType,
 			"and",
-			[]types.Type{types.BoolType()},
-			types.BoolType(),
+			[]types.Type{types.BoolType},
+			types.BoolType,
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputBool := inputValue.Bool()
-				argumentBool := argumentValues[0].Bool()
+				inputBool := inputValue.(values.BoolValue)
+				argumentBool := argumentValues[0].(values.BoolValue)
 				return values.BoolValue(inputBool && argumentBool)
 			},
 		),
 		shapes.SimpleFuncer(
-			types.BoolType(),
+			types.BoolType,
 			"or",
-			[]types.Type{types.BoolType()},
-			types.BoolType(),
+			[]types.Type{types.BoolType},
+			types.BoolType,
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputBool := inputValue.Bool()
-				argumentBool := argumentValues[0].Bool()
+				inputBool := inputValue.(values.BoolValue)
+				argumentBool := argumentValues[0].(values.BoolValue)
 				return values.BoolValue(inputBool || argumentBool)
 			},
 		),
 		shapes.SimpleFuncer(
-			types.BoolType(),
+			types.BoolType,
 			"not",
 			nil,
-			types.BoolType(),
+			types.BoolType,
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputBool := inputValue.Bool()
+				inputBool := inputValue.(values.BoolValue)
 				return values.BoolValue(!inputBool)
 			},
 		),
 		shapes.SimpleFuncer(
-			types.BoolType(),
+			types.BoolType,
 			"==",
-			[]types.Type{types.BoolType()},
-			types.BoolType(),
+			[]types.Type{types.BoolType},
+			types.BoolType,
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				inputBool := inputValue.Bool()
-				argumentBool := argumentValues[0].Bool()
+				inputBool := inputValue.(values.BoolValue)
+				argumentBool := argumentValues[0].(values.BoolValue)
 				return values.BoolValue(inputBool == argumentBool)
 			},
 		),
