@@ -9,6 +9,8 @@ import (
 	"github.com/texttheater/bach/values"
 )
 
+// TODO Merge conditional expressions into match expressions?
+
 type ConditionalExpression struct {
 	Pos             lexer.Position
 	Condition       Expression
@@ -39,7 +41,7 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 			errors.GotType(conditionOutputShape.Type),
 		)
 	}
-	// context is the shared input context for all conditions and consequents.
+	// shape is the shared input shape for all conditions and consequents.
 	// Each condition may add to the FuncerStack. Type always stays the same.
 	shape := shapes.Shape{
 		Type:        inputShape.Type,
