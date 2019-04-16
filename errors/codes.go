@@ -12,6 +12,7 @@ const (
 	ConditionMustBeBool
 	MappingRequiresSeqType
 	TailRequiresArrType
+	ComposeWithVoid
 )
 
 func (code ErrorCode) String() string {
@@ -32,6 +33,8 @@ func (code ErrorCode) String() string {
 		return "MappingRequiresSeqType"
 	case TailRequiresArrType:
 		return "TailRequiresArrType"
+	case ComposeWithVoid:
+		return "ComposeWithVoid"
 	default:
 		return "Unknown"
 	}
@@ -57,8 +60,11 @@ func (code ErrorCode) DefaultMessage() string {
 		return "The input to a mapping must be a sequence."
 	case TailRequiresArrType:
 		return "The tail type of a Nearr type must be an array type."
+	case ComposeWithVoid:
+		return "Cannot compose with a function whose return type is Void."
+	default:
+		return "unknown error"
 	}
-	return "unknown error"
 }
 
 func (code ErrorCode) Kind() string {
@@ -81,6 +87,9 @@ func (code ErrorCode) Kind() string {
 		return "Type error"
 	case TailRequiresArrType:
 		return "Type error"
+	case ComposeWithVoid:
+		return "Type error"
+	default:
+		return "unknown error"
 	}
-	return "unknown error"
 }
