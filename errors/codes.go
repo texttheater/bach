@@ -13,6 +13,7 @@ const (
 	MappingRequiresSeqType
 	TailRequiresArrType
 	ComposeWithVoid
+	NonExhaustiveMatch
 )
 
 func (code ErrorCode) String() string {
@@ -35,6 +36,8 @@ func (code ErrorCode) String() string {
 		return "TailRequiresArrType"
 	case ComposeWithVoid:
 		return "ComposeWithVoid"
+	case NonExhaustiveMatch:
+		return "NonExhaustiveMatch"
 	default:
 		return "Unknown"
 	}
@@ -62,6 +65,8 @@ func (code ErrorCode) DefaultMessage() string {
 		return "The tail type of a Nearr type must be an array type."
 	case ComposeWithVoid:
 		return "Cannot compose with a function whose return type is Void."
+	case NonExhaustiveMatch:
+		return "Match is not exhaustive. Consider adding elis clauses and/or an else clause."
 	default:
 		return "unknown error"
 	}
@@ -89,6 +94,8 @@ func (code ErrorCode) Kind() string {
 		return "Type error"
 	case ComposeWithVoid:
 		return "Type error"
+	case NonExhaustiveMatch:
+		return "TypeError"
 	default:
 		return "unknown error"
 	}
