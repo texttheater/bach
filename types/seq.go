@@ -5,7 +5,7 @@ import (
 )
 
 func SeqType(elementType Type) Type {
-	return seqType{elementType}
+	return &seqType{elementType}
 }
 
 type seqType struct {
@@ -16,7 +16,7 @@ type seqType struct {
 // element. It is provided as a package variable for convenience.
 var AnySeqType = SeqType(AnyType)
 
-func (t seqType) Subsumes(u Type) bool {
+func (t *seqType) Subsumes(u Type) bool {
 	if VoidType.Subsumes(u) {
 		return true
 	}
@@ -24,7 +24,7 @@ func (t seqType) Subsumes(u Type) bool {
 		return true
 	}
 	switch u := u.(type) {
-	case seqType:
+	case *seqType:
 		return t.elementType.Subsumes(u.elementType)
 	case unionType:
 		for _, disjunct := range u {
@@ -38,10 +38,10 @@ func (t seqType) Subsumes(u Type) bool {
 	}
 }
 
-func (t seqType) String() string {
+func (t *seqType) String() string {
 	return fmt.Sprintf("Seq<%v>", t.elementType)
 }
 
-func (t seqType) ElementType() Type {
+func (t *seqType) ElementType() Type {
 	return t.elementType
 }
