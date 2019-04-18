@@ -14,6 +14,8 @@ const (
 	TailRequiresArrType
 	ComposeWithVoid
 	NonExhaustiveMatch
+	ImpossibleMatch
+	UnreachableElseClause
 )
 
 func (code ErrorCode) String() string {
@@ -38,6 +40,10 @@ func (code ErrorCode) String() string {
 		return "ComposeWithVoid"
 	case NonExhaustiveMatch:
 		return "NonExhaustiveMatch"
+	case ImpossibleMatch:
+		return "ImpossibleMatch"
+	case UnreachableElseClause:
+		return "UnreachableElseClause"
 	default:
 		return "Unknown"
 	}
@@ -67,6 +73,10 @@ func (code ErrorCode) DefaultMessage() string {
 		return "Cannot compose with a function whose return type is Void."
 	case NonExhaustiveMatch:
 		return "Match is not exhaustive. Consider adding elis clauses and/or an else clause."
+	case ImpossibleMatch:
+		return "Impossible match. The pattern will never match the input type."
+	case UnreachableElseClause:
+		return "The `else` clause is unreachable because the match is already exhaustive."
 	default:
 		return "unknown error"
 	}
@@ -96,6 +106,10 @@ func (code ErrorCode) Kind() string {
 		return "Type error"
 	case NonExhaustiveMatch:
 		return "TypeError"
+	case ImpossibleMatch:
+		return "TypeError"
+	case UnreachableElseClause:
+		return "UnreachableElseClause"
 	default:
 		return "unknown error"
 	}

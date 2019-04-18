@@ -65,6 +65,12 @@ func (x MatchExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Par
 			)
 		}
 	} else {
+		if types.VoidType.Subsumes(shape.Type) {
+			return zeroShape, nil, errors.E(
+				errors.Code(errors.UnreachableElseClause),
+				errors.Pos(x.Pos),
+			)
+		}
 		var alternativeOutputShape shapes.Shape
 		alternativeOutputShape, alternativeAction, err = x.Alternative.Typecheck(shape, nil)
 		if err != nil {
