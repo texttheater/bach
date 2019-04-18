@@ -39,7 +39,7 @@ func initIO() {
 					}
 					close(lines)
 				}()
-				return values.SeqValue(lines)
+				return values.SeqValue{types.StrType, lines}
 			},
 		),
 		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {

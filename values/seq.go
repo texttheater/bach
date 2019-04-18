@@ -1,6 +1,13 @@
 package values
 
-type SeqValue chan Value
+import (
+	"github.com/texttheater/bach/types"
+)
+
+type SeqValue struct {
+	ElementType types.Type
+	Channel     chan Value
+}
 
 func (v SeqValue) String() string {
 	return "<seq>"
@@ -12,5 +19,5 @@ func (v SeqValue) Out() string {
 
 func (v SeqValue) Iter() <-chan Value {
 	// TODO safeguard against iterating twice?
-	return v
+	return v.Channel
 }

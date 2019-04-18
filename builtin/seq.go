@@ -23,7 +23,7 @@ func initSeq() {
 					}
 					close(channel)
 				}()
-				return values.SeqValue(channel)
+				return values.SeqValue{types.NumType, channel}
 			},
 		),
 	})

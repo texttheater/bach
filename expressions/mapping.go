@@ -60,7 +60,7 @@ func (x MappingExpression) Typecheck(inputShape shapes.Shape, params []*shapes.P
 			close(channel)
 		}()
 		return states.State{
-			Value: values.SeqValue(channel),
+			Value: values.SeqValue{bodyOutputShape.Type, channel},
 			Stack: inputState.Stack,
 		}
 	}
