@@ -19,7 +19,7 @@ func initConv() {
 			if gotNumArgs != 0 {
 				return nil, nil, nil, false
 			}
-			outputType := types.ArrType(gotInputType.ElementType())
+			outputType := &types.ArrType{gotInputType.ElementType()}
 			action := func(inputState states.State, args []states.Action) states.State {
 				array := make([]values.Value, 0)
 				for el := range inputState.Value.Iter() {

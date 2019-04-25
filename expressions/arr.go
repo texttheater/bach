@@ -29,7 +29,7 @@ func (x ArrExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Param
 		if err != nil {
 			return zeroShape, nil, err
 		}
-		arrType = types.NearrType(elOutputShape.Type, arrType)
+		arrType = &types.NearrType{elOutputShape.Type, arrType}
 		elementActions[i] = elAction
 	}
 	outputShape := shapes.Shape{

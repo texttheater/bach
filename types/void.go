@@ -1,19 +1,17 @@
 package types
 
-var VoidType = voidType{}
-
-type voidType struct {
+type VoidType struct {
 }
 
-func (t voidType) Subsumes(other Type) bool {
-	_, ok := other.(voidType)
+func (t VoidType) Subsumes(other Type) bool {
+	_, ok := other.(VoidType)
 	return ok
 }
 
-func (t voidType) String() string {
+func (t VoidType) String() string {
 	return "Void"
 }
 
-func (t voidType) ElementType() Type {
+func (t VoidType) ElementType() Type {
 	panic("Void is not a sequence type")
 }

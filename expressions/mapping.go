@@ -42,7 +42,7 @@ func (x MappingExpression) Typecheck(inputShape shapes.Shape, params []*shapes.P
 	}
 	// create output shape
 	outputShape := shapes.Shape{
-		Type:        types.SeqType(bodyOutputShape.Type),
+		Type:        &types.SeqType{bodyOutputShape.Type},
 		FuncerStack: inputShape.FuncerStack,
 	}
 	// create action

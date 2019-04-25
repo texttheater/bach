@@ -1,22 +1,20 @@
 package types
 
-var NumType = numType{}
-
-type numType struct {
+type NumType struct {
 }
 
-func (t numType) Subsumes(other Type) bool {
-	if VoidType.Subsumes(other) {
+func (t NumType) Subsumes(other Type) bool {
+	if (VoidType{}).Subsumes(other) {
 		return true
 	}
-	_, ok := other.(numType)
+	_, ok := other.(NumType)
 	return ok
 }
 
-func (t numType) String() string {
+func (t NumType) String() string {
 	return "Num"
 }
 
-func (t numType) ElementType() Type {
+func (t NumType) ElementType() Type {
 	panic("Num is not a sequence type")
 }

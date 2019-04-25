@@ -1,22 +1,20 @@
 package types
 
-var StrType = strType{}
-
-type strType struct {
+type StrType struct {
 }
 
-func (t strType) Subsumes(other Type) bool {
-	if VoidType.Subsumes(other) {
+func (t StrType) Subsumes(other Type) bool {
+	if (VoidType{}).Subsumes(other) {
 		return true
 	}
-	_, ok := other.(strType)
+	_, ok := other.(StrType)
 	return ok
 }
 
-func (t strType) String() string {
+func (t StrType) String() string {
 	return "Str"
 }
 
-func (t strType) ElementType() Type {
+func (t StrType) ElementType() Type {
 	panic("Str is not a sequence type")
 }

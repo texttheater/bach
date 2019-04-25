@@ -11,10 +11,10 @@ import (
 func initText() {
 	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]shapes.Funcer{
 		shapes.SimpleFuncer(
-			types.StrType,
+			types.StrType{},
 			"split",
 			nil,
-			types.ArrType(types.StrType),
+			&types.ArrType{types.StrType{}},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				str, _ := inputValue.(values.StrValue)
 				fields := strings.Fields(string(str))

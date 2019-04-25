@@ -33,11 +33,11 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 	if err != nil {
 		return zeroShape, nil, err
 	}
-	if !types.BoolType.Subsumes(conditionOutputShape.Type) {
+	if !(types.BoolType{}).Subsumes(conditionOutputShape.Type) {
 		return zeroShape, nil, errors.E(
 			errors.Code(errors.ConditionMustBeBool),
 			errors.Pos(x.Pos),
-			errors.WantType(types.BoolType),
+			errors.WantType(types.BoolType{}),
 			errors.GotType(conditionOutputShape.Type),
 		)
 	}
@@ -59,11 +59,11 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 		if err != nil {
 			return zeroShape, nil, err
 		}
-		if !types.BoolType.Subsumes(conditionOutputShape.Type) {
+		if !(types.BoolType{}).Subsumes(conditionOutputShape.Type) {
 			return zeroShape, nil, errors.E(
 				errors.Code(errors.ConditionMustBeBool),
 				errors.Pos(x.Pos),
-				errors.WantType(types.BoolType),
+				errors.WantType(types.BoolType{}),
 				errors.GotType(conditionOutputShape.Type),
 			)
 		}

@@ -56,11 +56,11 @@ func (x MatchExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Par
 	var alternativeAction states.Action
 	if x.Alternative == nil {
 		// exhaustivity check
-		if !types.VoidType.Subsumes(shape.Type) {
+		if !(types.VoidType{}).Subsumes(shape.Type) {
 			return zeroShape, nil, errors.E(
 				errors.Code(errors.NonExhaustiveMatch),
 				errors.Pos(x.Pos),
-				errors.WantType(types.VoidType),
+				errors.WantType(types.VoidType{}),
 				errors.GotType(shape.Type),
 			)
 		}

@@ -32,7 +32,7 @@ func (x ObjExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Param
 		keyActionMap[key] = keyAction
 	}
 	outputShape := shapes.Shape{
-		Type:        types.ObjType(keyTypeMap),
+		Type:        types.NewObjType(keyTypeMap),
 		FuncerStack: inputShape.FuncerStack,
 	}
 	action := func(inputState states.State, args []states.Action) states.State {

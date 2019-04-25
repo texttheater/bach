@@ -1,22 +1,20 @@
 package types
 
-var NullType = nullType{}
-
-type nullType struct {
+type NullType struct {
 }
 
-func (t nullType) Subsumes(other Type) bool {
-	if VoidType.Subsumes(other) {
+func (t NullType) Subsumes(other Type) bool {
+	if (VoidType{}).Subsumes(other) {
 		return true
 	}
-	_, ok := other.(nullType)
+	_, ok := other.(NullType)
 	return ok
 }
 
-func (t nullType) String() string {
+func (t NullType) String() string {
 	return "Null"
 }
 
-func (t nullType) ElementType() Type {
+func (t NullType) ElementType() Type {
 	panic("Null is not a sequence type")
 }

@@ -4,29 +4,22 @@ import (
 	"bytes"
 )
 
-func NearrType(headType Type, tailType Type) Type {
-	if !AnyArrType.Subsumes(tailType) {
-		panic("tail type must be an array type")
-	}
-	return &nearrType{headType, tailType}
+type NearrType struct {
+	HeadType Type
+	TailType Type
 }
 
-type nearrType struct {
-	headType Type
-	tailType Type
-}
-
-func (t *nearrType) Subsumes(u Type) bool {
-	if VoidType.Subsumes(u) {
+func (t *NearrType) Subsumes(u Type) bool {
+	if (VoidType{}).Subsumes(u) {
 		return true
 	}
 	switch u := u.(type) {
-	case *nearrType:
-		if !t.headType.Subsumes(u.headType) {
+	case *NearrType:
+		if !t.HeadType.Subsumes(u.HeadType) {
 			return false
 		}
-		return t.tailType.Subsumes(u.tailType)
-	case unionType:
+		return t.TailType.Subsumes(u.TailType)
+	case UnionType:
 		for _, disjunct := range u {
 			if !t.Subsumes(disjunct) {
 				return false
@@ -38,33 +31,33 @@ func (t *nearrType) Subsumes(u Type) bool {
 	}
 }
 
-func (t *nearrType) ElementType() Type {
-	return Union(t.headType, t.tailType.ElementType())
+func (t *NearrType) ElementType() Type {
+	return Union(t.HeadType, t.TailType.ElementType())
 }
 
-func (t *nearrType) String() string {
+func (t *NearrType) String() string {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("Tup<")
-	buffer.WriteString(t.headType.String())
-	tailType := t.tailType
+	buffer.WriteString(t.HeadType.String())
+	tailType := t.TailType
 	for {
 		if VoidArrType.Subsumes(tailType) {
 			buffer.WriteString(">")
 			return buffer.String()
 		}
-		nearrTailType, ok := tailType.(*nearrType)
+		nearrTailType, ok := tailType.(*NearrType)
 		if !ok {
 			break
 		}
 		buffer.WriteString(", ")
-		buffer.WriteString(nearrTailType.headType.String())
-		tailType = nearrTailType.tailType
+		buffer.WriteString(nearrTailType.HeadType.String())
+		tailType = nearrTailType.TailType
 	}
 	buffer.Reset()
 	buffer.WriteString("Nearr<")
-	buffer.WriteString(t.headType.String())
+	buffer.WriteString(t.HeadType.String())
 	buffer.WriteString(", ")
-	buffer.WriteString(t.tailType.String())
+	buffer.WriteString(t.TailType.String())
 	buffer.WriteString(">")
 	return buffer.String()
 }

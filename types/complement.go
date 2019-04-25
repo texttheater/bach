@@ -1,10 +1,10 @@
 package types
 
 func Complement(a Type, b Type) Type {
-	if aUnion, ok := a.(unionType); ok {
-		var union unionType
+	if aUnion, ok := a.(UnionType); ok {
+		var union UnionType
 		for _, disjunct := range aUnion {
-			if bUnion, ok := b.(unionType); ok {
+			if bUnion, ok := b.(UnionType); ok {
 				for _, bDisjunct := range bUnion {
 					disjunct = Complement(disjunct, bDisjunct)
 				}
@@ -15,7 +15,7 @@ func Complement(a Type, b Type) Type {
 		}
 	}
 	if b.Subsumes(a) {
-		return VoidType
+		return VoidType{}
 	}
 	return a
 }

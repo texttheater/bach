@@ -16,7 +16,7 @@ func initTypes() {
 			if gotNumArgs != 0 {
 				return nil, nil, nil, false
 			}
-			outputType := types.StrType
+			outputType := types.StrType{}
 			action := func(inputState states.State, args []states.Action) states.State {
 				outputValue := values.StrValue(gotInputType.String())
 				outputState := states.State{

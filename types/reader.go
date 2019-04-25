@@ -1,22 +1,20 @@
 package types
 
-var ReaderType = readerType{}
-
-type readerType struct {
+type ReaderType struct {
 }
 
-func (t readerType) Subsumes(other Type) bool {
-	if VoidType.Subsumes(other) {
+func (t ReaderType) Subsumes(other Type) bool {
+	if (VoidType{}).Subsumes(other) {
 		return true
 	}
-	_, ok := other.(readerType)
+	_, ok := other.(ReaderType)
 	return ok
 }
 
-func (t readerType) String() string {
+func (t ReaderType) String() string {
 	return "Reader"
 }
 
-func (t readerType) ElementType() Type {
+func (t ReaderType) ElementType() Type {
 	panic("Reader is not a sequence type")
 }

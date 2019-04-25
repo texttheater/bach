@@ -92,7 +92,7 @@ type VoidType struct {
 }
 
 func (g *VoidType) Ast() types.Type {
-	return types.VoidType
+	return types.VoidType{}
 }
 
 type NullType struct {
@@ -100,7 +100,7 @@ type NullType struct {
 }
 
 func (g *NullType) Ast() types.Type {
-	return types.NullType
+	return types.NullType{}
 }
 
 type ReaderType struct {
@@ -108,7 +108,7 @@ type ReaderType struct {
 }
 
 func (g *ReaderType) Ast() types.Type {
-	return types.ReaderType
+	return types.ReaderType{}
 }
 
 type BoolType struct {
@@ -116,7 +116,7 @@ type BoolType struct {
 }
 
 func (g *BoolType) Ast() types.Type {
-	return types.BoolType
+	return types.BoolType{}
 }
 
 type NumType struct {
@@ -124,7 +124,7 @@ type NumType struct {
 }
 
 func (g *NumType) Ast() types.Type {
-	return types.NumType
+	return types.NumType{}
 }
 
 type StrType struct {
@@ -132,7 +132,7 @@ type StrType struct {
 }
 
 func (g *StrType) Ast() types.Type {
-	return types.StrType
+	return types.StrType{}
 }
 
 type SeqType struct {
@@ -145,7 +145,7 @@ func (g *SeqType) Ast() (types.Type, error) {
 	if err != nil {
 		return nil, err
 	}
-	return types.SeqType(elType), nil
+	return &types.SeqType{elType}, nil
 }
 
 type ArrType struct {
@@ -158,7 +158,7 @@ func (g *ArrType) Ast() (types.Type, error) {
 	if err != nil {
 		return nil, err
 	}
-	return types.ArrType(elType), nil
+	return &types.ArrType{elType}, nil
 }
 
 type NearrType struct {
@@ -184,7 +184,7 @@ func (g *NearrType) Ast() (types.Type, error) {
 			errors.GotType(tailType),
 		)
 	}
-	return types.NearrType(headType, tailType), nil
+	return &types.NearrType{headType, tailType}, nil
 }
 
 type TupType struct {
@@ -200,14 +200,14 @@ func (g *TupType) Ast() (types.Type, error) {
 		if err != nil {
 			return nil, err
 		}
-		t = types.NearrType(headType, t)
+		t = &types.NearrType{headType, t}
 	}
 	if g.Type != nil {
 		headType, err := g.Type.Ast()
 		if err != nil {
 			return nil, err
 		}
-		t = types.NearrType(headType, t)
+		t = &types.NearrType{headType, t}
 	}
 	return t, nil
 }
@@ -235,7 +235,7 @@ func (g *ObjType) Ast() (types.Type, error) {
 			}
 		}
 	}
-	return types.ObjType(propTypeMap), nil
+	return types.NewObjType(propTypeMap), nil
 }
 
 type AnyType struct {
@@ -243,5 +243,5 @@ type AnyType struct {
 }
 
 func (g *AnyType) Ast() types.Type {
-	return types.AnyType
+	return types.AnyType{}
 }

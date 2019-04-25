@@ -11,10 +11,10 @@ import (
 func initMath() {
 	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]shapes.Funcer{
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType{},
 			"+",
-			[]types.Type{types.NumType},
-			types.NumType,
+			[]types.Type{types.NumType{}},
+			types.NumType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
@@ -22,10 +22,10 @@ func initMath() {
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType{},
 			"-",
-			[]types.Type{types.NumType},
-			types.NumType,
+			[]types.Type{types.NumType{}},
+			types.NumType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
@@ -33,10 +33,10 @@ func initMath() {
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType{},
 			"*",
-			[]types.Type{types.NumType},
-			types.NumType,
+			[]types.Type{types.NumType{}},
+			types.NumType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
@@ -44,10 +44,10 @@ func initMath() {
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType{},
 			"/",
-			[]types.Type{types.NumType},
-			types.NumType,
+			[]types.Type{types.NumType{}},
+			types.NumType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
@@ -55,10 +55,10 @@ func initMath() {
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType{},
 			"%",
-			[]types.Type{types.NumType},
-			types.NumType,
+			[]types.Type{types.NumType{}},
+			types.NumType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
@@ -66,10 +66,10 @@ func initMath() {
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType{},
 			"<",
-			[]types.Type{types.NumType},
-			types.BoolType,
+			[]types.Type{types.NumType{}},
+			types.BoolType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
@@ -77,10 +77,10 @@ func initMath() {
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType{},
 			">",
-			[]types.Type{types.NumType},
-			types.BoolType,
+			[]types.Type{types.NumType{}},
+			types.BoolType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
@@ -88,10 +88,10 @@ func initMath() {
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType{},
 			"==",
-			[]types.Type{types.NumType},
-			types.BoolType,
+			[]types.Type{types.NumType{}},
+			types.BoolType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
@@ -99,10 +99,10 @@ func initMath() {
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType{},
 			"<=",
-			[]types.Type{types.NumType},
-			types.BoolType,
+			[]types.Type{types.NumType{}},
+			types.BoolType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
@@ -110,10 +110,10 @@ func initMath() {
 			},
 		),
 		shapes.SimpleFuncer(
-			types.NumType,
+			types.NumType{},
 			">=",
-			[]types.Type{types.NumType},
-			types.BoolType,
+			[]types.Type{types.NumType{}},
+			types.BoolType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
@@ -121,10 +121,10 @@ func initMath() {
 			},
 		),
 		shapes.SimpleFuncer(
-			types.SeqType(types.NumType),
+			&types.SeqType{types.NumType{}},
 			"sum",
 			nil,
-			types.NumType,
+			types.NumType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				sum := 0.0
 				for numValue := range inputValue.Iter() {
@@ -135,10 +135,10 @@ func initMath() {
 			},
 		),
 		shapes.SimpleFuncer(
-			types.SeqType(types.NumType),
+			&types.SeqType{types.NumType{}},
 			"average",
 			nil,
-			types.NumType,
+			types.NumType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				sum := 0.0
 				count := 0.0

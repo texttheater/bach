@@ -1,22 +1,20 @@
 package types
 
-var BoolType = boolType{}
-
-type boolType struct {
+type BoolType struct {
 }
 
-func (t boolType) Subsumes(other Type) bool {
-	if VoidType.Subsumes(other) {
+func (t BoolType) Subsumes(other Type) bool {
+	if (VoidType{}).Subsumes(other) {
 		return true
 	}
-	_, ok := other.(boolType)
+	_, ok := other.(BoolType)
 	return ok
 }
 
-func (t boolType) String() string {
+func (t BoolType) String() string {
 	return "Bool"
 }
 
-func (t boolType) ElementType() Type {
+func (t BoolType) ElementType() Type {
 	panic("Bool is not a sequence type")
 }

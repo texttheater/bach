@@ -4,31 +4,27 @@ import (
 	"fmt"
 )
 
-func ArrType(elementType Type) Type {
-	return &arrType{elementType}
+type ArrType struct {
+	ElType Type
 }
 
-var AnyArrType = ArrType(AnyType)
+var AnyArrType Type = &ArrType{AnyType{}}
 
-var VoidArrType = ArrType(VoidType)
+var VoidArrType Type = &ArrType{VoidType{}}
 
-type arrType struct {
-	elementType Type
-}
-
-func (t *arrType) Subsumes(u Type) bool {
-	if VoidType.Subsumes(u) {
+func (t *ArrType) Subsumes(u Type) bool {
+	if (VoidType{}).Subsumes(u) {
 		return true
 	}
 	switch u := u.(type) {
-	case *arrType:
-		return t.elementType.Subsumes(u.elementType)
-	case *nearrType:
-		if !t.elementType.Subsumes(u.headType) {
+	case *ArrType:
+		return t.ElType.Subsumes(u.ElType)
+	case *NearrType:
+		if !t.ElType.Subsumes(u.HeadType) {
 			return false
 		}
-		return t.Subsumes(u.tailType)
-	case unionType:
+		return t.Subsumes(u.TailType)
+	case UnionType:
 		for _, disjunct := range u {
 			if !t.Subsumes(disjunct) {
 				return false
@@ -40,13 +36,13 @@ func (t *arrType) Subsumes(u Type) bool {
 	}
 }
 
-func (t *arrType) String() string {
-	if VoidType.Subsumes(t.elementType) {
+func (t *ArrType) String() string {
+	if (VoidType{}).Subsumes(t.ElType) {
 		return "Tup<>"
 	}
-	return fmt.Sprintf("Arr<%s>", t.elementType)
+	return fmt.Sprintf("Arr<%s>", t.ElType)
 }
 
-func (t *arrType) ElementType() Type {
-	return t.elementType
+func (t *ArrType) ElementType() Type {
+	return t.ElType
 }

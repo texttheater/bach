@@ -14,10 +14,10 @@ import (
 func initIO() {
 	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]shapes.Funcer{
 		shapes.SimpleFuncer(
-			types.AnyType,
+			types.AnyType{},
 			"in",
 			nil,
-			types.ReaderType,
+			types.ReaderType{},
 			func(inputValue values.Value, argValues []values.Value) values.Value {
 				return values.ReaderValue{
 					os.Stdin,
@@ -25,10 +25,10 @@ func initIO() {
 			},
 		),
 		shapes.SimpleFuncer(
-			types.ReaderType,
+			types.ReaderType{},
 			"lines",
 			nil,
-			types.SeqType(types.StrType),
+			&types.SeqType{types.StrType{}},
 			func(inputValue values.Value, argValues []values.Value) values.Value {
 				reader, _ := inputValue.(values.ReaderValue)
 				lines := make(chan values.Value)
@@ -39,7 +39,7 @@ func initIO() {
 					}
 					close(lines)
 				}()
-				return values.SeqValue{types.StrType, lines}
+				return &values.SeqValue{types.StrType{}, lines}
 			},
 		),
 		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {

@@ -6,8 +6,8 @@ import (
 )
 
 func Union(a Type, b Type) Type {
-	if aUnion, ok := a.(unionType); ok {
-		if bUnion, ok := b.(unionType); ok {
+	if aUnion, ok := a.(UnionType); ok {
+		if bUnion, ok := b.(UnionType); ok {
 			for _, bDisjunct := range bUnion {
 				aUnion = typeAppend(aUnion, bDisjunct)
 			}
@@ -21,16 +21,16 @@ func Union(a Type, b Type) Type {
 	if b.Subsumes(a) {
 		return b
 	}
-	return unionType([]Type{a, b})
+	return UnionType([]Type{a, b})
 }
 
-// A unionType is a slice of types, representing their union. The elements are
+// A UnionType is a slice of types, representing their union. The elements are
 // called "disjuncts". The following invariants must be maintained: for every
-// unionType, 1) no disjunct subsumes another, 2) no disjunct is itself a union
+// UnionType, 1) no disjunct subsumes another, 2) no disjunct is itself a union
 // type.
-type unionType []Type
+type UnionType []Type
 
-func typeAppend(t unionType, u Type) unionType {
+func typeAppend(t UnionType, u Type) UnionType {
 	for i, disjunct := range t {
 		// case 1: a disjunct subsumes u already, no change needed
 		if disjunct.Subsumes(u) {
@@ -53,8 +53,8 @@ func typeAppend(t unionType, u Type) unionType {
 	return append(t, u)
 }
 
-func (t unionType) Subsumes(u Type) bool {
-	if uUnion, ok := u.(unionType); ok {
+func (t UnionType) Subsumes(u Type) bool {
+	if uUnion, ok := u.(UnionType); ok {
 	uLoop:
 		for _, uDisjunct := range uUnion {
 			// find a subsumer for uDisjunct among t
@@ -80,7 +80,7 @@ func (t unionType) Subsumes(u Type) bool {
 	return false
 }
 
-func (t unionType) String() string {
+func (t UnionType) String() string {
 	buffer := bytes.Buffer{}
 	buffer.WriteString(fmt.Sprintf("%s", t[0]))
 	for _, disjunct := range t[1:] {
@@ -90,8 +90,8 @@ func (t unionType) String() string {
 	return buffer.String()
 }
 
-func (t unionType) ElementType() Type {
-	var elType Type = VoidType
+func (t UnionType) ElementType() Type {
+	var elType Type = VoidType{}
 	for _, disjunct := range t {
 		elType = Union(elType, disjunct.ElementType())
 	}

@@ -5,7 +5,12 @@ import (
 	"sort"
 )
 
-func ObjType(propTypeMap map[string]Type) Type {
+type ObjType struct {
+	Props       []string
+	PropTypeMap map[string]Type
+}
+
+func NewObjType(propTypeMap map[string]Type) Type {
 	props := make([]string, len(propTypeMap))
 	i := 0
 	for k := range propTypeMap {
@@ -13,25 +18,20 @@ func ObjType(propTypeMap map[string]Type) Type {
 		i++
 	}
 	sort.Strings(props)
-	return objType{
-		props:       props,
-		propTypeMap: propTypeMap,
+	return ObjType{
+		Props:       props,
+		PropTypeMap: propTypeMap,
 	}
 }
 
-type objType struct {
-	props       []string
-	propTypeMap map[string]Type
-}
-
-func (t objType) Subsumes(u Type) bool {
-	if VoidType.Subsumes(u) {
+func (t ObjType) Subsumes(u Type) bool {
+	if (VoidType{}).Subsumes(u) {
 		return true
 	}
 	switch u := u.(type) {
-	case objType:
-		for k, v1 := range t.propTypeMap {
-			v2, ok := u.propTypeMap[k]
+	case ObjType:
+		for k, v1 := range t.PropTypeMap {
+			v2, ok := u.PropTypeMap[k]
 			if !ok {
 				return false
 			}
@@ -40,7 +40,7 @@ func (t objType) Subsumes(u Type) bool {
 			}
 		}
 		return true
-	case unionType:
+	case UnionType:
 		for _, disjunct := range u {
 			if !t.Subsumes(disjunct) {
 				return false
@@ -52,15 +52,15 @@ func (t objType) Subsumes(u Type) bool {
 	}
 }
 
-func (t objType) String() string {
+func (t ObjType) String() string {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("Obj<")
-	if len(t.props) > 0 {
-		buffer.WriteString(t.props[0])
+	if len(t.Props) > 0 {
+		buffer.WriteString(t.Props[0])
 		buffer.WriteString(": ")
-		buffer.WriteString(t.propTypeMap[t.props[0]].String())
-		for _, prop := range t.props[1:] {
-			typ := t.propTypeMap[prop]
+		buffer.WriteString(t.PropTypeMap[t.Props[0]].String())
+		for _, prop := range t.Props[1:] {
+			typ := t.PropTypeMap[prop]
 			buffer.WriteString(", ")
 			buffer.WriteString(prop)
 			buffer.WriteString(": ")
@@ -71,6 +71,6 @@ func (t objType) String() string {
 	return buffer.String()
 }
 
-func (t objType) ElementType() Type {
+func (t ObjType) ElementType() Type {
 	panic(t.String() + " is not a sequence type")
 }

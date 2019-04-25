@@ -1,18 +1,16 @@
 package types
 
-var AnyType = anyType{}
-
-type anyType struct {
+type AnyType struct {
 }
 
-func (t anyType) Subsumes(other Type) bool {
+func (t AnyType) Subsumes(other Type) bool {
 	return true
 }
 
-func (t anyType) String() string {
+func (t AnyType) String() string {
 	return "Any"
 }
 
-func (t anyType) ElementType() Type {
+func (t AnyType) ElementType() Type {
 	panic("Any is not a sequence type")
 }
