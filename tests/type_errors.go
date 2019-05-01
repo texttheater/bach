@@ -1,15 +1,15 @@
 package tests
 
 import (
+	"testing"
+
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/types"
 )
 
-func TypeErrorTestCases() []TestCase {
-	return []TestCase{
-		{"-1 *2", nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NullType{}), errors.Name("-"), errors.NumParams(1))},
-		{"3 <2 +1", nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.BoolType{}), errors.Name("+"), errors.NumParams(1))},
-		{"+", nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NullType{}), errors.Name("+"), errors.NumParams(0))},
-		{"hurz", nil, nil, errors.E(errors.Code(errors.NoSuchFunction))},
-	}
+func TestTypeErrors(t *testing.T) {
+	TestProgram("-1 *2", nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NullType{}), errors.Name("-"), errors.NumParams(1)), t)
+	TestProgram("3 <2 +1", nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.BoolType{}), errors.Name("+"), errors.NumParams(1)), t)
+	TestProgram("+", nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NullType{}), errors.Name("+"), errors.NumParams(0)), t)
+	TestProgram("hurz", nil, nil, errors.E(errors.Code(errors.NoSuchFunction)), t)
 }

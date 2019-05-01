@@ -1,15 +1,15 @@
 package tests
 
 import (
+	"testing"
+
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
-func SimpleTypeTestCases() []TestCase {
-	return []TestCase{
-		{`null type`, types.StrType{}, values.StrValue("Null"), nil},
-		{`true type`, types.StrType{}, values.StrValue("Bool"), nil},
-		{`1 type`, types.StrType{}, values.StrValue("Num"), nil},
-		{`"abc" type`, types.StrType{}, values.StrValue("Str"), nil},
-	}
+func TestSimpleTypes(t *testing.T) {
+	TestProgram(`null type`, types.StrType{}, values.StrValue("Null"), nil, t)
+	TestProgram(`true type`, types.StrType{}, values.StrValue("Bool"), nil, t)
+	TestProgram(`1 type`, types.StrType{}, values.StrValue("Num"), nil, t)
+	TestProgram(`"abc" type`, types.StrType{}, values.StrValue("Str"), nil, t)
 }
