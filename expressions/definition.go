@@ -21,7 +21,7 @@ type DefinitionExpression struct {
 func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return zeroShape, nil, errors.E(
+		return shapes.Shape{}, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
@@ -101,11 +101,11 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*shape
 	// typecheck body (crucially, setting body action)
 	bodyOutputShape, bodyAction, err := x.Body.Typecheck(bodyInputShape, nil)
 	if err != nil {
-		return zeroShape, nil, err
+		return shapes.Shape{}, nil, err
 	}
 	// check body output type
 	if !x.OutputType.Subsumes(bodyOutputShape.Type) {
-		return zeroShape, nil, errors.E(
+		return shapes.Shape{}, nil, errors.E(
 			errors.Code(errors.FunctionBodyHasWrongOutputType),
 			errors.Pos(x.Pos),
 			errors.WantType(x.OutputType),

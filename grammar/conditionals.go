@@ -17,8 +17,15 @@ type Conditional struct {
 func (g *Conditional) Ast() (expressions.Expression, error) {
 	elifConditions := make([]expressions.Expression, len(g.ElifConditions))
 	elifConsequents := make([]expressions.Expression, len(g.ElifConsequents))
+	condition, err := g.Condition.Ast()
+	if err != nil {
+		return nil, err
+	}
+	consequent, err := g.Consequent.Ast()
+	if err != nil {
+		return nil, err
+	}
 	for i := range g.ElifConditions {
-		var err error
 		elifConditions[i], err = g.ElifConditions[i].Ast()
 		if err != nil {
 			return nil, err
@@ -27,14 +34,6 @@ func (g *Conditional) Ast() (expressions.Expression, error) {
 		if err != nil {
 			return nil, err
 		}
-	}
-	condition, err := g.Condition.Ast()
-	if err != nil {
-		return nil, err
-	}
-	consequent, err := g.Consequent.Ast()
-	if err != nil {
-		return nil, err
 	}
 	alternative, err := g.Alternative.Ast()
 	if err != nil {

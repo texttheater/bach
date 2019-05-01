@@ -23,7 +23,7 @@ type ConditionalExpression struct {
 func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return zeroShape, nil, errors.E(
+		return shapes.Shape{}, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
@@ -31,10 +31,10 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 	// typecheck condition
 	conditionOutputShape, conditionAction, err := x.Condition.Typecheck(inputShape, nil)
 	if err != nil {
-		return zeroShape, nil, err
+		return shapes.Shape{}, nil, err
 	}
 	if !(types.BoolType{}).Subsumes(conditionOutputShape.Type) {
-		return zeroShape, nil, errors.E(
+		return shapes.Shape{}, nil, errors.E(
 			errors.Code(errors.ConditionMustBeBool),
 			errors.Pos(x.Pos),
 			errors.WantType(types.BoolType{}),
@@ -49,7 +49,7 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 	}
 	consequentOutputShape, consequentAction, err := x.Consequent.Typecheck(shape, nil)
 	if err != nil {
-		return zeroShape, nil, err
+		return shapes.Shape{}, nil, err
 	}
 	outputType := consequentOutputShape.Type
 	elifConditionActions := make([]states.Action, len(x.ElifConditions))
@@ -57,10 +57,10 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 	for i := range x.ElifConditions {
 		conditionOutputShape, elifConditionAction, err := x.ElifConditions[i].Typecheck(shape, nil)
 		if err != nil {
-			return zeroShape, nil, err
+			return shapes.Shape{}, nil, err
 		}
 		if !(types.BoolType{}).Subsumes(conditionOutputShape.Type) {
-			return zeroShape, nil, errors.E(
+			return shapes.Shape{}, nil, errors.E(
 				errors.Code(errors.ConditionMustBeBool),
 				errors.Pos(x.Pos),
 				errors.WantType(types.BoolType{}),
@@ -71,14 +71,14 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 		elifConditionActions[i] = elifConditionAction
 		consequentOutputShape, elifConsequentAction, err := x.ElifConsequents[i].Typecheck(shape, nil)
 		if err != nil {
-			return zeroShape, nil, err
+			return shapes.Shape{}, nil, err
 		}
 		elifConsequentActions[i] = elifConsequentAction
 		outputType = types.Union(outputType, consequentOutputShape.Type)
 	}
 	alternativeOutputShape, alternativeAction, err := x.Alternative.Typecheck(shape, nil)
 	if err != nil {
-		return zeroShape, nil, err
+		return shapes.Shape{}, nil, err
 	}
 	outputType = types.Union(outputType, alternativeOutputShape.Type)
 	action := func(inputState states.State, args []states.Action) states.State {

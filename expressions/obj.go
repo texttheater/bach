@@ -16,7 +16,7 @@ type ObjExpression struct {
 
 func (x ObjExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
 	if len(params) > 0 {
-		return zeroShape, nil, errors.E(
+		return shapes.Shape{}, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
@@ -26,7 +26,7 @@ func (x ObjExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Param
 	for key, valExpression := range x.PropValMap {
 		keyOutputShape, keyAction, err := valExpression.Typecheck(inputShape, nil)
 		if err != nil {
-			return zeroShape, nil, err
+			return shapes.Shape{}, nil, err
 		}
 		keyTypeMap[key] = keyOutputShape.Type
 		keyActionMap[key] = keyAction

@@ -16,24 +16,24 @@ type CompositionExpression struct {
 
 func (x CompositionExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
 	if len(params) > 0 {
-		return zeroShape, nil, errors.E(
+		return shapes.Shape{}, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
 	middleShape, lAction, err := x.Left.Typecheck(inputShape, nil)
 	if err != nil {
-		return zeroShape, nil, err
+		return shapes.Shape{}, nil, err
 	}
 	if (types.VoidType{}).Subsumes(middleShape.Type) {
-		return zeroShape, nil, errors.E(
+		return shapes.Shape{}, nil, errors.E(
 			errors.Code(errors.ComposeWithVoid),
 			errors.Pos(x.Pos),
 		)
 	}
 	outputShape, rAction, err := x.Right.Typecheck(middleShape, nil)
 	if err != nil {
-		return zeroShape, nil, err
+		return shapes.Shape{}, nil, err
 	}
 	action := func(inputState states.State, args []states.Action) states.State {
 		middleState := lAction(inputState, nil)

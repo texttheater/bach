@@ -21,69 +21,89 @@ type MatchExpression struct {
 func (x MatchExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return zeroShape, nil, errors.E(
+		return shapes.Shape{}, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
 	// typecheck pattern
-	shape, matcher, err := x.Pattern.Typecheck(inputShape)
+	consequentInputShape, restType, matcher, err := x.Pattern.Typecheck(inputShape)
 	if err != nil {
-		return zeroShape, nil, err
+		return shapes.Shape{}, nil, err
 	}
 	// typecheck consequent
-	consequentOutputShape, consequentAction, err := x.Consequent.Typecheck(shape, nil)
+	consequentOutputShape, consequentAction, err := x.Consequent.Typecheck(consequentInputShape, nil)
 	if err != nil {
-		return zeroShape, nil, err
+		return shapes.Shape{}, nil, err
 	}
-	// typecheck elis patterns, consequents
+	// update input shape
+	inputShape = shapes.Shape{
+		Type:        restType,
+		FuncerStack: inputShape.FuncerStack,
+	}
+	// initialize output type
 	outputType := consequentOutputShape.Type
+	// typecheck elis patterns, consequents
 	elisMatchers := make([]patterns.Matcher, len(x.ElisPatterns))
 	elisConsequentActions := make([]states.Action, len(x.ElisConsequents))
 	for i := range x.ElisPatterns {
-		shape, elisMatchers[i], err = x.ElisPatterns[i].Typecheck(shape)
+		consequentInputShape, restType, elisMatchers[i], err = x.ElisPatterns[i].Typecheck(inputShape)
 		if err != nil {
-			return zeroShape, nil, err
+			return shapes.Shape{}, nil, err
 		}
-		consequentOutputShape, consequentAction, err := x.ElisConsequents[i].Typecheck(shape, nil)
+		consequentOutputShape, consequentAction, err := x.ElisConsequents[i].Typecheck(consequentInputShape, nil)
 		if err != nil {
-			return zeroShape, nil, err
+			return shapes.Shape{}, nil, err
 		}
 		elisConsequentActions[i] = consequentAction
+		// update input shape
+		inputShape = shapes.Shape{
+			Type:        restType,
+			FuncerStack: inputShape.FuncerStack,
+		}
+		// update output type
 		outputType = types.Union(outputType, consequentOutputShape.Type)
 	}
 	// typecheck alternative
 	var alternativeAction states.Action
 	if x.Alternative == nil {
 		// exhaustivity check
-		if !(types.VoidType{}).Subsumes(shape.Type) {
-			return zeroShape, nil, errors.E(
+		if !(types.VoidType{}).Subsumes(inputShape.Type) {
+			return shapes.Shape{}, nil, errors.E(
 				errors.Code(errors.NonExhaustiveMatch),
 				errors.Pos(x.Pos),
 				errors.WantType(types.VoidType{}),
-				errors.GotType(shape.Type),
+				errors.GotType(inputShape.Type),
 			)
 		}
 	} else {
 		var alternativeOutputShape shapes.Shape
-		alternativeOutputShape, alternativeAction, err = x.Alternative.Typecheck(shape, nil)
+		alternativeOutputShape, alternativeAction, err = x.Alternative.Typecheck(inputShape, nil)
 		if err != nil {
-			return zeroShape, nil, err
+			return shapes.Shape{}, nil, err
 		}
 		outputType = types.Union(outputType, alternativeOutputShape.Type)
 	}
 	// make action
 	action := func(inputState states.State, args []states.Action) states.State {
-		if matcherState, ok := matcher(inputState); ok {
-			consequentOutputState := consequentAction(matcherState, nil)
+		if matcherVarStack, ok := matcher(inputState); ok {
+			consequentInputState := states.State{
+				Value: inputState.Value,
+				Stack: matcherVarStack,
+			}
+			consequentOutputState := consequentAction(consequentInputState, nil)
 			return states.State{
 				consequentOutputState.Value,
 				inputState.Stack,
 			}
 		}
 		for i := range elisMatchers {
-			if matcherState, ok := elisMatchers[i](inputState); ok {
-				consequentOutputState := elisConsequentActions[i](matcherState, nil)
+			if matcherVarStack, ok := elisMatchers[i](inputState); ok {
+				consequentInputState := states.State{
+					Value: inputState.Value,
+					Stack: matcherVarStack,
+				}
+				consequentOutputState := elisConsequentActions[i](consequentInputState, nil)
 				return states.State{
 					consequentOutputState.Value,
 					inputState.Stack,

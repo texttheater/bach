@@ -20,7 +20,7 @@ func (x CallExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Para
 	for {
 		// Reached bottom of stack without finding a matching function
 		if stack == nil {
-			return zeroShape, nil, errors.E(
+			return shapes.Shape{}, nil, errors.E(
 				errors.Code(errors.NoSuchFunction),
 				errors.Pos(x.Pos),
 				errors.InputType(inputShape.Type),
@@ -43,10 +43,10 @@ func (x CallExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Para
 			argInputShape := shapes.Shape{param.InputType, inputShape.FuncerStack}
 			argOutputShape, argAction, err := x.Args[i].Typecheck(argInputShape, param.Params)
 			if err != nil {
-				return zeroShape, nil, err
+				return shapes.Shape{}, nil, err
 			}
 			if !param.OutputType.Subsumes(argOutputShape.Type) {
-				return zeroShape, nil, errors.E(
+				return shapes.Shape{}, nil, errors.E(
 					errors.Code(errors.ArgHasWrongOutputType),
 					errors.Pos(x.Pos),
 					errors.ArgNum(i),
@@ -60,7 +60,7 @@ func (x CallExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Para
 		// to function to call)
 		for i := 0; i < len(params); i++ {
 			if !params[i].Subsumes(*funParams[len(x.Args)+i]) {
-				return zeroShape, nil, errors.E(
+				return shapes.Shape{}, nil, errors.E(
 					errors.Code(errors.ParamDoesNotMatch),
 					errors.Pos(x.Pos),
 					errors.ParamNum(i),

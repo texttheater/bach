@@ -39,6 +39,7 @@ type Component struct {
 	Assignment  *Assignment  `| @Assignment`
 	Definition  *Definition  `| @@`
 	Conditional *Conditional `| @@`
+	Match       *Match       `| @@`
 	Mapping     *Mapping     `| @@`
 }
 
@@ -74,6 +75,9 @@ func (g *Component) Ast() (expressions.Expression, error) {
 	}
 	if g.Conditional != nil {
 		return g.Conditional.Ast()
+	}
+	if g.Match != nil {
+		return g.Match.Ast()
 	}
 	if g.Mapping != nil {
 		return g.Mapping.Ast()

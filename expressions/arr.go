@@ -16,7 +16,7 @@ type ArrExpression struct {
 
 func (x ArrExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
 	if len(params) > 0 {
-		return zeroShape, nil, errors.E(
+		return shapes.Shape{}, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
@@ -27,7 +27,7 @@ func (x ArrExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Param
 		elExpression := x.Elements[i]
 		elOutputShape, elAction, err := elExpression.Typecheck(inputShape, nil)
 		if err != nil {
-			return zeroShape, nil, err
+			return shapes.Shape{}, nil, err
 		}
 		arrType = &types.NearrType{elOutputShape.Type, arrType}
 		elementActions[i] = elAction

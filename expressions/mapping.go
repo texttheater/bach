@@ -17,14 +17,14 @@ type MappingExpression struct {
 func (x MappingExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return zeroShape, nil, errors.E(
+		return shapes.Shape{}, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
 	// make sure the input type is a sequence type
 	if !types.AnySeqType.Subsumes(inputShape.Type) {
-		return zeroShape, nil, errors.E(
+		return shapes.Shape{}, nil, errors.E(
 			errors.Code(errors.MappingRequiresSeqType),
 			errors.Pos(x.Pos),
 			errors.WantType(types.AnySeqType),
@@ -38,7 +38,7 @@ func (x MappingExpression) Typecheck(inputShape shapes.Shape, params []*shapes.P
 	}
 	bodyOutputShape, bodyAction, err := x.Body.Typecheck(bodyInputShape, nil)
 	if err != nil {
-		return zeroShape, nil, err
+		return shapes.Shape{}, nil, err
 	}
 	// create output shape
 	outputShape := shapes.Shape{
