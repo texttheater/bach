@@ -19,6 +19,7 @@ func TestInterp(t *testing.T) {
 	tests.TestDefinitions(t)
 	tests.TestCalls(t)
 	tests.TestConditionals(t)
+	tests.TestMatching(t)
 	tests.TestRecursion(t)
 	tests.TestOverloading(t)
 	tests.TestClosures(t)
