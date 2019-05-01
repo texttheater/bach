@@ -13,6 +13,10 @@ func Complement(a Type, b Type) Type {
 			}
 			union = typeAppend(union, disjunct)
 		}
+		if len(union) == 1 {
+			return union[0]
+		}
+		return union
 	}
 	if b.Subsumes(a) {
 		return VoidType{}
