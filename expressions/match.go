@@ -77,6 +77,14 @@ func (x MatchExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Par
 			)
 		}
 	} else {
+		// reachability check
+		if (types.VoidType{}).Subsumes(inputShape.Type) {
+			return shapes.Shape{}, nil, errors.E(
+				errors.Code(errors.UnreachableElseClause),
+				errors.Pos(x.Pos),
+			)
+		}
+		// alternative
 		var alternativeOutputShape shapes.Shape
 		alternativeOutputShape, alternativeAction, err = x.Alternative.Typecheck(inputShape, nil)
 		if err != nil {
