@@ -12,7 +12,7 @@ type Match struct {
 	Consequent      *Composition   `"then" @@`
 	ElisPatterns    []*Pattern     `( "elis" @@`
 	ElisConsequents []*Composition `  "then" @@ )*`
-	Alternative     *Composition   `"else" @@ "ok"`
+	Alternative     *Composition   `( "else" @@ )? "ok"`
 }
 
 func (g *Match) Ast() (expressions.Expression, error) {
@@ -36,9 +36,12 @@ func (g *Match) Ast() (expressions.Expression, error) {
 			return nil, err
 		}
 	}
-	alternative, err := g.Alternative.Ast()
-	if err != nil {
-		return nil, err
+	var alternative expressions.Expression
+	if g.Alternative != nil {
+		alternative, err = g.Alternative.Ast()
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &expressions.MatchExpression{
 		Pos:             g.Pos,

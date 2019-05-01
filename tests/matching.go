@@ -9,4 +9,5 @@ import (
 
 func TestMatching(t *testing.T) {
 	TestProgram(`if true then 2 else "two" ok is Num then true else false ok`, types.BoolType{}, values.BoolValue(true), nil, t)
+	TestProgram(`if true then 2 else "two" ok is Num then true elis Str then false ok`, types.BoolType{}, values.BoolValue(true), nil, t)
 }
