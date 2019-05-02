@@ -14,7 +14,7 @@ func Parse(input string) (expressions.Expression, error) {
 		participle.Lexer(grammar.LexerDefinition),
 		participle.Unquote("Str"),
 		participle.Map(grammar.ToKeyword, "Prop"),
-		participle.UseLookahead(1),
+		participle.UseLookahead(0),
 	)
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {
