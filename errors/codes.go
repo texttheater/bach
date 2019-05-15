@@ -105,9 +105,9 @@ func (code ErrorCode) Kind() string {
 	case ComposeWithVoid:
 		return "Type error"
 	case NonExhaustiveMatch:
-		return "TypeError"
+		return "Type error"
 	case ImpossibleMatch:
-		return "TypeError"
+		return "Type error"
 	case UnreachableElseClause:
 		return "UnreachableElseClause"
 	default:
