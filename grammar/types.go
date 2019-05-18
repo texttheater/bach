@@ -2,9 +2,10 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/types"
 )
+
+// TODO remove error handling code (no errors)
 
 type Type struct {
 	Pos                lexer.Position
@@ -37,7 +38,6 @@ type NonDisjunctiveType struct {
 	StrType    *StrType    `| @@`
 	SeqType    *SeqType    `| @@`
 	ArrType    *ArrType    `| @@`
-	NearrType  *NearrType  `| @@`
 	TupType    *TupType    `| @@`
 	ObjType    *ObjType    `| @@`
 	AnyType    *AnyType    `| @@`
@@ -67,13 +67,6 @@ func (g *NonDisjunctiveType) Ast() (types.Type, error) {
 	}
 	if g.ArrType != nil {
 		return g.ArrType.Ast()
-	}
-	if g.NearrType != nil {
-		ast, err := g.NearrType.Ast()
-		if err != nil {
-			return nil, err
-		}
-		return ast, nil
 	}
 	if g.TupType != nil {
 		return g.TupType.Ast()
@@ -161,32 +154,6 @@ func (g *ArrType) Ast() (types.Type, error) {
 	return &types.ArrType{elType}, nil
 }
 
-type NearrType struct {
-	Pos      lexer.Position `"Nearr<"`
-	HeadType *Type          `@@ ","`
-	TailType *Type          `@@ ">"`
-}
-
-func (g *NearrType) Ast() (types.Type, error) {
-	headType, err := g.HeadType.Ast()
-	if err != nil {
-		return nil, err
-	}
-	tailType, err := g.TailType.Ast()
-	if err != nil {
-		return nil, err
-	}
-	if !types.AnyArrType.Subsumes(tailType) {
-		return nil, errors.E(
-			errors.Code(errors.TailRequiresArrType),
-			errors.Pos(g.Pos),
-			errors.WantType(types.AnyArrType),
-			errors.GotType(tailType),
-		)
-	}
-	return &types.NearrType{headType, tailType}, nil
-}
-
 type TupType struct {
 	Pos   lexer.Position `"Tup<"`
 	Type  *Type          `( @@`
@@ -194,22 +161,23 @@ type TupType struct {
 }
 
 func (g *TupType) Ast() (types.Type, error) {
-	t := types.VoidArrType
-	for i := len(g.Types) - 1; i >= 0; i-- {
-		headType, err := g.Types[i].Ast()
-		if err != nil {
-			return nil, err
-		}
-		t = &types.NearrType{headType, t}
-	}
+	var elementTypes []types.Type
 	if g.Type != nil {
-		headType, err := g.Type.Ast()
+		elementTypes = make([]types.Type, len(g.Types)+1)
+		el, err := g.Type.Ast()
 		if err != nil {
 			return nil, err
 		}
-		t = &types.NearrType{headType, t}
+		elementTypes[0] = el
+		for i, elementType := range g.Types {
+			el, err = elementType.Ast()
+			if err != nil {
+				return nil, err
+			}
+			elementTypes[i+1] = el
+		}
 	}
-	return t, nil
+	return types.TupType(elementTypes), nil
 }
 
 type ObjType struct {

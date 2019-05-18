@@ -16,11 +16,13 @@ func (t *SeqType) Subsumes(u Type) bool {
 	switch u := u.(type) {
 	case VoidType:
 		return true
-	case *NearrType:
-		if !t.ElType.Subsumes(u.HeadType) {
-			return false
+	case TupType:
+		for _, el := range u {
+			if !t.ElType.Subsumes(el) {
+				return false
+			}
 		}
-		return t.Subsumes(u.TailType)
+		return true
 	case *ArrType:
 		return t.ElType.Subsumes(u.ElType)
 	case *SeqType:

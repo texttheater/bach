@@ -21,7 +21,7 @@ func (x ArrExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Param
 			errors.Pos(x.Pos),
 		)
 	}
-	arrType := types.VoidArrType
+	elementTypes := make([]types.Type, len(x.Elements))
 	elementActions := make([]states.Action, len(x.Elements))
 	for i := len(x.Elements) - 1; i >= 0; i-- {
 		elExpression := x.Elements[i]
@@ -29,11 +29,11 @@ func (x ArrExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Param
 		if err != nil {
 			return shapes.Shape{}, nil, err
 		}
-		arrType = &types.NearrType{elOutputShape.Type, arrType}
+		elementTypes[i] = elOutputShape.Type
 		elementActions[i] = elAction
 	}
 	outputShape := shapes.Shape{
-		Type:        arrType,
+		Type:        types.TupType(elementTypes),
 		FuncerStack: inputShape.FuncerStack,
 	}
 	action := func(inputState states.State, args []states.Action) states.State {
