@@ -30,11 +30,7 @@ func (g *Pattern) Ast() (patterns.Pattern, error) {
 	} else if g.StrType != nil {
 		t = g.StrType.Ast()
 	} else if g.SeqType != nil {
-		var err error
-		t, err = g.SeqType.Ast()
-		if err != nil {
-			return nil, err
-		}
+		t = g.SeqType.Ast()
 	} else if g.ArrPattern != nil {
 		p, err := g.ArrPattern.Ast()
 		if err != nil {

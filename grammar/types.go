@@ -13,19 +13,13 @@ type Type struct {
 	Disjuncts          []*NonDisjunctiveType `( "|" @@ )*`
 }
 
-func (g *Type) Ast() (types.Type, error) {
-	result, err := g.NonDisjunctiveType.Ast()
-	if err != nil {
-		return nil, err
-	}
+func (g *Type) Ast() types.Type {
+	result := g.NonDisjunctiveType.Ast()
 	for _, d := range g.Disjuncts {
-		t, err := d.Ast()
-		if err != nil {
-			return nil, err
-		}
+		t := d.Ast()
 		result = types.Union(result, t)
 	}
-	return result, nil
+	return result
 }
 
 type NonDisjunctiveType struct {
@@ -43,24 +37,24 @@ type NonDisjunctiveType struct {
 	AnyType    *AnyType    `| @@`
 }
 
-func (g *NonDisjunctiveType) Ast() (types.Type, error) {
+func (g *NonDisjunctiveType) Ast() types.Type {
 	if g.VoidType != nil {
-		return g.VoidType.Ast(), nil
+		return g.VoidType.Ast()
 	}
 	if g.NullType != nil {
-		return g.NullType.Ast(), nil
+		return g.NullType.Ast()
 	}
 	if g.ReaderType != nil {
-		return g.ReaderType.Ast(), nil
+		return g.ReaderType.Ast()
 	}
 	if g.BoolType != nil {
-		return g.BoolType.Ast(), nil
+		return g.BoolType.Ast()
 	}
 	if g.NumType != nil {
-		return g.NumType.Ast(), nil
+		return g.NumType.Ast()
 	}
 	if g.StrType != nil {
-		return g.StrType.Ast(), nil
+		return g.StrType.Ast()
 	}
 	if g.SeqType != nil {
 		return g.SeqType.Ast()
@@ -75,7 +69,7 @@ func (g *NonDisjunctiveType) Ast() (types.Type, error) {
 		return g.ObjType.Ast()
 	}
 	if g.AnyType != nil {
-		return g.AnyType.Ast(), nil
+		return g.AnyType.Ast()
 	}
 	panic("invalid type")
 }
@@ -133,12 +127,9 @@ type SeqType struct {
 	ElementType *Type          `@@ ">"`
 }
 
-func (g *SeqType) Ast() (types.Type, error) {
-	elType, err := g.ElementType.Ast()
-	if err != nil {
-		return nil, err
-	}
-	return &types.SeqType{elType}, nil
+func (g *SeqType) Ast() types.Type {
+	elType := g.ElementType.Ast()
+	return &types.SeqType{elType}
 }
 
 type ArrType struct {
@@ -146,12 +137,9 @@ type ArrType struct {
 	ElementType *Type          `@@ ">"`
 }
 
-func (g *ArrType) Ast() (types.Type, error) {
-	elType, err := g.ElementType.Ast()
-	if err != nil {
-		return nil, err
-	}
-	return &types.ArrType{elType}, nil
+func (g *ArrType) Ast() types.Type {
+	elType := g.ElementType.Ast()
+	return &types.ArrType{elType}
 }
 
 type TupType struct {
@@ -160,24 +148,18 @@ type TupType struct {
 	Types []*Type        `  ( "," @@ )* )? ">"`
 }
 
-func (g *TupType) Ast() (types.Type, error) {
+func (g *TupType) Ast() types.Type {
 	var elementTypes []types.Type
 	if g.Type != nil {
 		elementTypes = make([]types.Type, len(g.Types)+1)
-		el, err := g.Type.Ast()
-		if err != nil {
-			return nil, err
-		}
+		el := g.Type.Ast()
 		elementTypes[0] = el
 		for i, elementType := range g.Types {
-			el, err = elementType.Ast()
-			if err != nil {
-				return nil, err
-			}
+			el = elementType.Ast()
 			elementTypes[i+1] = el
 		}
 	}
-	return types.TupType(elementTypes), nil
+	return types.TupType(elementTypes)
 }
 
 type ObjType struct {
@@ -188,22 +170,15 @@ type ObjType struct {
 	ValTypes []*Type        `     ":" @@ )* )? ">"`
 }
 
-func (g *ObjType) Ast() (types.Type, error) {
+func (g *ObjType) Ast() types.Type {
 	propTypeMap := make(map[string]types.Type)
 	if g.Prop != nil {
-		var err error
-		propTypeMap[*g.Prop], err = g.ValType.Ast()
-		if err != nil {
-			return nil, err
-		}
+		propTypeMap[*g.Prop] = g.ValType.Ast()
 		for i := range g.Props {
-			propTypeMap[g.Props[i]], err = g.ValTypes[i].Ast()
-			if err != nil {
-				return nil, err
-			}
+			propTypeMap[g.Props[i]] = g.ValTypes[i].Ast()
 		}
 	}
-	return types.NewObjType(propTypeMap), nil
+	return types.NewObjType(propTypeMap)
 }
 
 type AnyType struct {

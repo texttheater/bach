@@ -21,10 +21,7 @@ type Definition struct {
 }
 
 func (g *Definition) Ast() (expressions.Expression, error) {
-	inputType, err := g.InputType.Ast()
-	if err != nil {
-		return nil, err
-	}
+	inputType := g.InputType.Ast()
 	var name = g.Name
 	var params []*shapes.Parameter
 	var paramNames []string
@@ -32,10 +29,11 @@ func (g *Definition) Ast() (expressions.Expression, error) {
 		name = g.NameLpar.Name
 		params = make([]*shapes.Parameter, len(g.Params)+1)
 		paramNames = make([]string, len(g.ParamNames)+1)
-		params[0], err = g.Parameter.Ast()
+		param, err := g.Parameter.Ast()
 		if err != nil {
 			return nil, err
 		}
+		params[0] = param
 		paramNames[0] = *g.ParamName
 		for i, param := range g.Params {
 			params[i+1], err = param.Ast()
@@ -45,10 +43,7 @@ func (g *Definition) Ast() (expressions.Expression, error) {
 			paramNames[i+1] = g.ParamNames[i+1]
 		}
 	}
-	outputType, err := g.OutputType.Ast()
-	if err != nil {
-		return nil, err
-	}
+	outputType := g.OutputType.Ast()
 	body, err := g.Body.Ast()
 	if err != nil {
 		return nil, err
@@ -75,11 +70,7 @@ type Parameter struct {
 func (g *Parameter) Ast() (*shapes.Parameter, error) {
 	var inputType types.Type
 	if g.InputType != nil {
-		var err error
-		inputType, err = g.InputType.Ast()
-		if err != nil {
-			return nil, err
-		}
+		inputType = g.InputType.Ast()
 	} else {
 		inputType = types.AnyType{}
 	}
@@ -98,10 +89,7 @@ func (g *Parameter) Ast() (*shapes.Parameter, error) {
 			}
 		}
 	}
-	outputType, err := g.OutputType.Ast()
-	if err != nil {
-		return nil, err
-	}
+	outputType := g.OutputType.Ast()
 	return &shapes.Parameter{
 		InputType:  inputType,
 		Params:     params,
