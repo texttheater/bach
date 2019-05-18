@@ -13,22 +13,20 @@ type SeqType struct {
 var AnySeqType Type = &SeqType{AnyType{}}
 
 func (t *SeqType) Subsumes(u Type) bool {
-	if (VoidType{}).Subsumes(u) {
-		return true
-	}
-	if (&ArrType{t.ElType}).Subsumes(u) {
-		return true
-	}
 	switch u := u.(type) {
+	case VoidType:
+		return true
+	case *NearrType:
+		if !t.ElType.Subsumes(u.HeadType) {
+			return false
+		}
+		return t.Subsumes(u.TailType)
+	case *ArrType:
+		return t.ElType.Subsumes(u.ElType)
 	case *SeqType:
 		return t.ElType.Subsumes(u.ElType)
 	case UnionType:
-		for _, disjunct := range u {
-			if !t.Subsumes(disjunct) {
-				return false
-			}
-		}
-		return true
+		return u.inverseSubsumes(t)
 	default:
 		return false
 	}

@@ -3,12 +3,15 @@ package types
 type BoolType struct {
 }
 
-func (t BoolType) Subsumes(other Type) bool {
-	if (VoidType{}).Subsumes(other) {
+func (t BoolType) Subsumes(u Type) bool {
+	switch u.(type) {
+	case VoidType:
 		return true
+	case BoolType:
+		return true
+	default:
+		return false
 	}
-	_, ok := other.(BoolType)
-	return ok
 }
 
 func (t BoolType) String() string {

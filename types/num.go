@@ -3,12 +3,15 @@ package types
 type NumType struct {
 }
 
-func (t NumType) Subsumes(other Type) bool {
-	if (VoidType{}).Subsumes(other) {
+func (t NumType) Subsumes(u Type) bool {
+	switch u.(type) {
+	case VoidType:
 		return true
+	case NumType:
+		return true
+	default:
+		return false
 	}
-	_, ok := other.(NumType)
-	return ok
 }
 
 func (t NumType) String() string {

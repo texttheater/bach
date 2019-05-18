@@ -3,9 +3,13 @@ package types
 type VoidType struct {
 }
 
-func (t VoidType) Subsumes(other Type) bool {
-	_, ok := other.(VoidType)
-	return ok
+func (t VoidType) Subsumes(u Type) bool {
+	switch u.(type) {
+	case VoidType:
+		return true
+	default:
+		return false
+	}
 }
 
 func (t VoidType) String() string {

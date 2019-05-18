@@ -25,10 +25,9 @@ func NewObjType(propTypeMap map[string]Type) Type {
 }
 
 func (t ObjType) Subsumes(u Type) bool {
-	if (VoidType{}).Subsumes(u) {
-		return true
-	}
 	switch u := u.(type) {
+	case VoidType:
+		return true
 	case ObjType:
 		for k, v1 := range t.PropTypeMap {
 			v2, ok := u.PropTypeMap[k]
@@ -41,12 +40,7 @@ func (t ObjType) Subsumes(u Type) bool {
 		}
 		return true
 	case UnionType:
-		for _, disjunct := range u {
-			if !t.Subsumes(disjunct) {
-				return false
-			}
-		}
-		return true
+		return u.inverseSubsumes(t)
 	default:
 		return false
 	}

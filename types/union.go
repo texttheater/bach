@@ -30,6 +30,8 @@ func Union(a Type, b Type) Type {
 // type.
 type UnionType []Type
 
+// TODO make this private?
+
 func typeAppend(t UnionType, u Type) UnionType {
 	for i, disjunct := range t {
 		// case 1: a disjunct subsumes u already, no change needed
@@ -53,31 +55,40 @@ func typeAppend(t UnionType, u Type) UnionType {
 	return append(t, u)
 }
 
-func (t UnionType) Subsumes(u Type) bool {
-	if uUnion, ok := u.(UnionType); ok {
-	uLoop:
-		for _, uDisjunct := range uUnion {
-			// find a subsumer for uDisjunct among t
-			for _, tDisjunct := range t {
-				if tDisjunct.Subsumes(uDisjunct) {
-					// subsumer found, check next uDisjunct
-					continue uLoop
-				}
-			}
-			// no subsumer found
+func (t UnionType) inverseSubsumes(u Type) bool {
+	// precondition: u is not a UnionType
+	for _, disjunct := range t {
+		if !u.Subsumes(disjunct) {
 			return false
 		}
-		// all uDisjuncts checked
-		return true
 	}
-	// find a subsumer for u
-	for _, tDisjunct := range t {
-		if tDisjunct.Subsumes(u) {
-			return true
+	return true
+}
+
+func (t UnionType) Subsumes(u Type) bool {
+	switch u := u.(type) {
+	case UnionType:
+		// check that for every disjunct of u, at least one disjunct of
+		// t subsumes it
+	uDisjuncts:
+		for _, uDisjunct := range u {
+			for _, tDisjunct := range t {
+				if tDisjunct.Subsumes(uDisjunct) {
+					continue uDisjuncts
+				}
+			}
+			return false
 		}
+		return true
+	default:
+		// check that at least one disjunct of t subsumes u
+		for _, tDisjunct := range t {
+			if tDisjunct.Subsumes(u) {
+				return true
+			}
+		}
+		return false
 	}
-	// no subsumer found
-	return false
 }
 
 func (t UnionType) String() string {

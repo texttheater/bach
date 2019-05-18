@@ -3,12 +3,15 @@ package types
 type StrType struct {
 }
 
-func (t StrType) Subsumes(other Type) bool {
-	if (VoidType{}).Subsumes(other) {
+func (t StrType) Subsumes(u Type) bool {
+	switch u.(type) {
+	case VoidType:
 		return true
+	case StrType:
+		return true
+	default:
+		return false
 	}
-	_, ok := other.(StrType)
-	return ok
 }
 
 func (t StrType) String() string {

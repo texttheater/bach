@@ -3,12 +3,15 @@ package types
 type ReaderType struct {
 }
 
-func (t ReaderType) Subsumes(other Type) bool {
-	if (VoidType{}).Subsumes(other) {
+func (t ReaderType) Subsumes(u Type) bool {
+	switch u.(type) {
+	case VoidType:
 		return true
+	case ReaderType:
+		return true
+	default:
+		return false
 	}
-	_, ok := other.(ReaderType)
-	return ok
 }
 
 func (t ReaderType) String() string {

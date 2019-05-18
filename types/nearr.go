@@ -10,22 +10,16 @@ type NearrType struct {
 }
 
 func (t *NearrType) Subsumes(u Type) bool {
-	if (VoidType{}).Subsumes(u) {
-		return true
-	}
 	switch u := u.(type) {
+	case VoidType:
+		return true
 	case *NearrType:
 		if !t.HeadType.Subsumes(u.HeadType) {
 			return false
 		}
 		return t.TailType.Subsumes(u.TailType)
 	case UnionType:
-		for _, disjunct := range u {
-			if !t.Subsumes(disjunct) {
-				return false
-			}
-		}
-		return true
+		return u.inverseSubsumes(t)
 	default:
 		return false
 	}

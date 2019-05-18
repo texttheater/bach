@@ -39,4 +39,10 @@ func TestMatching(t *testing.T) {
 			errors.Code(errors.UnreachableElseClause),
 		),
 		t)
+	//TestProgram(
+	//	`[1, 2, 3] is Seq<Num> then each +1 all arr ok`,
+	//	&types.ArrType{types.NumType{}},
+	//	values.ArrValue([]values.Value{values.NumValue(2), values.NumValue(3), values.NumValue(4)}),
+	//	nil,
+	//	t)
 }
