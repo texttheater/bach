@@ -27,6 +27,65 @@ func (t TupType) Subsumes(u Type) bool {
 	}
 }
 
+func (t TupType) Partition(u Type) (Type, Type) {
+	switch u := u.(type) {
+	case VoidType:
+		return u, t
+	case TupType:
+		if len(t) != len(u) {
+			return VoidType{}, t
+		}
+		elTypes := make([]Type, len(t))
+		allSubsumed := true
+		for i := range t {
+			intersection, _ := t[i].Partition(u[i])
+			if (VoidType{}).Subsumes(intersection) {
+				return VoidType{}, t
+			}
+			allSubsumed = allSubsumed && intersection.Subsumes(t[i])
+			elTypes[i] = intersection
+		}
+		if allSubsumed {
+			return TupType(elTypes), VoidType{}
+		}
+		return TupType(elTypes), t
+	case *ArrType:
+		elTypes := make([]Type, len(t))
+		allSubsumed := true
+		for i, elType := range t {
+			intersection, _ := elType.Partition(u.ElType)
+			if (VoidType{}).Subsumes(intersection) {
+				return VoidType{}, t
+			}
+			allSubsumed = allSubsumed && intersection.Subsumes(elType)
+			elTypes[i] = intersection
+		}
+		if allSubsumed {
+			return TupType(elTypes), VoidType{}
+		}
+		return TupType(elTypes), t
+	case *SeqType:
+		elTypes := make([]Type, len(t))
+		allSubsumed := true
+		for i, elType := range t {
+			intersection, _ := elType.Partition(u.ElType)
+			if (VoidType{}).Subsumes(intersection) {
+				return VoidType{}, t
+			}
+			allSubsumed = allSubsumed && intersection.Subsumes(elType)
+			elTypes[i] = intersection
+		}
+		if allSubsumed {
+			return TupType(elTypes), VoidType{}
+		}
+		return TupType(elTypes), t
+	case AnyType:
+		return t, VoidType{}
+	default:
+		return VoidType{}, t
+	}
+}
+
 func (t TupType) ElementType() Type {
 	var elType Type = VoidType{}
 	for _, el := range t {

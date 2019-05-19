@@ -12,6 +12,10 @@ func (t VoidType) Subsumes(u Type) bool {
 	}
 }
 
+func (t VoidType) Partition(u Type) (Type, Type) {
+	return t, t
+}
+
 func (t VoidType) String() string {
 	return "Void"
 }

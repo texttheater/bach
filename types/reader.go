@@ -14,6 +14,21 @@ func (t ReaderType) Subsumes(u Type) bool {
 	}
 }
 
+func (t ReaderType) Partition(u Type) (Type, Type) {
+	switch u := u.(type) {
+	case VoidType:
+		return u, t
+	case ReaderType:
+		return u, VoidType{}
+	case UnionType:
+		return u.inversePartition(t)
+	case AnyType:
+		return t, VoidType{}
+	default:
+		return VoidType{}, t
+	}
+}
+
 func (t ReaderType) String() string {
 	return "Reader"
 }

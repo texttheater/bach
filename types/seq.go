@@ -34,6 +34,44 @@ func (t *SeqType) Subsumes(u Type) bool {
 	}
 }
 
+func (t *SeqType) Partition(u Type) (Type, Type) {
+	switch u := u.(type) {
+	case VoidType:
+		return u, t
+	case TupType:
+		elTypes := make([]Type, len(u))
+		for i, el := range u {
+			intersection, _ := t.ElType.Partition(el)
+			if (VoidType{}).Subsumes(intersection) {
+				return VoidType{}, t
+			}
+			elTypes[i] = intersection
+		}
+		return TupType(elTypes), t
+	case *ArrType:
+		intersection, _ := t.ElType.Partition(u.ElType)
+		if (VoidType{}).Subsumes(intersection) {
+			return VoidType{}, t
+		}
+		return &ArrType{intersection}, t
+	case *SeqType:
+		intersection, _ := t.ElType.Partition(u.ElType)
+		if (VoidType{}).Subsumes(intersection) {
+			return VoidType{}, t
+		}
+		if intersection.Subsumes(t.ElType) {
+			return &SeqType{intersection}, VoidType{}
+		}
+		return &SeqType{intersection}, t
+	case UnionType:
+		return u.inversePartition(t)
+	case AnyType:
+		return t, VoidType{}
+	default:
+		return VoidType{}, t
+	}
+}
+
 func (t *SeqType) String() string {
 	return fmt.Sprintf("Seq<%v>", t.ElType)
 }

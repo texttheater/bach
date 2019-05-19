@@ -14,6 +14,21 @@ func (t NullType) Subsumes(u Type) bool {
 	}
 }
 
+func (t NullType) Partition(u Type) (Type, Type) {
+	switch u := u.(type) {
+	case VoidType:
+		return u, t
+	case NullType:
+		return u, VoidType{}
+	case UnionType:
+		return u.inversePartition(t)
+	case AnyType:
+		return t, VoidType{}
+	default:
+		return VoidType{}, t
+	}
+}
+
 func (t NullType) String() string {
 	return "Null"
 }

@@ -14,6 +14,21 @@ func (t BoolType) Subsumes(u Type) bool {
 	}
 }
 
+func (t BoolType) Partition(u Type) (Type, Type) {
+	switch u := u.(type) {
+	case VoidType:
+		return u, t
+	case BoolType:
+		return u, VoidType{}
+	case UnionType:
+		return u.inversePartition(t)
+	case AnyType:
+		return t, VoidType{}
+	default:
+		return VoidType{}, t
+	}
+}
+
 func (t BoolType) String() string {
 	return "Bool"
 }

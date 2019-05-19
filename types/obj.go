@@ -46,6 +46,46 @@ func (t ObjType) Subsumes(u Type) bool {
 	}
 }
 
+func (t ObjType) Partition(u Type) (Type, Type) {
+	switch u := u.(type) {
+	case VoidType:
+		return u, t
+	case ObjType:
+		propTypeMap := make(map[string]Type)
+		allSubsumed := true
+		for k, v1 := range t.PropTypeMap {
+			if v2, ok := u.PropTypeMap[k]; ok {
+				intersection, _ := v1.Partition(v2)
+				if (VoidType{}).Subsumes(v1) {
+					return VoidType{}, t
+				}
+				if allSubsumed && !intersection.Subsumes(v1) {
+					allSubsumed = false
+				}
+				v1 = intersection
+			}
+			propTypeMap[k] = v1
+		}
+		for k, v2 := range u.PropTypeMap {
+			if _, ok := propTypeMap[k]; ok {
+				continue
+			}
+			allSubsumed = false
+			propTypeMap[k] = v2
+		}
+		if allSubsumed {
+			return NewObjType(propTypeMap), VoidType{}
+		}
+		return NewObjType(propTypeMap), t
+	case UnionType:
+		return u.inversePartition(t)
+	case AnyType:
+		return t, VoidType{}
+	default:
+		return VoidType{}, t
+	}
+}
+
 func (t ObjType) String() string {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("Obj<")

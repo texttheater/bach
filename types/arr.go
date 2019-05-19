@@ -32,6 +32,47 @@ func (t *ArrType) Subsumes(u Type) bool {
 	}
 }
 
+func (t *ArrType) Partition(u Type) (Type, Type) {
+	switch u := u.(type) {
+	case VoidType:
+		return u, t
+	case TupType:
+		elTypes := make([]Type, len(u))
+		for i, elType := range u {
+			intersection, _ := t.ElType.Partition(elType)
+			if (VoidType{}).Subsumes(intersection) {
+				return VoidType{}, t
+			}
+			elTypes[i] = intersection
+		}
+		return TupType(elTypes), t
+	case *ArrType:
+		intersection, _ := t.ElType.Partition(u.ElType)
+		if (VoidType{}).Subsumes(intersection) {
+			return VoidType{}, t
+		}
+		if intersection.Subsumes(t.ElType) {
+			return &ArrType{intersection}, VoidType{}
+		}
+		return &ArrType{intersection}, t
+	case *SeqType:
+		intersection, _ := t.ElType.Partition(u.ElType)
+		if (VoidType{}).Subsumes(intersection) {
+			return VoidType{}, t
+		}
+		if intersection.Subsumes(t.ElType) {
+			return &SeqType{intersection}, VoidType{}
+		}
+		return &SeqType{intersection}, t
+	case UnionType:
+		return u.inversePartition(t)
+	case AnyType:
+		return t, VoidType{}
+	default:
+		return VoidType{}, t
+	}
+}
+
 func (t *ArrType) String() string {
 	if (VoidType{}).Subsumes(t.ElType) {
 		return "Tup<>"

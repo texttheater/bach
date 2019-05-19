@@ -92,6 +92,51 @@ func (t UnionType) Subsumes(u Type) bool {
 	}
 }
 
+func (t UnionType) inversePartition(u Type) (Type, Type) {
+	// precondition: u is not a UnionType
+	var intersection Type = VoidType{}
+	complement := u
+	for _, disjunct := range t {
+		var i Type
+		i, complement = complement.Partition(disjunct)
+		intersection = Union(intersection, i)
+	}
+	return intersection, complement
+}
+
+func (t UnionType) Partition(u Type) (Type, Type) {
+	switch u := u.(type) {
+	case VoidType:
+		return u, t
+	case UnionType:
+		var intersectionsUnion Type = VoidType{}
+		var complementsUnion Type = VoidType{}
+		for _, tDisjunct := range t {
+			intersection, complement := u.inversePartition(tDisjunct)
+			//intersection := VoidType{}
+			//complement := tDisjunct
+			//for _, uDisjunct := range u {
+			//	i, complement = complement.Partition(uDisjunct)
+			//	intersection = Union(intersection, i)
+			//}
+			intersectionsUnion = Union(intersectionsUnion, intersection)
+			complementsUnion = Union(complementsUnion, complement)
+		}
+		return intersectionsUnion, complementsUnion
+	case AnyType:
+		return t, VoidType{}
+	default:
+		var intersectionsUnion Type = VoidType{}
+		var complementsUnion Type = VoidType{}
+		for _, tDisjunct := range t {
+			intersection, complement := tDisjunct.Partition(u)
+			intersectionsUnion = Union(intersectionsUnion, intersection)
+			complementsUnion = Union(complementsUnion, complement)
+		}
+		return intersectionsUnion, complementsUnion
+	}
+}
+
 func (t UnionType) String() string {
 	buffer := bytes.Buffer{}
 	buffer.WriteString(fmt.Sprintf("%s", t[0]))
