@@ -7,10 +7,6 @@ func (t AnyType) Subsumes(u Type) bool {
 	return true
 }
 
-func (t AnyType) Union(u Type) Type {
-	return t
-}
-
 func (t AnyType) String() string {
 	return "Any"
 }
