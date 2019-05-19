@@ -15,6 +15,9 @@ func Union(a Type, b Type) Type {
 		}
 		return typeAppend(aUnion, b)
 	}
+	if bUnion, ok := b.(UnionType); ok {
+		return typeAppend(bUnion, a)
+	}
 	if a.Subsumes(b) {
 		return a
 	}
@@ -29,8 +32,6 @@ func Union(a Type, b Type) Type {
 // UnionType, 1) no disjunct subsumes another, 2) no disjunct is itself a union
 // type.
 type UnionType []Type
-
-// TODO make this private?
 
 func typeAppend(t UnionType, u Type) UnionType {
 	for i, disjunct := range t {
