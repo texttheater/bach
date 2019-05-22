@@ -63,9 +63,9 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*shape
 		}
 		return x.Params, x.OutputType, funAction, true
 	}
-	functionStack := inputShape.FuncerStack.Push(funFuncer)
+	functionStack := inputShape.Stack.Push(funFuncer)
 	// add parameter funcers for use in the body
-	bodyFuncerStack := functionStack
+	bodyStack := functionStack
 	for i, param := range x.Params {
 		var id interface{} = param
 		paramFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {
@@ -91,12 +91,12 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*shape
 			return param.Params, param.OutputType, paramAction, true
 		}
 
-		bodyFuncerStack = bodyFuncerStack.Push(paramFuncer)
+		bodyStack = bodyStack.Push(paramFuncer)
 	}
 	// define body input context
 	bodyInputShape := shapes.Shape{
-		Type:        x.InputType,
-		FuncerStack: bodyFuncerStack,
+		Type:  x.InputType,
+		Stack: bodyStack,
 	}
 	// typecheck body (crucially, setting body action)
 	bodyOutputShape, bodyAction, err := x.Body.Typecheck(bodyInputShape, nil)
@@ -114,8 +114,8 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*shape
 	}
 	// define output context
 	outputShape := shapes.Shape{
-		Type:        inputShape.Type,
-		FuncerStack: functionStack,
+		Type:  inputShape.Type,
+		Stack: functionStack,
 	}
 	// define action (crucially, setting body input stack)
 	action := func(inputState states.State, args []states.Action) states.State {

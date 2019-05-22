@@ -16,7 +16,7 @@ type CallExpression struct {
 func (x CallExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
 	// Go down the function stack and find the function invoked by this
 	// call
-	stack := inputShape.FuncerStack
+	stack := inputShape.Stack
 	for {
 		// Reached bottom of stack without finding a matching function
 		if stack == nil {
@@ -40,7 +40,7 @@ func (x CallExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Para
 		// Check function params filled by this call
 		for i := 0; i < len(x.Args); i++ {
 			param := funParams[i]
-			argInputShape := shapes.Shape{param.InputType, inputShape.FuncerStack}
+			argInputShape := shapes.Shape{param.InputType, inputShape.Stack}
 			argOutputShape, argAction, err := x.Args[i].Typecheck(argInputShape, param.Params)
 			if err != nil {
 				return shapes.Shape{}, nil, err
@@ -70,6 +70,6 @@ func (x CallExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Para
 			}
 		}
 		// Return result
-		return shapes.Shape{funOutputType, inputShape.FuncerStack}, action, nil
+		return shapes.Shape{funOutputType, inputShape.Stack}, action, nil
 	}
 }

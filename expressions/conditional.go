@@ -42,10 +42,10 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 		)
 	}
 	// shape is the shared input shape for all conditions and consequents.
-	// Each condition may add to the FuncerStack. Type always stays the same.
+	// Each condition may add to the Stack. Type always stays the same.
 	shape := shapes.Shape{
-		Type:        inputShape.Type,
-		FuncerStack: conditionOutputShape.FuncerStack,
+		Type:  inputShape.Type,
+		Stack: conditionOutputShape.Stack,
 	}
 	consequentOutputShape, consequentAction, err := x.Consequent.Typecheck(shape, nil)
 	if err != nil {
@@ -67,7 +67,7 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 				errors.GotType(conditionOutputShape.Type),
 			)
 		}
-		shape.FuncerStack = conditionOutputShape.FuncerStack
+		shape.Stack = conditionOutputShape.Stack
 		elifConditionActions[i] = elifConditionAction
 		consequentOutputShape, elifConsequentAction, err := x.ElifConsequents[i].Typecheck(shape, nil)
 		if err != nil {
@@ -117,8 +117,8 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*shap
 		}
 	}
 	outputShape := shapes.Shape{
-		Type:        outputType,
-		FuncerStack: inputShape.FuncerStack,
+		Type:  outputType,
+		Stack: inputShape.Stack,
 	}
 	return outputShape, action, nil
 }

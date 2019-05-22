@@ -32,8 +32,8 @@ func (x ObjExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Param
 		keyActionMap[key] = keyAction
 	}
 	outputShape := shapes.Shape{
-		Type:        types.NewObjType(keyTypeMap),
-		FuncerStack: inputShape.FuncerStack,
+		Type:  types.NewObjType(keyTypeMap),
+		Stack: inputShape.Stack,
 	}
 	action := func(inputState states.State, args []states.Action) states.State {
 		propValMap := make(map[string]values.Value)

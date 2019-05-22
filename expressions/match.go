@@ -38,8 +38,8 @@ func (x MatchExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Par
 	}
 	// update input shape
 	inputShape = shapes.Shape{
-		Type:        restType,
-		FuncerStack: inputShape.FuncerStack,
+		Type:  restType,
+		Stack: inputShape.Stack,
 	}
 	// initialize output type
 	outputType := consequentOutputShape.Type
@@ -58,8 +58,8 @@ func (x MatchExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Par
 		elisConsequentActions[i] = consequentAction
 		// update input shape
 		inputShape = shapes.Shape{
-			Type:        restType,
-			FuncerStack: inputShape.FuncerStack,
+			Type:  restType,
+			Stack: inputShape.Stack,
 		}
 		// update output type
 		outputType = types.Union(outputType, consequentOutputShape.Type)
@@ -127,7 +127,7 @@ func (x MatchExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Par
 	// return
 	outputShape := shapes.Shape{
 		outputType,
-		inputShape.FuncerStack,
+		inputShape.Stack,
 	}
 	return outputShape, action, nil
 }

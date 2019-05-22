@@ -22,7 +22,7 @@ func (x ConstantExpression) Typecheck(inputShape shapes.Shape, params []*shapes.
 			errors.Pos(x.Pos),
 		)
 	}
-	outputShape := shapes.Shape{x.Type, inputShape.FuncerStack}
+	outputShape := shapes.Shape{x.Type, inputShape.Stack}
 	action := func(inputState states.State, args []states.Action) states.State {
 		return states.State{
 			Value: x.Value,

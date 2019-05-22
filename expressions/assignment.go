@@ -46,7 +46,7 @@ func (x AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*shape
 		}
 		return nil, inputShape.Type, varAction, true
 	}
-	outputShape := shapes.Shape{inputShape.Type, inputShape.FuncerStack.Push(varFuncer)}
+	outputShape := shapes.Shape{inputShape.Type, inputShape.Stack.Push(varFuncer)}
 	action := func(inputState states.State, args []states.Action) states.State {
 		return states.State{
 			Value: inputState.Value,

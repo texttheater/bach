@@ -7,7 +7,7 @@ import (
 )
 
 func initValues() {
-	InitialShape.FuncerStack = InitialShape.FuncerStack.PushAll([]shapes.Funcer{
+	InitialShape.Stack = InitialShape.Stack.PushAll([]shapes.Funcer{
 		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {
 			if gotName != "id" {
 				return nil, nil, nil, false

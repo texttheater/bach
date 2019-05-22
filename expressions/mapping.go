@@ -33,8 +33,8 @@ func (x MappingExpression) Typecheck(inputShape shapes.Shape, params []*shapes.P
 	}
 	// typecheck body
 	bodyInputShape := shapes.Shape{
-		Type:        inputShape.Type.ElementType(),
-		FuncerStack: inputShape.FuncerStack,
+		Type:  inputShape.Type.ElementType(),
+		Stack: inputShape.Stack,
 	}
 	bodyOutputShape, bodyAction, err := x.Body.Typecheck(bodyInputShape, nil)
 	if err != nil {
@@ -42,8 +42,8 @@ func (x MappingExpression) Typecheck(inputShape shapes.Shape, params []*shapes.P
 	}
 	// create output shape
 	outputShape := shapes.Shape{
-		Type:        &types.SeqType{bodyOutputShape.Type},
-		FuncerStack: inputShape.FuncerStack,
+		Type:  &types.SeqType{bodyOutputShape.Type},
+		Stack: inputShape.Stack,
 	}
 	// create action
 	action := func(inputState states.State, args []states.Action) states.State {

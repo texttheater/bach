@@ -24,8 +24,8 @@ func (p TypePattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Typ
 		)
 	}
 	outputShape := shapes.Shape{
-		Type:        p.Type,
-		FuncerStack: inputShape.FuncerStack,
+		Type:  p.Type,
+		Stack: inputShape.Stack,
 	}
 	restType := types.Complement(inputShape.Type, p.Type)
 	var check func(values.Value) bool

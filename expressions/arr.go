@@ -33,8 +33,8 @@ func (x ArrExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Param
 		elementActions[i] = elAction
 	}
 	outputShape := shapes.Shape{
-		Type:        types.TupType(elementTypes),
-		FuncerStack: inputShape.FuncerStack,
+		Type:  types.TupType(elementTypes),
+		Stack: inputShape.Stack,
 	}
 	action := func(inputState states.State, args []states.Action) states.State {
 		elementValues := make([]values.Value, len(elementActions))

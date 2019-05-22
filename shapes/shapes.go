@@ -5,8 +5,8 @@ import (
 )
 
 type Shape struct {
-	Type        types.Type
-	FuncerStack *FuncerStack
+	Type  types.Type
+	Stack *FuncerStack
 }
 
 type FuncerStack struct {
