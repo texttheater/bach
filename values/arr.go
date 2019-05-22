@@ -2,6 +2,8 @@ package values
 
 import (
 	"bytes"
+
+	"github.com/texttheater/bach/types"
 )
 
 type ArrValue []Value
@@ -33,4 +35,46 @@ func (v ArrValue) Iter() <-chan Value {
 		close(channel)
 	}()
 	return channel
+}
+
+func (v ArrValue) Inhabits(t types.Type) bool {
+	switch t := t.(type) {
+	case types.TupType:
+		if len(v) != len(t) {
+			return false
+		}
+		for i := range v {
+			if !v[i].Inhabits(t[i]) {
+				return false
+			}
+		}
+		return true
+	case *types.ArrType:
+		if (types.AnyType{}).Subsumes(t.ElType) {
+			return true
+		}
+		for _, e := range v {
+			if !e.Inhabits(t.ElType) {
+				return false
+			}
+		}
+		return true
+	case *types.SeqType:
+		if (types.AnyType{}).Subsumes(t.ElType) {
+			return true
+		}
+		for _, e := range v {
+			if !e.Inhabits(t.ElType) {
+				return false
+			}
+		}
+		return true
+	case types.UnionType:
+		return inhabits(v, t)
+	case types.AnyType:
+		return true
+	default:
+		return false
+
+	}
 }

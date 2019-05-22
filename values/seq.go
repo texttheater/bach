@@ -21,3 +21,16 @@ func (v SeqValue) Iter() <-chan Value {
 	// TODO safeguard against iterating twice?
 	return v.Channel
 }
+
+func (v SeqValue) Inhabits(t types.Type) bool {
+	switch t := t.(type) {
+	case *types.SeqType:
+		return t.ElType.Subsumes(v.ElementType)
+	case types.UnionType:
+		return inhabits(v, t)
+	case types.AnyType:
+		return true
+	default:
+		return false
+	}
+}
