@@ -5,8 +5,6 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-// TODO remove error handling code (no errors)
-
 type Type struct {
 	Pos                lexer.Position
 	NonDisjunctiveType *NonDisjunctiveType   `@@`
