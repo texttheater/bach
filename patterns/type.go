@@ -6,7 +6,6 @@ import (
 	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 type TypePattern struct {
@@ -28,43 +27,10 @@ func (p TypePattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Typ
 		Type:  intersection,
 		Stack: inputShape.Stack,
 	}
-	var check func(values.Value) bool
-	switch t := p.Type.(type) {
-	case types.NullType:
-		check = func(v values.Value) bool {
-			_, ok := v.(values.NullValue)
-			return ok
-		}
-	case types.ReaderType:
-		check = func(v values.Value) bool {
-			_, ok := v.(values.ReaderValue)
-			return ok
-		}
-	case types.BoolType:
-		check = func(v values.Value) bool {
-			_, ok := v.(values.BoolValue)
-			return ok
-		}
-	case types.NumType:
-		check = func(v values.Value) bool {
-			_, ok := v.(values.NumValue)
-			return ok
-		}
-	case types.StrType:
-		check = func(v values.Value) bool {
-			_, ok := v.(values.StrValue)
-			return ok
-		}
-	case *types.SeqType:
-		check = func(v values.Value) bool {
-			u, ok := v.(values.SeqValue)
-			return ok && t.ElType.Subsumes(u.ElementType)
-		}
-	default:
-		panic("invalid type pattern")
-	}
 	matcher := func(inputState states.State) (*states.VariableStack, bool) {
-		if check(inputState.Value) {
+		// TODO For efficiency, we should inhabitation of a more
+		// general type than p.Type if that is equivalent.
+		if inputState.Value.Inhabits(p.Type) {
 			return inputState.Stack, true
 		}
 		return nil, false
