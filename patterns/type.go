@@ -15,7 +15,8 @@ type TypePattern struct {
 }
 
 func (p TypePattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type, Matcher, error) {
-	if !inputShape.Type.Subsumes(p.Type) {
+	intersection, complement := inputShape.Type.Partition(p.Type)
+	if (types.VoidType{}).Subsumes(intersection) {
 		return shapes.Shape{}, nil, nil, errors.E(
 			errors.Code(errors.ImpossibleMatch),
 			errors.Pos(p.Pos),
@@ -24,10 +25,9 @@ func (p TypePattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Typ
 		)
 	}
 	outputShape := shapes.Shape{
-		Type:  p.Type,
+		Type:  intersection,
 		Stack: inputShape.Stack,
 	}
-	restType := types.Complement(inputShape.Type, p.Type)
 	var check func(values.Value) bool
 	switch t := p.Type.(type) {
 	case types.NullType:
@@ -69,5 +69,5 @@ func (p TypePattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Typ
 		}
 		return nil, false
 	}
-	return outputShape, restType, matcher, nil
+	return outputShape, complement, matcher, nil
 }
