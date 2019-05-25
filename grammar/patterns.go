@@ -8,29 +8,14 @@ import (
 
 type Pattern struct {
 	Pos        lexer.Position
-	NullType   *NullType   `  @@`
-	ReaderType *ReaderType `| @@`
-	BoolType   *BoolType   `| @@`
-	NumType    *NumType    `| @@`
-	StrType    *StrType    `| @@`
-	SeqType    *SeqType    `| @@`
+	Type       *Type       `  @@`
 	ArrPattern *ArrPattern `| @@`
 }
 
 func (g *Pattern) Ast() (patterns.Pattern, error) {
 	var t types.Type
-	if g.NullType != nil {
-		t = g.NullType.Ast()
-	} else if g.ReaderType != nil {
-		t = g.ReaderType.Ast()
-	} else if g.BoolType != nil {
-		t = g.BoolType.Ast()
-	} else if g.NumType != nil {
-		t = g.NumType.Ast()
-	} else if g.StrType != nil {
-		t = g.StrType.Ast()
-	} else if g.SeqType != nil {
-		t = g.SeqType.Ast()
+	if g.Type != nil {
+		t = g.Type.Ast()
 	} else if g.ArrPattern != nil {
 		p, err := g.ArrPattern.Ast()
 		if err != nil {
