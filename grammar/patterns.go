@@ -10,6 +10,7 @@ type Pattern struct {
 	Pos        lexer.Position
 	Type       *Type       `  @@`
 	ArrPattern *ArrPattern `| @@`
+	ObjPattern *ObjPattern `| @@`
 }
 
 func (g *Pattern) Ast() (patterns.Pattern, error) {
@@ -18,6 +19,12 @@ func (g *Pattern) Ast() (patterns.Pattern, error) {
 		t = g.Type.Ast()
 	} else if g.ArrPattern != nil {
 		p, err := g.ArrPattern.Ast()
+		if err != nil {
+			return nil, err
+		}
+		return p, nil
+	} else if g.ObjPattern != nil {
+		p, err := g.ObjPattern.Ast()
 		if err != nil {
 			return nil, err
 		}
@@ -49,8 +56,34 @@ func (g *ArrPattern) Ast() (patterns.Pattern, error) {
 				return nil, err
 			}
 			elPatterns[i+1] = p
-
 		}
 	}
 	return &patterns.ArrPattern{g.Pos, elPatterns}, nil
+}
+
+type ObjPattern struct {
+	Pos    lexer.Position `"{"`
+	Prop   *string        `( @Prop`
+	Value  *Pattern       `  ":" @@`
+	Props  []string       `   ( "," @Prop`
+	Values []*Pattern     `     ":" @@ )* )? "}"`
+}
+
+func (g *ObjPattern) Ast() (patterns.Pattern, error) {
+	propPatternMap := make(map[string]patterns.Pattern)
+	if g.Prop != nil {
+		p, err := g.Value.Ast()
+		if err != nil {
+			return nil, err
+		}
+		propPatternMap[*g.Prop] = p
+		for i, prop := range g.Props {
+			p, err := g.Values[i].Ast()
+			if err != nil {
+				return nil, err
+			}
+			propPatternMap[prop] = p
+		}
+	}
+	return &patterns.ObjPattern{g.Pos, propPatternMap}, nil
 }
