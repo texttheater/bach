@@ -3,7 +3,6 @@ package grammar
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/patterns"
-	"github.com/texttheater/bach/types"
 )
 
 type Pattern struct {
@@ -14,9 +13,9 @@ type Pattern struct {
 }
 
 func (g *Pattern) Ast() (patterns.Pattern, error) {
-	var t types.Type
 	if g.Type != nil {
-		t = g.Type.Ast()
+		t := g.Type.Ast()
+		return patterns.TypePattern{g.Pos, t}, nil
 	} else if g.ArrPattern != nil {
 		p, err := g.ArrPattern.Ast()
 		if err != nil {
@@ -32,7 +31,6 @@ func (g *Pattern) Ast() (patterns.Pattern, error) {
 	} else {
 		panic("invalid pattern")
 	}
-	return patterns.TypePattern{g.Pos, t}, nil
 }
 
 type ArrPattern struct {
