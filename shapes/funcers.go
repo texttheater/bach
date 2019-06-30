@@ -12,7 +12,7 @@ type Funcer func(gotInputType types.Type, gotName string, gotNumArgs int) (param
 
 type Kernel func(inputValue values.Value, argValues []values.Value) values.Value
 
-func VarFuncer(id interface{}, name string, varType types.Type) Funcer {
+func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
 	return func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*Parameter, types.Type, states.Action, bool) {
 		if gotName != name {
 			return nil, nil, nil, false

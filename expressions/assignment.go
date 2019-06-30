@@ -20,20 +20,15 @@ func (x AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*shape
 			errors.Pos(x.Pos),
 		)
 	}
-	var id interface{} = x
-	varFuncer := shapes.VarFuncer(id, x.Name, inputShape.Type)
-	outputShape := shapes.Shape{inputShape.Type, inputShape.Stack.Push(varFuncer)}
+	var id interface{} = x // TODO do we need this variable?
+	variableFuncer := shapes.VariableFuncer(id, x.Name, inputShape.Type)
+	outputShape := shapes.Shape{inputShape.Type, inputShape.Stack.Push(variableFuncer)}
 	action := func(inputState states.State, args []states.Action) states.State {
 		return states.State{
 			Value: inputState.Value,
 			Stack: inputState.Stack.Push(states.Variable{
-				ID: id,
-				Action: func(i states.State, as []states.Action) states.State {
-					return states.State{
-						Value: inputState.Value,
-						Stack: i.Stack,
-					}
-				},
+				ID:     x,
+				Action: states.SimpleAction(inputState.Value),
 			}),
 		}
 	}

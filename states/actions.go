@@ -1,5 +1,9 @@
 package states
 
+import (
+	"github.com/texttheater/bach/values"
+)
+
 type Action func(inputState State, args []Action) State
 
 func (a Action) SetArg(arg Action) Action {
@@ -10,5 +14,14 @@ func (a Action) SetArg(arg Action) Action {
 			args[i+1] = outerArg
 		}
 		return a(inputState, args)
+	}
+}
+
+func SimpleAction(value values.Value) Action {
+	return func(inputState State, args []Action) State {
+		return State{
+			Value: value,
+			Stack: inputState.Stack,
+		}
 	}
 }
