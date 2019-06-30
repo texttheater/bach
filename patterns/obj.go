@@ -22,7 +22,7 @@ func (p *ObjPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Typ
 	propMatcherMap := make(map[string]Matcher)
 	for prop, valPattern := range p.PropPatternMap {
 		valShape, _, valMatcher, err := valPattern.Typecheck(shapes.Shape{
-			Type:  inputShape.Type,
+			Type:  propInputTypeMap[prop],
 			Stack: funcerStack,
 		})
 		if err != nil {
