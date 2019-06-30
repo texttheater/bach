@@ -20,8 +20,7 @@ func (x AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*shape
 			errors.Pos(x.Pos),
 		)
 	}
-	var id interface{} = x // TODO do we need this variable?
-	variableFuncer := shapes.VariableFuncer(id, x.Name, inputShape.Type)
+	variableFuncer := shapes.VariableFuncer(x, x.Name, inputShape.Type)
 	outputShape := shapes.Shape{inputShape.Type, inputShape.Stack.Push(variableFuncer)}
 	action := func(inputState states.State, args []states.Action) states.State {
 		return states.State{

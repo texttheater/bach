@@ -45,9 +45,8 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*shape
 			// Variable objects to the body input state.
 			bodyInputStack := bodyInputStackStub
 			for i, param := range x.Params {
-				var id interface{} = param
 				bodyInputStack = bodyInputStack.Push(states.Variable{
-					ID:     id,
+					ID:     param,
 					Action: args[i],
 				})
 			}
@@ -67,7 +66,6 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*shape
 	// add parameter funcers for use in the body
 	bodyStack := functionStack
 	for i, param := range x.Params {
-		var id interface{} = param
 		paramFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {
 			if !param.InputType.Subsumes(gotInputType) {
 				return nil, nil, nil, false
@@ -81,7 +79,7 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*shape
 			paramAction := func(inputState states.State, args []states.Action) states.State {
 				stack := inputState.Stack
 				for stack != nil {
-					if stack.Head.ID == id {
+					if stack.Head.ID == param {
 						return stack.Head.Action(inputState, args)
 					}
 					stack = stack.Tail
