@@ -20,6 +20,9 @@ func (p *ArrPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Typ
 	elementInputTypes := make([]types.Type, len(p.ElementPatterns))
 	switch t := inputShape.Type.(type) {
 	case types.TupType:
+		if len(t) != len(elementInputTypes) {
+			return shapes.Shape{}, types.VoidType{}, nil, nil
+		}
 		for i, elType := range t {
 			elementInputTypes[i] = elType
 		}
