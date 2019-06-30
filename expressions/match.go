@@ -47,6 +47,14 @@ func (x MatchExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Par
 	elisMatchers := make([]patterns.Matcher, len(x.ElisPatterns))
 	elisConsequentActions := make([]states.Action, len(x.ElisConsequents))
 	for i := range x.ElisPatterns {
+		// reachability check
+		if (types.VoidType{}).Subsumes(inputShape.Type) {
+			return shapes.Shape{}, nil, errors.E(
+				errors.Code(errors.UnreachableElisClause),
+				errors.Pos(x.Pos),
+			)
+		}
+		// typecheck
 		consequentInputShape, restType, elisMatchers[i], err = x.ElisPatterns[i].Typecheck(inputShape)
 		if err != nil {
 			return shapes.Shape{}, nil, err

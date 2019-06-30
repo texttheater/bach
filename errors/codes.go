@@ -14,6 +14,7 @@ const (
 	ComposeWithVoid
 	NonExhaustiveMatch
 	ImpossibleMatch
+	UnreachableElisClause
 	UnreachableElseClause
 )
 
@@ -39,6 +40,8 @@ func (code ErrorCode) String() string {
 		return "NonExhaustiveMatch"
 	case ImpossibleMatch:
 		return "ImpossibleMatch"
+	case UnreachableElisClause:
+		return "UnreachableElisClause"
 	case UnreachableElseClause:
 		return "UnreachableElseClause"
 	default:
@@ -70,6 +73,8 @@ func (code ErrorCode) DefaultMessage() string {
 		return "Match is not exhaustive. Consider adding elis clauses and/or an else clause."
 	case ImpossibleMatch:
 		return "Impossible match. The pattern will never match the input type."
+	case UnreachableElisClause:
+		return "The `elis` clause is unreachable because the match is already exhaustive."
 	case UnreachableElseClause:
 		return "The `else` clause is unreachable because the match is already exhaustive."
 	default:
@@ -100,6 +105,8 @@ func (code ErrorCode) Kind() string {
 	case NonExhaustiveMatch:
 		return "Type error"
 	case ImpossibleMatch:
+		return "Type error"
+	case UnreachableElisClause:
 		return "Type error"
 	case UnreachableElseClause:
 		return "Type error"
