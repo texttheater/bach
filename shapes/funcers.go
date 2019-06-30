@@ -1,6 +1,8 @@
 package shapes
 
 import (
+	"fmt"
+
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
@@ -9,6 +11,32 @@ import (
 type Funcer func(gotInputType types.Type, gotName string, gotNumArgs int) (params []*Parameter, outputType types.Type, action states.Action, ok bool)
 
 type Kernel func(inputValue values.Value, argValues []values.Value) values.Value
+
+func VarFuncer(id interface{}, name string, varType types.Type) Funcer {
+	return func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*Parameter, types.Type, states.Action, bool) {
+		if gotName != name {
+			return nil, nil, nil, false
+		}
+		if gotNumArgs != 0 {
+			return nil, nil, nil, false
+		}
+		varAction := func(inputState states.State, args []states.Action) states.State {
+			stack := inputState.Stack
+			for stack != nil {
+				if stack.Head.ID == id {
+					return states.State{
+						Value: stack.Head.Action(states.InitialState, nil).Value,
+						Stack: inputState.Stack,
+					}
+				}
+				stack = stack.Tail
+			}
+			panic(fmt.Sprintf("variable %s not found", name))
+		}
+		return nil, varType, varAction, true
+	}
+
+}
 
 func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, kernel Kernel) Funcer {
 	// make parameters from argument types

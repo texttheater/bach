@@ -1,13 +1,10 @@
 package expressions
 
 import (
-	"fmt"
-
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
-	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
@@ -24,28 +21,7 @@ func (x AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*shape
 		)
 	}
 	var id interface{} = x
-	varFuncer := func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {
-		if gotName != x.Name {
-			return nil, nil, nil, false
-		}
-		if gotNumArgs != 0 {
-			return nil, nil, nil, false
-		}
-		varAction := func(inputState states.State, args []states.Action) states.State {
-			stack := inputState.Stack
-			for stack != nil {
-				if stack.Head.ID == id {
-					return states.State{
-						Value: stack.Head.Action(states.InitialState, nil).Value,
-						Stack: inputState.Stack,
-					}
-				}
-				stack = stack.Tail
-			}
-			panic(fmt.Sprintf("variable %s not found", x.Name))
-		}
-		return nil, inputShape.Type, varAction, true
-	}
+	varFuncer := shapes.VarFuncer(id, x.Name, inputShape.Type)
 	outputShape := shapes.Shape{inputShape.Type, inputShape.Stack.Push(varFuncer)}
 	action := func(inputState states.State, args []states.Action) states.State {
 		return states.State{
