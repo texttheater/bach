@@ -12,6 +12,7 @@ import (
 type ArrPattern struct {
 	Pos             lexer.Position
 	ElementPatterns []Pattern
+	Name            *string
 }
 
 func (p *ArrPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type, Matcher, error) {
@@ -48,6 +49,12 @@ func (p *ArrPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Typ
 		Type:  intersection,
 		Stack: funcerStack,
 	}
+	if p.Name != nil {
+		outputShape.Stack = &shapes.FuncerStack{
+			Head: shapes.VariableFuncer(p, *p.Name, outputShape.Type),
+			Tail: outputShape.Stack,
+		}
+	}
 	// build matcher
 	matcher := func(inputState states.State) (*states.VariableStack, bool) {
 		varStack := inputState.Stack
@@ -64,6 +71,15 @@ func (p *ArrPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Typ
 				})
 				if !ok {
 					return nil, false
+				}
+			}
+			if p.Name != nil {
+				varStack = &states.VariableStack{
+					Head: states.Variable{
+						ID:     p,
+						Action: states.SimpleAction(inputState.Value),
+					},
+					Tail: varStack,
 				}
 			}
 			return varStack, true

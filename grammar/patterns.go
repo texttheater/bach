@@ -38,17 +38,19 @@ func (g *Pattern) Ast() (patterns.Pattern, error) {
 
 type TypePattern struct {
 	Pos  lexer.Position
-	Type *Type `@@`
+	Type *Type   `@@`
+	Name *string `( @Prop | @Op1 | @Op2 )?`
 }
 
 func (g *TypePattern) Ast() (patterns.Pattern, error) {
-	return patterns.TypePattern{g.Pos, g.Type.Ast()}, nil
+	return patterns.TypePattern{g.Pos, g.Type.Ast(), g.Name}, nil
 }
 
 type ArrPattern struct {
 	Pos      lexer.Position `"["`
 	Element  *Pattern       `( @@`
 	Elements []*Pattern     `  ( "," @@ )* )? "]"`
+	Name     *string        `( @Prop | @Op1 | @Op2 )?`
 }
 
 func (g *ArrPattern) Ast() (patterns.Pattern, error) {
@@ -68,7 +70,7 @@ func (g *ArrPattern) Ast() (patterns.Pattern, error) {
 			elPatterns[i+1] = p
 		}
 	}
-	return &patterns.ArrPattern{g.Pos, elPatterns}, nil
+	return &patterns.ArrPattern{g.Pos, elPatterns, g.Name}, nil
 }
 
 type ObjPattern struct {
@@ -77,6 +79,7 @@ type ObjPattern struct {
 	Value  *Pattern       `  ":" @@`
 	Props  []string       `   ( "," @Prop`
 	Values []*Pattern     `     ":" @@ )* )? "}"`
+	Name   *string        `( @Prop | @Op1 | @Op2 )?`
 }
 
 func (g *ObjPattern) Ast() (patterns.Pattern, error) {
@@ -95,5 +98,5 @@ func (g *ObjPattern) Ast() (patterns.Pattern, error) {
 			propPatternMap[prop] = p
 		}
 	}
-	return &patterns.ObjPattern{g.Pos, propPatternMap}, nil
+	return &patterns.ObjPattern{g.Pos, propPatternMap, g.Name}, nil
 }
