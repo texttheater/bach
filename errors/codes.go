@@ -102,8 +102,8 @@ func (code ErrorCode) Kind() string {
 	case ImpossibleMatch:
 		return "Type error"
 	case UnreachableElseClause:
-		return "UnreachableElseClause"
+		return "Type error"
 	default:
-		return "unknown error"
+		return "Unknown error"
 	}
 }
