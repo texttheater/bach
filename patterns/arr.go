@@ -31,6 +31,9 @@ func (p *ArrPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Typ
 			elementInputTypes[i] = t.ElType
 		}
 	case types.UnionType:
+		for i := range elementInputTypes {
+			elementInputTypes[i] = types.VoidType{}
+		}
 		for _, disjunct := range t {
 			switch d := disjunct.(type) {
 			case types.TupType:
