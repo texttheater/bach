@@ -6,16 +6,19 @@ import (
 )
 
 type Pattern struct {
-	Pos        lexer.Position
-	Type       *Type       `  @@`
-	ArrPattern *ArrPattern `| @@`
-	ObjPattern *ObjPattern `| @@`
+	Pos         lexer.Position
+	TypePattern *TypePattern `  @@`
+	ArrPattern  *ArrPattern  `| @@`
+	ObjPattern  *ObjPattern  `| @@`
 }
 
 func (g *Pattern) Ast() (patterns.Pattern, error) {
-	if g.Type != nil {
-		t := g.Type.Ast()
-		return patterns.TypePattern{g.Pos, t}, nil
+	if g.TypePattern != nil {
+		p, err := g.TypePattern.Ast()
+		if err != nil {
+			return nil, err
+		}
+		return p, nil
 	} else if g.ArrPattern != nil {
 		p, err := g.ArrPattern.Ast()
 		if err != nil {
@@ -31,6 +34,15 @@ func (g *Pattern) Ast() (patterns.Pattern, error) {
 	} else {
 		panic("invalid pattern")
 	}
+}
+
+type TypePattern struct {
+	Pos  lexer.Position
+	Type *Type `@@`
+}
+
+func (g *TypePattern) Ast() (patterns.Pattern, error) {
+	return patterns.TypePattern{g.Pos, g.Type.Ast()}, nil
 }
 
 type ArrPattern struct {
