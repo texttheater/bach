@@ -30,10 +30,35 @@ func (p *ArrPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Typ
 		for i := range elementInputTypes {
 			elementInputTypes[i] = t.ElType
 		}
-	default:
-		for i := range elementInputTypes {
-			elementInputTypes[i] = types.VoidType{}
+	case types.UnionType:
+		for _, disjunct := range t {
+			switch d := disjunct.(type) {
+			case types.TupType:
+				if len(d) != len(elementInputTypes) {
+					continue
+				}
+				for i := range elementInputTypes {
+					elementInputTypes[i] = types.Union(
+						elementInputTypes[i],
+						d[i],
+					)
+				}
+			case *types.ArrType:
+				for i := range elementInputTypes {
+					elementInputTypes[i] = types.Union(
+						elementInputTypes[i],
+						d.ElType,
+					)
+				}
+			}
 		}
+		for _, elInputType := range elementInputTypes {
+			if (types.VoidType{}).Subsumes(elInputType) {
+				return shapes.Shape{}, types.VoidType{}, nil, nil
+			}
+		}
+	default:
+		return shapes.Shape{}, types.VoidType{}, nil, nil
 	}
 	// process element patterns
 	funcerStack := inputShape.Stack

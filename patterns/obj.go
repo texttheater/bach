@@ -16,6 +16,41 @@ type ObjPattern struct {
 }
 
 func (p *ObjPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type, Matcher, error) {
+	// compute value input types
+	propInputTypeMap := make(map[string]types.Type)
+	switch t := inputShape.Type.(type) {
+	case types.ObjType:
+		for prop := range p.PropPatternMap {
+			valType, ok := t.PropTypeMap[prop]
+			if !ok {
+				valType = types.VoidType{}
+			}
+			propInputTypeMap[prop] = valType
+		}
+	case types.UnionType:
+	PatternProps:
+		for prop := range p.PropPatternMap {
+			propInputTypeMap[prop] = types.VoidType{}
+			for _, disjunct := range t {
+				switch d := disjunct.(type) {
+				case types.ObjType:
+					valType, ok := d.PropTypeMap[prop]
+					if !ok {
+						propInputTypeMap[prop] = types.AnyType{}
+						continue PatternProps
+					}
+					propInputTypeMap[prop] = types.Union(
+						propInputTypeMap[prop],
+						valType,
+					)
+				}
+			}
+		}
+	default:
+		for prop := range p.PropPatternMap {
+			propInputTypeMap[prop] = types.VoidType{}
+		}
+	}
 	// process value patterns
 	funcerStack := inputShape.Stack
 	propTypeMap := make(map[string]types.Type)
