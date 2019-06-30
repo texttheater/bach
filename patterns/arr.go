@@ -16,13 +16,29 @@ type ArrPattern struct {
 }
 
 func (p *ArrPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type, Matcher, error) {
+	// compute element input types
+	elementInputTypes := make([]types.Type, len(p.ElementPatterns))
+	switch t := inputShape.Type.(type) {
+	case types.TupType:
+		for i, elType := range t {
+			elementInputTypes[i] = elType
+		}
+	case *types.ArrType:
+		for i := range elementInputTypes {
+			elementInputTypes[i] = t.ElType
+		}
+	default:
+		for i := range elementInputTypes {
+			elementInputTypes[i] = types.VoidType{}
+		}
+	}
 	// process element patterns
 	funcerStack := inputShape.Stack
 	elementTypes := make([]types.Type, len(p.ElementPatterns))
 	elementMatchers := make([]Matcher, len(p.ElementPatterns))
 	for i, elPattern := range p.ElementPatterns {
 		elShape, _, elMatcher, err := elPattern.Typecheck(shapes.Shape{
-			Type:  inputShape.Type,
+			Type:  elementInputTypes[i],
 			Stack: funcerStack,
 		})
 		if err != nil {
