@@ -61,6 +61,13 @@ func TestMatchingArr(t *testing.T) {
 		t,
 	)
 	TestProgram(
+		`[[1]] is [[x]] then x ok`,
+		types.NumType{},
+		values.NumValue(1),
+		nil,
+		t,
+	)
+	TestProgram(
 		`if true then [1] else [2] ok is [Num a] then a ok`,
 		types.NumType{},
 		values.NumValue(1),

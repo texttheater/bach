@@ -3,17 +3,25 @@ package grammar
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/patterns"
+	"github.com/texttheater/bach/types"
 )
 
 type Pattern struct {
 	Pos         lexer.Position
-	TypePattern *TypePattern `  @@`
+	NamePattern *NamePattern `  @@`
+	TypePattern *TypePattern `| @@`
 	ArrPattern  *ArrPattern  `| @@`
 	ObjPattern  *ObjPattern  `| @@`
 }
 
 func (g *Pattern) Ast() (patterns.Pattern, error) {
-	if g.TypePattern != nil {
+	if g.NamePattern != nil {
+		p, err := g.NamePattern.Ast()
+		if err != nil {
+			return nil, err
+		}
+		return p, nil
+	} else if g.TypePattern != nil {
 		p, err := g.TypePattern.Ast()
 		if err != nil {
 			return nil, err
@@ -34,6 +42,15 @@ func (g *Pattern) Ast() (patterns.Pattern, error) {
 	} else {
 		panic("invalid pattern")
 	}
+}
+
+type NamePattern struct {
+	Pos  lexer.Position
+	Name *string `@Prop | @Op1 | @Op2`
+}
+
+func (g *NamePattern) Ast() (patterns.Pattern, error) {
+	return patterns.TypePattern{g.Pos, types.AnyType{}, g.Name}, nil
 }
 
 type TypePattern struct {
