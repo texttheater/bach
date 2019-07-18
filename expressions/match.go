@@ -7,6 +7,7 @@ import (
 	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
+	"github.com/texttheater/bach/values"
 )
 
 type MatchExpression struct {
@@ -29,9 +30,34 @@ func (x MatchExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Par
 		)
 	}
 	// typecheck pattern
-	consequentInputShape, restType, matcher, err := x.Pattern.Typecheck(inputShape)
+	patternOutputShape, restType, matcher, err := x.Pattern.Typecheck(inputShape)
 	if err != nil {
 		return shapes.Shape{}, nil, err
+	}
+	// typecheck guard
+	var guardOutputShape shapes.Shape
+	var guardAction states.Action
+	if x.Guard == nil {
+		guardOutputShape = patternOutputShape
+		guardAction = states.SimpleAction(values.BoolValue(true))
+	} else {
+		guardOutputShape, guardAction, err = x.Guard.Typecheck(patternOutputShape, nil)
+		if err != nil {
+			return shapes.Shape{}, nil, err
+		}
+		if !(types.BoolType{}).Subsumes(guardOutputShape.Type) {
+			return shapes.Shape{}, nil, errors.E(
+				errors.Code(errors.ConditionMustBeBool),
+				errors.Pos(x.Pos),
+				errors.WantType(types.BoolType{}),
+				errors.GotType(guardOutputShape.Type),
+			)
+		}
+	}
+	// build consequent input shape
+	consequentInputShape := shapes.Shape{
+		Type:  patternOutputShape.Type,
+		Stack: guardOutputShape.Stack,
 	}
 	// typecheck consequent
 	consequentOutputShape, consequentAction, err := x.Consequent.Typecheck(consequentInputShape, nil)
@@ -39,14 +65,18 @@ func (x MatchExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Par
 		return shapes.Shape{}, nil, err
 	}
 	// update input shape
+	if x.Guard != nil {
+		restType = inputShape.Type
+	}
 	inputShape = shapes.Shape{
 		Type:  restType,
 		Stack: inputShape.Stack,
 	}
 	// initialize output type
 	outputType := consequentOutputShape.Type
-	// typecheck elis patterns, consequents
+	// typecheck elis patterns, guards, consequents
 	elisMatchers := make([]patterns.Matcher, len(x.ElisPatterns))
+	elisGuardActions := make([]states.Action, len(x.ElisGuards))
 	elisConsequentActions := make([]states.Action, len(x.ElisConsequents))
 	for i := range x.ElisPatterns {
 		// reachability check
@@ -56,17 +86,45 @@ func (x MatchExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Par
 				errors.Pos(x.Pos),
 			)
 		}
-		// typecheck
-		consequentInputShape, restType, elisMatchers[i], err = x.ElisPatterns[i].Typecheck(inputShape)
+		// typecheck pattern
+		patternOutputShape, restType, elisMatchers[i], err = x.ElisPatterns[i].Typecheck(inputShape)
 		if err != nil {
 			return shapes.Shape{}, nil, err
 		}
+		// typecheck guard
+		var guardOutputShape shapes.Shape
+		if x.ElisGuards[i] == nil {
+			guardOutputShape = patternOutputShape
+			elisGuardActions[i] = states.SimpleAction(values.BoolValue(true))
+		} else {
+			guardOutputShape, elisGuardActions[i], err = x.ElisGuards[i].Typecheck(patternOutputShape, nil)
+			if err != nil {
+				return shapes.Shape{}, nil, err
+			}
+			if !(types.BoolType{}).Subsumes(guardOutputShape.Type) {
+				return shapes.Shape{}, nil, errors.E(
+					errors.Code(errors.ConditionMustBeBool),
+					errors.Pos(x.Pos),
+					errors.WantType(types.BoolType{}),
+					errors.GotType(guardOutputShape.Type),
+				)
+			}
+		}
+		// build consequent input shape
+		consequentInputShape := shapes.Shape{
+			Type:  patternOutputShape.Type,
+			Stack: guardOutputShape.Stack,
+		}
+		// typecheck consequent
 		consequentOutputShape, consequentAction, err := x.ElisConsequents[i].Typecheck(consequentInputShape, nil)
 		if err != nil {
 			return shapes.Shape{}, nil, err
 		}
 		elisConsequentActions[i] = consequentAction
 		// update input shape
+		if x.ElisGuards[i] != nil {
+			restType = inputShape.Type
+		}
 		inputShape = shapes.Shape{
 			Type:  restType,
 			Stack: inputShape.Stack,
@@ -104,27 +162,45 @@ func (x MatchExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Par
 	}
 	// make action
 	action := func(inputState states.State, args []states.Action) states.State {
-		if matcherVarStack, ok := matcher(inputState); ok {
-			consequentInputState := states.State{
+		matcherVarStack, ok := matcher(inputState)
+		if ok {
+			guardInputState := states.State{
 				Value: inputState.Value,
 				Stack: matcherVarStack,
 			}
-			consequentOutputState := consequentAction(consequentInputState, nil)
-			return states.State{
-				consequentOutputState.Value,
-				inputState.Stack,
+			guardState := guardAction(guardInputState, nil)
+			boolGuardValue := guardState.Value.(values.BoolValue)
+			if boolGuardValue {
+				consequentInputState := states.State{
+					Value: inputState.Value,
+					Stack: guardState.Stack,
+				}
+				consequentOutputState := consequentAction(consequentInputState, nil)
+				return states.State{
+					Value: consequentOutputState.Value,
+					Stack: inputState.Stack,
+				}
 			}
 		}
 		for i := range elisMatchers {
-			if matcherVarStack, ok := elisMatchers[i](inputState); ok {
-				consequentInputState := states.State{
+			matcherVarStack, ok := elisMatchers[i](inputState)
+			if ok {
+				guardInputState := states.State{
 					Value: inputState.Value,
 					Stack: matcherVarStack,
 				}
-				consequentOutputState := elisConsequentActions[i](consequentInputState, nil)
-				return states.State{
-					consequentOutputState.Value,
-					inputState.Stack,
+				guardState := elisGuardActions[i](guardInputState, nil)
+				boolGuardValue := guardState.Value.(values.BoolValue)
+				if boolGuardValue {
+					consequentInputState := states.State{
+						Value: inputState.Value,
+						Stack: guardState.Stack,
+					}
+					consequentOutputState := elisConsequentActions[i](consequentInputState, nil)
+					return states.State{
+						Value: consequentOutputState.Value,
+						Stack: inputState.Stack,
+					}
 				}
 			}
 		}
