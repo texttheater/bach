@@ -30,17 +30,16 @@ func (g *Composition) Ast() (expressions.Expression, error) {
 }
 
 type Component struct {
-	Pos         lexer.Position
-	Num         *float64     `  @Num`
-	Str         *string      `| @Str`
-	Array       *Array       `| @@`
-	Object      *Object      `| @@`
-	Call        *Call        `| @@`
-	Assignment  *Assignment  `| @Assignment`
-	Definition  *Definition  `| @@`
-	Conditional *Conditional `| @@`
-	Match       *Match       `| @@`
-	Mapping     *Mapping     `| @@`
+	Pos        lexer.Position
+	Num        *float64    `  @Num`
+	Str        *string     `| @Str`
+	Array      *Array      `| @@`
+	Object     *Object     `| @@`
+	Call       *Call       `| @@`
+	Assignment *Assignment `| @Assignment`
+	Definition *Definition `| @@`
+	Match      *Match      `| @@`
+	Mapping    *Mapping    `| @@`
 }
 
 func (g *Component) Ast() (expressions.Expression, error) {
@@ -72,9 +71,6 @@ func (g *Component) Ast() (expressions.Expression, error) {
 	}
 	if g.Definition != nil {
 		return g.Definition.Ast()
-	}
-	if g.Conditional != nil {
-		return g.Conditional.Ast()
 	}
 	if g.Match != nil {
 		return g.Match.Ast()

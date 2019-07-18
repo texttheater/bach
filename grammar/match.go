@@ -4,55 +4,76 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/patterns"
+	"github.com/texttheater/bach/types"
 )
 
 type Match struct {
-	Pos         lexer.Position
-	Pattern     *Pattern     `"is" @@`
-	Guard       *Composition `( "with" @@)?`
-	Consequent  *Composition `"then" @@`
-	Eliss       []*Elis      `( @@ )*`
-	Alternative *Composition `( "else" @@ )? "ok"`
+	Pos          lexer.Position
+	Pattern      *Pattern       `( "is" @@`
+	Guard        *Composition   `  ( "with" @@)?`
+	Condition    *Composition   `| "if" @@ )`
+	Consequent   *Composition   `"then" @@`
+	Alternatives []*Alternative `( @@ )*`
+	Alternative  *Composition   `( "else" @@ )? "ok"`
 }
 
-type Elis struct {
+type Alternative struct {
 	Pos        lexer.Position
-	Pattern    *Pattern     `"elis" @@`
-	Guard      *Composition `( "with" @@ )?`
+	Pattern    *Pattern     `( "elis" @@`
+	Guard      *Composition `  ( "with" @@ )?`
+	Condition  *Composition `| "elif" @@ )`
 	Consequent *Composition `"then" @@`
 }
 
 func (g *Match) Ast() (expressions.Expression, error) {
-	pattern, err := g.Pattern.Ast()
-	if err != nil {
-		return nil, err
-	}
+	var pattern patterns.Pattern
 	var guard expressions.Expression
-	if g.Guard != nil {
-		guard, err = g.Guard.Ast()
+	var err error
+	if g.Pattern == nil {
+		pattern = patterns.TypePattern{g.Pos, types.AnyType{}, nil}
+		guard, err = g.Condition.Ast()
 		if err != nil {
 			return nil, err
+		}
+	} else {
+		pattern, err = g.Pattern.Ast()
+		if err != nil {
+			return nil, err
+		}
+		if g.Guard != nil {
+			guard, err = g.Guard.Ast()
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	consequent, err := g.Consequent.Ast()
 	if err != nil {
 		return nil, err
 	}
-	elisPatterns := make([]patterns.Pattern, len(g.Eliss))
-	elisGuards := make([]expressions.Expression, len(g.Eliss))
-	elisConsequents := make([]expressions.Expression, len(g.Eliss))
-	for i, elis := range g.Eliss {
-		elisPatterns[i], err = elis.Pattern.Ast()
-		if err != nil {
-			return nil, err
-		}
-		if elis.Guard != nil {
-			elisGuards[i], err = elis.Guard.Ast()
+	alternativePatterns := make([]patterns.Pattern, len(g.Alternatives))
+	alternativeGuards := make([]expressions.Expression, len(g.Alternatives))
+	alternativeConsequents := make([]expressions.Expression, len(g.Alternatives))
+	for i, alternative := range g.Alternatives {
+		if alternative.Pattern == nil {
+			alternativePatterns[i] = patterns.TypePattern{alternative.Pos, types.AnyType{}, nil}
+			alternativeGuards[i], err = alternative.Condition.Ast()
 			if err != nil {
 				return nil, err
 			}
+		} else {
+			alternativePatterns[i], err = alternative.Pattern.Ast()
+			if err != nil {
+				return nil, err
+			}
+			if alternative.Guard != nil {
+				alternativeGuards[i], err = alternative.Guard.Ast()
+				if err != nil {
+					return nil, err
+				}
+			}
 		}
-		elisConsequents[i], err = elis.Consequent.Ast()
+		alternativeConsequents[i], err = alternative.Consequent.Ast()
 		if err != nil {
 			return nil, err
 		}
@@ -69,9 +90,9 @@ func (g *Match) Ast() (expressions.Expression, error) {
 		Pattern:         pattern,
 		Guard:           guard,
 		Consequent:      consequent,
-		ElisPatterns:    elisPatterns,
-		ElisGuards:      elisGuards,
-		ElisConsequents: elisConsequents,
+		ElisPatterns:    alternativePatterns,
+		ElisGuards:      alternativeGuards,
+		ElisConsequents: alternativeConsequents,
 		Alternative:     alternative,
 	}, nil
 }
