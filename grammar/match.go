@@ -7,14 +7,19 @@ import (
 )
 
 type Match struct {
-	Pos             lexer.Position
-	Pattern         *Pattern       `"is" @@`
-	Guard           *Composition   `( "with" @@)?`
-	Consequent      *Composition   `"then" @@`
-	ElisPatterns    []*Pattern     `( "elis" @@`
-	ElisGuards      []*Composition `  ( "with" @@)?`
-	ElisConsequents []*Composition `  "then" @@ )*`
-	Alternative     *Composition   `( "else" @@ )? "ok"`
+	Pos         lexer.Position
+	Pattern     *Pattern     `"is" @@`
+	Guard       *Composition `( "with" @@)?`
+	Consequent  *Composition `"then" @@`
+	Eliss       []*Elis      `( @@ )*`
+	Alternative *Composition `( "else" @@ )? "ok"`
+}
+
+type Elis struct {
+	Pos        lexer.Position
+	Pattern    *Pattern     `"elis" @@`
+	Guard      *Composition `( "with" @@ )?`
+	Consequent *Composition `"then" @@`
 }
 
 func (g *Match) Ast() (expressions.Expression, error) {
@@ -22,18 +27,32 @@ func (g *Match) Ast() (expressions.Expression, error) {
 	if err != nil {
 		return nil, err
 	}
+	var guard expressions.Expression
+	if g.Guard != nil {
+		guard, err = g.Guard.Ast()
+		if err != nil {
+			return nil, err
+		}
+	}
 	consequent, err := g.Consequent.Ast()
 	if err != nil {
 		return nil, err
 	}
-	elisPatterns := make([]patterns.Pattern, len(g.ElisPatterns))
-	elisConsequents := make([]expressions.Expression, len(g.ElisConsequents))
-	for i := range g.ElisPatterns {
-		elisPatterns[i], err = g.ElisPatterns[i].Ast()
+	elisPatterns := make([]patterns.Pattern, len(g.Eliss))
+	elisGuards := make([]expressions.Expression, len(g.Eliss))
+	elisConsequents := make([]expressions.Expression, len(g.Eliss))
+	for i, elis := range g.Eliss {
+		elisPatterns[i], err = elis.Pattern.Ast()
 		if err != nil {
 			return nil, err
 		}
-		elisConsequents[i], err = g.ElisConsequents[i].Ast()
+		if elis.Guard != nil {
+			elisGuards[i], err = elis.Guard.Ast()
+			if err != nil {
+				return nil, err
+			}
+		}
+		elisConsequents[i], err = elis.Consequent.Ast()
 		if err != nil {
 			return nil, err
 		}
@@ -48,8 +67,10 @@ func (g *Match) Ast() (expressions.Expression, error) {
 	return &expressions.MatchExpression{
 		Pos:             g.Pos,
 		Pattern:         pattern,
+		Guard:           guard,
 		Consequent:      consequent,
 		ElisPatterns:    elisPatterns,
+		ElisGuards:      elisGuards,
 		ElisConsequents: elisConsequents,
 		Alternative:     alternative,
 	}, nil

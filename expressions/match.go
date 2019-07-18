@@ -12,8 +12,10 @@ import (
 type MatchExpression struct {
 	Pos             lexer.Position
 	Pattern         patterns.Pattern
+	Guard           Expression
 	Consequent      Expression
 	ElisPatterns    []patterns.Pattern
+	ElisGuards      []Expression
 	ElisConsequents []Expression
 	Alternative     Expression
 }
