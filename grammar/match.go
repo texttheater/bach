@@ -9,8 +9,10 @@ import (
 type Match struct {
 	Pos             lexer.Position
 	Pattern         *Pattern       `"is" @@`
+	Guard           *Composition   `( "with" @@)?`
 	Consequent      *Composition   `"then" @@`
 	ElisPatterns    []*Pattern     `( "elis" @@`
+	ElisGuards      []*Composition `  ( "with" @@)?`
 	ElisConsequents []*Composition `  "then" @@ )*`
 	Alternative     *Composition   `( "else" @@ )? "ok"`
 }

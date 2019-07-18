@@ -30,7 +30,7 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Pipe>\|)` +
 		// the following will be scanned as Name, but mapped to the
 		// appropriate token types by ToKeyword (see below)
-		`|(?P<Keyword>for|def|as|ok|if|then|elif|else|is|elis)` +
+		`|(?P<Keyword>for|def|as|ok|if|then|elif|else|is|elis|with)` +
 		`|(?P<TypeKeyword>Void|Null|Reader|Bool|Num|Str|Seq|Arr|Nearr|Tup|Obj|Any)`,
 ))
 
@@ -55,5 +55,6 @@ func isKeyword(name string) bool {
 	return name == "for" || name == "def" || name == "as" ||
 		name == "ok" || name == "if" || name == "then" ||
 		name == "elif" || name == "else" || name == "each" ||
-		name == "all" || name == "is" || name == "elis"
+		name == "all" || name == "is" || name == "elis" ||
+		name == "with"
 }
