@@ -30,16 +30,17 @@ func (g *Composition) Ast() (expressions.Expression, error) {
 }
 
 type Component struct {
-	Pos        lexer.Position
-	Num        *float64    `  @Num`
-	Str        *string     `| @Str`
-	Array      *Array      `| @@`
-	Object     *Object     `| @@`
-	Call       *Call       `| @@`
-	Assignment *Assignment `| @Assignment`
-	Definition *Definition `| @@`
-	Match      *Match      `| @@`
-	Mapping    *Mapping    `| @@`
+	Pos         lexer.Position
+	Num         *float64     `  @Num`
+	Str         *string      `| @Str`
+	Array       *Array       `| @@`
+	Object      *Object      `| @@`
+	Call        *Call        `| @@`
+	Assignment  *Assignment  `| @Assignment`
+	Definition  *Definition  `| @@`
+	Match       *Match       `| @@`
+	Mapping     *Mapping     `| @@`
+	Parenthesis *Parenthesis `| @@`
 }
 
 func (g *Component) Ast() (expressions.Expression, error) {
@@ -77,6 +78,9 @@ func (g *Component) Ast() (expressions.Expression, error) {
 	}
 	if g.Mapping != nil {
 		return g.Mapping.Ast()
+	}
+	if g.Parenthesis != nil {
+		return g.Parenthesis.Ast()
 	}
 	panic("invalid component")
 }
