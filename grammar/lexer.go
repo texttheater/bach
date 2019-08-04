@@ -15,7 +15,7 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Assignment>=(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
 		`|(?P<TypeKeywordLangle>(?:Void|Null|Bool|Num|Str|Seq|Arr|Nearr|Tup|Obj|Any)<)` +
-		`|(?P<NameRegexp>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)/(?:\\.|[^/])*/[A-Za-z]*)` +
+		`|(?P<NameRegexp>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)/(?:\\.|[^/])*/)` +
 		`|(?P<Prop>[\p{L}_][\p{L}_0-9]*)` +
 		`|(?P<Op1>[+\-*/%<>=])` +
 		`|(?P<Op2>==|<=|>=)` +

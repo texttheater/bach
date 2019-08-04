@@ -36,6 +36,7 @@ type Component struct {
 	Array       *Array       `| @@`
 	Object      *Object      `| @@`
 	Call        *Call        `| @@`
+	RegexpCall  *RegexpCall  `| @@`
 	Assignment  *Assignment  `| @Assignment`
 	Definition  *Definition  `| @@`
 	Match       *Match       `| @@`
@@ -66,6 +67,9 @@ func (g *Component) Ast() (expressions.Expression, error) {
 	}
 	if g.Call != nil {
 		return g.Call.Ast()
+	}
+	if g.RegexpCall != nil {
+		return g.RegexpCall.Ast()
 	}
 	if g.Assignment != nil {
 		return g.Assignment.Ast(), nil
