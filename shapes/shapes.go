@@ -1,6 +1,8 @@
 package shapes
 
 import (
+	"fmt"
+
 	"github.com/texttheater/bach/types"
 )
 
@@ -23,4 +25,14 @@ func (s *FuncerStack) PushAll(funcers []Funcer) *FuncerStack {
 		s = s.Push(funcers[i])
 	}
 	return s
+}
+
+func (s *FuncerStack) String() string {
+	slice := make([]Funcer, 0)
+	stack := s
+	for stack != nil {
+		slice = append(slice, stack.Head)
+		stack = stack.Tail
+	}
+	return fmt.Sprintf("%v", slice)
 }
