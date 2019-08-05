@@ -8,8 +8,6 @@ import (
 	"strings"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/shapes"
-	"github.com/texttheater/bach/types"
 )
 
 type errorAttribute func(err *e)
@@ -56,19 +54,19 @@ func Message(message string) errorAttribute {
 	}
 }
 
-func WantType(wantType types.Type) errorAttribute {
+func WantType(wantType interface{}) errorAttribute {
 	return func(err *e) {
 		err.WantType = wantType
 	}
 }
 
-func GotType(gotType types.Type) errorAttribute {
+func GotType(gotType interface{}) errorAttribute {
 	return func(err *e) {
 		err.GotType = gotType
 	}
 }
 
-func InputType(inputType types.Type) errorAttribute {
+func InputType(inputType interface{}) errorAttribute {
 	return func(err *e) {
 		err.InputType = inputType
 	}
@@ -98,13 +96,13 @@ func ParamNum(paramNum int) errorAttribute {
 	}
 }
 
-func WantParam(wantParam *shapes.Parameter) errorAttribute {
+func WantParam(wantParam interface{}) errorAttribute {
 	return func(err *e) {
 		err.WantParam = wantParam
 	}
 }
 
-func GotParam(gotParam *shapes.Parameter) errorAttribute {
+func GotParam(gotParam interface{}) errorAttribute {
 	return func(err *e) {
 		err.GotParam = gotParam
 	}
@@ -123,15 +121,15 @@ type e struct {
 	Code      *ErrorCode
 	Pos       *lexer.Position
 	Message   *string
-	WantType  types.Type
-	GotType   types.Type
-	InputType types.Type
+	WantType  interface{}
+	GotType   interface{}
+	InputType interface{}
 	Name      *string
 	ArgNum    *int
 	NumParams *int
 	ParamNum  *int
-	WantParam *shapes.Parameter
-	GotParam  *shapes.Parameter
+	WantParam interface{}
+	GotParam  interface{}
 	Hint      *string
 }
 
@@ -147,13 +145,13 @@ func (err *e) Error() string {
 		m["Message"] = *err.Message
 	}
 	if err.WantType != nil {
-		m["WantType"] = err.WantType.String()
+		m["WantType"] = fmt.Sprintf("%s", err.WantType)
 	}
 	if err.GotType != nil {
-		m["GotType"] = err.GotType.String()
+		m["GotType"] = fmt.Sprintf("%s", err.GotType)
 	}
 	if err.InputType != nil {
-		m["InputType"] = err.InputType.String()
+		m["InputType"] = fmt.Sprintf("%s", err.InputType)
 	}
 	if err.Name != nil {
 		m["Name"] = *err.Name
@@ -168,10 +166,10 @@ func (err *e) Error() string {
 		m["ParamNum"] = *err.ParamNum
 	}
 	if err.WantParam != nil {
-		m["WantParam"] = err.WantParam.String()
+		m["WantParam"] = fmt.Sprintf("%s", err.WantParam)
 	}
 	if err.GotParam != nil {
-		m["GotParam"] = err.GotParam.String()
+		m["GotParam"] = fmt.Sprintf("%s", err.GotParam)
 	}
 	out, err2 := json.Marshal(m)
 	if err2 != nil {
@@ -233,10 +231,10 @@ func Explain(err error, program string) {
 		fmt.Fprintln(os.Stderr, "Param #:   ", *e.ParamNum)
 	}
 	if e.WantParam != nil {
-		fmt.Fprintln(os.Stderr, "Want param:", *e.WantParam)
+		fmt.Fprintln(os.Stderr, "Want param:", e.WantParam)
 	}
 	if e.GotParam != nil {
-		fmt.Fprintln(os.Stderr, "Got param: ", *e.GotParam)
+		fmt.Fprintln(os.Stderr, "Got param: ", e.GotParam)
 	}
 }
 
