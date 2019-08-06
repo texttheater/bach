@@ -41,7 +41,6 @@ type Component struct {
 	Definition  *Definition  `| @@`
 	Match       *Match       `| @@`
 	Mapping     *Mapping     `| @@`
-	Parenthesis *Parenthesis `| @@`
 }
 
 func (g *Component) Ast() (functions.Expression, error) {
@@ -82,9 +81,6 @@ func (g *Component) Ast() (functions.Expression, error) {
 	}
 	if g.Mapping != nil {
 		return g.Mapping.Ast()
-	}
-	if g.Parenthesis != nil {
-		return g.Parenthesis.Ast()
 	}
 	panic("invalid component")
 }
