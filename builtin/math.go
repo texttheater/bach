@@ -136,7 +136,7 @@ func initMath() {
 		),
 		functions.SimpleFuncer(
 			&types.SeqType{types.NumType{}},
-			"average",
+			"avg",
 			nil,
 			types.NumType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
