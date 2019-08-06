@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/shapes"
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -32,6 +32,6 @@ func TestCalls(t *testing.T) {
 	TestProgram(`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok f(/)`, types.NumType{}, values.NumValue(0.5), nil, t)
 	TestProgram(`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok f(+1)`, nil, nil, errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NumType{}), errors.Name("+"), errors.NumParams(2)), t)
 	TestProgram(`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok`, types.NullType{}, &values.NullValue{}, nil, t)
-	TestProgram(`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok f(g)`, nil, nil, errors.E(errors.Code(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&shapes.Parameter{InputType: types.AnyType{}, Params: nil, OutputType: types.NumType{}}), errors.GotParam(&shapes.Parameter{InputType: types.AnyType{}, Params: nil, OutputType: types.StrType{}})), t)
-	TestProgram(`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok for Any def g(x for Str Num) Num as "abc" x ok f(g)`, nil, nil, errors.E(errors.Code(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&shapes.Parameter{InputType: types.AnyType{}, Params: nil, OutputType: types.NumType{}}), errors.GotParam(&shapes.Parameter{InputType: types.StrType{}, Params: nil, OutputType: types.NumType{}})), t)
+	TestProgram(`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok f(g)`, nil, nil, errors.E(errors.Code(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&functions.Parameter{InputType: types.AnyType{}, Params: nil, OutputType: types.NumType{}}), errors.GotParam(&functions.Parameter{InputType: types.AnyType{}, Params: nil, OutputType: types.StrType{}})), t)
+	TestProgram(`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok for Any def g(x for Str Num) Num as "abc" x ok f(g)`, nil, nil, errors.E(errors.Code(errors.ParamDoesNotMatch), errors.ParamNum(0), errors.WantParam(&functions.Parameter{InputType: types.AnyType{}, Params: nil, OutputType: types.NumType{}}), errors.GotParam(&functions.Parameter{InputType: types.StrType{}, Params: nil, OutputType: types.NumType{}})), t)
 }

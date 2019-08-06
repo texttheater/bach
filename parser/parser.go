@@ -4,11 +4,11 @@ import (
 	"github.com/alecthomas/participle"
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/grammar"
 )
 
-func Parse(input string) (expressions.Expression, error) {
+func Parse(input string) (functions.Expression, error) {
 	parser, err := participle.Build(
 		&grammar.Composition{},
 		participle.Lexer(grammar.LexerDefinition),

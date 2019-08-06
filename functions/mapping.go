@@ -1,9 +1,8 @@
-package expressions
+package functions
 
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
@@ -14,17 +13,17 @@ type MappingExpression struct {
 	Body Expression
 }
 
-func (x MappingExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
+func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return shapes.Shape{}, nil, errors.E(
+		return Shape{}, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
 	// make sure the input type is a sequence type
 	if !types.AnySeqType.Subsumes(inputShape.Type) {
-		return shapes.Shape{}, nil, errors.E(
+		return Shape{}, nil, errors.E(
 			errors.Code(errors.MappingRequiresSeqType),
 			errors.Pos(x.Pos),
 			errors.WantType(types.AnySeqType),
@@ -32,16 +31,16 @@ func (x MappingExpression) Typecheck(inputShape shapes.Shape, params []*shapes.P
 		)
 	}
 	// typecheck body
-	bodyInputShape := shapes.Shape{
+	bodyInputShape := Shape{
 		Type:  inputShape.Type.ElementType(),
 		Stack: inputShape.Stack,
 	}
 	bodyOutputShape, bodyAction, err := x.Body.Typecheck(bodyInputShape, nil)
 	if err != nil {
-		return shapes.Shape{}, nil, err
+		return Shape{}, nil, err
 	}
 	// create output shape
-	outputShape := shapes.Shape{
+	outputShape := Shape{
 		Type:  &types.SeqType{bodyOutputShape.Type},
 		Stack: inputShape.Stack,
 	}

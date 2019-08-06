@@ -1,14 +1,14 @@
 package builtin
 
 import (
-	"github.com/texttheater/bach/shapes"
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
 func initSeq() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]shapes.Funcer{
-		shapes.SimpleFuncer(
+	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
+		functions.SimpleFuncer(
 			types.AnyType{},
 			"range",
 			[]types.Type{types.NumType{}, types.NumType{}},

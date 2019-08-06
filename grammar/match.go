@@ -2,8 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/expressions"
-	"github.com/texttheater/bach/patterns"
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
 )
 
@@ -25,12 +24,12 @@ type Alternative struct {
 	Consequent *Composition `"then" @@`
 }
 
-func (g *Match) Ast() (expressions.Expression, error) {
-	var pattern patterns.Pattern
-	var guard expressions.Expression
+func (g *Match) Ast() (functions.Expression, error) {
+	var pattern functions.Pattern
+	var guard functions.Expression
 	var err error
 	if g.Pattern == nil {
-		pattern = patterns.TypePattern{g.Pos, types.AnyType{}, nil}
+		pattern = functions.TypePattern{g.Pos, types.AnyType{}, nil}
 		guard, err = g.Condition.Ast()
 		if err != nil {
 			return nil, err
@@ -51,12 +50,12 @@ func (g *Match) Ast() (expressions.Expression, error) {
 	if err != nil {
 		return nil, err
 	}
-	alternativePatterns := make([]patterns.Pattern, len(g.Alternatives))
-	alternativeGuards := make([]expressions.Expression, len(g.Alternatives))
-	alternativeConsequents := make([]expressions.Expression, len(g.Alternatives))
+	alternativePatterns := make([]functions.Pattern, len(g.Alternatives))
+	alternativeGuards := make([]functions.Expression, len(g.Alternatives))
+	alternativeConsequents := make([]functions.Expression, len(g.Alternatives))
 	for i, alternative := range g.Alternatives {
 		if alternative.Pattern == nil {
-			alternativePatterns[i] = patterns.TypePattern{alternative.Pos, types.AnyType{}, nil}
+			alternativePatterns[i] = functions.TypePattern{alternative.Pos, types.AnyType{}, nil}
 			alternativeGuards[i], err = alternative.Condition.Ast()
 			if err != nil {
 				return nil, err
@@ -78,14 +77,14 @@ func (g *Match) Ast() (expressions.Expression, error) {
 			return nil, err
 		}
 	}
-	var alternative expressions.Expression
+	var alternative functions.Expression
 	if g.Alternative != nil {
 		alternative, err = g.Alternative.Ast()
 		if err != nil {
 			return nil, err
 		}
 	}
-	return &expressions.MatchExpression{
+	return &functions.MatchExpression{
 		Pos:             g.Pos,
 		Pattern:         pattern,
 		Guard:           guard,

@@ -1,10 +1,9 @@
-package expressions
+package functions
 
 import (
 	"regexp/syntax"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 )
 
@@ -13,6 +12,6 @@ type RegexpExpression struct {
 	Regexp *syntax.Regexp
 }
 
-func (x RegexpExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
+func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	panic("not implemented yet")
 }

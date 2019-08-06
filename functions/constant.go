@@ -1,9 +1,8 @@
-package expressions
+package functions
 
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
@@ -15,14 +14,14 @@ type ConstantExpression struct {
 	Value values.Value
 }
 
-func (x ConstantExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
+func (x ConstantExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	if len(params) > 0 {
-		return shapes.Shape{}, nil, errors.E(
+		return Shape{}, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
-	outputShape := shapes.Shape{x.Type, inputShape.Stack}
+	outputShape := Shape{x.Type, inputShape.Stack}
 	action := func(inputState states.State, args []states.Action) states.State {
 		return states.State{
 			Value: x.Value,

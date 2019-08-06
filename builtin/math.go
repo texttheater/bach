@@ -3,14 +3,14 @@ package builtin
 import (
 	"math"
 
-	"github.com/texttheater/bach/shapes"
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
 func initMath() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]shapes.Funcer{
-		shapes.SimpleFuncer(
+	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
+		functions.SimpleFuncer(
 			types.NumType{},
 			"+",
 			[]types.Type{types.NumType{}},
@@ -21,7 +21,7 @@ func initMath() {
 				return values.NumValue(inputNum + argumentNum)
 			},
 		),
-		shapes.SimpleFuncer(
+		functions.SimpleFuncer(
 			types.NumType{},
 			"-",
 			[]types.Type{types.NumType{}},
@@ -32,7 +32,7 @@ func initMath() {
 				return values.NumValue(inputNum - argumentNum)
 			},
 		),
-		shapes.SimpleFuncer(
+		functions.SimpleFuncer(
 			types.NumType{},
 			"*",
 			[]types.Type{types.NumType{}},
@@ -43,7 +43,7 @@ func initMath() {
 				return values.NumValue(inputNum * argumentNum)
 			},
 		),
-		shapes.SimpleFuncer(
+		functions.SimpleFuncer(
 			types.NumType{},
 			"/",
 			[]types.Type{types.NumType{}},
@@ -54,7 +54,7 @@ func initMath() {
 				return values.NumValue(inputNum / argumentNum)
 			},
 		),
-		shapes.SimpleFuncer(
+		functions.SimpleFuncer(
 			types.NumType{},
 			"%",
 			[]types.Type{types.NumType{}},
@@ -65,7 +65,7 @@ func initMath() {
 				return values.NumValue(math.Mod(float64(inputNum), float64(argumentNum)))
 			},
 		),
-		shapes.SimpleFuncer(
+		functions.SimpleFuncer(
 			types.NumType{},
 			"<",
 			[]types.Type{types.NumType{}},
@@ -76,7 +76,7 @@ func initMath() {
 				return values.BoolValue(inputNum < argumentNum)
 			},
 		),
-		shapes.SimpleFuncer(
+		functions.SimpleFuncer(
 			types.NumType{},
 			">",
 			[]types.Type{types.NumType{}},
@@ -87,7 +87,7 @@ func initMath() {
 				return values.BoolValue(inputNum > argumentNum)
 			},
 		),
-		shapes.SimpleFuncer(
+		functions.SimpleFuncer(
 			types.NumType{},
 			"==",
 			[]types.Type{types.NumType{}},
@@ -98,7 +98,7 @@ func initMath() {
 				return values.BoolValue(inputNum == argumentNum)
 			},
 		),
-		shapes.SimpleFuncer(
+		functions.SimpleFuncer(
 			types.NumType{},
 			"<=",
 			[]types.Type{types.NumType{}},
@@ -109,7 +109,7 @@ func initMath() {
 				return values.BoolValue(inputNum <= argumentNum)
 			},
 		),
-		shapes.SimpleFuncer(
+		functions.SimpleFuncer(
 			types.NumType{},
 			">=",
 			[]types.Type{types.NumType{}},
@@ -120,7 +120,7 @@ func initMath() {
 				return values.BoolValue(inputNum >= argumentNum)
 			},
 		),
-		shapes.SimpleFuncer(
+		functions.SimpleFuncer(
 			&types.SeqType{types.NumType{}},
 			"sum",
 			nil,
@@ -134,7 +134,7 @@ func initMath() {
 				return values.NumValue(sum)
 			},
 		),
-		shapes.SimpleFuncer(
+		functions.SimpleFuncer(
 			&types.SeqType{types.NumType{}},
 			"average",
 			nil,

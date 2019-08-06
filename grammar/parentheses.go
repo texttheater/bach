@@ -2,7 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/functions"
 )
 
 type Parenthesis struct {
@@ -10,6 +10,6 @@ type Parenthesis struct {
 	Composition *Composition `"(" @@ ")"`
 }
 
-func (g *Parenthesis) Ast() (expressions.Expression, error) {
+func (g *Parenthesis) Ast() (functions.Expression, error) {
 	return g.Composition.Ast()
 }

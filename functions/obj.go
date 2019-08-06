@@ -1,9 +1,8 @@
-package expressions
+package functions
 
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
@@ -14,9 +13,9 @@ type ObjExpression struct {
 	PropValMap map[string]Expression
 }
 
-func (x ObjExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
+func (x ObjExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	if len(params) > 0 {
-		return shapes.Shape{}, nil, errors.E(
+		return Shape{}, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
@@ -26,12 +25,12 @@ func (x ObjExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Param
 	for key, valExpression := range x.PropValMap {
 		keyOutputShape, keyAction, err := valExpression.Typecheck(inputShape, nil)
 		if err != nil {
-			return shapes.Shape{}, nil, err
+			return Shape{}, nil, err
 		}
 		keyTypeMap[key] = keyOutputShape.Type
 		keyActionMap[key] = keyAction
 	}
-	outputShape := shapes.Shape{
+	outputShape := Shape{
 		Type:  types.NewObjType(keyTypeMap),
 		Stack: inputShape.Stack,
 	}

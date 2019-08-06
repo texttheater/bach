@@ -2,7 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/functions"
 )
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -17,8 +17,8 @@ func (g *Assignment) Capture(values []string) error {
 	return nil
 }
 
-func (g *Assignment) Ast() expressions.Expression {
-	return &expressions.AssignmentExpression{
+func (g *Assignment) Ast() functions.Expression {
+	return &functions.AssignmentExpression{
 		Pos:  g.Pos,
 		Name: g.Name,
 	}

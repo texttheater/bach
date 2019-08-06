@@ -2,7 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -13,7 +13,7 @@ type Composition struct {
 	Components []*Component `( @@ )*`
 }
 
-func (g *Composition) Ast() (expressions.Expression, error) {
+func (g *Composition) Ast() (functions.Expression, error) {
 	pos := g.Component.Pos
 	e, err := g.Component.Ast()
 	if err != nil {
@@ -24,7 +24,7 @@ func (g *Composition) Ast() (expressions.Expression, error) {
 		if err != nil {
 			return nil, err
 		}
-		e = &expressions.CompositionExpression{pos, e, compAst}
+		e = &functions.CompositionExpression{pos, e, compAst}
 	}
 	return e, nil
 }
@@ -44,16 +44,16 @@ type Component struct {
 	Parenthesis *Parenthesis `| @@`
 }
 
-func (g *Component) Ast() (expressions.Expression, error) {
+func (g *Component) Ast() (functions.Expression, error) {
 	if g.Num != nil {
-		return &expressions.ConstantExpression{
+		return &functions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.NumType{},
 			Value: values.NumValue(*g.Num),
 		}, nil
 	}
 	if g.Str != nil {
-		return &expressions.ConstantExpression{
+		return &functions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.StrType{},
 			Value: values.StrValue(*g.Str),

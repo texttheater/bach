@@ -1,25 +1,28 @@
 package builtin
 
 import (
-	"github.com/texttheater/bach/shapes"
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
 func initConv() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]shapes.Funcer{
-		func(gotInputType types.Type, gotName string, gotNumArgs int) ([]*shapes.Parameter, types.Type, states.Action, bool) {
-			if !types.AnySeqType.Subsumes(gotInputType) {
-				return nil, nil, nil, false
+	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
+		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*functions.Parameter) (functions.Shape, states.Action, bool, error) {
+			if len(gotCall.Args)+len(gotParams) != 0 {
+				return functions.Shape{}, nil, false, nil
 			}
-			if gotName != "arr" {
-				return nil, nil, nil, false
+			if gotCall.Name != "arr" {
+				return functions.Shape{}, nil, false, nil
 			}
-			if gotNumArgs != 0 {
-				return nil, nil, nil, false
+			if !types.AnySeqType.Subsumes(gotInputShape.Type) {
+				return functions.Shape{}, nil, false, nil
 			}
-			outputType := &types.ArrType{gotInputType.ElementType()}
+			outputShape := functions.Shape{
+				Type:  &types.ArrType{gotInputShape.Type.ElementType()},
+				Stack: gotInputShape.Stack,
+			}
 			action := func(inputState states.State, args []states.Action) states.State {
 				array := make([]values.Value, 0)
 				for el := range inputState.Value.Iter() {
@@ -31,7 +34,7 @@ func initConv() {
 				}
 				return outputState
 			}
-			return nil, outputType, action, true
+			return outputShape, action, true, nil
 		},
 	})
 }

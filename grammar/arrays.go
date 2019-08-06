@@ -2,7 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/functions"
 )
 
 type Array struct {
@@ -11,10 +11,10 @@ type Array struct {
 	Elements []*Composition `  ( "," @@ )* )? "]"`
 }
 
-func (g *Array) Ast() (expressions.Expression, error) {
-	var elements []expressions.Expression
+func (g *Array) Ast() (functions.Expression, error) {
+	var elements []functions.Expression
 	if g.Element != nil {
-		elements = make([]expressions.Expression, 1+len(g.Elements))
+		elements = make([]functions.Expression, 1+len(g.Elements))
 		var err error
 		elements[0], err = g.Element.Ast()
 		if err != nil {
@@ -27,5 +27,5 @@ func (g *Array) Ast() (expressions.Expression, error) {
 			}
 		}
 	}
-	return &expressions.ArrExpression{g.Pos, elements}, nil
+	return &functions.ArrExpression{g.Pos, elements}, nil
 }

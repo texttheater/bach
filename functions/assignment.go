@@ -1,9 +1,8 @@
-package expressions
+package functions
 
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/values"
 )
@@ -13,15 +12,15 @@ type AssignmentExpression struct {
 	Name string
 }
 
-func (x AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*shapes.Parameter) (shapes.Shape, states.Action, error) {
+func (x AssignmentExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	if len(params) > 0 {
-		return shapes.Shape{}, nil, errors.E(
+		return Shape{}, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
-	variableFuncer := shapes.VariableFuncer(x, x.Name, inputShape.Type)
-	outputShape := shapes.Shape{inputShape.Type, inputShape.Stack.Push(variableFuncer)}
+	variableFuncer := VariableFuncer(x, x.Name, inputShape.Type)
+	outputShape := Shape{inputShape.Type, inputShape.Stack.Push(variableFuncer)}
 	action := func(inputState states.State, args []states.Action) states.State {
 		return states.State{
 			Value: inputState.Value,

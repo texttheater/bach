@@ -2,7 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/patterns"
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
 )
 
@@ -14,7 +14,7 @@ type Pattern struct {
 	ObjPattern  *ObjPattern  `| @@`
 }
 
-func (g *Pattern) Ast() (patterns.Pattern, error) {
+func (g *Pattern) Ast() (functions.Pattern, error) {
 	if g.NamePattern != nil {
 		p, err := g.NamePattern.Ast()
 		if err != nil {
@@ -49,8 +49,8 @@ type NamePattern struct {
 	Name *string `@Prop | @Op1 | @Op2`
 }
 
-func (g *NamePattern) Ast() (patterns.Pattern, error) {
-	return patterns.TypePattern{g.Pos, types.AnyType{}, g.Name}, nil
+func (g *NamePattern) Ast() (functions.Pattern, error) {
+	return functions.TypePattern{g.Pos, types.AnyType{}, g.Name}, nil
 }
 
 type TypePattern struct {
@@ -59,8 +59,8 @@ type TypePattern struct {
 	Name *string `( @Prop | @Op1 | @Op2 )?`
 }
 
-func (g *TypePattern) Ast() (patterns.Pattern, error) {
-	return patterns.TypePattern{g.Pos, g.Type.Ast(), g.Name}, nil
+func (g *TypePattern) Ast() (functions.Pattern, error) {
+	return functions.TypePattern{g.Pos, g.Type.Ast(), g.Name}, nil
 }
 
 type ArrPattern struct {
@@ -70,10 +70,10 @@ type ArrPattern struct {
 	Name     *string        `( @Prop | @Op1 | @Op2 )?`
 }
 
-func (g *ArrPattern) Ast() (patterns.Pattern, error) {
-	var elPatterns []patterns.Pattern
+func (g *ArrPattern) Ast() (functions.Pattern, error) {
+	var elPatterns []functions.Pattern
 	if g.Element != nil {
-		elPatterns = make([]patterns.Pattern, len(g.Elements)+1)
+		elPatterns = make([]functions.Pattern, len(g.Elements)+1)
 		p, err := g.Element.Ast()
 		if err != nil {
 			return nil, err
@@ -87,7 +87,7 @@ func (g *ArrPattern) Ast() (patterns.Pattern, error) {
 			elPatterns[i+1] = p
 		}
 	}
-	return &patterns.ArrPattern{g.Pos, elPatterns, g.Name}, nil
+	return &functions.ArrPattern{g.Pos, elPatterns, g.Name}, nil
 }
 
 type ObjPattern struct {
@@ -99,8 +99,8 @@ type ObjPattern struct {
 	Name   *string        `( @Prop | @Op1 | @Op2 )?`
 }
 
-func (g *ObjPattern) Ast() (patterns.Pattern, error) {
-	propPatternMap := make(map[string]patterns.Pattern)
+func (g *ObjPattern) Ast() (functions.Pattern, error) {
+	propPatternMap := make(map[string]functions.Pattern)
 	if g.Prop != nil {
 		p, err := g.Value.Ast()
 		if err != nil {
@@ -115,5 +115,5 @@ func (g *ObjPattern) Ast() (patterns.Pattern, error) {
 			propPatternMap[prop] = p
 		}
 	}
-	return &patterns.ObjPattern{g.Pos, propPatternMap, g.Name}, nil
+	return &functions.ObjPattern{g.Pos, propPatternMap, g.Name}, nil
 }

@@ -3,14 +3,14 @@ package builtin
 import (
 	"strings"
 
-	"github.com/texttheater/bach/shapes"
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
 
 func initText() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]shapes.Funcer{
-		shapes.SimpleFuncer(
+	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
+		functions.SimpleFuncer(
 			types.StrType{},
 			"split",
 			nil,

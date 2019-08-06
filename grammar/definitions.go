@@ -2,8 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/expressions"
-	"github.com/texttheater/bach/shapes"
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
 )
 
@@ -20,14 +19,14 @@ type Definition struct {
 	Body       *Composition `"as" @@ "ok"`
 }
 
-func (g *Definition) Ast() (expressions.Expression, error) {
+func (g *Definition) Ast() (functions.Expression, error) {
 	inputType := g.InputType.Ast()
 	var name = g.Name
-	var params []*shapes.Parameter
+	var params []*functions.Parameter
 	var paramNames []string
 	if g.NameLpar != nil {
 		name = g.NameLpar.Name
-		params = make([]*shapes.Parameter, len(g.Params)+1)
+		params = make([]*functions.Parameter, len(g.Params)+1)
 		paramNames = make([]string, len(g.ParamNames)+1)
 		param, err := g.Parameter.Ast()
 		if err != nil {
@@ -48,7 +47,7 @@ func (g *Definition) Ast() (expressions.Expression, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &expressions.DefinitionExpression{
+	return &functions.DefinitionExpression{
 		Pos:        g.Pos,
 		InputType:  inputType,
 		Name:       name,
@@ -67,16 +66,16 @@ type Parameter struct {
 	OutputType *Type        `@@`
 }
 
-func (g *Parameter) Ast() (*shapes.Parameter, error) {
+func (g *Parameter) Ast() (*functions.Parameter, error) {
 	var inputType types.Type
 	if g.InputType != nil {
 		inputType = g.InputType.Ast()
 	} else {
 		inputType = types.AnyType{}
 	}
-	var params []*shapes.Parameter
+	var params []*functions.Parameter
 	if g.Parameter != nil {
-		params = make([]*shapes.Parameter, len(g.Params)+1)
+		params = make([]*functions.Parameter, len(g.Params)+1)
 		var err error
 		params[0], err = g.Parameter.Ast()
 		if err != nil {
@@ -90,7 +89,7 @@ func (g *Parameter) Ast() (*shapes.Parameter, error) {
 		}
 	}
 	outputType := g.OutputType.Ast()
-	return &shapes.Parameter{
+	return &functions.Parameter{
 		InputType:  inputType,
 		Params:     params,
 		OutputType: outputType,

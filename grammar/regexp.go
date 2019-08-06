@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/functions"
 )
 
 type RegexpCall struct {
@@ -13,7 +13,7 @@ type RegexpCall struct {
 	NameRegexp *string `@NameRegexp`
 }
 
-func (g *RegexpCall) Ast() (expressions.Expression, error) {
+func (g *RegexpCall) Ast() (functions.Expression, error) {
 	index := strings.Index(*g.NameRegexp, "/")
 	name := (*g.NameRegexp)[:index]
 	regexpString := (*g.NameRegexp)[index : len(*g.NameRegexp)-1]
@@ -21,14 +21,14 @@ func (g *RegexpCall) Ast() (expressions.Expression, error) {
 	if err != nil {
 		return nil, err
 	}
-	regexpExpression := &expressions.RegexpExpression{
+	regexpExpression := &functions.RegexpExpression{
 		Pos:    g.Pos,
 		Regexp: regexp,
 	}
-	callExpression := &expressions.CallExpression{
+	callExpression := &functions.CallExpression{
 		Pos:  g.Pos,
 		Name: name,
-		Args: []expressions.Expression{
+		Args: []functions.Expression{
 			regexpExpression,
 		},
 	}

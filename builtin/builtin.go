@@ -1,11 +1,11 @@
 package builtin
 
 import (
-	"github.com/texttheater/bach/shapes"
+	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
 )
 
-var InitialShape shapes.Shape = shapes.Shape{types.NullType{}, nil}
+var InitialShape functions.Shape = functions.Shape{types.NullType{}, nil}
 
 func init() {
 	initNull()
