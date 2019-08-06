@@ -30,17 +30,17 @@ func (g *Composition) Ast() (functions.Expression, error) {
 }
 
 type Component struct {
-	Pos         lexer.Position
-	Num         *float64     `  @Num`
-	Str         *string      `| @Str`
-	Array       *Array       `| @@`
-	Object      *Object      `| @@`
-	Call        *Call        `| @@`
-	RegexpCall  *RegexpCall  `| @@`
-	Assignment  *Assignment  `| @Assignment`
-	Definition  *Definition  `| @@`
-	Match       *Match       `| @@`
-	Mapping     *Mapping     `| @@`
+	Pos        lexer.Position
+	Num        *float64    `  @Num`
+	Str        *string     `| @Str`
+	Array      *Array      `| @@`
+	Object     *Object     `| @@`
+	Call       *Call       `| @@`
+	RegexpCall *RegexpCall `| @@`
+	Assignment *Assignment `| @Assignment`
+	Definition *Definition `| @@`
+	Match      *Match      `| @@`
+	Mapping    *Mapping    `| @@`
 }
 
 func (g *Component) Ast() (functions.Expression, error) {
