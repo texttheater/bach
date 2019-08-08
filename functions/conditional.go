@@ -8,7 +8,7 @@ import (
 	"github.com/texttheater/bach/values"
 )
 
-type MatchExpression struct {
+type ConditionalExpression struct {
 	Pos             lexer.Position
 	Pattern         Pattern
 	Guard           Expression
@@ -19,7 +19,7 @@ type MatchExpression struct {
 	Alternative     Expression
 }
 
-func (x MatchExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
+func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return Shape{}, nil, errors.E(

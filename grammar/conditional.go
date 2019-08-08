@@ -6,7 +6,7 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-type Match struct {
+type Conditional struct {
 	Pos          lexer.Position
 	Pattern      *Pattern       `( "is" @@`
 	Guard        *Composition   `  ( "with" @@)?`
@@ -24,7 +24,7 @@ type Alternative struct {
 	Consequent *Composition `"then" @@`
 }
 
-func (g *Match) Ast() (functions.Expression, error) {
+func (g *Conditional) Ast() (functions.Expression, error) {
 	var pattern functions.Pattern
 	var guard functions.Expression
 	var err error
@@ -84,7 +84,7 @@ func (g *Match) Ast() (functions.Expression, error) {
 			return nil, err
 		}
 	}
-	return &functions.MatchExpression{
+	return &functions.ConditionalExpression{
 		Pos:             g.Pos,
 		Pattern:         pattern,
 		Guard:           guard,
