@@ -7,21 +7,29 @@ import (
 )
 
 type Conditional struct {
-	Pos          lexer.Position
-	Pattern      *Pattern       `( "is" @@`
-	Guard        *Composition   `  ( "with" @@)?`
-	Condition    *Composition   `| "if" @@ )`
-	Consequent   *Composition   `"then" @@`
-	Alternatives []*Alternative `( @@ )*`
-	Alternative  *Composition   `( "else" @@ )? "ok"`
+	Pos               lexer.Position
+	Pattern           *Pattern     `( "is" @@`
+	Guard             *Composition `  ( "with" @@)?`
+	Condition         *Composition `| "if" @@ )`
+	Consequent        *Composition `( "then" @@`
+	LongAlternatives  []*CLongAlt  `  ( @@ )*`
+	Alternative       *Composition `  ( "else" @@ )?`
+	ShortAlternatives []*CShortAlt `| ( @@ )* ) "ok"`
 }
 
-type Alternative struct {
+type CLongAlt struct {
 	Pos        lexer.Position
 	Pattern    *Pattern     `( "elis" @@`
 	Guard      *Composition `  ( "with" @@ )?`
 	Condition  *Composition `| "elif" @@ )`
 	Consequent *Composition `"then" @@`
+}
+
+type CShortAlt struct {
+	Pos       lexer.Position
+	Pattern   *Pattern     `( "elis" @@`
+	Guard     *Composition `  ( "with" @@ )?`
+	Condition *Composition `| "elif" @@ )`
 }
 
 func (g *Conditional) Ast() (functions.Expression, error) {
@@ -50,10 +58,11 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 	if err != nil {
 		return nil, err
 	}
-	alternativePatterns := make([]functions.Pattern, len(g.Alternatives))
-	alternativeGuards := make([]functions.Expression, len(g.Alternatives))
-	alternativeConsequents := make([]functions.Expression, len(g.Alternatives))
-	for i, alternative := range g.Alternatives {
+	// TODO support short alternatives
+	alternativePatterns := make([]functions.Pattern, len(g.LongAlternatives))
+	alternativeGuards := make([]functions.Expression, len(g.LongAlternatives))
+	alternativeConsequents := make([]functions.Expression, len(g.LongAlternatives))
+	for i, alternative := range g.LongAlternatives {
 		if alternative.Pattern == nil {
 			alternativePatterns[i] = functions.TypePattern{alternative.Pos, types.AnyType{}, nil}
 			alternativeGuards[i], err = alternative.Condition.Ast()
