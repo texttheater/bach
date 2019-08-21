@@ -54,14 +54,14 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 			}
 		}
 	}
-	consequent, err := g.Consequent.Ast()
-	if err != nil {
-		return nil, err
-	}
-	alternativePatterns := make([]functions.Pattern, len(g.LongAlternatives))
-	alternativeGuards := make([]functions.Expression, len(g.LongAlternatives))
-	alternativeConsequents := make([]functions.Expression, len(g.LongAlternatives))
 	if g.Consequent != nil { // long form
+		consequent, err := g.Consequent.Ast()
+		if err != nil {
+			return nil, err
+		}
+		alternativePatterns := make([]functions.Pattern, len(g.LongAlternatives))
+		alternativeGuards := make([]functions.Expression, len(g.LongAlternatives))
+		alternativeConsequents := make([]functions.Expression, len(g.LongAlternatives))
 		for i, alternative := range g.LongAlternatives {
 			if alternative.Pattern == nil {
 				alternativePatterns[i] = functions.TypePattern{alternative.Pos, types.AnyType{}, nil}
