@@ -37,7 +37,11 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 	var guard functions.Expression
 	var err error
 	if g.Pattern == nil {
-		pattern = functions.TypePattern{g.Pos, types.AnyType{}, nil}
+		pattern = functions.TypePattern{
+			Pos:  g.Pos,
+			Type: types.AnyType{},
+			Name: nil,
+		}
 		guard, err = g.Condition.Ast()
 		if err != nil {
 			return nil, err
@@ -64,7 +68,11 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 		alternativeConsequents := make([]functions.Expression, len(g.LongAlternatives))
 		for i, alternative := range g.LongAlternatives {
 			if alternative.Pattern == nil {
-				alternativePatterns[i] = functions.TypePattern{alternative.Pos, types.AnyType{}, nil}
+				alternativePatterns[i] = functions.TypePattern{
+					Pos:  alternative.Pos,
+					Type: types.AnyType{},
+					Name: nil,
+				}
 				alternativeGuards[i], err = alternative.Condition.Ast()
 				if err != nil {
 					return nil, err
@@ -110,7 +118,11 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 		alternativeConsequents := make([]functions.Expression, len(g.ShortAlternatives))
 		for i, alternative := range g.ShortAlternatives {
 			if alternative.Pattern == nil {
-				alternativePatterns[i] = functions.TypePattern{alternative.Pos, types.AnyType{}, nil}
+				alternativePatterns[i] = functions.TypePattern{
+					Pos:  alternative.Pos,
+					Type: types.AnyType{},
+					Name: nil,
+				}
 				alternativeGuards[i], err = alternative.Condition.Ast()
 				if err != nil {
 					return nil, err
