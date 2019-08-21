@@ -104,6 +104,41 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 			Alternative:     alternative,
 		}, nil
 	} else { // short form
-		panic("not implemented yet")
+		consequent := &functions.RightExpression{}
+		alternativePatterns := make([]functions.Pattern, len(g.ShortAlternatives))
+		alternativeGuards := make([]functions.Expression, len(g.ShortAlternatives))
+		alternativeConsequents := make([]functions.Expression, len(g.ShortAlternatives))
+		for i, alternative := range g.ShortAlternatives {
+			if alternative.Pattern == nil {
+				alternativePatterns[i] = functions.TypePattern{alternative.Pos, types.AnyType{}, nil}
+				alternativeGuards[i], err = alternative.Condition.Ast()
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				alternativePatterns[i], err = alternative.Pattern.Ast()
+				if err != nil {
+					return nil, err
+				}
+				if alternative.Guard != nil {
+					alternativeGuards[i], err = alternative.Guard.Ast()
+					if err != nil {
+						return nil, err
+					}
+				}
+			}
+			alternativeConsequents[i] = &functions.RightExpression{}
+		}
+		alternative := &functions.LeftExpression{}
+		return &functions.ConditionalExpression{
+			Pos:             g.Pos,
+			Pattern:         pattern,
+			Guard:           guard,
+			Consequent:      consequent,
+			ElisPatterns:    alternativePatterns,
+			ElisGuards:      alternativeGuards,
+			ElisConsequents: alternativeConsequents,
+			Alternative:     alternative,
+		}, nil
 	}
 }
