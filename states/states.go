@@ -5,6 +5,7 @@ import (
 )
 
 type State struct {
+	Drop  bool
 	Value values.Value
 	Stack *VariableStack
 }

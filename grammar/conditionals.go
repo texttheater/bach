@@ -40,7 +40,6 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 		pattern = functions.TypePattern{
 			Pos:  g.Pos,
 			Type: types.AnyType{},
-			Name: nil,
 		}
 		guard, err = g.Condition.Ast()
 		if err != nil {

@@ -54,7 +54,9 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 					Stack: inputState.Stack,
 				}
 				bodyOutputState := bodyAction(bodyInputState, nil)
-				channel <- bodyOutputState.Value
+				if !bodyOutputState.Drop {
+					channel <- bodyOutputState.Value
+				}
 			}
 			close(channel)
 		}()

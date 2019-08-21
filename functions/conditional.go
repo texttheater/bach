@@ -204,8 +204,8 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		}
 		alternativeOutputState := alternativeAction(inputState, nil)
 		return states.State{
-			alternativeOutputState.Value,
-			inputState.Stack,
+			Value: alternativeOutputState.Value,
+			Stack: inputState.Stack,
 		}
 	}
 	// return
