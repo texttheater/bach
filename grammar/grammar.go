@@ -41,6 +41,7 @@ type Component struct {
 	Definition  *Definition  `| @@`
 	Conditional *Conditional `| @@`
 	Mapping     *Mapping     `| @@`
+	Filter      *Filter      `| @@`
 }
 
 func (g *Component) Ast() (functions.Expression, error) {
@@ -81,6 +82,9 @@ func (g *Component) Ast() (functions.Expression, error) {
 	}
 	if g.Mapping != nil {
 		return g.Mapping.Ast()
+	}
+	if g.Filter != nil {
+		return g.Filter.Ast()
 	}
 	panic("invalid component")
 }
