@@ -14,7 +14,7 @@ type Filter struct {
 	Consequent        *Composition `( "then" ( @@ | "drop" )` // long form
 	LongAlternatives  []*FLongAlt  `  ( @@ )*`
 	Alternative       *Composition `  ( "else" ( @@ | "drop" ) )?` // short form
-	ShortAlternatives []*FShortAlt `| ( @@ )* )`
+	ShortAlternatives []*FShortAlt `| ( @@ )* ) "all"`
 }
 
 type FLongAlt struct {
