@@ -147,14 +147,15 @@ func (g *Filter) Ast() (functions.Expression, error) {
 		return &functions.MappingExpression{
 			Pos: g.Pos,
 			Body: &functions.ConditionalExpression{
-				Pos:             g.Pos,
-				Pattern:         pattern,
-				Guard:           guard,
-				Consequent:      consequent,
-				ElisPatterns:    alternativePatterns,
-				ElisGuards:      alternativeGuards,
-				ElisConsequents: alternativeConsequents,
-				Alternative:     alternative,
+				Pos:                           g.Pos,
+				Pattern:                       pattern,
+				Guard:                         guard,
+				Consequent:                    consequent,
+				ElisPatterns:                  alternativePatterns,
+				ElisGuards:                    alternativeGuards,
+				ElisConsequents:               alternativeConsequents,
+				Alternative:                   alternative,
+				UnreachableAlternativeAllowed: true,
 			},
 		}, nil
 	}

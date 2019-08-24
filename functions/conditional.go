@@ -9,14 +9,15 @@ import (
 )
 
 type ConditionalExpression struct {
-	Pos             lexer.Position
-	Pattern         Pattern
-	Guard           Expression
-	Consequent      Expression
-	ElisPatterns    []Pattern
-	ElisGuards      []Expression
-	ElisConsequents []Expression
-	Alternative     Expression
+	Pos                           lexer.Position
+	Pattern                       Pattern
+	Guard                         Expression
+	Consequent                    Expression
+	ElisPatterns                  []Pattern
+	ElisGuards                    []Expression
+	ElisConsequents               []Expression
+	Alternative                   Expression
+	UnreachableAlternativeAllowed bool
 }
 
 func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
@@ -144,7 +145,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		}
 	} else {
 		// reachability check
-		if (types.VoidType{}).Subsumes(inputShape.Type) {
+		if !x.UnreachableAlternativeAllowed && (types.VoidType{}).Subsumes(inputShape.Type) {
 			return Shape{}, nil, errors.E(
 				errors.Code(errors.UnreachableElseClause),
 				errors.Pos(x.Pos),

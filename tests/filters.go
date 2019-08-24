@@ -48,4 +48,15 @@ func TestFilters(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgram(
+		`[1, 2, 3] eachis Num all arr`,
+		&types.ArrType{types.NumType{}},
+		values.ArrValue([]values.Value{
+			values.NumValue(1),
+			values.NumValue(2),
+			values.NumValue(3),
+		}),
+		nil,
+		t,
+	)
 }
