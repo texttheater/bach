@@ -32,4 +32,5 @@ func TestInterp(t *testing.T) {
 	tests.TestObjectTypes(t)
 	tests.TestUnionTypes(t)
 	tests.TestAnyType(t)
+	tests.TestFilters(t)
 }
