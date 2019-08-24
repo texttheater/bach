@@ -28,14 +28,14 @@ func TestMatchingType(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`if true then 2 else "two" ok is Num then true elis Str then false ok`,
+		`if true then 2 else "two" ok is Num then true elseIs Str then false ok`,
 		types.BoolType{},
 		values.BoolValue(true),
 		nil,
 		t,
 	)
 	TestProgram(
-		`if true then 2 else "two" ok is Num then true elis Str then false else false ok`,
+		`if true then 2 else "two" ok is Num then true elseIs Str then false else false ok`,
 		nil,
 		nil,
 		errors.E(

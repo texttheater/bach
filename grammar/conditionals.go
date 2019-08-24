@@ -19,17 +19,17 @@ type Conditional struct {
 
 type CLongAlt struct {
 	Pos        lexer.Position
-	Pattern    *Pattern     `( "elis" @@`
+	Pattern    *Pattern     `( "elseIs" @@`
 	Guard      *Composition `  ( "with" @@ )?`
-	Condition  *Composition `| "elif" @@ )`
+	Condition  *Composition `| "elseIf" @@ )`
 	Consequent *Composition `"then" @@`
 }
 
 type CShortAlt struct {
 	Pos       lexer.Position
-	Pattern   *Pattern     `( "elis" @@`
+	Pattern   *Pattern     `( "elseIs" @@`
 	Guard     *Composition `  ( "with" @@ )?`
-	Condition *Composition `| "elif" @@ )`
+	Condition *Composition `| "elseIf" @@ )`
 }
 
 func (g *Conditional) Ast() (functions.Expression, error) {

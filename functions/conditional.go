@@ -73,7 +73,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 	}
 	// initialize output type
 	outputType := consequentOutputShape.Type
-	// typecheck elis patterns, guards, consequents
+	// typecheck elseIs patterns, guards, consequents
 	elisMatchers := make([]Matcher, len(x.ElisPatterns))
 	elisGuardActions := make([]states.Action, len(x.ElisGuards))
 	elisConsequentActions := make([]states.Action, len(x.ElisConsequents))

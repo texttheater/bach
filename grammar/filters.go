@@ -8,9 +8,9 @@ import (
 
 type Filter struct {
 	Pos               lexer.Position
-	Pattern           *Pattern     `( "eachis" @@`
+	Pattern           *Pattern     `( "eachIs" @@`
 	Guard             *Composition `  ( "with" @@ )?`
-	Condition         *Composition `| "eachif" @@ )`
+	Condition         *Composition `| "eachIf" @@ )`
 	Consequent        *Composition `( "then" ( @@ | "drop" )` // long form
 	LongAlternatives  []*FLongAlt  `  ( @@ )*`
 	Alternative       *Composition `  ( "else" ( @@ | "drop" ) )?` // short form
@@ -19,17 +19,17 @@ type Filter struct {
 
 type FLongAlt struct {
 	Pos        lexer.Position
-	Pattern    *Pattern     `( "elis" @@`
+	Pattern    *Pattern     `( "elseIs" @@`
 	Guard      *Composition `  ( "with" @@ )?`
-	Condition  *Composition `| "elif" @@ )`
+	Condition  *Composition `| "elseIf" @@ )`
 	Consequent *Composition `"then" @@`
 }
 
 type FShortAlt struct {
 	Pos       lexer.Position
-	Pattern   *Pattern     `( "elis" @@`
+	Pattern   *Pattern     `( "elseIs" @@`
 	Guard     *Composition `  ( "with" @@ )?`
-	Condition *Composition `| "elif" @@ )`
+	Condition *Composition `| "elseIf" @@ )`
 }
 
 func (g *Filter) Ast() (functions.Expression, error) {

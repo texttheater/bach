@@ -24,7 +24,7 @@ func TestMatchingObj(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`if true then {a: 1} else {b: 2} ok is {a: Num} then true elis {a: Num, b: Num} then false ok`,
+		`if true then {a: 1} else {b: 2} ok is {a: Num} then true elseIs {a: Num, b: Num} then false ok`,
 		nil,
 		nil,
 		errors.E(
@@ -33,14 +33,14 @@ func TestMatchingObj(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`if true then {a: 1} else {b: 2} ok is {a: Num a} then a elis {b: Num b} then b ok`,
+		`if true then {a: 1} else {b: 2} ok is {a: Num a} then a elseIs {b: Num b} then b ok`,
 		types.NumType{},
 		values.NumValue(1),
 		nil,
 		t,
 	)
 	TestProgram(
-		`if true then {a: 1} else {b: "s"} ok is {a: Num a} then a elis {b: Num b} then b ok`,
+		`if true then {a: 1} else {b: "s"} ok is {a: Num a} then a elseIs {b: Num b} then b ok`,
 		nil,
 		nil,
 		errors.E(
@@ -49,7 +49,7 @@ func TestMatchingObj(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`if true then {a: 1} elif true then {b: "s"} else {c: true} ok is {a: Num a} then a elis {b: Num b} then b ok`,
+		`if true then {a: 1} elseIf true then {b: "s"} else {c: true} ok is {a: Num a} then a elseIs {b: Num b} then b ok`,
 		nil,
 		nil,
 		errors.E(
@@ -69,7 +69,7 @@ func TestMatchingObj(t *testing.T) {
 	// types currently cannot represent the *absence* of attributes, so any
 	// attribute not present in the type has Any type by default.
 	TestProgram(
-		`if true then {a: 1} else {b: 2} ok is {a: Num x} with x ==1 then true elif false then false elis {a: Num x} then x elis {b: Num x} then x ok`,
+		`if true then {a: 1} else {b: 2} ok is {a: Num x} with x ==1 then true elseIf false then false elseIs {a: Num x} then x elseIs {b: Num x} then x ok`,
 		types.Union(types.BoolType{}, types.NumType{}),
 		values.BoolValue(true),
 		nil,

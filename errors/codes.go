@@ -70,11 +70,11 @@ func (code ErrorCode) DefaultMessage() string {
 	case ComposeWithVoid:
 		return "Cannot compose with a function whose return type is Void."
 	case NonExhaustiveMatch:
-		return "Match is not exhaustive. Consider adding elis clauses and/or an else clause."
+		return "Match is not exhaustive. Consider adding `elseIs` clauses and/or an `else` clause."
 	case ImpossibleMatch:
 		return "Impossible match. The pattern will never match the input type."
 	case UnreachableElisClause:
-		return "The `elis` clause is unreachable because the match is already exhaustive."
+		return "The `elseIs` clause is unreachable because the match is already exhaustive."
 	case UnreachableElseClause:
 		return "The `else` clause is unreachable because the match is already exhaustive."
 	default:

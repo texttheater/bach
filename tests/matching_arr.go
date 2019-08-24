@@ -84,7 +84,7 @@ func TestMatchingArr(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`if true then [1] else ["2"] ok is [Num a] then a elis [Str a] then a ok`,
+		`if true then [1] else ["2"] ok is [Num a] then a elseIs [Str a] then a ok`,
 		types.Union(types.NumType{}, types.StrType{}),
 		values.NumValue(1),
 		nil,
