@@ -7,29 +7,21 @@ import (
 )
 
 type Conditional struct {
-	Pos               lexer.Position
-	Pattern           *Pattern     `( "is" @@`
-	Guard             *Composition `  ( "with" @@)?`
-	Condition         *Composition `| "if" @@ )`
-	Consequent        *Composition `( "then" @@` // long form
-	LongAlternatives  []*CLongAlt  `  ( @@ )*`
-	Alternative       *Composition `  ( "else" @@ )?`
-	ShortAlternatives []*CShortAlt `| ( @@ )* ) "ok"` // short form
+	Pos          lexer.Position
+	Pattern      *Pattern       `( "is" @@`
+	Guard        *Composition   `  ( "with" @@)?`
+	Condition    *Composition   `| "if" @@ )`
+	Consequent   *Composition   `"then" @@` // long form
+	Alternatives []*Alternative `( @@ )*`
+	Alternative  *Composition   `( "else" @@ )? "ok"`
 }
 
-type CLongAlt struct {
+type Alternative struct {
 	Pos        lexer.Position
 	Pattern    *Pattern     `( "elseIs" @@`
 	Guard      *Composition `  ( "with" @@ )?`
 	Condition  *Composition `| "elseIf" @@ )`
 	Consequent *Composition `"then" @@`
-}
-
-type CShortAlt struct {
-	Pos       lexer.Position
-	Pattern   *Pattern     `( "elseIs" @@`
-	Guard     *Composition `  ( "with" @@ )?`
-	Condition *Composition `| "elseIf" @@ )`
 }
 
 func (g *Conditional) Ast() (functions.Expression, error) {
@@ -57,99 +49,56 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 			}
 		}
 	}
-	if g.Consequent != nil { // long form
-		consequent, err := g.Consequent.Ast()
+	consequent, err := g.Consequent.Ast()
+	if err != nil {
+		return nil, err
+	}
+	alternativePatterns := make([]functions.Pattern, len(g.Alternatives))
+	alternativeGuards := make([]functions.Expression, len(g.Alternatives))
+	alternativeConsequents := make([]functions.Expression, len(g.Alternatives))
+	for i, alternative := range g.Alternatives {
+		if alternative.Pattern == nil {
+			alternativePatterns[i] = functions.TypePattern{
+				Pos:  alternative.Pos,
+				Type: types.AnyType{},
+				Name: nil,
+			}
+			alternativeGuards[i], err = alternative.Condition.Ast()
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			alternativePatterns[i], err = alternative.Pattern.Ast()
+			if err != nil {
+				return nil, err
+			}
+			if alternative.Guard != nil {
+				alternativeGuards[i], err = alternative.Guard.Ast()
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+		alternativeConsequents[i], err = alternative.Consequent.Ast()
 		if err != nil {
 			return nil, err
 		}
-		alternativePatterns := make([]functions.Pattern, len(g.LongAlternatives))
-		alternativeGuards := make([]functions.Expression, len(g.LongAlternatives))
-		alternativeConsequents := make([]functions.Expression, len(g.LongAlternatives))
-		for i, alternative := range g.LongAlternatives {
-			if alternative.Pattern == nil {
-				alternativePatterns[i] = functions.TypePattern{
-					Pos:  alternative.Pos,
-					Type: types.AnyType{},
-					Name: nil,
-				}
-				alternativeGuards[i], err = alternative.Condition.Ast()
-				if err != nil {
-					return nil, err
-				}
-			} else {
-				alternativePatterns[i], err = alternative.Pattern.Ast()
-				if err != nil {
-					return nil, err
-				}
-				if alternative.Guard != nil {
-					alternativeGuards[i], err = alternative.Guard.Ast()
-					if err != nil {
-						return nil, err
-					}
-				}
-			}
-			alternativeConsequents[i], err = alternative.Consequent.Ast()
-			if err != nil {
-				return nil, err
-			}
-		}
-		var alternative functions.Expression
-		if g.Alternative != nil {
-			alternative, err = g.Alternative.Ast()
-			if err != nil {
-				return nil, err
-			}
-		}
-		return &functions.ConditionalExpression{
-			Pos:             g.Pos,
-			Pattern:         pattern,
-			Guard:           guard,
-			Consequent:      consequent,
-			ElisPatterns:    alternativePatterns,
-			ElisGuards:      alternativeGuards,
-			ElisConsequents: alternativeConsequents,
-			Alternative:     alternative,
-		}, nil
-	} else { // short form
-		consequent := &functions.RightExpression{}
-		alternativePatterns := make([]functions.Pattern, len(g.ShortAlternatives))
-		alternativeGuards := make([]functions.Expression, len(g.ShortAlternatives))
-		alternativeConsequents := make([]functions.Expression, len(g.ShortAlternatives))
-		for i, alternative := range g.ShortAlternatives {
-			if alternative.Pattern == nil {
-				alternativePatterns[i] = functions.TypePattern{
-					Pos:  alternative.Pos,
-					Type: types.AnyType{},
-					Name: nil,
-				}
-				alternativeGuards[i], err = alternative.Condition.Ast()
-				if err != nil {
-					return nil, err
-				}
-			} else {
-				alternativePatterns[i], err = alternative.Pattern.Ast()
-				if err != nil {
-					return nil, err
-				}
-				if alternative.Guard != nil {
-					alternativeGuards[i], err = alternative.Guard.Ast()
-					if err != nil {
-						return nil, err
-					}
-				}
-			}
-			alternativeConsequents[i] = &functions.RightExpression{}
-		}
-		alternative := &functions.LeftExpression{}
-		return &functions.ConditionalExpression{
-			Pos:             g.Pos,
-			Pattern:         pattern,
-			Guard:           guard,
-			Consequent:      consequent,
-			ElisPatterns:    alternativePatterns,
-			ElisGuards:      alternativeGuards,
-			ElisConsequents: alternativeConsequents,
-			Alternative:     alternative,
-		}, nil
 	}
+	var alternative functions.Expression
+	if g.Alternative != nil {
+		alternative, err = g.Alternative.Ast()
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &functions.ConditionalExpression{
+		Pos:             g.Pos,
+		Pattern:         pattern,
+		Guard:           guard,
+		Consequent:      consequent,
+		ElisPatterns:    alternativePatterns,
+		ElisGuards:      alternativeGuards,
+		ElisConsequents: alternativeConsequents,
+		Alternative:     alternative,
+	}, nil
 }
