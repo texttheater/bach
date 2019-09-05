@@ -41,3 +41,10 @@ func (x CompositionExpression) Typecheck(inputShape Shape, params []*Parameter) 
 	}
 	return outputShape, action, nil
 }
+
+func Compose(pos lexer.Position, l Expression, r Expression) Expression {
+	if l == nil {
+		return r
+	}
+	return &CompositionExpression{pos, l, r}
+}

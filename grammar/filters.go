@@ -45,7 +45,7 @@ func (g *FilterFromPComponent) Ast(pos lexer.Position, body functions.Expression
 	if err != nil {
 		return nil, err
 	}
-	body = &functions.CompositionExpression{pos, body, component}
+	body = functions.Compose(pos, body, component)
 	if g.FromComponent != nil {
 		body, err = g.FromComponent.Ast(pos, body)
 		if err != nil {
@@ -150,7 +150,7 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 			return nil, err
 		}
 		x.Alternative = alternative
-		body = &functions.CompositionExpression{pos, body, x}
+		body = functions.Compose(pos, body, x)
 		if c.FromComponent != nil {
 			body, err = c.FromComponent.Ast(pos, body)
 			if err != nil {
@@ -160,7 +160,7 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 		return body, nil
 	} else { // short form
 		x.Consequent = &functions.IdentityExpression{}
-		c := g.FromConsequentLong
+		c := g.FromConsequentShort
 		for c.FromConsequent != nil { // further elis/elif clauses
 			if c.Pattern != nil {
 				pattern, err := c.Pattern.Ast()
@@ -190,7 +190,7 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 		}
 		x.Alternative = &functions.DropExpression{}
 		x.UnreachableAlternativeAllowed = true
-		body = &functions.CompositionExpression{pos, body, x}
+		body = functions.Compose(pos, body, x)
 		if c.FromComponent != nil {
 			var err error
 			body, err = c.FromComponent.Ast(pos, body)
