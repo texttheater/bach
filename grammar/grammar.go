@@ -40,7 +40,6 @@ type SComponent struct {
 	Assignment  *Assignment  `| @Assignment`
 	Definition  *Definition  `| @@`
 	Conditional *Conditional `| @@`
-	Mapping     *Mapping     `| @@`
 	Filter      *Filter      `| @@`
 }
 
@@ -80,9 +79,6 @@ func (g *SComponent) Ast() (functions.Expression, error) {
 	if g.Conditional != nil {
 		return g.Conditional.Ast()
 	}
-	if g.Mapping != nil {
-		return g.Mapping.Ast()
-	}
 	if g.Filter != nil {
 		return g.Filter.Ast()
 	}
@@ -99,7 +95,6 @@ type PComponent struct {
 	RegexpCall *RegexpCall `| @@`
 	Assignment *Assignment `| @Assignment`
 	Definition *Definition `| @@`
-	Mapping    *Mapping    `| @@`
 	Filter     *Filter     `| @@`
 }
 
@@ -135,9 +130,6 @@ func (g *PComponent) Ast() (functions.Expression, error) {
 	}
 	if g.Definition != nil {
 		return g.Definition.Ast()
-	}
-	if g.Mapping != nil {
-		return g.Mapping.Ast()
 	}
 	if g.Filter != nil {
 		return g.Filter.Ast()
