@@ -18,9 +18,9 @@ type Conditional struct {
 
 type Alternative struct {
 	Pos        lexer.Position
-	Pattern    *Pattern     `( "elseIs" @@`
+	Pattern    *Pattern     `( "elis" @@`
 	Guard      *Composition `  ( "with" @@ )?`
-	Condition  *Composition `| "elseIf" @@ )`
+	Condition  *Composition `| "elif" @@ )`
 	Consequent *Composition `"then" @@`
 }
 

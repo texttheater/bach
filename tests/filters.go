@@ -9,7 +9,7 @@ import (
 
 func TestFilters(t *testing.T) {
 	TestProgram(
-		`["a", 1, "b", 2, "c", 3] eachIs Num with %2 >0 elseIs Str all arr`,
+		`["a", 1, "b", 2, "c", 3] each is Num with %2 >0 elis Str all arr`,
 		&types.ArrType{types.Union(types.NumType{}, types.StrType{})},
 		values.ArrValue([]values.Value{
 			values.StrValue("a"),
@@ -22,7 +22,7 @@ func TestFilters(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[{n: 1}, {n: 2}, {n: 3}] eachIs {n: n} with n %2 >0 all arr`,
+		`[{n: 1}, {n: 2}, {n: 3}] each is {n: n} with n %2 >0 all arr`,
 		&types.ArrType{types.NewObjType(map[string]types.Type{
 			"n": types.NumType{},
 		})},
@@ -38,7 +38,7 @@ func TestFilters(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[{n: 1}, {n: 2}, {n: 3}] eachIs {n: n} then n all arr`,
+		`[{n: 1}, {n: 2}, {n: 3}] each is {n: n} then n all arr`,
 		&types.ArrType{types.NumType{}},
 		values.ArrValue([]values.Value{
 			values.NumValue(1),
@@ -49,7 +49,7 @@ func TestFilters(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[1, 2, 3] eachIs Num all arr`,
+		`[1, 2, 3] each is Num all arr`,
 		&types.ArrType{types.NumType{}},
 		values.ArrValue([]values.Value{
 			values.NumValue(1),

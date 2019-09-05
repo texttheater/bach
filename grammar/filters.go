@@ -3,160 +3,201 @@ package grammar
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/functions"
-	"github.com/texttheater/bach/types"
 )
 
 type Filter struct {
-	Pos               lexer.Position
-	Pattern           *Pattern     `( "eachIs" @@`
-	Guard             *Composition `  ( "with" @@ )?`
-	Condition         *Composition `| "eachIf" @@ )`
-	Consequent        *Composition `( "then" ( @@ | "drop" )` // long form
-	LongAlternatives  []*FLongAlt  `  ( @@ )*`
-	Alternative       *Composition `  ( "else" ( @@ | "drop" ) )?` // short form
-	ShortAlternatives []*FShortAlt `| ( @@ )* ) "all"`
-}
-
-type FLongAlt struct {
-	Pos        lexer.Position
-	Pattern    *Pattern     `( "elseIs" @@`
-	Guard      *Composition `  ( "with" @@ )?`
-	Condition  *Composition `| "elseIf" @@ )`
-	Consequent *Composition `"then" @@`
-}
-
-type FShortAlt struct {
-	Pos       lexer.Position
-	Pattern   *Pattern     `( "elseIs" @@`
-	Guard     *Composition `  ( "with" @@ )?`
-	Condition *Composition `| "elseIf" @@ )`
+	Pos           lexer.Position
+	FromComponent *FilterFromComponent `"each" @@`
 }
 
 func (g *Filter) Ast() (functions.Expression, error) {
-	var pattern functions.Pattern
-	var guard functions.Expression
-	var err error
-	if g.Pattern == nil {
-		pattern = functions.TypePattern{
-			Pos:  g.Pos,
-			Type: types.AnyType{},
-		}
-		guard, err = g.Condition.Ast()
+	body, err := g.FromComponent.Ast(g.Pos, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &functions.MappingExpression{g.Pos, body}, nil
+}
+
+type FilterFromComponent struct {
+	Pos             lexer.Position
+	FromSComponent  *FilterFromSComponent  `( @@`
+	FromConditional *FilterFromConditional `| @@ )`
+}
+
+func (g *FilterFromComponent) Ast(pos lexer.Position, body functions.Expression) (functions.Expression, error) {
+	if g.FromSComponent != nil {
+		return g.FromSComponent.Ast(pos, body)
+	}
+	if g.FromConditional != nil {
+		return g.FromConditional.Ast(pos, body)
+	}
+	panic("invalid component")
+}
+
+type FilterFromSComponent struct {
+	Pos           lexer.Position
+	SComponent    *SComponent          `@@`
+	FromComponent *FilterFromComponent `( @@ | "all" )`
+}
+
+func (g *FilterFromSComponent) Ast(pos lexer.Position, body functions.Expression) (functions.Expression, error) {
+	component, err := g.SComponent.Ast()
+	if err != nil {
+		return nil, err
+	}
+	body = &functions.CompositionExpression{pos, body, component}
+	if g.FromComponent != nil {
+		body, err = g.FromComponent.Ast(pos, body)
 		if err != nil {
 			return nil, err
-		}
-	} else {
-		pattern, err = g.Pattern.Ast()
-		if err != nil {
-			return nil, err
-		}
-		if g.Guard != nil {
-			guard, err = g.Guard.Ast()
-			if err != nil {
-				return nil, err
-			}
 		}
 	}
-	if g.Consequent != nil { // long form
-		consequent, err := g.Consequent.Ast()
+	return body, nil
+}
+
+type FilterFromConditional struct {
+	Pos                 lexer.Position
+	Pattern             *Pattern                   `( "is" @@`
+	Guard               *Composition               `  ( "with" @@ )?`
+	Condition           *Composition               `| "if" @@ )`
+	FromConsequentLong  *FilterFromConsequentLong  `( @@`
+	FromConsequentShort *FilterFromConsequentShort `| @@ )`
+}
+
+type FilterFromConsequentLong struct {
+	Pos            lexer.Position
+	Consequent     *Composition              `"then" ( @@ | "drop" )`
+	Pattern        *Pattern                  `( ( ( "elis" @@`
+	Guard          *Composition              `      ( "with" @@ )?`
+	Condition      *Composition              `    | "elif" @@)`
+	FromConsequent *FilterFromConsequentLong `    @@ )`
+	Alternative    *Composition              `  | "else" @@ )?`
+	FromComponent  *FilterFromComponent      `"ok" ( @@ | "all" )`
+}
+
+type FilterFromConsequentShort struct {
+	Pos            lexer.Position
+	Pattern        *Pattern                   `( ( "elis" @@`
+	Guard          *Composition               `    ("with" @@)?`
+	Condition      *Composition               `  | "elif" @@ )`
+	FromConsequent *FilterFromConsequentShort `  @@`
+	FromComponent  *FilterFromComponent       `| ( "ok" @@ | "all" ) )`
+}
+
+func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expression) (functions.Expression, error) {
+	x := &functions.ConditionalExpression{}
+	x.Pos = g.Pos
+	if g.Pattern != nil {
+		pattern, err := g.Pattern.Ast()
 		if err != nil {
 			return nil, err
 		}
-		alternativePatterns := make([]functions.Pattern, len(g.LongAlternatives))
-		alternativeGuards := make([]functions.Expression, len(g.LongAlternatives))
-		alternativeConsequents := make([]functions.Expression, len(g.LongAlternatives))
-		for i, alternative := range g.LongAlternatives {
-			if alternative.Pattern == nil {
-				alternativePatterns[i] = functions.TypePattern{
-					Pos:  alternative.Pos,
-					Type: types.AnyType{},
-					Name: nil,
-				}
-				alternativeGuards[i], err = alternative.Condition.Ast()
+		x.Pattern = pattern
+		if g.Guard != nil {
+			guard, err := g.Guard.Ast()
+			if err != nil {
+				return nil, err
+			}
+			x.Guard = guard
+		}
+	} else {
+		condition, err := g.Condition.Ast()
+		if err != nil {
+			return nil, err
+		}
+		x.Guard = condition
+	}
+	if g.FromConsequentLong != nil { // long form
+		consequent, err := g.FromConsequentLong.Consequent.Ast()
+		if err != nil {
+			return nil, err
+		}
+		x.Consequent = consequent
+		c := g.FromConsequentLong
+		for c.FromConsequent != nil { // further elis/elif clauses
+			if c.Pattern != nil {
+				pattern, err := c.Pattern.Ast()
 				if err != nil {
 					return nil, err
 				}
-			} else {
-				alternativePatterns[i], err = alternative.Pattern.Ast()
-				if err != nil {
-					return nil, err
-				}
-				if alternative.Guard != nil {
-					alternativeGuards[i], err = alternative.Guard.Ast()
+				x.ElisPatterns = append(x.ElisPatterns, pattern)
+				if c.Guard != nil {
+					guard, err := c.Guard.Ast()
 					if err != nil {
 						return nil, err
 					}
+					x.ElisGuards = append(x.ElisGuards, guard)
+				} else {
+					x.ElisGuards = append(x.ElisGuards, nil)
 				}
+			} else {
+				condition, err := c.Condition.Ast()
+				if err != nil {
+					return nil, err
+				}
+				x.ElisPatterns = append(x.ElisPatterns, nil)
+				x.ElisGuards = append(x.ElisGuards, condition)
 			}
-			alternativeConsequents[i], err = alternative.Consequent.Ast()
+			consequent, err = c.FromConsequent.Consequent.Ast()
+			if err != nil {
+				return nil, err
+			}
+			x.ElisConsequents = append(x.ElisConsequents, consequent)
+			c = c.FromConsequent
+		}
+		alternative, err := c.Alternative.Ast()
+		if err != nil {
+			return nil, err
+		}
+		x.Alternative = alternative
+		body = &functions.CompositionExpression{pos, body, x}
+		if c.FromComponent != nil {
+			body, err = c.FromComponent.Ast(pos, body)
 			if err != nil {
 				return nil, err
 			}
 		}
-		var alternative functions.Expression
-		if g.Alternative != nil {
-			alternative, err = g.Alternative.Ast()
-			if err != nil {
-				return nil, err
-			}
-		}
-		return &functions.MappingExpression{
-			Pos: g.Pos,
-			Body: &functions.ConditionalExpression{
-				Pos:             g.Pos,
-				Pattern:         pattern,
-				Guard:           guard,
-				Consequent:      consequent,
-				ElisPatterns:    alternativePatterns,
-				ElisGuards:      alternativeGuards,
-				ElisConsequents: alternativeConsequents,
-				Alternative:     alternative,
-			},
-		}, nil
+		return body, nil
 	} else { // short form
-		consequent := &functions.IdentityExpression{}
-		alternativePatterns := make([]functions.Pattern, len(g.ShortAlternatives))
-		alternativeGuards := make([]functions.Expression, len(g.ShortAlternatives))
-		alternativeConsequents := make([]functions.Expression, len(g.ShortAlternatives))
-		for i, alternative := range g.ShortAlternatives {
-			if alternative.Pattern == nil {
-				alternativePatterns[i] = functions.TypePattern{
-					Pos:  alternative.Pos,
-					Type: types.AnyType{},
-					Name: nil,
-				}
-				alternativeGuards[i], err = alternative.Condition.Ast()
+		x.Consequent = &functions.IdentityExpression{}
+		c := g.FromConsequentLong
+		for c.FromConsequent != nil { // further elis/elif clauses
+			if c.Pattern != nil {
+				pattern, err := c.Pattern.Ast()
 				if err != nil {
 					return nil, err
 				}
-			} else {
-				alternativePatterns[i], err = alternative.Pattern.Ast()
-				if err != nil {
-					return nil, err
-				}
-				if alternative.Guard != nil {
-					alternativeGuards[i], err = alternative.Guard.Ast()
+				x.ElisPatterns = append(x.ElisPatterns, pattern)
+				if c.Guard != nil {
+					guard, err := c.Guard.Ast()
 					if err != nil {
 						return nil, err
 					}
+					x.ElisGuards = append(x.ElisGuards, guard)
+				} else {
+					x.ElisGuards = append(x.ElisGuards, nil)
 				}
+			} else {
+				condition, err := c.Condition.Ast()
+				if err != nil {
+					return nil, err
+				}
+				x.ElisPatterns = append(x.ElisPatterns, nil)
+				x.ElisGuards = append(x.ElisGuards, condition)
 			}
-			alternativeConsequents[i] = &functions.IdentityExpression{}
+			x.ElisConsequents = append(x.ElisConsequents, &functions.IdentityExpression{pos})
+			c = c.FromConsequent
 		}
-		alternative := &functions.DropExpression{}
-		return &functions.MappingExpression{
-			Pos: g.Pos,
-			Body: &functions.ConditionalExpression{
-				Pos:                           g.Pos,
-				Pattern:                       pattern,
-				Guard:                         guard,
-				Consequent:                    consequent,
-				ElisPatterns:                  alternativePatterns,
-				ElisGuards:                    alternativeGuards,
-				ElisConsequents:               alternativeConsequents,
-				Alternative:                   alternative,
-				UnreachableAlternativeAllowed: true,
-			},
-		}, nil
+		x.Alternative = &functions.DropExpression{}
+		x.UnreachableAlternativeAllowed = true
+		body = &functions.CompositionExpression{pos, body, x}
+		if c.FromComponent != nil {
+			var err error
+			body, err = c.FromComponent.Ast(pos, body)
+			if err != nil {
+				return nil, err
+			}
+		}
+		return body, nil
 	}
 }
