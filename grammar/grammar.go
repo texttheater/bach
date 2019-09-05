@@ -9,8 +9,8 @@ import (
 
 type Composition struct {
 	Pos        lexer.Position
-	Component  *Component   `@@`
-	Components []*Component `( @@ )*`
+	Component  *SComponent   `@@`
+	Components []*SComponent `( @@ )*`
 }
 
 func (g *Composition) Ast() (functions.Expression, error) {
@@ -29,7 +29,7 @@ func (g *Composition) Ast() (functions.Expression, error) {
 	return e, nil
 }
 
-type Component struct {
+type SComponent struct {
 	Pos         lexer.Position
 	Num         *float64     `  @Num`
 	Str         *string      `| @Str`
@@ -44,7 +44,7 @@ type Component struct {
 	Filter      *Filter      `| @@`
 }
 
-func (g *Component) Ast() (functions.Expression, error) {
+func (g *SComponent) Ast() (functions.Expression, error) {
 	if g.Num != nil {
 		return &functions.ConstantExpression{
 			Pos:   g.Pos,
@@ -79,6 +79,62 @@ func (g *Component) Ast() (functions.Expression, error) {
 	}
 	if g.Conditional != nil {
 		return g.Conditional.Ast()
+	}
+	if g.Mapping != nil {
+		return g.Mapping.Ast()
+	}
+	if g.Filter != nil {
+		return g.Filter.Ast()
+	}
+	panic("invalid component")
+}
+
+type PComponent struct {
+	Pos        lexer.Position
+	Num        *float64    `  @Num`
+	Str        *string     `| @Str`
+	Array      *Array      `| @@`
+	Object     *Object     `| @@`
+	Call       *Call       `| @@`
+	RegexpCall *RegexpCall `| @@`
+	Assignment *Assignment `| @Assignment`
+	Definition *Definition `| @@`
+	Mapping    *Mapping    `| @@`
+	Filter     *Filter     `| @@`
+}
+
+func (g *PComponent) Ast() (functions.Expression, error) {
+	if g.Num != nil {
+		return &functions.ConstantExpression{
+			Pos:   g.Pos,
+			Type:  types.NumType{},
+			Value: values.NumValue(*g.Num),
+		}, nil
+	}
+	if g.Str != nil {
+		return &functions.ConstantExpression{
+			Pos:   g.Pos,
+			Type:  types.StrType{},
+			Value: values.StrValue(*g.Str),
+		}, nil
+	}
+	if g.Array != nil {
+		return g.Array.Ast()
+	}
+	if g.Object != nil {
+		return g.Object.Ast()
+	}
+	if g.Call != nil {
+		return g.Call.Ast()
+	}
+	if g.RegexpCall != nil {
+		return g.RegexpCall.Ast()
+	}
+	if g.Assignment != nil {
+		return g.Assignment.Ast(), nil
+	}
+	if g.Definition != nil {
+		return g.Definition.Ast()
 	}
 	if g.Mapping != nil {
 		return g.Mapping.Ast()
