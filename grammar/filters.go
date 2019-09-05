@@ -20,13 +20,13 @@ func (g *Filter) Ast() (functions.Expression, error) {
 
 type FilterFromComponent struct {
 	Pos             lexer.Position
-	FromSComponent  *FilterFromSComponent  `( @@`
+	FromPComponent  *FilterFromPComponent  `( @@`
 	FromConditional *FilterFromConditional `| @@ )`
 }
 
 func (g *FilterFromComponent) Ast(pos lexer.Position, body functions.Expression) (functions.Expression, error) {
-	if g.FromSComponent != nil {
-		return g.FromSComponent.Ast(pos, body)
+	if g.FromPComponent != nil {
+		return g.FromPComponent.Ast(pos, body)
 	}
 	if g.FromConditional != nil {
 		return g.FromConditional.Ast(pos, body)
@@ -34,14 +34,14 @@ func (g *FilterFromComponent) Ast(pos lexer.Position, body functions.Expression)
 	panic("invalid component")
 }
 
-type FilterFromSComponent struct {
+type FilterFromPComponent struct {
 	Pos           lexer.Position
-	SComponent    *SComponent          `@@`
+	PComponent    *PComponent          `@@`
 	FromComponent *FilterFromComponent `( @@ | "all" )`
 }
 
-func (g *FilterFromSComponent) Ast(pos lexer.Position, body functions.Expression) (functions.Expression, error) {
-	component, err := g.SComponent.Ast()
+func (g *FilterFromPComponent) Ast(pos lexer.Position, body functions.Expression) (functions.Expression, error) {
+	component, err := g.PComponent.Ast()
 	if err != nil {
 		return nil, err
 	}
