@@ -3,6 +3,7 @@ package grammar
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/types"
 )
 
 type Filter struct {
@@ -105,6 +106,10 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 		if err != nil {
 			return nil, err
 		}
+		x.Pattern = functions.TypePattern{
+			Pos:  g.Pos,
+			Type: types.AnyType{},
+		}
 		x.Guard = condition
 	}
 	if g.FromConsequentLong != nil { // long form
@@ -135,7 +140,10 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 				if err != nil {
 					return nil, err
 				}
-				x.ElisPatterns = append(x.ElisPatterns, nil)
+				x.ElisPatterns = append(x.ElisPatterns, functions.TypePattern{
+					Pos:  c.Pos,
+					Type: types.AnyType{},
+				})
 				x.ElisGuards = append(x.ElisGuards, condition)
 			}
 			consequent, err = c.FromConsequent.Consequent.Ast()
@@ -182,7 +190,10 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 				if err != nil {
 					return nil, err
 				}
-				x.ElisPatterns = append(x.ElisPatterns, nil)
+				x.ElisPatterns = append(x.ElisPatterns, functions.TypePattern{
+					Pos:  c.Pos,
+					Type: types.AnyType{},
+				})
 				x.ElisGuards = append(x.ElisGuards, condition)
 			}
 			x.ElisConsequents = append(x.ElisConsequents, &functions.IdentityExpression{pos})
