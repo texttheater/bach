@@ -38,7 +38,7 @@ func TestFilters(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[{n: 1}, {n: 2}, {n: 3}] each is {n: n} then n all arr`,
+		`[{n: 1}, {n: 2}, {n: 3}] each is {n: n} then n ok all arr`,
 		&types.ArrType{types.NumType{}},
 		values.ArrValue([]values.Value{
 			values.NumValue(1),
