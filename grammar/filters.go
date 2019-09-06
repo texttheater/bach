@@ -153,11 +153,13 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 			x.ElisConsequents = append(x.ElisConsequents, consequent)
 			c = c.FromConsequent
 		}
-		alternative, err := c.Alternative.Ast()
-		if err != nil {
-			return nil, err
+		if c.Alternative != nil {
+			alternative, err := c.Alternative.Ast()
+			if err != nil {
+				return nil, err
+			}
+			x.Alternative = alternative
 		}
-		x.Alternative = alternative
 		body = functions.Compose(pos, body, x)
 		if c.FromComponent != nil {
 			body, err = c.FromComponent.Ast(pos, body)
