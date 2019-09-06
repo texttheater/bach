@@ -68,12 +68,12 @@ type FilterFromConditional struct {
 type FilterFromConsequentLong struct {
 	Pos            lexer.Position
 	Consequent     *Composition              `"then" ( @@ | "drop" )`
-	Pattern        *Pattern                  `( ( ( "elis" @@`
-	Guard          *Composition              `      ( "with" @@ )?`
-	Condition      *Composition              `    | "elif" @@)`
-	FromConsequent *FilterFromConsequentLong `    @@ )`
-	Alternative    *Composition              `  | "else" @@ )?`
-	FromComponent  *FilterFromComponent      `"ok" ( @@ | "all" )`
+	Pattern        *Pattern                  `( ( "elis" @@`
+	Guard          *Composition              `    ( "with" @@ )?`
+	Condition      *Composition              `  | "elif" @@ )`
+	FromConsequent *FilterFromConsequentLong `  @@`
+	Alternative    *Composition              `| ( "else" @@ )?`
+	FromComponent  *FilterFromComponent      `  "ok" ( @@ | "all" ) )`
 }
 
 type FilterFromConsequentShort struct {
