@@ -1,2 +1,2 @@
 fmt :
-	find . -name \*.go | parallel --gnu go fmt
+	find . -name \*.go | xargs gofmt -w
