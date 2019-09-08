@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
 )
@@ -55,6 +56,37 @@ func TestFilters(t *testing.T) {
 			values.NumValue(1),
 			values.NumValue(2),
 			values.NumValue(3),
+		}),
+		nil,
+		t,
+	)
+	TestProgram(
+		`[1, 2, 3] each if ==1 then "a" elif ==2 then "b" else "c" ok all arr`,
+		&types.ArrType{types.StrType{}},
+		values.ArrValue([]values.Value{
+			values.StrValue("a"),
+			values.StrValue("b"),
+			values.StrValue("c"),
+		}),
+		nil,
+		t,
+	)
+	TestProgram(
+		`[1, 2, 3] each if ==1 then "a" elif ==2 then "b" else "c" all arr`,
+		nil,
+		nil,
+		errors.E(
+			errors.Code(errors.Syntax),
+		),
+		t,
+	)
+	TestProgram(
+		`[1, 2, 3] each is Num ok +1 all arr`,
+		&types.ArrType{types.NumType{}},
+		values.ArrValue([]values.Value{
+			values.NumValue(2),
+			values.NumValue(3),
+			values.NumValue(4),
 		}),
 		nil,
 		t,
