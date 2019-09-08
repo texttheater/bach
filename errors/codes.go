@@ -16,6 +16,7 @@ const (
 	ImpossibleMatch
 	UnreachableElisClause
 	UnreachableElseClause
+	RegexpWantsString
 )
 
 func (code ErrorCode) String() string {
@@ -44,6 +45,8 @@ func (code ErrorCode) String() string {
 		return "UnreachableElisClause"
 	case UnreachableElseClause:
 		return "UnreachableElseClause"
+	case RegexpWantsString:
+		return "RegexpWantsString"
 	default:
 		return "Unknown"
 	}
@@ -77,6 +80,8 @@ func (code ErrorCode) DefaultMessage() string {
 		return "The `elis` clause is unreachable because the match is already exhaustive."
 	case UnreachableElseClause:
 		return "The `else` clause is unreachable because the match is already exhaustive."
+	case RegexpWantsString:
+		return "Regular expressions require Str as input type."
 	default:
 		return "unknown error"
 	}
@@ -109,6 +114,8 @@ func (code ErrorCode) Kind() string {
 	case UnreachableElisClause:
 		return "Type error"
 	case UnreachableElseClause:
+		return "Type error"
+	case RegexpWantsString:
 		return "Type error"
 	default:
 		return "Unknown error"
