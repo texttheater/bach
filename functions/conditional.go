@@ -13,9 +13,9 @@ type ConditionalExpression struct {
 	Pattern                       Pattern
 	Guard                         Expression
 	Consequent                    Expression
-	ElisPatterns                  []Pattern
-	ElisGuards                    []Expression
-	ElisConsequents               []Expression
+	AlternativePatterns           []Pattern
+	AlternativeGuards             []Expression
+	AlternativeConsequents        []Expression
 	Alternative                   Expression
 	UnreachableAlternativeAllowed bool
 }
@@ -74,10 +74,10 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 	// initialize output type
 	outputType := consequentOutputShape.Type
 	// typecheck elis patterns, guards, consequents
-	elisMatchers := make([]Matcher, len(x.ElisPatterns))
-	elisGuardActions := make([]states.Action, len(x.ElisGuards))
-	elisConsequentActions := make([]states.Action, len(x.ElisConsequents))
-	for i := range x.ElisPatterns {
+	elisMatchers := make([]Matcher, len(x.AlternativePatterns))
+	elisGuardActions := make([]states.Action, len(x.AlternativeGuards))
+	elisConsequentActions := make([]states.Action, len(x.AlternativeConsequents))
+	for i := range x.AlternativePatterns {
 		// reachability check
 		if (types.VoidType{}).Subsumes(inputShape.Type) {
 			return Shape{}, nil, errors.E(
@@ -86,17 +86,17 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 			)
 		}
 		// typecheck pattern
-		patternOutputShape, restType, elisMatchers[i], err = x.ElisPatterns[i].Typecheck(inputShape)
+		patternOutputShape, restType, elisMatchers[i], err = x.AlternativePatterns[i].Typecheck(inputShape)
 		if err != nil {
 			return Shape{}, nil, err
 		}
 		// typecheck guard
 		var guardOutputShape Shape
-		if x.ElisGuards[i] == nil {
+		if x.AlternativeGuards[i] == nil {
 			guardOutputShape = patternOutputShape
 			elisGuardActions[i] = states.SimpleAction(values.BoolValue(true))
 		} else {
-			guardOutputShape, elisGuardActions[i], err = x.ElisGuards[i].Typecheck(patternOutputShape, nil)
+			guardOutputShape, elisGuardActions[i], err = x.AlternativeGuards[i].Typecheck(patternOutputShape, nil)
 			if err != nil {
 				return Shape{}, nil, err
 			}
@@ -115,13 +115,13 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 			Stack: guardOutputShape.Stack,
 		}
 		// typecheck consequent
-		consequentOutputShape, consequentAction, err := x.ElisConsequents[i].Typecheck(consequentInputShape, nil)
+		consequentOutputShape, consequentAction, err := x.AlternativeConsequents[i].Typecheck(consequentInputShape, nil)
 		if err != nil {
 			return Shape{}, nil, err
 		}
 		elisConsequentActions[i] = consequentAction
 		// update input shape
-		if x.ElisGuards[i] != nil {
+		if x.AlternativeGuards[i] != nil {
 			restType = inputShape.Type
 		}
 		inputShape = Shape{

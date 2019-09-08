@@ -125,32 +125,32 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 				if err != nil {
 					return nil, err
 				}
-				x.ElisPatterns = append(x.ElisPatterns, pattern)
+				x.AlternativePatterns = append(x.AlternativePatterns, pattern)
 				if c.Guard != nil {
 					guard, err := c.Guard.Ast()
 					if err != nil {
 						return nil, err
 					}
-					x.ElisGuards = append(x.ElisGuards, guard)
+					x.AlternativeGuards = append(x.AlternativeGuards, guard)
 				} else {
-					x.ElisGuards = append(x.ElisGuards, nil)
+					x.AlternativeGuards = append(x.AlternativeGuards, nil)
 				}
 			} else {
 				condition, err := c.Condition.Ast()
 				if err != nil {
 					return nil, err
 				}
-				x.ElisPatterns = append(x.ElisPatterns, functions.TypePattern{
+				x.AlternativePatterns = append(x.AlternativePatterns, functions.TypePattern{
 					Pos:  c.Pos,
 					Type: types.AnyType{},
 				})
-				x.ElisGuards = append(x.ElisGuards, condition)
+				x.AlternativeGuards = append(x.AlternativeGuards, condition)
 			}
 			consequent, err = c.FromConsequent.Consequent.Ast()
 			if err != nil {
 				return nil, err
 			}
-			x.ElisConsequents = append(x.ElisConsequents, consequent)
+			x.AlternativeConsequents = append(x.AlternativeConsequents, consequent)
 			c = c.FromConsequent
 		}
 		if c.Alternative != nil {
@@ -177,28 +177,28 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 				if err != nil {
 					return nil, err
 				}
-				x.ElisPatterns = append(x.ElisPatterns, pattern)
+				x.AlternativePatterns = append(x.AlternativePatterns, pattern)
 				if c.Guard != nil {
 					guard, err := c.Guard.Ast()
 					if err != nil {
 						return nil, err
 					}
-					x.ElisGuards = append(x.ElisGuards, guard)
+					x.AlternativeGuards = append(x.AlternativeGuards, guard)
 				} else {
-					x.ElisGuards = append(x.ElisGuards, nil)
+					x.AlternativeGuards = append(x.AlternativeGuards, nil)
 				}
 			} else {
 				condition, err := c.Condition.Ast()
 				if err != nil {
 					return nil, err
 				}
-				x.ElisPatterns = append(x.ElisPatterns, functions.TypePattern{
+				x.AlternativePatterns = append(x.AlternativePatterns, functions.TypePattern{
 					Pos:  c.Pos,
 					Type: types.AnyType{},
 				})
-				x.ElisGuards = append(x.ElisGuards, condition)
+				x.AlternativeGuards = append(x.AlternativeGuards, condition)
 			}
-			x.ElisConsequents = append(x.ElisConsequents, &functions.IdentityExpression{pos})
+			x.AlternativeConsequents = append(x.AlternativeConsequents, &functions.IdentityExpression{pos})
 			c = c.FromConsequent
 		}
 		x.Alternative = &functions.DropExpression{}

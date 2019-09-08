@@ -92,13 +92,13 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 		}
 	}
 	return &functions.ConditionalExpression{
-		Pos:             g.Pos,
-		Pattern:         pattern,
-		Guard:           guard,
-		Consequent:      consequent,
-		ElisPatterns:    alternativePatterns,
-		ElisGuards:      alternativeGuards,
-		ElisConsequents: alternativeConsequents,
-		Alternative:     alternative,
+		Pos:                    g.Pos,
+		Pattern:                pattern,
+		Guard:                  guard,
+		Consequent:             consequent,
+		AlternativePatterns:    alternativePatterns,
+		AlternativeGuards:      alternativeGuards,
+		AlternativeConsequents: alternativeConsequents,
+		Alternative:            alternative,
 	}, nil
 }
