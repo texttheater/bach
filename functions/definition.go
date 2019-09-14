@@ -86,7 +86,7 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 	if !x.OutputType.Subsumes(bodyOutputShape.Type) {
 		return Shape{}, nil, errors.E(
 			errors.Code(errors.FunctionBodyHasWrongOutputType),
-			errors.Pos(x.Pos),
+			errors.Pos(x.Body.Position()),
 			errors.WantType(x.OutputType),
 			errors.GotType(bodyOutputShape.Type),
 		)

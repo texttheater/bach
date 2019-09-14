@@ -51,7 +51,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		if !(types.BoolType{}).Subsumes(guardOutputShape.Type) {
 			return Shape{}, nil, errors.E(
 				errors.Code(errors.ConditionMustBeBool),
-				errors.Pos(x.Pos),
+				errors.Pos(x.Guard.Position()),
 				errors.WantType(types.BoolType{}),
 				errors.GotType(guardOutputShape.Type),
 			)
@@ -86,7 +86,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		if (types.VoidType{}).Subsumes(inputShape.Type) {
 			return Shape{}, nil, errors.E(
 				errors.Code(errors.UnreachableElisClause),
-				errors.Pos(x.Pos),
+				errors.Pos(x.Pattern.Position()),
 			)
 		}
 		// typecheck pattern
@@ -107,7 +107,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 			if !(types.BoolType{}).Subsumes(guardOutputShape.Type) {
 				return Shape{}, nil, errors.E(
 					errors.Code(errors.ConditionMustBeBool),
-					errors.Pos(x.Pos),
+					errors.Pos(x.AlternativeGuards[i].Position()),
 					errors.WantType(types.BoolType{}),
 					errors.GotType(guardOutputShape.Type),
 				)
@@ -152,7 +152,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		if !x.UnreachableAlternativeAllowed && (types.VoidType{}).Subsumes(inputShape.Type) {
 			return Shape{}, nil, errors.E(
 				errors.Code(errors.UnreachableElseClause),
-				errors.Pos(x.Pos),
+				errors.Pos(x.Alternative.Position()),
 			)
 		}
 		// alternative
@@ -227,6 +227,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 // pattern/matcher kinda analogous to expression/action
 
 type Pattern interface {
+	Position() lexer.Position
 	Typecheck(inputShape Shape) (outputShape Shape, restType types.Type, matcher Matcher, err error)
 }
 
@@ -238,7 +239,11 @@ type ArrPattern struct {
 	Name            *string
 }
 
-func (p *ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, error) {
+func (p ArrPattern) Position() lexer.Position {
+	return p.Pos
+}
+
+func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, error) {
 	// compute element input types
 	elementInputTypes := make([]types.Type, len(p.ElementPatterns))
 	switch t := inputShape.Type.(type) {
@@ -368,7 +373,11 @@ type ObjPattern struct {
 	Name           *string
 }
 
-func (p *ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, error) {
+func (p ObjPattern) Position() lexer.Position {
+	return p.Pos
+}
+
+func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, error) {
 	// compute value input types
 	propInputTypeMap := make(map[string]types.Type)
 	switch t := inputShape.Type.(type) {
@@ -483,6 +492,10 @@ type TypePattern struct {
 	Pos  lexer.Position
 	Type types.Type
 	Name *string
+}
+
+func (p TypePattern) Position() lexer.Position {
+	return p.Pos
 }
 
 func (p TypePattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, error) {
