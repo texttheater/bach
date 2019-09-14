@@ -14,6 +14,10 @@ type RegexpExpression struct {
 	Regexp *syntax.Regexp
 }
 
+func (x RegexpExpression) Position() lexer.Position {
+	return x.Pos
+}
+
 func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	if !(types.StrType{}).Subsumes(inputShape.Type) {
 		return Shape{}, nil, errors.E(

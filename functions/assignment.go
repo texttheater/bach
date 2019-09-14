@@ -12,6 +12,10 @@ type AssignmentExpression struct {
 	Name string
 }
 
+func (x AssignmentExpression) Position() lexer.Position {
+	return x.Pos
+}
+
 func (x AssignmentExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	if len(params) > 0 {
 		return Shape{}, nil, errors.E(

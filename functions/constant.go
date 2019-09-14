@@ -14,6 +14,10 @@ type ConstantExpression struct {
 	Value values.Value
 }
 
+func (x ConstantExpression) Position() lexer.Position {
+	return x.Pos
+}
+
 func (x ConstantExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	if len(params) > 0 {
 		return Shape{}, nil, errors.E(

@@ -17,6 +17,10 @@ type DefinitionExpression struct {
 	Body       Expression
 }
 
+func (x DefinitionExpression) Position() lexer.Position {
+	return x.Pos
+}
+
 func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {

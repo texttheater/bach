@@ -9,6 +9,10 @@ type IdentityExpression struct {
 	Pos lexer.Position
 }
 
+func (x IdentityExpression) Position() lexer.Position {
+	return x.Pos
+}
+
 func (x IdentityExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	return inputShape, func(inputState states.State, args []states.Action) states.State {
 		return inputState

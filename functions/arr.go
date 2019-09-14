@@ -13,6 +13,10 @@ type ArrExpression struct {
 	Elements []Expression
 }
 
+func (x ArrExpression) Position() lexer.Position {
+	return x.Pos
+}
+
 func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	if len(params) > 0 {
 		return Shape{}, nil, errors.E(

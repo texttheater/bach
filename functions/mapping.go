@@ -13,6 +13,10 @@ type MappingExpression struct {
 	Body Expression
 }
 
+func (x MappingExpression) Position() lexer.Position {
+	return x.Pos
+}
+
 func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {

@@ -20,6 +20,10 @@ type ConditionalExpression struct {
 	UnreachableAlternativeAllowed bool
 }
 
+func (x ConditionalExpression) Position() lexer.Position {
+	return x.Pos
+}
+
 func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {

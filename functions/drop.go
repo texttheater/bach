@@ -10,6 +10,10 @@ type DropExpression struct {
 	Pos lexer.Position
 }
 
+func (x DropExpression) Position() lexer.Position {
+	return x.Pos
+}
+
 func (x DropExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	outputShape := Shape{
 		Type:  types.VoidType{},

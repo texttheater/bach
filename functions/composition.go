@@ -13,6 +13,10 @@ type CompositionExpression struct {
 	Right Expression
 }
 
+func (x CompositionExpression) Position() lexer.Position {
+	return x.Pos
+}
+
 func (x CompositionExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	if len(params) > 0 {
 		return Shape{}, nil, errors.E(

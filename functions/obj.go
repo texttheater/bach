@@ -13,6 +13,10 @@ type ObjExpression struct {
 	PropValMap map[string]Expression
 }
 
+func (x ObjExpression) Position() lexer.Position {
+	return x.Pos
+}
+
 func (x ObjExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	if len(params) > 0 {
 		return Shape{}, nil, errors.E(

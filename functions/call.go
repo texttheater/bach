@@ -17,6 +17,10 @@ type CallExpression struct {
 	Args []Expression
 }
 
+func (x CallExpression) Position() lexer.Position {
+	return x.Pos
+}
+
 func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	// go down the function stack and find the function invoked by this
 	// call
