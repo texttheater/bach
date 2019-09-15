@@ -191,11 +191,6 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 		if !wantInputType.Subsumes(gotInputShape.Type) {
 			return Shape{}, nil, false, nil
 		}
-		// create output shape
-		outputShape := Shape{
-			Type:  outputType,
-			Stack: gotInputShape.Stack,
-		}
 		// typecheck and set parameters filled by this call
 		funAction := action
 		for i := range gotCall.Args {
@@ -229,6 +224,11 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 					errors.GotParam(params[len(gotCall.Args)+i]),
 				)
 			}
+		}
+		// create output shape
+		outputShape := Shape{
+			Type:  outputType,
+			Stack: gotInputShape.Stack,
 		}
 		// return
 		return outputShape, funAction, true, nil
