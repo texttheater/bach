@@ -9,16 +9,16 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-type RegexpExpression struct {
+type RegexpMatchExpression struct {
 	Pos    lexer.Position
 	Regexp *syntax.Regexp
 }
 
-func (x RegexpExpression) Position() lexer.Position {
+func (x RegexpMatchExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
+func (x RegexpMatchExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	if !(types.StrType{}).Subsumes(inputShape.Type) {
 		return Shape{}, nil, errors.E(
 			errors.Code(errors.RegexpWantsString),

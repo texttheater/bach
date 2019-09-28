@@ -36,11 +36,11 @@ type SComponent struct {
 	Array       *Array       `| @@`
 	Object      *Object      `| @@`
 	Call        *Call        `| @@`
-	RegexpCall  *RegexpCall  `| @@`
 	Assignment  *Assignment  `| @Assignment`
 	Definition  *Definition  `| @@`
 	Conditional *Conditional `| @@`
 	Filter      *Filter      `| @@`
+	RegexpMatch *RegexpMatch `| @@`
 }
 
 func (g *SComponent) Ast() (functions.Expression, error) {
@@ -67,8 +67,8 @@ func (g *SComponent) Ast() (functions.Expression, error) {
 	if g.Call != nil {
 		return g.Call.Ast()
 	}
-	if g.RegexpCall != nil {
-		return g.RegexpCall.Ast()
+	if g.RegexpMatch != nil {
+		return g.RegexpMatch.Ast()
 	}
 	if g.Assignment != nil {
 		return g.Assignment.Ast(), nil
@@ -86,16 +86,16 @@ func (g *SComponent) Ast() (functions.Expression, error) {
 }
 
 type PComponent struct {
-	Pos        lexer.Position
-	Num        *float64    `  @Num`
-	Str        *string     `| @Str`
-	Array      *Array      `| @@`
-	Object     *Object     `| @@`
-	Call       *Call       `| @@`
-	RegexpCall *RegexpCall `| @@`
-	Assignment *Assignment `| @Assignment`
-	Definition *Definition `| @@`
-	Filter     *Filter     `| @@`
+	Pos         lexer.Position
+	Num         *float64     `  @Num`
+	Str         *string      `| @Str`
+	Array       *Array       `| @@`
+	Object      *Object      `| @@`
+	Call        *Call        `| @@`
+	Assignment  *Assignment  `| @Assignment`
+	Definition  *Definition  `| @@`
+	Filter      *Filter      `| @@`
+	RegexpMatch *RegexpMatch `| @@`
 }
 
 func (g *PComponent) Ast() (functions.Expression, error) {
@@ -122,8 +122,8 @@ func (g *PComponent) Ast() (functions.Expression, error) {
 	if g.Call != nil {
 		return g.Call.Ast()
 	}
-	if g.RegexpCall != nil {
-		return g.RegexpCall.Ast()
+	if g.RegexpMatch != nil {
+		return g.RegexpMatch.Ast()
 	}
 	if g.Assignment != nil {
 		return g.Assignment.Ast(), nil
