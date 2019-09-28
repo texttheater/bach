@@ -1,7 +1,7 @@
 package grammar
 
 import (
-	"regexp/syntax"
+	"regexp"
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/functions"
@@ -14,7 +14,7 @@ type RegexpMatch struct {
 
 func (g *RegexpMatch) Ast() (functions.Expression, error) {
 	regexpString := (*g.RegexpMatch)[2 : len(*g.RegexpMatch)-1]
-	regexp, err := syntax.Parse(regexpString, 0)
+	regexp, err := regexp.Compile(regexpString)
 	if err != nil {
 		return nil, err
 	}

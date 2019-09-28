@@ -1,7 +1,7 @@
 package functions
 
 import (
-	"regexp/syntax"
+	"regexp"
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
@@ -11,7 +11,7 @@ import (
 
 type RegexpMatchExpression struct {
 	Pos    lexer.Position
-	Regexp *syntax.Regexp
+	Regexp *regexp.Regexp
 }
 
 func (x RegexpMatchExpression) Position() lexer.Position {
