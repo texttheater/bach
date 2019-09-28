@@ -10,6 +10,11 @@ type ObjType struct {
 	PropTypeMap map[string]Type
 }
 
+var AnyObjType = ObjType{
+	Props:       nil,
+	PropTypeMap: make(map[string]Type),
+}
+
 func NewObjType(propTypeMap map[string]Type) Type {
 	props := make([]string, len(propTypeMap))
 	i := 0
