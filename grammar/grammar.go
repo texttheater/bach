@@ -30,17 +30,18 @@ func (g *Composition) Ast() (functions.Expression, error) {
 }
 
 type SComponent struct {
-	Pos         lexer.Position
-	Num         *float64     `  @Num`
-	Str         *string      `| @Str`
-	Array       *Array       `| @@`
-	Object      *Object      `| @@`
-	Call        *Call        `| @@`
-	Assignment  *Assignment  `| @Assignment`
-	Definition  *Definition  `| @@`
-	Conditional *Conditional `| @@`
-	Filter      *Filter      `| @@`
-	RegexpMatch *RegexpMatch `| @@`
+	Pos             lexer.Position
+	Num             *float64         `  @Num`
+	Str             *string          `| @Str`
+	Array           *Array           `| @@`
+	Object          *Object          `| @@`
+	Call            *Call            `| @@`
+	Assignment      *Assignment      `| @Assignment`
+	Definition      *Definition      `| @@`
+	Conditional     *Conditional     `| @@`
+	Filter          *Filter          `| @@`
+	RegexpFindFirst *RegexpFindFirst `| @@`
+	RegexpFindAll   *RegexpFindAll   `| @@`
 }
 
 func (g *SComponent) Ast() (functions.Expression, error) {
@@ -67,8 +68,11 @@ func (g *SComponent) Ast() (functions.Expression, error) {
 	if g.Call != nil {
 		return g.Call.Ast()
 	}
-	if g.RegexpMatch != nil {
-		return g.RegexpMatch.Ast()
+	if g.RegexpFindFirst != nil {
+		return g.RegexpFindFirst.Ast()
+	}
+	if g.RegexpFindAll != nil {
+		return g.RegexpFindAll.Ast()
 	}
 	if g.Assignment != nil {
 		return g.Assignment.Ast(), nil
@@ -86,16 +90,17 @@ func (g *SComponent) Ast() (functions.Expression, error) {
 }
 
 type PComponent struct {
-	Pos         lexer.Position
-	Num         *float64     `  @Num`
-	Str         *string      `| @Str`
-	Array       *Array       `| @@`
-	Object      *Object      `| @@`
-	Call        *Call        `| @@`
-	Assignment  *Assignment  `| @Assignment`
-	Definition  *Definition  `| @@`
-	Filter      *Filter      `| @@`
-	RegexpMatch *RegexpMatch `| @@`
+	Pos             lexer.Position
+	Num             *float64         `  @Num`
+	Str             *string          `| @Str`
+	Array           *Array           `| @@`
+	Object          *Object          `| @@`
+	Call            *Call            `| @@`
+	Assignment      *Assignment      `| @Assignment`
+	Definition      *Definition      `| @@`
+	Filter          *Filter          `| @@`
+	RegexpFindFirst *RegexpFindFirst `| @@`
+	RegexpFindAll   *RegexpFindAll   `| @@`
 }
 
 func (g *PComponent) Ast() (functions.Expression, error) {
@@ -122,8 +127,11 @@ func (g *PComponent) Ast() (functions.Expression, error) {
 	if g.Call != nil {
 		return g.Call.Ast()
 	}
-	if g.RegexpMatch != nil {
-		return g.RegexpMatch.Ast()
+	if g.RegexpFindFirst != nil {
+		return g.RegexpFindFirst.Ast()
+	}
+	if g.RegexpFindAll != nil {
+		return g.RegexpFindAll.Ast()
 	}
 	if g.Assignment != nil {
 		return g.Assignment.Ast(), nil
