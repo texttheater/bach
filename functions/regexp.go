@@ -31,6 +31,7 @@ func (x RegexpMatchExpression) Typecheck(inputShape Shape, params []*Parameter) 
 	}
 	submatchType := types.Union(types.NullType{}, types.StrType{})
 	propTypeMap := make(map[string]types.Type)
+	propTypeMap["start"] = types.NumType{}
 	for i, name := range x.Regexp.SubexpNames() {
 		propTypeMap[strconv.Itoa(i)] = submatchType
 		if name != "" {
@@ -51,6 +52,9 @@ func (x RegexpMatchExpression) Typecheck(inputShape Shape, params []*Parameter) 
 			}
 		}
 		propValueMap := make(map[string]values.Value)
+		if propTypeMap["start"].Subsumes(types.NumType{}) {
+			propValueMap["start"] = values.NumValue(match[0])
+		}
 		for i, name := range x.Regexp.SubexpNames() {
 			fromIndex := indexes[2*i]
 			toIndex := indexes[2*i+1]
