@@ -5,8 +5,6 @@ import (
 	"github.com/texttheater/bach/functions"
 )
 
-///////////////////////////////////////////////////////////////////////////////
-
 type Assignment struct {
 	Pos  lexer.Position
 	Name string
@@ -17,11 +15,9 @@ func (g *Assignment) Capture(values []string) error {
 	return nil
 }
 
-func (g *Assignment) Ast() functions.Expression {
+func (g *Assignment) Ast() (functions.Expression, error) {
 	return &functions.AssignmentExpression{
 		Pos:  g.Pos,
 		Name: g.Name,
-	}
+	}, nil
 }
-
-///////////////////////////////////////////////////////////////////////////////

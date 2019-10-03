@@ -9,8 +9,6 @@ import (
 	"github.com/texttheater/bach/values"
 )
 
-///////////////////////////////////////////////////////////////////////////////
-
 type Call struct {
 	Pos         lexer.Position
 	Op1Num      *Op1Num      `  @Op1Num`
@@ -43,8 +41,6 @@ func (g *Call) Ast() (functions.Expression, error) {
 	panic("invalid call")
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
 type Op1Num struct {
 	Pos lexer.Position
 	Op  string
@@ -74,8 +70,6 @@ func (g *Op1Num) Ast() functions.Expression {
 		},
 	}
 }
-
-///////////////////////////////////////////////////////////////////////////////
 
 type Op2Num struct {
 	Pos lexer.Position
@@ -107,8 +101,6 @@ func (g *Op2Num) Ast() functions.Expression {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
 type Op1Name struct {
 	Pos  lexer.Position
 	Op   string
@@ -125,8 +117,6 @@ func (g *Op1Name) Ast() functions.Expression {
 	return &functions.CallExpression{g.Pos, g.Op, []functions.Expression{&functions.CallExpression{g.Pos, g.Name, []functions.Expression{}}}}
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
 type Op2Name struct {
 	Pos  lexer.Position
 	Op   string
@@ -142,8 +132,6 @@ func (g *Op2Name) Capture(values []string) error {
 func (g *Op2Name) Ast() functions.Expression {
 	return &functions.CallExpression{g.Pos, g.Op, []functions.Expression{&functions.CallExpression{g.Pos, g.Name, []functions.Expression{}}}}
 }
-
-///////////////////////////////////////////////////////////////////////////////
 
 type NameArglist struct {
 	Pos      lexer.Position
@@ -168,8 +156,6 @@ func (g *NameArglist) Ast() (functions.Expression, error) {
 	return &functions.CallExpression{g.Pos, g.NameLpar.Name, args}, nil
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
 type NameLpar struct {
 	Pos  lexer.Position
 	Name string
@@ -179,5 +165,3 @@ func (g *NameLpar) Capture(values []string) error {
 	g.Name = values[0][:len(values[0])-1]
 	return nil
 }
-
-///////////////////////////////////////////////////////////////////////////////

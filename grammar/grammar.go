@@ -75,7 +75,7 @@ func (g *SComponent) Ast() (functions.Expression, error) {
 		return g.RegexpFindAll.Ast()
 	}
 	if g.Assignment != nil {
-		return g.Assignment.Ast(), nil
+		return g.Assignment.Ast()
 	}
 	if g.Definition != nil {
 		return g.Definition.Ast()
@@ -134,7 +134,7 @@ func (g *PComponent) Ast() (functions.Expression, error) {
 		return g.RegexpFindAll.Ast()
 	}
 	if g.Assignment != nil {
-		return g.Assignment.Ast(), nil
+		return g.Assignment.Ast()
 	}
 	if g.Definition != nil {
 		return g.Definition.Ast()
