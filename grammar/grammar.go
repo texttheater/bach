@@ -39,6 +39,7 @@ type SComponent struct {
 	Assignment      *Assignment      `| @Assignment`
 	Definition      *Definition      `| @@`
 	Conditional     *Conditional     `| @@`
+	Drop            *Drop            `| @@`
 	Filter          *Filter          `| @@`
 	RegexpFindFirst *RegexpFindFirst `| @@`
 	RegexpFindAll   *RegexpFindAll   `| @@`
@@ -83,6 +84,9 @@ func (g *SComponent) Ast() (functions.Expression, error) {
 	if g.Conditional != nil {
 		return g.Conditional.Ast()
 	}
+	if g.Drop != nil {
+		return g.Drop.Ast()
+	}
 	if g.Filter != nil {
 		return g.Filter.Ast()
 	}
@@ -98,6 +102,7 @@ type PComponent struct {
 	Call            *Call            `| @@`
 	Assignment      *Assignment      `| @Assignment`
 	Definition      *Definition      `| @@`
+	Drop            *Drop            `| @@`
 	Filter          *Filter          `| @@`
 	RegexpFindFirst *RegexpFindFirst `| @@`
 	RegexpFindAll   *RegexpFindAll   `| @@`
@@ -138,6 +143,9 @@ func (g *PComponent) Ast() (functions.Expression, error) {
 	}
 	if g.Definition != nil {
 		return g.Definition.Ast()
+	}
+	if g.Drop != nil {
+		return g.Drop.Ast()
 	}
 	if g.Filter != nil {
 		return g.Filter.Ast()

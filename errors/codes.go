@@ -12,6 +12,7 @@ const (
 	ConditionMustBeBool
 	MappingRequiresSeqType
 	ComposeWithVoid
+	VoidProgram
 	NonExhaustiveMatch
 	ImpossibleMatch
 	UnreachableElisClause
@@ -37,6 +38,8 @@ func (code ErrorCode) String() string {
 		return "MappingRequiresSeqType"
 	case ComposeWithVoid:
 		return "ComposeWithVoid"
+	case VoidProgram:
+		return "VoidProgram"
 	case NonExhaustiveMatch:
 		return "NonExhaustiveMatch"
 	case ImpossibleMatch:
@@ -72,6 +75,8 @@ func (code ErrorCode) DefaultMessage() string {
 		return "The input to a mapping must be a sequence."
 	case ComposeWithVoid:
 		return "Cannot compose with a function whose return type is Void."
+	case VoidProgram:
+		return "Type of program cannot be Void."
 	case NonExhaustiveMatch:
 		return "Match is not exhaustive. Consider adding `elis` clauses and/or an `else` clause."
 	case ImpossibleMatch:
@@ -106,6 +111,8 @@ func (code ErrorCode) Kind() string {
 	case MappingRequiresSeqType:
 		return "Type error"
 	case ComposeWithVoid:
+		return "Type error"
+	case VoidProgram:
 		return "Type error"
 	case NonExhaustiveMatch:
 		return "Type error"

@@ -39,6 +39,35 @@ func TestFilters(t *testing.T) {
 		t,
 	)
 	TestProgram(
+		`[1, 2, 3, 4, 5, 6] each if %2 ==0 then *2 else drop ok all arr`,
+		&types.ArrType{types.NumType{}},
+		values.ArrValue([]values.Value{
+			values.NumValue(4),
+			values.NumValue(8),
+			values.NumValue(12),
+		}),
+		nil,
+		t,
+	)
+	TestProgram(
+		`[1, 2, 3, 4, 5, 6] each if %2 ==0 then drop else id ok all arr`,
+		&types.ArrType{types.NumType{}},
+		values.ArrValue([]values.Value{
+			values.NumValue(1),
+			values.NumValue(3),
+			values.NumValue(5),
+		}),
+		nil,
+		t,
+	)
+	TestProgram(
+		`[1, 2, 3] each drop all arr`,
+		&types.ArrType{types.VoidType{}},
+		values.ArrValue([]values.Value{}),
+		nil,
+		t,
+	)
+	TestProgram(
 		`[{n: 1}, {n: 2}, {n: 3}] each is {n: n} then n ok all arr`,
 		&types.ArrType{types.NumType{}},
 		values.ArrValue([]values.Value{

@@ -67,7 +67,7 @@ type FilterFromConditional struct {
 
 type FilterFromConsequentLong struct {
 	Pos            lexer.Position
-	Consequent     *Composition              `"then" ( @@ | "drop" )`
+	Consequent     *Composition              `"then" @@`
 	Pattern        *Pattern                  `( ( "elis" @@`
 	Guard          *Composition              `    ( "with" @@ )?`
 	Condition      *Composition              `  | "elif" @@ )`
