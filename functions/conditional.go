@@ -180,6 +180,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 				}
 				consequentOutputState := consequentAction(consequentInputState, nil)
 				return states.State{
+					Error: consequentOutputState.Error,
 					Drop:  consequentOutputState.Drop,
 					Value: consequentOutputState.Value,
 					Stack: inputState.Stack,
@@ -202,6 +203,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 					}
 					consequentOutputState := elisConsequentActions[i](consequentInputState, nil)
 					return states.State{
+						Error: consequentOutputState.Error,
 						Drop:  consequentOutputState.Drop,
 						Value: consequentOutputState.Value,
 						Stack: inputState.Stack,
@@ -211,6 +213,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		}
 		alternativeOutputState := alternativeAction(inputState, nil)
 		return states.State{
+			Error: alternativeOutputState.Error,
 			Drop:  alternativeOutputState.Drop,
 			Value: alternativeOutputState.Value,
 			Stack: inputState.Stack,

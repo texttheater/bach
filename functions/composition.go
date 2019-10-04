@@ -40,6 +40,9 @@ func (x CompositionExpression) Typecheck(inputShape Shape, params []*Parameter) 
 	}
 	action := func(inputState states.State, args []states.Action) states.State {
 		middleState := lAction(inputState, nil)
+		if middleState.Error != nil {
+			return middleState
+		}
 		if middleState.Drop {
 			return middleState
 		}
