@@ -1,7 +1,9 @@
 package grammar
 
 import (
+	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/functions"
@@ -15,6 +17,7 @@ type Call struct {
 	Op2Num      *Op2Num      `| @Op2Num`
 	Op1Name     *Op1Name     `| @Op1Name`
 	Op2Name     *Op2Name     `| @Op2Name`
+	NameRegexp  *NameRegexp  `| @@`
 	NameArglist *NameArglist `| @@`
 	Name        *string      `| ( @Prop | @Op1 | @Op2 )`
 }
@@ -31,6 +34,9 @@ func (g *Call) Ast() (functions.Expression, error) {
 	}
 	if g.Op2Name != nil {
 		return g.Op2Name.Ast(), nil
+	}
+	if g.NameRegexp != nil {
+		return g.NameRegexp.Ast()
 	}
 	if g.NameArglist != nil {
 		return g.NameArglist.Ast()
@@ -131,6 +137,34 @@ func (g *Op2Name) Capture(values []string) error {
 
 func (g *Op2Name) Ast() functions.Expression {
 	return &functions.CallExpression{g.Pos, g.Op, []functions.Expression{&functions.CallExpression{g.Pos, g.Name, []functions.Expression{}}}}
+}
+
+type NameRegexp struct {
+	Pos        lexer.Position
+	NameRegexp *string `@NameRegexp`
+}
+
+func (g *NameRegexp) Ast() (functions.Expression, error) {
+	nameRegexp := *(g.NameRegexp)
+	i := strings.Index(nameRegexp, "~")
+	name := nameRegexp[:i]
+	regexpString := nameRegexp[i+1 : len(nameRegexp)-1]
+	regexp, err := regexp.Compile(regexpString)
+	if err != nil {
+		return nil, err
+	}
+	regexpExpression := &functions.RegexpExpression{
+		Pos:    g.Pos, // FIXME
+		Regexp: regexp,
+	}
+	callExpression := &functions.CallExpression{
+		Pos:  g.Pos,
+		Name: name,
+		Args: []functions.Expression{
+			regexpExpression,
+		},
+	}
+	return callExpression, nil
 }
 
 type NameArglist struct {

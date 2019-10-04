@@ -7,38 +7,20 @@ import (
 	"github.com/texttheater/bach/functions"
 )
 
-type RegexpFindFirst struct {
-	Pos             lexer.Position
-	RegexpFindFirst *string `@RegexpFindFirst`
+type Regexp struct {
+	Pos    lexer.Position
+	Regexp *string `@Regexp`
 }
 
-func (g *RegexpFindFirst) Ast() (functions.Expression, error) {
-	regexpString := (*g.RegexpFindFirst)[2 : len(*g.RegexpFindFirst)-1]
+func (g *Regexp) Ast() (functions.Expression, error) {
+	regexpString := (*g.Regexp)[1 : len(*g.Regexp)-1]
 	regexp, err := regexp.Compile(regexpString)
 	if err != nil {
 		return nil, err
 	}
-	regexpFindFirstExpression := &functions.RegexpFindFirstExpression{
+	regexpExpression := &functions.RegexpExpression{
 		Pos:    g.Pos,
 		Regexp: regexp,
 	}
-	return regexpFindFirstExpression, nil
-}
-
-type RegexpFindAll struct {
-	Pos           lexer.Position
-	RegexpFindAll *string `@RegexpFindAll`
-}
-
-func (g *RegexpFindAll) Ast() (functions.Expression, error) {
-	regexpString := (*g.RegexpFindAll)[2 : len(*g.RegexpFindAll)-2]
-	regexp, err := regexp.Compile(regexpString)
-	if err != nil {
-		return nil, err
-	}
-	regexpFindAllExpression := &functions.RegexpFindAllExpression{
-		Pos:    g.Pos,
-		Regexp: regexp,
-	}
-	return regexpFindAllExpression, nil
+	return regexpExpression, nil
 }

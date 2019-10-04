@@ -30,19 +30,18 @@ func (g *Composition) Ast() (functions.Expression, error) {
 }
 
 type SComponent struct {
-	Pos             lexer.Position
-	Num             *float64         `  @Num`
-	Str             *string          `| @Str`
-	Array           *Array           `| @@`
-	Object          *Object          `| @@`
-	Call            *Call            `| @@`
-	Assignment      *Assignment      `| @Assignment`
-	Definition      *Definition      `| @@`
-	Conditional     *Conditional     `| @@`
-	Drop            *Drop            `| @@`
-	Filter          *Filter          `| @@`
-	RegexpFindFirst *RegexpFindFirst `| @@`
-	RegexpFindAll   *RegexpFindAll   `| @@`
+	Pos         lexer.Position
+	Num         *float64     `  @Num`
+	Str         *string      `| @Str`
+	Array       *Array       `| @@`
+	Object      *Object      `| @@`
+	Call        *Call        `| @@`
+	Assignment  *Assignment  `| @Assignment`
+	Definition  *Definition  `| @@`
+	Conditional *Conditional `| @@`
+	Drop        *Drop        `| @@`
+	Filter      *Filter      `| @@`
+	Regexp      *Regexp      `| @@`
 }
 
 func (g *SComponent) Ast() (functions.Expression, error) {
@@ -69,11 +68,8 @@ func (g *SComponent) Ast() (functions.Expression, error) {
 	if g.Call != nil {
 		return g.Call.Ast()
 	}
-	if g.RegexpFindFirst != nil {
-		return g.RegexpFindFirst.Ast()
-	}
-	if g.RegexpFindAll != nil {
-		return g.RegexpFindAll.Ast()
+	if g.Regexp != nil {
+		return g.Regexp.Ast()
 	}
 	if g.Assignment != nil {
 		return g.Assignment.Ast()
@@ -94,18 +90,17 @@ func (g *SComponent) Ast() (functions.Expression, error) {
 }
 
 type PComponent struct {
-	Pos             lexer.Position
-	Num             *float64         `  @Num`
-	Str             *string          `| @Str`
-	Array           *Array           `| @@`
-	Object          *Object          `| @@`
-	Call            *Call            `| @@`
-	Assignment      *Assignment      `| @Assignment`
-	Definition      *Definition      `| @@`
-	Drop            *Drop            `| @@`
-	Filter          *Filter          `| @@`
-	RegexpFindFirst *RegexpFindFirst `| @@`
-	RegexpFindAll   *RegexpFindAll   `| @@`
+	Pos        lexer.Position
+	Num        *float64    `  @Num`
+	Str        *string     `| @Str`
+	Array      *Array      `| @@`
+	Object     *Object     `| @@`
+	Call       *Call       `| @@`
+	Assignment *Assignment `| @Assignment`
+	Definition *Definition `| @@`
+	Drop       *Drop       `| @@`
+	Filter     *Filter     `| @@`
+	Regexp     *Regexp     `| @@`
 }
 
 func (g *PComponent) Ast() (functions.Expression, error) {
@@ -132,11 +127,8 @@ func (g *PComponent) Ast() (functions.Expression, error) {
 	if g.Call != nil {
 		return g.Call.Ast()
 	}
-	if g.RegexpFindFirst != nil {
-		return g.RegexpFindFirst.Ast()
-	}
-	if g.RegexpFindAll != nil {
-		return g.RegexpFindAll.Ast()
+	if g.Regexp != nil {
+		return g.Regexp.Ast()
 	}
 	if g.Assignment != nil {
 		return g.Assignment.Ast()
