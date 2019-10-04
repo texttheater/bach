@@ -13,10 +13,10 @@ import (
 
 type Call struct {
 	Pos         lexer.Position
-	Op1Num      *Op1Num      `  @Op1Num`
-	Op2Num      *Op2Num      `| @Op2Num`
-	Op1Name     *Op1Name     `| @Op1Name`
-	Op2Name     *Op2Name     `| @Op2Name`
+	Op1Num      *Op1Num      `  @@`
+	Op2Num      *Op2Num      `| @@`
+	Op1Name     *Op1Name     `| @@`
+	Op2Name     *Op2Name     `| @@`
 	NameRegexp  *NameRegexp  `| @@`
 	NameArglist *NameArglist `| @@`
 	Name        *string      `| ( @Prop | @Op1 | @Op2 )`
@@ -24,16 +24,16 @@ type Call struct {
 
 func (g *Call) Ast() (functions.Expression, error) {
 	if g.Op1Num != nil {
-		return g.Op1Num.Ast(), nil
+		return g.Op1Num.Ast()
 	}
 	if g.Op2Num != nil {
-		return g.Op2Num.Ast(), nil
+		return g.Op2Num.Ast()
 	}
 	if g.Op1Name != nil {
-		return g.Op1Name.Ast(), nil
+		return g.Op1Name.Ast()
 	}
 	if g.Op2Name != nil {
-		return g.Op2Name.Ast(), nil
+		return g.Op2Name.Ast()
 	}
 	if g.NameRegexp != nil {
 		return g.NameRegexp.Ast()
@@ -42,101 +42,107 @@ func (g *Call) Ast() (functions.Expression, error) {
 		return g.NameArglist.Ast()
 	}
 	if g.Name != nil {
-		return &functions.CallExpression{g.Pos, *g.Name, []functions.Expression{}}, nil
+		return &functions.CallExpression{
+			Pos:  g.Pos,
+			Name: *g.Name,
+			Args: nil,
+		}, nil
 	}
 	panic("invalid call")
 }
 
 type Op1Num struct {
-	Pos lexer.Position
-	Op  string
-	Num float64
+	Pos    lexer.Position
+	Op1Num *string `@Op1Num`
 }
 
-func (g *Op1Num) Capture(values []string) error {
-	g.Op = string(values[0][:1])
-	f, err := strconv.ParseFloat(values[0][1:], 64)
+func (g *Op1Num) Ast() (functions.Expression, error) {
+	op1num := *g.Op1Num
+	op := op1num[:1]
+	num, err := strconv.ParseFloat(op1num[1:], 64)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	g.Num = f
-	return nil
-}
-
-func (g *Op1Num) Ast() functions.Expression {
 	return &functions.CallExpression{
 		Pos:  g.Pos,
-		Name: g.Op,
+		Name: op,
 		Args: []functions.Expression{
 			&functions.ConstantExpression{
 				Pos:   g.Pos,
 				Type:  types.NumType{},
-				Value: values.NumValue(g.Num),
+				Value: values.NumValue(num),
 			},
 		},
-	}
+	}, nil
 }
 
 type Op2Num struct {
-	Pos lexer.Position
-	Op  string
-	Num float64
+	Pos    lexer.Position
+	Op2Num *string `@Op2Num`
 }
 
-func (g *Op2Num) Capture(values []string) error {
-	g.Op = string(values[0][:2])
-	f, err := strconv.ParseFloat(values[0][2:], 64)
+func (g *Op2Num) Ast() (functions.Expression, error) {
+	op2num := *g.Op2Num
+	op := op2num[:2]
+	num, err := strconv.ParseFloat(op2num[2:], 64)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	g.Num = f
-	return nil
-}
-
-func (g *Op2Num) Ast() functions.Expression {
 	return &functions.CallExpression{
 		Pos:  g.Pos,
-		Name: g.Op,
+		Name: op,
 		Args: []functions.Expression{
 			&functions.ConstantExpression{
 				Pos:   g.Pos,
 				Type:  types.NumType{},
-				Value: values.NumValue(g.Num),
+				Value: values.NumValue(num),
 			},
 		},
-	}
+	}, nil
 }
 
 type Op1Name struct {
-	Pos  lexer.Position
-	Op   string
-	Name string
+	Pos     lexer.Position
+	Op1Name *string `@Op1Name`
 }
 
-func (g *Op1Name) Capture(values []string) error {
-	g.Op = string(values[0][:1])
-	g.Name = values[0][1:]
-	return nil
-}
-
-func (g *Op1Name) Ast() functions.Expression {
-	return &functions.CallExpression{g.Pos, g.Op, []functions.Expression{&functions.CallExpression{g.Pos, g.Name, []functions.Expression{}}}}
+func (g *Op1Name) Ast() (functions.Expression, error) {
+	op1name := *g.Op1Name
+	op := op1name[:1]
+	name := op1name[1:]
+	return &functions.CallExpression{
+		Pos:  g.Pos,
+		Name: op,
+		Args: []functions.Expression{
+			&functions.CallExpression{
+				Pos:  g.Pos,
+				Name: name,
+				Args: nil,
+			},
+		},
+	}, nil
 }
 
 type Op2Name struct {
-	Pos  lexer.Position
-	Op   string
-	Name string
+	Pos     lexer.Position
+	Op2Name *string `@Op2Name`
 }
 
-func (g *Op2Name) Capture(values []string) error {
-	g.Op = string(values[0][:2])
-	g.Name = values[0][2:]
-	return nil
-}
-
-func (g *Op2Name) Ast() functions.Expression {
-	return &functions.CallExpression{g.Pos, g.Op, []functions.Expression{&functions.CallExpression{g.Pos, g.Name, []functions.Expression{}}}}
+func (g *Op2Name) Ast() (functions.Expression, error) {
+	op2name := *g.Op2Name
+	op := op2name[:2]
+	name := op2name[2:]
+	return &functions.CallExpression{
+		Pos:  g.Pos,
+		Name: op,
+		Args: []functions.Expression{
+			&functions.CallExpression{
+				Pos:  g.Pos,
+				Name: name,
+				Args: nil,
+			},
+		},
+	}, nil
 }
 
 type NameRegexp struct {
