@@ -7,15 +7,15 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-type DropExpression struct {
+type RejectExpression struct {
 	Pos lexer.Position
 }
 
-func (x DropExpression) Position() lexer.Position {
+func (x RejectExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x DropExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
+func (x RejectExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return Shape{}, nil, errors.E(
@@ -31,7 +31,11 @@ func (x DropExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 	// create action
 	action := func(inputState states.State, args []states.Action) states.State {
 		return states.State{
-			Drop: true,
+			Error: errors.E(
+				errors.Pos(x.Pos),
+				errors.Code(errors.UnexpectedValue),
+				errors.GotValue(inputState.Value),
+			),
 		}
 	}
 	// return

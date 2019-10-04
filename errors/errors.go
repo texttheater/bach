@@ -20,6 +20,7 @@ type errorAttribute func(err *e)
 //    Message
 //    WantType
 //    GotType
+//    GotValue
 //    InputType
 //    Name
 //    ArgNum
@@ -63,6 +64,12 @@ func WantType(wantType interface{}) errorAttribute {
 func GotType(gotType interface{}) errorAttribute {
 	return func(err *e) {
 		err.GotType = gotType
+	}
+}
+
+func GotValue(gotValue interface{}) errorAttribute {
+	return func(err *e) {
+		err.GotValue = gotValue
 	}
 }
 
@@ -123,6 +130,7 @@ type e struct {
 	Message   *string
 	WantType  interface{}
 	GotType   interface{}
+	GotValue  interface{}
 	InputType interface{}
 	Name      *string
 	ArgNum    *int
@@ -149,6 +157,9 @@ func (err *e) Error() string {
 	}
 	if err.GotType != nil {
 		m["GotType"] = fmt.Sprintf("%s", err.GotType)
+	}
+	if err.GotValue != nil {
+		m["GotValue"] = fmt.Sprintf("%s", err.GotValue)
 	}
 	if err.InputType != nil {
 		m["InputType"] = fmt.Sprintf("%s", err.InputType)
@@ -215,6 +226,9 @@ func Explain(err error, program string) {
 	if e.GotType != nil {
 		fmt.Fprintln(os.Stderr, "Got type:  ", e.GotType)
 	}
+	if e.GotValue != nil {
+		fmt.Fprintln(os.Stderr, "Got value: ", e.GotValue)
+	}
 	if e.InputType != nil {
 		fmt.Fprintln(os.Stderr, "Input type:", e.InputType)
 	}
@@ -268,6 +282,9 @@ func Match(err1, err2 error) bool {
 		return false
 	}
 	if e1.GotType != nil && !reflect.DeepEqual(e1.GotType, e2.GotType) {
+		return false
+	}
+	if e1.GotValue != nil && !reflect.DeepEqual(e1.GotValue, e2.GotValue) {
 		return false
 	}
 	if e1.InputType != nil && !reflect.DeepEqual(e1.InputType, e2.InputType) {

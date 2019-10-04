@@ -31,7 +31,7 @@ func InterpretString(program string) (types.Type, values.Value, error) {
 	// evaluate
 	outputState := action(states.InitialState, nil)
 	if outputState.Error != nil {
-		return nil, nil, err
+		return nil, nil, outputState.Error
 	}
 	drain(outputShape.Type, outputState.Value)
 	return outputShape.Type, outputState.Value, nil
