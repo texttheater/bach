@@ -61,6 +61,16 @@ func TestFilters(t *testing.T) {
 		t,
 	)
 	TestProgram(
+		`[1, 2, 3] each if %2 ==0 then drop else id ok +1 all arr`,
+		&types.ArrType{types.NumType{}},
+		values.ArrValue([]values.Value{
+			values.NumValue(2),
+			values.NumValue(4),
+		}),
+		nil,
+		t,
+	)
+	TestProgram(
 		`[1, 2, 3] each drop all arr`,
 		&types.ArrType{types.VoidType{}},
 		values.ArrValue([]values.Value{}),
