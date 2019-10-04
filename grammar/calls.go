@@ -145,7 +145,7 @@ type NameRegexp struct {
 }
 
 func (g *NameRegexp) Ast() (functions.Expression, error) {
-	nameRegexp := *(g.NameRegexp)
+	nameRegexp := *g.NameRegexp
 	i := strings.Index(nameRegexp, "~")
 	name := nameRegexp[:i]
 	regexpString := nameRegexp[i+1 : len(nameRegexp)-1]
