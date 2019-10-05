@@ -4,6 +4,7 @@ import (
 	"regexp"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
 )
 
@@ -16,7 +17,11 @@ func (g *Regexp) Ast() (functions.Expression, error) {
 	regexpString := (*g.Regexp)[1 : len(*g.Regexp)-1]
 	regexp, err := regexp.Compile(regexpString)
 	if err != nil {
-		return nil, err
+		return nil, errors.E(
+			errors.Pos(g.Pos),
+			errors.Code(errors.BadRegexp),
+			errors.Message(err.Error()),
+		)
 	}
 	regexpExpression := &functions.RegexpExpression{
 		Pos:    g.Pos,

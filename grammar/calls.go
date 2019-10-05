@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/bach/values"
@@ -163,12 +164,16 @@ func (g *NameRegexp) Ast() (functions.Expression, error) {
 	i := strings.Index(nameRegexp, "~")
 	name := nameRegexp[:i]
 	regexpString := nameRegexp[i+1 : len(nameRegexp)-1]
-	regexp, err := regexp.Compile(regexpString)
-	if err != nil {
-		return nil, err
-	}
 	regexpPos := g.Pos
 	regexpPos.Column += len(name)
+	regexp, err := regexp.Compile(regexpString)
+	if err != nil {
+		return nil, errors.E(
+			errors.Pos(regexpPos),
+			errors.Code(errors.BadRegexp),
+			errors.Message(err.Error()),
+		)
+	}
 	return &functions.CallExpression{
 		Pos:  g.Pos,
 		Name: name,

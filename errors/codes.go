@@ -18,6 +18,7 @@ const (
 	UnreachableElisClause
 	UnreachableElseClause
 	RegexpWantsString
+	BadRegexp
 	UnexpectedValue
 )
 
@@ -51,6 +52,8 @@ func (code ErrorCode) String() string {
 		return "UnreachableElseClause"
 	case RegexpWantsString:
 		return "RegexpWantsString"
+	case BadRegexp:
+		return "BadRegexp"
 	case UnexpectedValue:
 		return "UnexpectedValue"
 	default:
@@ -90,6 +93,8 @@ func (code ErrorCode) DefaultMessage() string {
 		return "The `else` clause is unreachable because the match is already exhaustive."
 	case RegexpWantsString:
 		return "Regular expressions require Str as input type."
+	case BadRegexp:
+		return "error parsing regexp"
 	case UnexpectedValue:
 		return "Conditional got an unexpected input value."
 	default:
@@ -129,6 +134,8 @@ func (code ErrorCode) Kind() string {
 		return "Type error"
 	case RegexpWantsString:
 		return "Type error"
+	case BadRegexp:
+		return "Syntax error"
 	case UnexpectedValue:
 		return "Value error"
 	default:
