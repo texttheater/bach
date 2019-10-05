@@ -63,12 +63,14 @@ func (g *Op1Num) Ast() (functions.Expression, error) {
 	if err != nil {
 		return nil, err
 	}
+	numPos := g.Pos
+	numPos.Column += 1
 	return &functions.CallExpression{
 		Pos:  g.Pos,
 		Name: op,
 		Args: []functions.Expression{
 			&functions.ConstantExpression{
-				Pos:   g.Pos,
+				Pos:   numPos,
 				Type:  types.NumType{},
 				Value: values.NumValue(num),
 			},
@@ -88,12 +90,14 @@ func (g *Op2Num) Ast() (functions.Expression, error) {
 	if err != nil {
 		return nil, err
 	}
+	numPos := g.Pos
+	numPos.Column += 2
 	return &functions.CallExpression{
 		Pos:  g.Pos,
 		Name: op,
 		Args: []functions.Expression{
 			&functions.ConstantExpression{
-				Pos:   g.Pos,
+				Pos:   numPos,
 				Type:  types.NumType{},
 				Value: values.NumValue(num),
 			},
@@ -110,12 +114,14 @@ func (g *Op1Name) Ast() (functions.Expression, error) {
 	op1name := *g.Op1Name
 	op := op1name[:1]
 	name := op1name[1:]
+	namePos := g.Pos
+	namePos.Column += 1
 	return &functions.CallExpression{
 		Pos:  g.Pos,
 		Name: op,
 		Args: []functions.Expression{
 			&functions.CallExpression{
-				Pos:  g.Pos,
+				Pos:  namePos,
 				Name: name,
 				Args: nil,
 			},
@@ -132,12 +138,14 @@ func (g *Op2Name) Ast() (functions.Expression, error) {
 	op2name := *g.Op2Name
 	op := op2name[:2]
 	name := op2name[2:]
+	namePos := g.Pos
+	namePos.Column += 2
 	return &functions.CallExpression{
 		Pos:  g.Pos,
 		Name: op,
 		Args: []functions.Expression{
 			&functions.CallExpression{
-				Pos:  g.Pos,
+				Pos:  namePos,
 				Name: name,
 				Args: nil,
 			},
@@ -159,18 +167,18 @@ func (g *NameRegexp) Ast() (functions.Expression, error) {
 	if err != nil {
 		return nil, err
 	}
-	regexpExpression := &functions.RegexpExpression{
-		Pos:    g.Pos, // FIXME
-		Regexp: regexp,
-	}
-	callExpression := &functions.CallExpression{
+	regexpPos := g.Pos
+	regexpPos.Column += len(name)
+	return &functions.CallExpression{
 		Pos:  g.Pos,
 		Name: name,
 		Args: []functions.Expression{
-			regexpExpression,
+			&functions.RegexpExpression{
+				Pos:    regexpPos,
+				Regexp: regexp,
+			},
 		},
-	}
-	return callExpression, nil
+	}, nil
 }
 
 type NameArglist struct {
