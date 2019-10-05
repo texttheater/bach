@@ -5,6 +5,7 @@ import (
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
+	"github.com/texttheater/bach/values"
 )
 
 type RejectExpression struct {
@@ -31,13 +32,19 @@ func (x RejectExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 	// create action
 	action := func(inputState states.State, args []states.Action) states.State {
 		return states.State{
-			Error: errors.E(
-				errors.Pos(x.Pos),
-				errors.Code(errors.UnexpectedValue),
-				errors.GotValue(inputState.Value),
-			),
+			Error: RejectError{
+				Value: inputState.Value,
+			},
 		}
 	}
 	// return
 	return outputShape, action, nil
+}
+
+type RejectError struct {
+	Value values.Value
+}
+
+func (e RejectError) Error() string {
+	return e.Value.String() + ": value rejected"
 }

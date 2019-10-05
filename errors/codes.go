@@ -91,7 +91,7 @@ func (code ErrorCode) DefaultMessage() string {
 	case RegexpWantsString:
 		return "Regular expressions require Str as input type."
 	case UnexpectedValue:
-		return "Conditional received an unexpected value."
+		return "Conditional got an unexpected input value."
 	default:
 		return "unknown error"
 	}

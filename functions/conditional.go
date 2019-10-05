@@ -161,6 +161,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		if err != nil {
 			return Shape{}, nil, err
 		}
+		// update output type
 		outputType = types.Union(outputType, alternativeOutputShape.Type)
 	}
 	// make action
@@ -180,7 +181,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 				}
 				consequentOutputState := consequentAction(consequentInputState, nil)
 				return states.State{
-					Error: consequentOutputState.Error,
+					Error: wrap(consequentOutputState.Error, x.Pos),
 					Drop:  consequentOutputState.Drop,
 					Value: consequentOutputState.Value,
 					Stack: inputState.Stack,
@@ -203,7 +204,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 					}
 					consequentOutputState := elisConsequentActions[i](consequentInputState, nil)
 					return states.State{
-						Error: consequentOutputState.Error,
+						Error: wrap(consequentOutputState.Error, x.Pos),
 						Drop:  consequentOutputState.Drop,
 						Value: consequentOutputState.Value,
 						Stack: inputState.Stack,
@@ -213,7 +214,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		}
 		alternativeOutputState := alternativeAction(inputState, nil)
 		return states.State{
-			Error: alternativeOutputState.Error,
+			Error: wrap(alternativeOutputState.Error, x.Pos),
 			Drop:  alternativeOutputState.Drop,
 			Value: alternativeOutputState.Value,
 			Stack: inputState.Stack,
@@ -225,6 +226,20 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		inputShape.Stack,
 	}
 	return outputShape, action, nil
+}
+
+// wrap replaces a RejectError with an explainable error with location
+// information about the conditional, and the value that was not handled.
+func wrap(e error, pos lexer.Position) error {
+	rejectError, ok := e.(RejectError)
+	if !ok {
+		return e
+	}
+	return errors.E(
+		errors.Pos(pos),
+		errors.Code(errors.UnexpectedValue),
+		errors.GotValue(rejectError.Value),
+	)
 }
 
 // pattern/matcher kinda analogous to expression/action
