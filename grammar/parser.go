@@ -1,19 +1,18 @@
-package parser
+package grammar
 
 import (
 	"github.com/alecthomas/participle"
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
-	"github.com/texttheater/bach/grammar"
 )
 
 func Parse(input string) (functions.Expression, error) {
 	parser, err := participle.Build(
-		&grammar.Composition{},
-		participle.Lexer(grammar.LexerDefinition),
+		&Composition{},
+		participle.Lexer(LexerDefinition),
 		participle.Unquote("Str"),
-		participle.Map(grammar.ToKeyword, "Lid"),
+		participle.Map(ToKeyword, "Lid"),
 		participle.UseLookahead(0),
 	)
 	if err != nil {
@@ -26,7 +25,7 @@ func Parse(input string) (functions.Expression, error) {
 		}
 		return nil, err
 	}
-	composition := &grammar.Composition{}
+	composition := &Composition{}
 	err = parser.ParseString(input, composition)
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {

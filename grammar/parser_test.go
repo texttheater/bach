@@ -1,10 +1,10 @@
-package parser_test
+package grammar_test
 
 import (
+	"testing"
+
 	"github.com/alecthomas/participle"
 	"github.com/texttheater/bach/grammar"
-
-	"testing"
 )
 
 func TestFilter(t *testing.T) {
