@@ -27,5 +27,8 @@ func (g *Array) Ast() (functions.Expression, error) {
 			}
 		}
 	}
-	return &functions.ArrExpression{g.Pos, elements}, nil
+	return &functions.ArrExpression{
+		Pos:      g.Pos,
+		Elements: elements,
+	}, nil
 }

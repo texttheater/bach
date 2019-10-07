@@ -208,5 +208,48 @@ func (g *NameArglist) Ast() (functions.Expression, error) {
 			return nil, err
 		}
 	}
-	return &functions.CallExpression{g.Pos, name, args}, nil
+	return &functions.CallExpression{
+		Pos:  g.Pos,
+		Name: name,
+		Args: args,
+	}, nil
+}
+
+type NameArray struct {
+	Pos        lexer.Position
+	NameLbrack *string        `@NameLbrack`
+	Element    *Composition   `( @@`
+	Elements   []*Composition `  ( "," @@ )* )? "]"`
+}
+
+func (g *NameArray) Ast() (functions.Expression, error) {
+	nameLbrack := *g.NameLbrack
+	name := nameLbrack[:len(nameLbrack)-1]
+	var elements []functions.Expression
+	if g.Element != nil {
+		elements = make([]functions.Expression, 1+len(g.Elements))
+		var err error
+		elements[0], err = g.Element.Ast()
+		if err != nil {
+			return nil, err
+		}
+		for i, element := range g.Elements {
+			elements[i+1], err = element.Ast()
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	arrPos := g.Pos
+	arrPos.Column += len(name)
+	return &functions.CallExpression{
+		Pos:  g.Pos,
+		Name: name,
+		Args: []functions.Expression{
+			&functions.ArrExpression{
+				Pos:      arrPos,
+				Elements: elements,
+			},
+		},
+	}, nil
 }
