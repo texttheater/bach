@@ -6,20 +6,25 @@ import (
 
 var LexerDefinition = lexer.Must(lexer.Regexp(
 	`([\s]+)` +
-		`|(?P<Num>\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)` +
-		`|(?P<Str>"(?:\\.|[^"])*")` +
+		// tokens starting type literals
+		`|(?P<TypeKeywordLangle>(?:Void|Null|Bool|Num|Str|Seq|Arr|Tup|Obj|Any)<)` +
+		// tokens starting calls
 		`|(?P<Op1Num>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op2Num>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op1Lid>[+\-*/%<>](?:[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Op2Lid>(?:==|<=|>=)(?:[\p{L}_][\p{L}_0-9]*))` +
-		`|(?P<Assignment>=(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
-		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
-		`|(?P<TypeKeywordLangle>(?:Void|Null|Bool|Num|Str|Seq|Arr|Tup|Obj|Any)<)` +
-		`|(?P<Regexp>~(?:\\.|[^/])*)~` +
 		`|(?P<NameRegexp>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)~(?:\\.|[^/])*)~` +
+		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
+		// assignment
+		`|(?P<Assignment>=(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
+		// names
 		`|(?P<Lid>[\p{L}_][\p{L}_0-9]*)` +
 		`|(?P<Op1>[+\-*/%<>=])` +
 		`|(?P<Op2>==|<=|>=)` +
+		// starting with unique characters
+		`|(?P<Num>\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)` +
+		`|(?P<Str>"(?:\\.|[^"])*")` +
+		`|(?P<Regexp>~(?:\\.|[^/])*)~` +
 		`|(?P<Getter>@(?:[\p{L}_][\p{L}_0-9]*|[+\-*/%<>=]|==|<=|>=|\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Comma>,)` +
 		`|(?P<Lpar>\()` +

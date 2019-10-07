@@ -16,8 +16,8 @@ type Call struct {
 	Pos         lexer.Position
 	Op1Num      *Op1Num      `  @@`
 	Op2Num      *Op2Num      `| @@`
-	Op1Lid     *Op1Lid     `| @@`
-	Op2Lid     *Op2Lid     `| @@`
+	Op1Lid      *Op1Lid      `| @@`
+	Op2Lid      *Op2Lid      `| @@`
 	NameRegexp  *NameRegexp  `| @@`
 	NameArglist *NameArglist `| @@`
 	Name        *string      `| ( @Lid | @Op1 | @Op2 )`
@@ -107,7 +107,7 @@ func (g *Op2Num) Ast() (functions.Expression, error) {
 }
 
 type Op1Lid struct {
-	Pos     lexer.Position
+	Pos    lexer.Position
 	Op1Lid *string `@Op1Lid`
 }
 
@@ -131,7 +131,7 @@ func (g *Op1Lid) Ast() (functions.Expression, error) {
 }
 
 type Op2Lid struct {
-	Pos     lexer.Position
+	Pos    lexer.Position
 	Op2Lid *string `@Op2Lid`
 }
 
