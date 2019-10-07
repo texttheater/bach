@@ -36,7 +36,7 @@ type SComponent struct {
 	Array       *Array       `| @@`
 	Object      *Object      `| @@`
 	Call        *Call        `| @@`
-	Assignment  *Assignment  `| @Assignment`
+	Assignment  *Assignment  `| @@`
 	Definition  *Definition  `| @@`
 	Conditional *Conditional `| @@`
 	Filter      *Filter      `| @@`
@@ -100,7 +100,7 @@ type PComponent struct {
 	Array      *Array      `| @@`
 	Object     *Object     `| @@`
 	Call       *Call       `| @@`
-	Assignment *Assignment `| @Assignment`
+	Assignment *Assignment `| @@`
 	Definition *Definition `| @@`
 	Filter     *Filter     `| @@`
 	Regexp     *Regexp     `| @@`

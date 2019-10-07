@@ -188,12 +188,14 @@ func (g *NameRegexp) Ast() (functions.Expression, error) {
 
 type NameArglist struct {
 	Pos      lexer.Position
-	NameLpar *NameLpar      `@NameLpar`
+	NameLpar *string        `@NameLpar`
 	Arg      *Composition   `@@`
 	Args     []*Composition `( "," @@ )* ")"`
 }
 
 func (g *NameArglist) Ast() (functions.Expression, error) {
+	nameLpar := *g.NameLpar
+	name := nameLpar[:len(nameLpar)-1]
 	args := make([]functions.Expression, len(g.Args)+1)
 	var err error
 	args[0], err = g.Arg.Ast()
@@ -206,15 +208,5 @@ func (g *NameArglist) Ast() (functions.Expression, error) {
 			return nil, err
 		}
 	}
-	return &functions.CallExpression{g.Pos, g.NameLpar.Name, args}, nil
-}
-
-type NameLpar struct {
-	Pos  lexer.Position
-	Name string
-}
-
-func (g *NameLpar) Capture(values []string) error {
-	g.Name = values[0][:len(values[0])-1]
-	return nil
+	return &functions.CallExpression{g.Pos, name, args}, nil
 }
