@@ -14,18 +14,18 @@ import (
 
 type Call struct {
 	Pos         lexer.Position
-	Op1Num      *Op1Num      `  @@`
+	Op1Lid      *Op1Lid      `  @@`
 	Op2Num      *Op2Num      `| @@`
 	Op1Name     *Op1Name     `| @@`
 	Op2Name     *Op2Name     `| @@`
 	NameRegexp  *NameRegexp  `| @@`
 	NameArglist *NameArglist `| @@`
-	Name        *string      `| ( @Prop | @Op1 | @Op2 )`
+	Name        *string      `| ( @Lid | @Op1 | @Op2 )`
 }
 
 func (g *Call) Ast() (functions.Expression, error) {
-	if g.Op1Num != nil {
-		return g.Op1Num.Ast()
+	if g.Op1Lid != nil {
+		return g.Op1Lid.Ast()
 	}
 	if g.Op2Num != nil {
 		return g.Op2Num.Ast()
@@ -52,13 +52,13 @@ func (g *Call) Ast() (functions.Expression, error) {
 	panic("invalid call")
 }
 
-type Op1Num struct {
+type Op1Lid struct {
 	Pos    lexer.Position
-	Op1Num *string `@Op1Num`
+	Op1Lid *string `@Op1Lid`
 }
 
-func (g *Op1Num) Ast() (functions.Expression, error) {
-	op1num := *g.Op1Num
+func (g *Op1Lid) Ast() (functions.Expression, error) {
+	op1num := *g.Op1Lid
 	op := op1num[:1]
 	num, err := strconv.ParseFloat(op1num[1:], 64)
 	if err != nil {

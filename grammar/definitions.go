@@ -9,11 +9,11 @@ import (
 type Definition struct {
 	Pos        lexer.Position
 	InputType  *Type        `"for" @@`
-	Name       string       `"def" ( ( @Prop | @Op1 | @Op2 )`
+	Name       string       `"def" ( ( @Lid | @Op1 | @Op2 )`
 	NameLpar   *NameLpar    `      | @NameLpar`
-	ParamName  *string      `        ( @Prop | @Op1 | @Op2 )`
+	ParamName  *string      `        ( @Lid | @Op1 | @Op2 )`
 	Parameter  *Parameter   `        @@`
-	ParamNames []string     `        ( "," ( @Prop | @Op1 | @Op2 )`
+	ParamNames []string     `        ( "," ( @Lid | @Op1 | @Op2 )`
 	Params     []*Parameter `          @@ )* ")" )`
 	OutputType *Type        `@@`
 	Body       *Composition `"as" @@ "ok"`

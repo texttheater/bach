@@ -162,9 +162,9 @@ func (g *TupType) Ast() types.Type {
 
 type ObjType struct {
 	Pos      lexer.Position `"Obj<"`
-	Prop     *string        `( @Prop`
+	Prop     *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
 	ValType  *Type          `  ":" @@`
-	Props    []string       `  ( @Prop`
+	Props    []string       `  ( ( @Lid | @Op1 | @Op2 | @Num )`
 	ValTypes []*Type        `     ":" @@ )* )? ">"`
 }
 

@@ -12,7 +12,7 @@ func TestFilter(t *testing.T) {
 		&grammar.Filter{},
 		participle.Lexer(grammar.LexerDefinition),
 		participle.Unquote("Str"),
-		participle.Map(grammar.ToKeyword, "Prop"),
+		participle.Map(grammar.ToKeyword, "Lid"),
 		participle.UseLookahead(0),
 	)
 	if err != nil {

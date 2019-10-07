@@ -46,7 +46,7 @@ func (g *Pattern) Ast() (functions.Pattern, error) {
 
 type NamePattern struct {
 	Pos  lexer.Position
-	Name *string `@Prop | @Op1 | @Op2`
+	Name *string `@Lid | @Op1 | @Op2`
 }
 
 func (g *NamePattern) Ast() (functions.Pattern, error) {
@@ -56,7 +56,7 @@ func (g *NamePattern) Ast() (functions.Pattern, error) {
 type TypePattern struct {
 	Pos  lexer.Position
 	Type *Type   `@@`
-	Name *string `( @Prop | @Op1 | @Op2 )?`
+	Name *string `( @Lid | @Op1 | @Op2 )?`
 }
 
 func (g *TypePattern) Ast() (functions.Pattern, error) {
@@ -67,7 +67,7 @@ type ArrPattern struct {
 	Pos      lexer.Position `"["`
 	Element  *Pattern       `( @@`
 	Elements []*Pattern     `  ( "," @@ )* )? "]"`
-	Name     *string        `( @Prop | @Op1 | @Op2 )?`
+	Name     *string        `( @Lid | @Op1 | @Op2 )?`
 }
 
 func (g *ArrPattern) Ast() (functions.Pattern, error) {
@@ -92,11 +92,11 @@ func (g *ArrPattern) Ast() (functions.Pattern, error) {
 
 type ObjPattern struct {
 	Pos    lexer.Position `"{"`
-	Prop   *string        `( @Prop`
+	Prop   *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
 	Value  *Pattern       `  ":" @@`
-	Props  []string       `   ( "," @Prop`
+	Props  []string       `   ( "," ( @Lid | @Op1 | @Op2 | @Num )`
 	Values []*Pattern     `     ":" @@ )* )? "}"`
-	Name   *string        `( @Prop | @Op1 | @Op2 )?`
+	Name   *string        `( @Lid | @Op1 | @Op2 )?`
 }
 
 func (g *ObjPattern) Ast() (functions.Pattern, error) {
