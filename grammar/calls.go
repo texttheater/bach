@@ -14,27 +14,27 @@ import (
 
 type Call struct {
 	Pos         lexer.Position
-	Op1Lid      *Op1Lid      `  @@`
+	Op1Num      *Op1Num      `  @@`
 	Op2Num      *Op2Num      `| @@`
-	Op1Name     *Op1Name     `| @@`
-	Op2Name     *Op2Name     `| @@`
+	Op1Lid     *Op1Lid     `| @@`
+	Op2Lid     *Op2Lid     `| @@`
 	NameRegexp  *NameRegexp  `| @@`
 	NameArglist *NameArglist `| @@`
 	Name        *string      `| ( @Lid | @Op1 | @Op2 )`
 }
 
 func (g *Call) Ast() (functions.Expression, error) {
-	if g.Op1Lid != nil {
-		return g.Op1Lid.Ast()
+	if g.Op1Num != nil {
+		return g.Op1Num.Ast()
 	}
 	if g.Op2Num != nil {
 		return g.Op2Num.Ast()
 	}
-	if g.Op1Name != nil {
-		return g.Op1Name.Ast()
+	if g.Op1Lid != nil {
+		return g.Op1Lid.Ast()
 	}
-	if g.Op2Name != nil {
-		return g.Op2Name.Ast()
+	if g.Op2Lid != nil {
+		return g.Op2Lid.Ast()
 	}
 	if g.NameRegexp != nil {
 		return g.NameRegexp.Ast()
@@ -52,13 +52,13 @@ func (g *Call) Ast() (functions.Expression, error) {
 	panic("invalid call")
 }
 
-type Op1Lid struct {
+type Op1Num struct {
 	Pos    lexer.Position
-	Op1Lid *string `@Op1Lid`
+	Op1Num *string `@Op1Num`
 }
 
-func (g *Op1Lid) Ast() (functions.Expression, error) {
-	op1num := *g.Op1Lid
+func (g *Op1Num) Ast() (functions.Expression, error) {
+	op1num := *g.Op1Num
 	op := op1num[:1]
 	num, err := strconv.ParseFloat(op1num[1:], 64)
 	if err != nil {
@@ -106,13 +106,13 @@ func (g *Op2Num) Ast() (functions.Expression, error) {
 	}, nil
 }
 
-type Op1Name struct {
+type Op1Lid struct {
 	Pos     lexer.Position
-	Op1Name *string `@Op1Name`
+	Op1Lid *string `@Op1Lid`
 }
 
-func (g *Op1Name) Ast() (functions.Expression, error) {
-	op1name := *g.Op1Name
+func (g *Op1Lid) Ast() (functions.Expression, error) {
+	op1name := *g.Op1Lid
 	op := op1name[:1]
 	name := op1name[1:]
 	namePos := g.Pos
@@ -130,13 +130,13 @@ func (g *Op1Name) Ast() (functions.Expression, error) {
 	}, nil
 }
 
-type Op2Name struct {
+type Op2Lid struct {
 	Pos     lexer.Position
-	Op2Name *string `@Op2Name`
+	Op2Lid *string `@Op2Lid`
 }
 
-func (g *Op2Name) Ast() (functions.Expression, error) {
-	op2name := *g.Op2Name
+func (g *Op2Lid) Ast() (functions.Expression, error) {
+	op2name := *g.Op2Lid
 	op := op2name[:2]
 	name := op2name[2:]
 	namePos := g.Pos
