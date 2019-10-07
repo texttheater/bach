@@ -292,3 +292,31 @@ func (g *NameObject) Ast() (functions.Expression, error) {
 		},
 	}, nil
 }
+
+type NameString struct {
+	Pos     lexer.Position
+	NameStr *string `@NameStr`
+}
+
+func (g *NameString) Ast() (functions.Expression, error) {
+	nameStr := *g.NameStr
+	i := strings.Index(nameStr, "\"")
+	name := nameStr[:i]
+	str, err := strconv.Unquote(nameStr[i : len(nameStr)-1])
+	if err != nil {
+		return nil, err
+	}
+	strPos := g.Pos
+	strPos.Column += len(name)
+	return &functions.CallExpression{
+		Pos:  g.Pos,
+		Name: name,
+		Args: []functions.Expression{
+			&functions.ConstantExpression{
+				Pos:   strPos,
+				Type:  types.StrType{},
+				Value: values.StrValue(str),
+			},
+		},
+	}, nil
+}
