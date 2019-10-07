@@ -202,8 +202,8 @@ func (g *NameArglist) Ast() (functions.Expression, error) {
 	if err != nil {
 		return nil, err
 	}
-	for i, Arg := range g.Args {
-		args[i+1], err = Arg.Ast()
+	for i, arg := range g.Args {
+		args[i+1], err = arg.Ast()
 		if err != nil {
 			return nil, err
 		}
