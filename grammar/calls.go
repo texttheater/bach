@@ -225,6 +225,8 @@ type NameArray struct {
 func (g *NameArray) Ast() (functions.Expression, error) {
 	nameLbrack := *g.NameLbrack
 	name := nameLbrack[:len(nameLbrack)-1]
+	arrPos := g.Pos
+	arrPos.Column += len(name)
 	var elements []functions.Expression
 	if g.Element != nil {
 		elements = make([]functions.Expression, 1+len(g.Elements))
@@ -240,8 +242,6 @@ func (g *NameArray) Ast() (functions.Expression, error) {
 			}
 		}
 	}
-	arrPos := g.Pos
-	arrPos.Column += len(name)
 	return &functions.CallExpression{
 		Pos:  g.Pos,
 		Name: name,
@@ -249,6 +249,45 @@ func (g *NameArray) Ast() (functions.Expression, error) {
 			&functions.ArrExpression{
 				Pos:      arrPos,
 				Elements: elements,
+			},
+		},
+	}, nil
+}
+
+type NameObject struct {
+	Pos        lexer.Position
+	NameLbrace *string        `@NameLbarace`
+	Prop       *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
+	Value      *Composition   `  ":" @@`
+	Props      []string       `  ( "," ( @Lid | @Op1 | @Op2 | @Num )`
+	Values     []*Composition `    ":" @@ )* )? "}"`
+}
+
+func (g *NameObject) Ast() (functions.Expression, error) {
+	nameLbrace := *g.NameLbrace
+	name := nameLbrace[:len(nameLbrace)-1]
+	objPos := g.Pos
+	objPos.Column += len(name)
+	propValMap := make(map[string]functions.Expression)
+	if g.Prop != nil {
+		var err error
+		propValMap[*g.Prop], err = g.Value.Ast()
+		if err != nil {
+			return nil, err
+		}
+		for i := range g.Props {
+			propValMap[g.Props[i]], err = g.Values[i].Ast()
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return &functions.CallExpression{
+		Name: name,
+		Args: []functions.Expression{
+			&functions.ObjExpression{
+				objPos,
+				propValMap,
 			},
 		},
 	}, nil
