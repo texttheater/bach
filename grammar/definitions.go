@@ -22,6 +22,18 @@ type Definition struct {
 }
 
 func (g *Definition) Ast() (functions.Expression, error) {
+	var typeParamNames []string
+	if g.TypeParam != nil {
+		typeParamNames = make([]string, len(g.TypeParams)+1)
+		typeParamName := *(g.TypeParam)
+		if typeParamName[0] == '<' {
+			typeParamName = typeParamName[1:]
+		}
+		typeParamNames[0] = typeParamName
+		for i, typeParamName := range g.TypeParams {
+			typeParamNames[i+1] = typeParamName
+		}
+	}
 	inputType := g.InputType.Ast()
 	var name string
 	var params []*functions.Parameter
