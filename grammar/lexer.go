@@ -11,6 +11,7 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		// tokens starting calls
 		`|(?P<Op1Num>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op2Num>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
+		`|(?P<LangleLid><(?:[\p{L}_][\p{L}_0-9]*))` + // HACK: separate from Op1Lid because it's also used to start a list of type parameters
 		`|(?P<Op1Lid>[+\-*/%<>](?:[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Op2Lid>(?:==|<=|>=)(?:[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<NameStr>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)"(?:\\.|[^"])*")` +

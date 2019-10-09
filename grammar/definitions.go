@@ -8,7 +8,9 @@ import (
 
 type Definition struct {
 	Pos        lexer.Position
-	InputType  *Type        `"for" @@`
+	TypeParam  *string      `"for" ( ( @LangleLid | "<" @Lid )`
+	TypeParams []string     `        ( "," @Lid )* ">" )?`
+	InputType  *Type        `@@`
 	Name       *string      `"def" ( ( @Lid | @Op1 | @Op2 )`
 	NameLpar   *string      `      | @NameLpar`
 	ParamName  *string      `        ( @Lid | @Op1 | @Op2 )`
