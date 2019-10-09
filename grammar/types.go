@@ -21,18 +21,19 @@ func (g *Type) Ast() types.Type {
 }
 
 type NonDisjunctiveType struct {
-	Pos        lexer.Position
-	VoidType   *VoidType   `  @@`
-	NullType   *NullType   `| @@`
-	ReaderType *ReaderType `| @@`
-	BoolType   *BoolType   `| @@`
-	NumType    *NumType    `| @@`
-	StrType    *StrType    `| @@`
-	SeqType    *SeqType    `| @@`
-	ArrType    *ArrType    `| @@`
-	TupType    *TupType    `| @@`
-	ObjType    *ObjType    `| @@`
-	AnyType    *AnyType    `| @@`
+	Pos          lexer.Position
+	VoidType     *VoidType     `  @@`
+	NullType     *NullType     `| @@`
+	ReaderType   *ReaderType   `| @@`
+	BoolType     *BoolType     `| @@`
+	NumType      *NumType      `| @@`
+	StrType      *StrType      `| @@`
+	SeqType      *SeqType      `| @@`
+	ArrType      *ArrType      `| @@`
+	TupType      *TupType      `| @@`
+	ObjType      *ObjType      `| @@`
+	AnyType      *AnyType      `| @@`
+	TypeVariable *TypeVariable `| @@`
 }
 
 func (g *NonDisjunctiveType) Ast() types.Type {
@@ -185,4 +186,13 @@ type AnyType struct {
 
 func (g *AnyType) Ast() types.Type {
 	return types.AnyType{}
+}
+
+type TypeVariable struct {
+	Pos  lexer.Position
+	Name string `@Lid`
+}
+
+func (g *TypeVariable) Ast() types.Type {
+	return types.AnyType{} // FIXME
 }
