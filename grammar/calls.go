@@ -54,13 +54,12 @@ func (g *Call) Ast() (functions.Expression, error) {
 
 type Op1Num struct {
 	Pos    lexer.Position
-	Op1Num *string `@Op1Num`
+	Op1Num string `@Op1Num`
 }
 
 func (g *Op1Num) Ast() (functions.Expression, error) {
-	op1num := *g.Op1Num
-	op := op1num[:1]
-	num, err := strconv.ParseFloat(op1num[1:], 64)
+	op := g.Op1Num[:1]
+	num, err := strconv.ParseFloat(g.Op1Num[1:], 64)
 	if err != nil {
 		return nil, err
 	}
@@ -81,13 +80,12 @@ func (g *Op1Num) Ast() (functions.Expression, error) {
 
 type Op2Num struct {
 	Pos    lexer.Position
-	Op2Num *string `@Op2Num`
+	Op2Num string `@Op2Num`
 }
 
 func (g *Op2Num) Ast() (functions.Expression, error) {
-	op2num := *g.Op2Num
-	op := op2num[:2]
-	num, err := strconv.ParseFloat(op2num[2:], 64)
+	op := g.Op2Num[:2]
+	num, err := strconv.ParseFloat(g.Op2Num[2:], 64)
 	if err != nil {
 		return nil, err
 	}
@@ -108,13 +106,12 @@ func (g *Op2Num) Ast() (functions.Expression, error) {
 
 type Op1Lid struct {
 	Pos    lexer.Position
-	Op1Lid *string `@Op1Lid`
+	Op1Lid string `@Op1Lid`
 }
 
 func (g *Op1Lid) Ast() (functions.Expression, error) {
-	op1name := *g.Op1Lid
-	op := op1name[:1]
-	name := op1name[1:]
+	op := g.Op1Lid[:1]
+	name := g.Op1Lid[1:]
 	namePos := g.Pos
 	namePos.Column += 1
 	return &functions.CallExpression{
@@ -132,13 +129,12 @@ func (g *Op1Lid) Ast() (functions.Expression, error) {
 
 type Op2Lid struct {
 	Pos    lexer.Position
-	Op2Lid *string `@Op2Lid`
+	Op2Lid string `@Op2Lid`
 }
 
 func (g *Op2Lid) Ast() (functions.Expression, error) {
-	op2name := *g.Op2Lid
-	op := op2name[:2]
-	name := op2name[2:]
+	op := g.Op2Lid[:2]
+	name := g.Op2Lid[2:]
 	namePos := g.Pos
 	namePos.Column += 2
 	return &functions.CallExpression{
@@ -156,14 +152,13 @@ func (g *Op2Lid) Ast() (functions.Expression, error) {
 
 type NameRegexp struct {
 	Pos        lexer.Position
-	NameRegexp *string `@NameRegexp`
+	NameRegexp string `@NameRegexp`
 }
 
 func (g *NameRegexp) Ast() (functions.Expression, error) {
-	nameRegexp := *g.NameRegexp
-	i := strings.Index(nameRegexp, "~")
-	name := nameRegexp[:i]
-	regexpString := nameRegexp[i+1 : len(nameRegexp)-1]
+	i := strings.Index(g.NameRegexp, "~")
+	name := g.NameRegexp[:i]
+	regexpString := g.NameRegexp[i+1 : len(g.NameRegexp)-1]
 	regexpPos := g.Pos
 	regexpPos.Column += len(name)
 	regexp, err := regexp.Compile(regexpString)
@@ -188,14 +183,13 @@ func (g *NameRegexp) Ast() (functions.Expression, error) {
 
 type NameArglist struct {
 	Pos      lexer.Position
-	NameLpar *string        `@NameLpar`
+	NameLpar string         `@NameLpar`
 	Arg      *Composition   `@@`
 	Args     []*Composition `( "," @@ )* ")"`
 }
 
 func (g *NameArglist) Ast() (functions.Expression, error) {
-	nameLpar := *g.NameLpar
-	name := nameLpar[:len(nameLpar)-1]
+	name := g.NameLpar[:len(g.NameLpar)-1]
 	args := make([]functions.Expression, len(g.Args)+1)
 	var err error
 	args[0], err = g.Arg.Ast()
@@ -217,14 +211,13 @@ func (g *NameArglist) Ast() (functions.Expression, error) {
 
 type NameArray struct {
 	Pos        lexer.Position
-	NameLbrack *string        `@NameLbrack`
+	NameLbrack string         `@NameLbrack`
 	Element    *Composition   `( @@`
 	Elements   []*Composition `  ( "," @@ )* )? "]"`
 }
 
 func (g *NameArray) Ast() (functions.Expression, error) {
-	nameLbrack := *g.NameLbrack
-	name := nameLbrack[:len(nameLbrack)-1]
+	name := g.NameLbrack[:len(g.NameLbrack)-1]
 	arrPos := g.Pos
 	arrPos.Column += len(name)
 	var elements []functions.Expression
@@ -256,7 +249,7 @@ func (g *NameArray) Ast() (functions.Expression, error) {
 
 type NameObject struct {
 	Pos        lexer.Position
-	NameLbrace *string        `@NameLbarace`
+	NameLbrace string         `@NameLbarace`
 	Prop       *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
 	Value      *Composition   `  ":" @@`
 	Props      []string       `  ( "," ( @Lid | @Op1 | @Op2 | @Num )`
@@ -264,8 +257,7 @@ type NameObject struct {
 }
 
 func (g *NameObject) Ast() (functions.Expression, error) {
-	nameLbrace := *g.NameLbrace
-	name := nameLbrace[:len(nameLbrace)-1]
+	name := g.NameLbrace[:len(g.NameLbrace)-1]
 	objPos := g.Pos
 	objPos.Column += len(name)
 	propValMap := make(map[string]functions.Expression)
@@ -295,14 +287,13 @@ func (g *NameObject) Ast() (functions.Expression, error) {
 
 type NameString struct {
 	Pos     lexer.Position
-	NameStr *string `@NameStr`
+	NameStr string `@NameStr`
 }
 
 func (g *NameString) Ast() (functions.Expression, error) {
-	nameStr := *g.NameStr
-	i := strings.Index(nameStr, "\"")
-	name := nameStr[:i]
-	str, err := strconv.Unquote(nameStr[i : len(nameStr)-1])
+	i := strings.Index(g.NameStr, "\"")
+	name := g.NameStr[:i]
+	str, err := strconv.Unquote(g.NameStr[i : len(g.NameStr)-1])
 	if err != nil {
 		return nil, err
 	}

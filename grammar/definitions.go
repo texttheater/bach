@@ -9,7 +9,7 @@ import (
 type Definition struct {
 	Pos        lexer.Position
 	InputType  *Type        `"for" @@`
-	Name       string       `"def" ( ( @Lid | @Op1 | @Op2 )`
+	Name       *string      `"def" ( ( @Lid | @Op1 | @Op2 )`
 	NameLpar   *string      `      | @NameLpar`
 	ParamName  *string      `        ( @Lid | @Op1 | @Op2 )`
 	Parameter  *Parameter   `        @@`
@@ -21,10 +21,12 @@ type Definition struct {
 
 func (g *Definition) Ast() (functions.Expression, error) {
 	inputType := g.InputType.Ast()
-	var name = g.Name
+	var name string
 	var params []*functions.Parameter
 	var paramNames []string
-	if g.NameLpar != nil {
+	if g.Name != nil {
+		name = *g.Name
+	} else {
 		nameLpar := *g.NameLpar
 		name = nameLpar[:len(nameLpar)-1]
 		params = make([]*functions.Parameter, len(g.Params)+1)

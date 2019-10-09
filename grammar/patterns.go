@@ -46,11 +46,11 @@ func (g *Pattern) Ast() (functions.Pattern, error) {
 
 type NamePattern struct {
 	Pos  lexer.Position
-	Name *string `@Lid | @Op1 | @Op2`
+	Name string `@Lid | @Op1 | @Op2`
 }
 
 func (g *NamePattern) Ast() (functions.Pattern, error) {
-	return functions.TypePattern{g.Pos, types.AnyType{}, g.Name}, nil
+	return functions.TypePattern{g.Pos, types.AnyType{}, &g.Name}, nil
 }
 
 type TypePattern struct {

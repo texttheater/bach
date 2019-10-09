@@ -10,11 +10,11 @@ import (
 
 type Regexp struct {
 	Pos    lexer.Position
-	Regexp *string `@Regexp`
+	Regexp string `@Regexp`
 }
 
 func (g *Regexp) Ast() (functions.Expression, error) {
-	regexpString := (*g.Regexp)[1 : len(*g.Regexp)-1]
+	regexpString := g.Regexp[1 : len(g.Regexp)-1]
 	regexp, err := regexp.Compile(regexpString)
 	if err != nil {
 		return nil, errors.E(
