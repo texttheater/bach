@@ -70,6 +70,9 @@ func (g *NonDisjunctiveType) Ast() types.Type {
 	if g.AnyType != nil {
 		return g.AnyType.Ast()
 	}
+	if g.TypeVariable != nil {
+		return g.TypeVariable.Ast()
+	}
 	panic("invalid type")
 }
 
