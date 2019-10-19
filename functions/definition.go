@@ -9,6 +9,7 @@ import (
 
 type DefinitionExpression struct {
 	Pos        lexer.Position
+	TypeParams []string
 	InputType  types.Type
 	Name       string
 	Params     []*Parameter

@@ -66,6 +66,7 @@ func (g *Definition) Ast() (functions.Expression, error) {
 	}
 	return &functions.DefinitionExpression{
 		Pos:        g.Pos,
+		TypeParams: typeParamNames,
 		InputType:  inputType,
 		Name:       name,
 		Params:     params,
