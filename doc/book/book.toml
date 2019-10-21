@@ -1,0 +1,6 @@
+[book]
+authors = ["Kilian Evang"]
+language = "en"
+multilingual = false
+src = "src"
+title = "The Bach Programming Language"
