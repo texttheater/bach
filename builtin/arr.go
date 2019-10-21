@@ -14,8 +14,12 @@ func initArr() {
 			nil,
 			types.NumType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				arr, _ := inputValue.(values.ArrValue)
-				length := len(arr)
+				arr, _ := inputValue.(*values.ArrValue)
+				length := 0
+				for arr != nil {
+					length += 1
+					arr = arr.Tail
+				}
 				return values.NumValue(length)
 			},
 		),

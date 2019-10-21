@@ -22,7 +22,7 @@ func initText() {
 				for i, field := range fields {
 					fieldsValue[i] = values.StrValue(field)
 				}
-				return values.ArrValue(fieldsValue)
+				return values.NewArrValue(fieldsValue)
 			},
 		),
 	})

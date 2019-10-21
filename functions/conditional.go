@@ -352,19 +352,23 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	matcher := func(inputState states.State) (*states.VariableStack, bool) {
 		varStack := inputState.Stack
 		switch v := inputState.Value.(type) {
-		case values.ArrValue:
-			if len(v) != len(elementMatchers) {
-				return nil, false
-			}
-			for i, elMatcher := range elementMatchers {
+		case *values.ArrValue:
+			for _, elMatcher := range elementMatchers {
+				if v == nil {
+					return nil, false
+				}
 				var ok bool
 				varStack, ok = elMatcher(states.State{
-					Value: v[i],
+					Value: v.Head,
 					Stack: varStack,
 				})
 				if !ok {
 					return nil, false
 				}
+				v = v.Tail
+			}
+			if v != nil {
+				return nil, false
 			}
 			if p.Name != nil {
 				varStack = &states.VariableStack{

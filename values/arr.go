@@ -6,67 +6,90 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-type ArrValue []Value
+func NewArrValue(elements []Value) *ArrValue {
+	var v *ArrValue = nil
+	for i := len(elements) - 1; i >= 0; i-- {
+		v = &ArrValue{
+			Head: elements[i],
+			Tail: v,
+		}
+	}
+	return v
+}
 
-func (v ArrValue) String() string {
+type ArrValue struct {
+	Head Value
+	Tail *ArrValue
+}
+
+func (v *ArrValue) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("[")
-	if len(v) > 0 {
-		buffer.WriteString(v[0].String())
-		for _, elValue := range v[1:] {
+	if v != nil {
+		buffer.WriteString(v.Head.String())
+		next := v.Tail
+		for next != nil {
 			buffer.WriteString(", ")
-			buffer.WriteString(elValue.String())
+			buffer.WriteString(next.Head.String())
+			next = next.Tail
 		}
 	}
 	buffer.WriteString("]")
 	return buffer.String()
 }
 
-func (v ArrValue) Out() string {
+func (v *ArrValue) Out() string {
 	return v.String()
 }
 
-func (v ArrValue) Iter() <-chan Value {
+func (v *ArrValue) Iter() <-chan Value {
 	channel := make(chan Value)
 	go func() {
-		for _, el := range v {
-			channel <- el
+		for v != nil {
+			channel <- v.Head
+			v = v.Tail
 		}
 		close(channel)
 	}()
 	return channel
 }
 
-func (v ArrValue) Inhabits(t types.Type) bool {
+func (v *ArrValue) Inhabits(t types.Type) bool {
 	switch t := t.(type) {
 	case types.TupType:
-		if len(v) != len(t) {
-			return false
-		}
-		for i := range v {
-			if !v[i].Inhabits(t[i]) {
+		for _, elType := range t {
+			if v == nil {
 				return false
 			}
+			if !v.Head.Inhabits(elType) {
+				return false
+			}
+			v = v.Tail
+		}
+		if v != nil {
+			return false
 		}
 		return true
 	case *types.ArrType:
 		if (types.AnyType{}).Subsumes(t.ElType) {
 			return true
 		}
-		for _, e := range v {
-			if !e.Inhabits(t.ElType) {
+		for v != nil {
+			if !v.Head.Inhabits(t.ElType) {
 				return false
 			}
+			v = v.Tail
 		}
 		return true
 	case *types.SeqType:
 		if (types.AnyType{}).Subsumes(t.ElType) {
 			return true
 		}
-		for _, e := range v {
-			if !e.Inhabits(t.ElType) {
+		for v != nil {
+			if !v.Head.Inhabits(t.ElType) {
 				return false
 			}
+			v = v.Tail
 		}
 		return true
 	case types.UnionType:
