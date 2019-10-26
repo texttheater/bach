@@ -25,6 +25,10 @@ func (t NumType) Bind(u Type, bindings map[string]Type) bool {
 	}
 }
 
+func (t NumType) Instantiate(bindings map[string]Type) Type {
+	return t
+}
+
 func (t NumType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
 	case VoidType:

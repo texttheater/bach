@@ -56,6 +56,12 @@ func (t *SeqType) Bind(u Type, bindings map[string]Type) bool {
 	}
 }
 
+func (t *SeqType) Instantiate(bindings map[string]Type) Type {
+	return &SeqType{
+		ElType: t.ElType.Instantiate(bindings),
+	}
+}
+
 func (t *SeqType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
 	case VoidType:

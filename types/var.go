@@ -33,6 +33,14 @@ func (t TypeVariable) Bind(u Type, bindings map[string]Type) bool {
 	return true
 }
 
+func (t TypeVariable) Instantiate(bindings map[string]Type) Type {
+	instType, ok := bindings[t.Name]
+	if !ok {
+		return t
+	}
+	return instType
+}
+
 func (t TypeVariable) Partition(u Type) (Type, Type) {
 	panic("cannot partition a type variable")
 }

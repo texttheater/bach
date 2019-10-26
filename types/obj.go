@@ -73,6 +73,17 @@ func (t ObjType) Bind(u Type, bindings map[string]Type) bool {
 	}
 }
 
+func (t ObjType) Instantiate(bindings map[string]Type) Type {
+	propTypeMap := make(map[string]Type)
+	for p, t := range t.PropTypeMap {
+		propTypeMap[p] = t.Instantiate(bindings)
+	}
+	return ObjType{
+		Props:       t.Props,
+		PropTypeMap: propTypeMap,
+	}
+}
+
 func (t ObjType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
 	case VoidType:

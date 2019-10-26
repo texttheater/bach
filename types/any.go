@@ -11,6 +11,10 @@ func (t AnyType) Bind(u Type, bindings map[string]Type) bool {
 	return true
 }
 
+func (t AnyType) Instantiate(bindings map[string]Type) Type {
+	return t
+}
+
 func (t AnyType) Partition(u Type) (Type, Type) {
 	switch u.(type) {
 	case AnyType:

@@ -128,6 +128,14 @@ func (t UnionType) Bind(u Type, bindings map[string]Type) bool {
 	}
 }
 
+func (t UnionType) Instantiate(bindings map[string]Type) Type {
+	var result Type = VoidType{}
+	for _, disjunct := range t {
+		result = Union(result, disjunct.Instantiate(bindings))
+	}
+	return result
+}
+
 func (t UnionType) inversePartition(u Type) (Type, Type) {
 	// precondition: u is not a UnionType
 	var intersection Type = VoidType{}

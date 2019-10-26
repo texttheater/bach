@@ -21,6 +21,10 @@ func (t VoidType) Bind(u Type, bindings map[string]Type) bool {
 	}
 }
 
+func (t VoidType) Instantiate(bindings map[string]Type) Type {
+	return t
+}
+
 func (t VoidType) Partition(u Type) (Type, Type) {
 	return t, t
 }

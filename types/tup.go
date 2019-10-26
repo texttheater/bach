@@ -48,6 +48,14 @@ func (t TupType) Bind(u Type, bindings map[string]Type) bool {
 	}
 }
 
+func (t TupType) Instantiate(bindings map[string]Type) Type {
+	elementTypes := make([]Type, len(t))
+	for i, elementType := range t {
+		elementTypes[i] = elementType.Instantiate(bindings)
+	}
+	return TupType(elementTypes)
+}
+
 func (t TupType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
 	case VoidType:

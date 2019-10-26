@@ -25,6 +25,10 @@ func (t ReaderType) Bind(u Type, bindings map[string]Type) bool {
 	}
 }
 
+func (t ReaderType) Instantiate(bindings map[string]Type) Type {
+	return t
+}
+
 func (t ReaderType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
 	case VoidType:
