@@ -113,12 +113,6 @@ func (t UnionType) Partition(u Type) (Type, Type) {
 		var complementsUnion Type = VoidType{}
 		for _, tDisjunct := range t {
 			intersection, complement := u.inversePartition(tDisjunct)
-			//intersection := VoidType{}
-			//complement := tDisjunct
-			//for _, uDisjunct := range u {
-			//	i, complement = complement.Partition(uDisjunct)
-			//	intersection = Union(intersection, i)
-			//}
 			intersectionsUnion = Union(intersectionsUnion, intersection)
 			complementsUnion = Union(complementsUnion, complement)
 		}
