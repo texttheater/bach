@@ -35,6 +35,13 @@ type BindingStack struct {
 	Tail *BindingStack
 }
 
+func (s *BindingStack) Push(element Binding) *BindingStack {
+	return &BindingStack{
+		Head: element,
+		Tail: s,
+	}
+}
+
 type Binding struct {
 	Name string
 	Type types.Type

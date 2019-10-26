@@ -49,7 +49,7 @@ func initRegexp() {
 				action = action.SetArg(argAction)
 				outputType = argOutputShape.Type
 			} else { // parameter not set by the call
-				wantParam := functions.Parameter{
+				wantParam := &functions.Parameter{
 					InputType:  types.StrType{},
 					Params:     nil,
 					OutputType: types.ObjType{},

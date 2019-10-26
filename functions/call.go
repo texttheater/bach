@@ -88,22 +88,47 @@ type Parameter struct {
 	OutputType types.Type
 }
 
-func (p Parameter) Subsumes(other Parameter) bool {
-	if len(p.Params) != len(other.Params) {
+func (p *Parameter) Subsumes(q *Parameter) bool {
+	if len(p.Params) != len(q.Params) {
 		return false
 	}
-	if !other.InputType.Subsumes(p.InputType) {
+	if !q.InputType.Subsumes(p.InputType) {
 		return false
 	}
-	if !p.OutputType.Subsumes(other.OutputType) {
+	if !p.OutputType.Subsumes(q.OutputType) {
 		return false
 	}
-	for i, otherParam := range other.Params {
-		if !otherParam.Subsumes(*p.Params[i]) {
+	for i, otherParam := range q.Params {
+		if !otherParam.Subsumes(p.Params[i]) {
 			return false
 		}
 	}
 	return true
+}
+
+func (p *Parameter) Instantiate(bindings map[string]types.Type) *Parameter {
+	inputType := p.InputType.Instantiate(bindings)
+	var params []*Parameter
+	if p.Params != nil {
+		params = make([]*Parameter, len(p.Params))
+		for i, param := range p.Params {
+			params[i] = param.Instantiate(bindings)
+		}
+	}
+	outputType := p.OutputType.Instantiate(bindings)
+	return &Parameter{
+		InputType:  inputType,
+		Params:     params,
+		OutputType: outputType,
+	}
+}
+
+func instantiate(params []*Parameter, bindings map[string]types.Type) []*Parameter {
+	result := make([]*Parameter, len(params))
+	for i, param := range params {
+		result[i] = param.Instantiate(bindings)
+	}
+	return result
 }
 
 func (p Parameter) String() string {
@@ -191,17 +216,18 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 			return Shape{}, nil, false, nil
 		}
 		// match input type
-		if !wantInputType.Subsumes(gotInputShape.Type) {
+		bindings := make(map[string]types.Type)
+		if !wantInputType.Bind(gotInputShape.Type, bindings) {
 			return Shape{}, nil, false, nil
 		}
 		// typecheck and set parameters filled by this call
 		funAction := action
 		for i := range gotCall.Args {
 			argInputShape := Shape{
-				Type:  params[i].InputType,
+				Type:  params[i].InputType.Instantiate(bindings), // TODO what if we don't have the binding yet at this stage?
 				Stack: gotInputShape.Stack,
 			}
-			argOutputShape, argAction, err := gotCall.Args[i].Typecheck(argInputShape, params[i].Params)
+			argOutputShape, argAction, err := gotCall.Args[i].Typecheck(argInputShape, instantiate(params[i].Params, bindings))
 			if err != nil {
 				return Shape{}, nil, false, err
 			}
@@ -217,23 +243,42 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 			funAction = funAction.SetArg(argAction)
 		}
 		// typecheck parameters not filled by the call
-		for i := range gotParams {
-			if !gotParams[i].Subsumes(*params[len(gotCall.Args)+i]) {
+		for i, gotParam := range gotParams {
+			wantParam := params[len(gotCall.Args)+i].Instantiate(bindings)
+			if !gotParam.Subsumes(wantParam) {
 				return Shape{}, nil, false, errors.E(
 					errors.Code(errors.ParamDoesNotMatch),
 					errors.Pos(gotCall.Pos),
 					errors.ParamNum(i),
-					errors.WantParam(gotParams[i]),
-					errors.GotParam(params[len(gotCall.Args)+i]),
+					errors.WantParam(gotParam),
+					errors.GotParam(wantParam),
 				)
 			}
 		}
 		// create output shape
 		outputShape := Shape{
-			Type:  outputType,
+			Type:  outputType.Instantiate(bindings),
 			Stack: gotInputShape.Stack,
 		}
+		// set new type variables on action
+		funAction2 := func(inputState states.State, args []states.Action) states.State {
+			typeStack := inputState.TypeStack
+			for n, t := range bindings {
+				typeStack = typeStack.Push(states.Binding{
+					Name: n,
+					Type: t,
+				})
+			}
+			inputState = states.State{
+				Error:     inputState.Error,
+				Drop:      inputState.Drop,
+				Value:     inputState.Value,
+				Stack:     inputState.Stack,
+				TypeStack: typeStack,
+			}
+			return funAction(inputState, args)
+		}
 		// return
-		return outputShape, funAction, true, nil
+		return outputShape, funAction2, true, nil
 	}
 }
