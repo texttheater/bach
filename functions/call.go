@@ -145,15 +145,17 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 	action := func(inputState states.State, args []states.Action) states.State {
 		argValues := make([]values.Value, len(argTypes))
 		argInputState := states.State{
-			Value: &values.NullValue{},
-			Stack: inputState.Stack,
+			Value:     &values.NullValue{},
+			Stack:     inputState.Stack,
+			TypeStack: inputState.TypeStack,
 		}
 		for i, arg := range args {
 			argValues[i] = arg(argInputState, nil).Value
 		}
 		return states.State{
-			Value: kernel(inputState.Value, argValues),
-			Stack: inputState.Stack,
+			Value:     kernel(inputState.Value, argValues),
+			Stack:     inputState.Stack,
+			TypeStack: inputState.TypeStack,
 		}
 	}
 	// return
@@ -166,8 +168,9 @@ func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
 		for stack != nil {
 			if stack.Head.ID == id {
 				return states.State{
-					Value: stack.Head.Action(states.InitialState, nil).Value,
-					Stack: inputState.Stack,
+					Value:     stack.Head.Action(states.InitialState, nil).Value,
+					Stack:     inputState.Stack,
+					TypeStack: inputState.TypeStack,
 				}
 			}
 			stack = stack.Tail

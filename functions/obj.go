@@ -45,8 +45,9 @@ func (x ObjExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 			propValMap[key] = valValue
 		}
 		return states.State{
-			Value: values.ObjValue(propValMap),
-			Stack: inputState.Stack,
+			Value:     values.ObjValue(propValMap),
+			Stack:     inputState.Stack,
+			TypeStack: inputState.TypeStack,
 		}
 	}
 	return outputShape, action, nil

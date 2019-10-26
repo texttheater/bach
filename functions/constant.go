@@ -28,8 +28,9 @@ func (x ConstantExpression) Typecheck(inputShape Shape, params []*Parameter) (Sh
 	outputShape := Shape{x.Type, inputShape.Stack}
 	action := func(inputState states.State, args []states.Action) states.State {
 		return states.State{
-			Value: x.Value,
-			Stack: inputState.Stack,
+			Value:     x.Value,
+			Stack:     inputState.Stack,
+			TypeStack: inputState.TypeStack,
 		}
 	}
 	return outputShape, action, nil

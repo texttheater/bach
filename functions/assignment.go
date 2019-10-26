@@ -32,6 +32,7 @@ func (x AssignmentExpression) Typecheck(inputShape Shape, params []*Parameter) (
 				ID:     x,
 				Action: states.SimpleAction(inputState.Value),
 			}),
+			TypeStack: inputState.TypeStack,
 		}
 	}
 	return outputShape, action, nil

@@ -57,8 +57,9 @@ func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 		match := x.Regexp.FindStringSubmatchIndex(inputString)
 		if match == nil {
 			return states.State{
-				Value: values.NullValue{},
-				Stack: inputState.Stack,
+				Value:     values.NullValue{},
+				Stack:     inputState.Stack,
+				TypeStack: inputState.TypeStack,
 			}
 		}
 		propValueMap := make(map[string]values.Value)
@@ -80,8 +81,9 @@ func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 			}
 		}
 		return states.State{
-			Value: values.ObjValue(propValueMap),
-			Stack: inputState.Stack,
+			Value:     values.ObjValue(propValueMap),
+			Stack:     inputState.Stack,
+			TypeStack: inputState.TypeStack,
 		}
 	}
 	return outputShape, action, nil

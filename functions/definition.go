@@ -44,13 +44,15 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 			})
 		}
 		bodyInputState := states.State{
-			Value: inputState.Value,
-			Stack: bodyInputStack,
+			Value:     inputState.Value,
+			Stack:     bodyInputStack,
+			TypeStack: inputState.TypeStack,
 		}
 		bodyOutputState := bodyAction(bodyInputState, nil)
 		return states.State{
-			Value: bodyOutputState.Value,
-			Stack: inputState.Stack,
+			Value:     bodyOutputState.Value,
+			Stack:     inputState.Stack,
+			TypeStack: inputState.TypeStack,
 		}
 	}
 	// make a funcer for the defined function, add it to the function stack

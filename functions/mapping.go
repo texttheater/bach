@@ -54,8 +54,9 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 		go func() {
 			for el := range inputState.Value.Iter() {
 				bodyInputState := states.State{
-					Value: el,
-					Stack: inputState.Stack,
+					Value:     el,
+					Stack:     inputState.Stack,
+					TypeStack: inputState.TypeStack,
 				}
 				bodyOutputState := bodyAction(bodyInputState, nil)
 				if !bodyOutputState.Drop {
@@ -65,8 +66,9 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 			close(channel)
 		}()
 		return states.State{
-			Value: values.SeqValue{bodyOutputShape.Type, channel},
-			Stack: inputState.Stack,
+			Value:     values.SeqValue{bodyOutputShape.Type, channel},
+			Stack:     inputState.Stack,
+			TypeStack: inputState.TypeStack,
 		}
 	}
 	return outputShape, action, nil

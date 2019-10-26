@@ -29,8 +29,9 @@ func initConv() {
 					array = append(array, el)
 				}
 				outputState := states.State{
-					Value: values.ArrValue(array),
-					Stack: inputState.Stack,
+					Value:     values.ArrValue(array),
+					Stack:     inputState.Stack,
+					TypeStack: inputState.TypeStack,
 				}
 				return outputState
 			}

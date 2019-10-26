@@ -20,8 +20,9 @@ func (a Action) SetArg(arg Action) Action {
 func SimpleAction(value values.Value) Action {
 	return func(inputState State, args []Action) State {
 		return State{
-			Value: value,
-			Stack: inputState.Stack,
+			Value:     value,
+			Stack:     inputState.Stack,
+			TypeStack: inputState.TypeStack,
 		}
 	}
 }
