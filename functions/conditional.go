@@ -551,7 +551,7 @@ func (p TypePattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, er
 	matcher := func(inputState states.State) (*states.VariableStack, bool) {
 		// TODO For efficiency, we should check inhabitation of a more
 		// general type than p.Type if that is equivalent.
-		if inputState.Value.Inhabits(p.Type) {
+		if inputState.Value.Inhabits(p.Type, inputState.TypeStack) {
 			varStack := inputState.Stack
 			if p.Name != nil {
 				varStack = &states.VariableStack{

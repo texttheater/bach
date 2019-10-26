@@ -22,14 +22,16 @@ func (v SeqValue) Iter() <-chan Value {
 	return v.Channel
 }
 
-func (v SeqValue) Inhabits(t types.Type) bool {
+func (v SeqValue) Inhabits(t types.Type, stack *BindingStack) bool {
 	switch t := t.(type) {
 	case *types.SeqType:
 		return t.ElType.Subsumes(v.ElementType)
 	case types.UnionType:
-		return inhabits(v, t)
+		return inhabits(v, t, stack)
 	case types.AnyType:
 		return true
+	case types.TypeVariable:
+		return stack.Inhabits(v, t)
 	default:
 		return false
 	}

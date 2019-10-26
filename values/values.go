@@ -8,12 +8,12 @@ type Value interface {
 	String() string
 	Out() string
 	Iter() <-chan Value
-	Inhabits(types.Type) bool
+	Inhabits(types.Type, *BindingStack) bool
 }
 
-func inhabits(v Value, t types.UnionType) bool {
+func inhabits(v Value, t types.UnionType, stack *BindingStack) bool {
 	for _, disjunct := range t {
-		if v.Inhabits(disjunct) {
+		if v.Inhabits(disjunct, stack) {
 			return true
 		}
 	}

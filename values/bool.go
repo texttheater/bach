@@ -21,14 +21,16 @@ func (v BoolValue) Iter() <-chan Value {
 	panic(fmt.Sprintf("%s is not a sequence", v))
 }
 
-func (v BoolValue) Inhabits(t types.Type) bool {
+func (v BoolValue) Inhabits(t types.Type, stack *BindingStack) bool {
 	switch t := t.(type) {
 	case types.BoolType:
 		return true
 	case types.UnionType:
-		return inhabits(v, t)
+		return inhabits(v, t, stack)
 	case types.AnyType:
 		return true
+	case types.TypeVariable:
+		return stack.Inhabits(v, t)
 	default:
 		return false
 	}

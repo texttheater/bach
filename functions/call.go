@@ -264,7 +264,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 		funAction2 := func(inputState states.State, args []states.Action) states.State {
 			typeStack := inputState.TypeStack
 			for n, t := range bindings {
-				typeStack = typeStack.Push(states.Binding{
+				typeStack = typeStack.Push(values.Binding{
 					Name: n,
 					Type: t,
 				})

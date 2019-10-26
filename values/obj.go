@@ -34,7 +34,7 @@ func (v ObjValue) Iter() <-chan Value {
 	panic(fmt.Sprintf("%s is not a sequence", v))
 }
 
-func (v ObjValue) Inhabits(t types.Type) bool {
+func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) bool {
 	switch t := t.(type) {
 	case types.ObjType:
 		for prop, wantType := range t.PropTypeMap {
@@ -42,15 +42,17 @@ func (v ObjValue) Inhabits(t types.Type) bool {
 			if !ok {
 				return false
 			}
-			if !gotValue.Inhabits(wantType) {
+			if !gotValue.Inhabits(wantType, stack) {
 				return false
 			}
 		}
 		return true
 	case types.UnionType:
-		return inhabits(v, t)
+		return inhabits(v, t, stack)
 	case types.AnyType:
 		return true
+	case types.TypeVariable:
+		return stack.Inhabits(v, t)
 	default:
 		return false
 	}
