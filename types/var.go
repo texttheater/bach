@@ -42,7 +42,21 @@ func (t TypeVariable) Instantiate(bindings map[string]Type) Type {
 }
 
 func (t TypeVariable) Partition(u Type) (Type, Type) {
-	panic("cannot partition a type variable")
+	switch u := u.(type) {
+	case VoidType:
+		return u, t
+	case TypeVariable:
+		if t.Name == u.Name {
+			return u, VoidType{}
+		}
+		return VoidType{}, t
+	case UnionType:
+		return u.inversePartition(t)
+	case AnyType:
+		return t, VoidType{}
+	default:
+		return VoidType{}, t
+	}
 }
 
 func (t TypeVariable) String() string {
