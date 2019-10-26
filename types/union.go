@@ -66,6 +66,16 @@ func (t UnionType) inverseSubsumes(u Type) bool {
 	return true
 }
 
+func (t UnionType) inverseBind(u Type, bindings map[string]Type) bool {
+	// precondition: u is not a UnionType
+	for _, disjunct := range t {
+		if !u.Bind(disjunct, bindings) {
+			return false
+		}
+	}
+	return true
+}
+
 func (t UnionType) Subsumes(u Type) bool {
 	switch u := u.(type) {
 	case UnionType:
@@ -85,6 +95,32 @@ func (t UnionType) Subsumes(u Type) bool {
 		// check that at least one disjunct of t subsumes u
 		for _, tDisjunct := range t {
 			if tDisjunct.Subsumes(u) {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+func (t UnionType) Bind(u Type, bindings map[string]Type) bool {
+	switch u := u.(type) {
+	case UnionType:
+		// check that for every disjunct of u, at least one disjunct of
+		// t subsumes it
+	uDisjuncts:
+		for _, uDisjunct := range u {
+			for _, tDisjunct := range t {
+				if tDisjunct.Bind(uDisjunct, bindings) {
+					continue uDisjuncts
+				}
+			}
+			return false
+		}
+		return true
+	default:
+		// check that at least one disjunct of t subsumes u
+		for _, tDisjunct := range t {
+			if tDisjunct.Bind(u, bindings) {
 				return true
 			}
 		}

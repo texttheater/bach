@@ -14,6 +14,17 @@ func (t BoolType) Subsumes(u Type) bool {
 	}
 }
 
+func (t BoolType) Bind(u Type, bindings map[string]Type) bool {
+	switch u.(type) {
+	case VoidType:
+		return true
+	case BoolType:
+		return true
+	default:
+		return false
+	}
+}
+
 func (t BoolType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
 	case VoidType:

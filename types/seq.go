@@ -34,6 +34,28 @@ func (t *SeqType) Subsumes(u Type) bool {
 	}
 }
 
+func (t *SeqType) Bind(u Type, bindings map[string]Type) bool {
+	switch u := u.(type) {
+	case VoidType:
+		return true
+	case TupType:
+		for _, el := range u {
+			if !t.ElType.Bind(el, bindings) {
+				return false
+			}
+		}
+		return true
+	case *ArrType:
+		return t.ElType.Bind(u.ElType, bindings)
+	case *SeqType:
+		return t.ElType.Bind(u.ElType, bindings)
+	case UnionType:
+		return u.inverseBind(t, bindings)
+	default:
+		return false
+	}
+}
+
 func (t *SeqType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
 	case VoidType:

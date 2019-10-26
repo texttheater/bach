@@ -51,6 +51,28 @@ func (t ObjType) Subsumes(u Type) bool {
 	}
 }
 
+func (t ObjType) Bind(u Type, bindings map[string]Type) bool {
+	switch u := u.(type) {
+	case VoidType:
+		return true
+	case ObjType:
+		for k, v1 := range t.PropTypeMap {
+			v2, ok := u.PropTypeMap[k]
+			if !ok {
+				return false
+			}
+			if !v1.Bind(v2, bindings) {
+				return false
+			}
+		}
+		return true
+	case UnionType:
+		return u.inverseBind(t, bindings)
+	default:
+		return false
+	}
+}
+
 func (t ObjType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
 	case VoidType:

@@ -7,6 +7,10 @@ func (t AnyType) Subsumes(u Type) bool {
 	return true
 }
 
+func (t AnyType) Bind(u Type, bindings map[string]Type) bool {
+	return true
+}
+
 func (t AnyType) Partition(u Type) (Type, Type) {
 	switch u.(type) {
 	case AnyType:

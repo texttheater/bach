@@ -14,6 +14,17 @@ func (t ReaderType) Subsumes(u Type) bool {
 	}
 }
 
+func (t ReaderType) Bind(u Type, bindings map[string]Type) bool {
+	switch u.(type) {
+	case VoidType:
+		return true
+	case ReaderType:
+		return true
+	default:
+		return false
+	}
+}
+
 func (t ReaderType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
 	case VoidType:

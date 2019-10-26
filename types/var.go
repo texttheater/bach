@@ -15,6 +15,24 @@ func (t TypeVariable) Subsumes(u Type) bool {
 	}
 }
 
+func (t TypeVariable) Bind(u Type, bindings map[string]Type) bool {
+	instType, ok := bindings[t.Name]
+	if !ok {
+		instType = AnyType{}
+	}
+	var newInstType Type
+	// pick the more specific type
+	if instType.Subsumes(u) {
+		newInstType = u
+	} else if u.Subsumes(instType) {
+		newInstType = instType
+	} else {
+		return false
+	}
+	bindings[t.Name] = newInstType
+	return true
+}
+
 func (t TypeVariable) Partition(u Type) (Type, Type) {
 	panic("cannot partition a type variable")
 }

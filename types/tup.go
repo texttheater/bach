@@ -27,6 +27,27 @@ func (t TupType) Subsumes(u Type) bool {
 	}
 }
 
+func (t TupType) Bind(u Type, bindings map[string]Type) bool {
+	switch u := u.(type) {
+	case VoidType:
+		return true
+	case TupType:
+		if len(t) != len(u) {
+			return false
+		}
+		for i := range t {
+			if !t[i].Bind(u[i], bindings) {
+				return false
+			}
+		}
+		return true
+	case UnionType:
+		return u.inverseBind(t, bindings)
+	default:
+		return false
+	}
+}
+
 func (t TupType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
 	case VoidType:
