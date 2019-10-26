@@ -79,6 +79,8 @@ func (t TupType) Partition(u Type) (Type, Type) {
 			return TupType(elTypes), VoidType{}
 		}
 		return TupType(elTypes), t
+	case UnionType:
+		return u.inversePartition(t)
 	case AnyType:
 		return t, VoidType{}
 	default:
