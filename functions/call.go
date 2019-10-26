@@ -145,9 +145,8 @@ func (p Parameter) String() string {
 			buffer.WriteString(",")
 			buffer.WriteString(param.String())
 		}
-		buffer.WriteString(")")
+		buffer.WriteString(") ")
 	}
-	buffer.WriteString(" ")
 	buffer.WriteString(p.OutputType.String())
 	return buffer.String()
 }
