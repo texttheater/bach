@@ -49,8 +49,9 @@ func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 	}
 	matchType := types.NewObjType(propTypeMap)
 	outputShape := Shape{
-		Type:  types.Union(types.NullType{}, matchType),
-		Stack: inputShape.Stack,
+		Type:      types.Union(types.NullType{}, matchType),
+		Stack:     inputShape.Stack,
+		TypeStack: inputShape.TypeStack,
 	}
 	action := func(inputState states.State, args []states.Action) states.State {
 		inputString := string(inputState.Value.(values.StrValue))

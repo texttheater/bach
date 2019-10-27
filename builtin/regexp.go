@@ -30,8 +30,9 @@ func initRegexp() {
 			var outputType types.Type
 			if len(gotCall.Args) > 0 { // parameter set by the call
 				argInputShape := functions.Shape{
-					Type:  types.StrType{},
-					Stack: gotInputShape.Stack,
+					Type:      types.StrType{},
+					Stack:     gotInputShape.Stack,
+					TypeStack: gotInputShape.TypeStack,
 				}
 				argOutputShape, argAction, err := gotCall.Args[0].Typecheck(argInputShape, nil)
 				if err != nil {
@@ -67,8 +68,9 @@ func initRegexp() {
 			}
 			// create output shape
 			outputShape := functions.Shape{
-				Type:  outputType,
-				Stack: gotInputShape.Stack,
+				Type:      outputType,
+				Stack:     gotInputShape.Stack,
+				TypeStack: gotInputShape.TypeStack,
 			}
 			return outputShape, action, true, nil
 		},

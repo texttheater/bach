@@ -76,8 +76,9 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 	}
 	// define body input context
 	bodyInputShape := Shape{
-		Type:  x.InputType,
-		Stack: bodyStack,
+		Type:      x.InputType,
+		Stack:     bodyStack,
+		TypeStack: inputShape.TypeStack, // TODO add type variables
 	}
 	// typecheck body (crucially, setting body action)
 	bodyOutputShape, bodyAction, err := x.Body.Typecheck(bodyInputShape, nil)
@@ -95,8 +96,9 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 	}
 	// define output context
 	outputShape := Shape{
-		Type:  inputShape.Type,
-		Stack: functionStack,
+		Type:      inputShape.Type,
+		Stack:     functionStack,
+		TypeStack: inputShape.TypeStack,
 	}
 	// define action (crucially, setting body input stack)
 	action := func(inputState states.State, args []states.Action) states.State {

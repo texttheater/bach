@@ -17,8 +17,9 @@ func initTypes() {
 				return functions.Shape{}, nil, false, nil
 			}
 			outputShape := functions.Shape{
-				Type:  types.StrType{},
-				Stack: gotInputShape.Stack,
+				Type:      types.StrType{},
+				Stack:     gotInputShape.Stack,
+				TypeStack: gotInputShape.TypeStack,
 			}
 			action := func(inputState states.State, args []states.Action) states.State {
 				outputValue := values.StrValue(gotInputShape.Type.String())

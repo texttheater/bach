@@ -20,8 +20,9 @@ func initConv() {
 				return functions.Shape{}, nil, false, nil
 			}
 			outputShape := functions.Shape{
-				Type:  &types.ArrType{gotInputShape.Type.ElementType()},
-				Stack: gotInputShape.Stack,
+				Type:      &types.ArrType{gotInputShape.Type.ElementType()},
+				Stack:     gotInputShape.Stack,
+				TypeStack: gotInputShape.TypeStack,
 			}
 			action := func(inputState states.State, args []states.Action) states.State {
 				array := make([]values.Value, 0)

@@ -25,8 +25,7 @@ func (x DropExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 	}
 	// create output shape
 	outputShape := Shape{
-		Type:  types.VoidType{},
-		Stack: nil,
+		Type: types.VoidType{},
 	}
 	// create action
 	action := func(inputState states.State, args []states.Action) states.State {

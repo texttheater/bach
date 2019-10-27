@@ -5,7 +5,9 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-var InitialShape functions.Shape = functions.Shape{types.NullType{}, nil}
+var InitialShape functions.Shape = functions.Shape{
+	Type: types.NullType{},
+}
 
 func init() {
 	initNull()

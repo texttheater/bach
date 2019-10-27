@@ -52,8 +52,9 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 }
 
 type Shape struct {
-	Type  types.Type
-	Stack *FuncerStack
+	Type      types.Type
+	Stack     *FuncerStack
+	TypeStack *TypeVarStack
 }
 
 type FuncerStack struct {
@@ -62,7 +63,10 @@ type FuncerStack struct {
 }
 
 func (s *FuncerStack) Push(funcer Funcer) *FuncerStack {
-	return &FuncerStack{funcer, s}
+	return &FuncerStack{
+		Head: funcer,
+		Tail: s,
+	}
 }
 
 func (s *FuncerStack) PushAll(funcers []Funcer) *FuncerStack {
@@ -80,6 +84,18 @@ func (s *FuncerStack) String() string {
 		stack = stack.Tail
 	}
 	return fmt.Sprintf("%v", slice)
+}
+
+type TypeVarStack struct {
+	Head string
+	Tail *TypeVarStack
+}
+
+func (s *TypeVarStack) Push(name string) *TypeVarStack {
+	return &TypeVarStack{
+		Head: name,
+		Tail: s,
+	}
 }
 
 type Parameter struct {
@@ -223,8 +239,9 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 		funAction := action
 		for i := range gotCall.Args {
 			argInputShape := Shape{
-				Type:  params[i].InputType.Instantiate(bindings), // TODO what if we don't have the binding yet at this stage?
-				Stack: gotInputShape.Stack,
+				Type:      params[i].InputType.Instantiate(bindings), // TODO what if we don't have the binding yet at this stage?
+				Stack:     gotInputShape.Stack,
+				TypeStack: gotInputShape.TypeStack,
 			}
 			argOutputShape, argAction, err := gotCall.Args[i].Typecheck(argInputShape, instantiate(params[i].Params, bindings))
 			if err != nil {
@@ -256,8 +273,9 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 		}
 		// create output shape
 		outputShape := Shape{
-			Type:  outputType.Instantiate(bindings),
-			Stack: gotInputShape.Stack,
+			Type:      outputType.Instantiate(bindings),
+			Stack:     gotInputShape.Stack,
+			TypeStack: gotInputShape.TypeStack,
 		}
 		// set new type variables on action
 		funAction2 := func(inputState states.State, args []states.Action) states.State {

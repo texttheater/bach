@@ -72,8 +72,9 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		restType = inputShape.Type
 	}
 	inputShape = Shape{
-		Type:  restType,
-		Stack: inputShape.Stack,
+		Type:      restType,
+		Stack:     inputShape.Stack,
+		TypeStack: inputShape.TypeStack,
 	}
 	// initialize output type
 	outputType := consequentOutputShape.Type
@@ -115,8 +116,9 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		}
 		// build consequent input shape
 		consequentInputShape := Shape{
-			Type:  patternOutputShape.Type,
-			Stack: guardOutputShape.Stack,
+			Type:      patternOutputShape.Type,
+			Stack:     guardOutputShape.Stack,
+			TypeStack: guardOutputShape.TypeStack,
 		}
 		// typecheck consequent
 		consequentOutputShape, consequentAction, err := x.AlternativeConsequents[i].Typecheck(consequentInputShape, nil)
@@ -129,8 +131,9 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 			restType = inputShape.Type
 		}
 		inputShape = Shape{
-			Type:  restType,
-			Stack: inputShape.Stack,
+			Type:      restType,
+			Stack:     inputShape.Stack,
+			TypeStack: inputShape.TypeStack,
 		}
 		// update output type
 		outputType = types.Union(outputType, consequentOutputShape.Type)
@@ -229,8 +232,9 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 	}
 	// return
 	outputShape := Shape{
-		outputType,
-		inputShape.Stack,
+		Type:      outputType,
+		Stack:     inputShape.Stack,
+		TypeStack: inputShape.TypeStack,
 	}
 	return outputShape, action, nil
 }
@@ -322,8 +326,9 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	elementMatchers := make([]Matcher, len(p.ElementPatterns))
 	for i, elPattern := range p.ElementPatterns {
 		elShape, _, elMatcher, err := elPattern.Typecheck(Shape{
-			Type:  elementInputTypes[i],
-			Stack: funcerStack,
+			Type:      elementInputTypes[i],
+			Stack:     funcerStack,
+			TypeStack: inputShape.TypeStack,
 		})
 		if err != nil {
 			return Shape{}, nil, nil, err
@@ -346,8 +351,9 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	}
 	// build output shape
 	outputShape := Shape{
-		Type:  intersection,
-		Stack: funcerStack,
+		Type:      intersection,
+		Stack:     funcerStack,
+		TypeStack: inputShape.TypeStack,
 	}
 	if p.Name != nil {
 		outputShape.Stack = &FuncerStack{
@@ -445,8 +451,9 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	propMatcherMap := make(map[string]Matcher)
 	for prop, valPattern := range p.PropPatternMap {
 		valShape, _, valMatcher, err := valPattern.Typecheck(Shape{
-			Type:  propInputTypeMap[prop],
-			Stack: funcerStack,
+			Type:      propInputTypeMap[prop],
+			Stack:     funcerStack,
+			TypeStack: inputShape.TypeStack,
 		})
 		if err != nil {
 			return Shape{}, nil, nil, err
@@ -469,8 +476,9 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	}
 	// build output shape
 	outputShape := Shape{
-		Type:  intersection,
-		Stack: funcerStack,
+		Type:      intersection,
+		Stack:     funcerStack,
+		TypeStack: inputShape.TypeStack,
 	}
 	if p.Name != nil {
 		outputShape.Stack = &FuncerStack{
@@ -538,8 +546,9 @@ func (p TypePattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, er
 	}
 	// build output shape
 	outputShape := Shape{
-		Type:  intersection,
-		Stack: inputShape.Stack,
+		Type:      intersection,
+		Stack:     inputShape.Stack,
+		TypeStack: inputShape.TypeStack,
 	}
 	if p.Name != nil {
 		outputShape.Stack = &FuncerStack{

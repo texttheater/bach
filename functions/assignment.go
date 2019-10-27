@@ -24,7 +24,11 @@ func (x AssignmentExpression) Typecheck(inputShape Shape, params []*Parameter) (
 		)
 	}
 	variableFuncer := VariableFuncer(x, x.Name, inputShape.Type)
-	outputShape := Shape{inputShape.Type, inputShape.Stack.Push(variableFuncer)}
+	outputShape := Shape{
+		Type:      inputShape.Type,
+		Stack:     inputShape.Stack.Push(variableFuncer),
+		TypeStack: inputShape.TypeStack,
+	}
 	action := func(inputState states.State, args []states.Action) states.State {
 		return states.State{
 			Value: inputState.Value,

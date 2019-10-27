@@ -50,8 +50,9 @@ func initIO() {
 				return functions.Shape{}, nil, false, nil
 			}
 			outputShape := functions.Shape{
-				Type:  gotInputShape.Type,
-				Stack: gotInputShape.Stack,
+				Type:      gotInputShape.Type,
+				Stack:     gotInputShape.Stack,
+				TypeStack: gotInputShape.TypeStack,
 			}
 			action := func(inputState states.State, args []states.Action) states.State {
 				fmt.Println(inputState.Value.Out())
@@ -67,8 +68,9 @@ func initIO() {
 				return functions.Shape{}, nil, false, nil
 			}
 			outputShape := functions.Shape{
-				Type:  gotInputShape.Type,
-				Stack: gotInputShape.Stack,
+				Type:      gotInputShape.Type,
+				Stack:     gotInputShape.Stack,
+				TypeStack: gotInputShape.TypeStack,
 			}
 			action := func(inputState states.State, args []states.Action) states.State {
 				fmt.Fprintln(os.Stderr, inputState.Value)
