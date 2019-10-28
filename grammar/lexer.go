@@ -8,6 +8,8 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 	`([\s]+)` +
 		// tokens starting type literals
 		`|(?P<TypeKeywordLangle>(?:Void|Null|Bool|Num|Str|Seq|Arr|Tup|Obj|Any)<)` +
+		// type variables
+		`|(?P<Typevar><[\p{L}_][\p{L}_0-9]*>)` +
 		// tokens starting calls
 		`|(?P<Op1Num>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op2Num>(?:==|<=|>=)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
