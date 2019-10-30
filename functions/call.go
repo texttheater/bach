@@ -230,7 +230,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 			if err != nil {
 				return Shape{}, nil, false, err
 			}
-			if !params[i].OutputType.Subsumes(argOutputShape.Type) {
+			if !params[i].OutputType.Bind(argOutputShape.Type, bindings) {
 				return Shape{}, nil, false, errors.E(
 					errors.Code(errors.ArgHasWrongOutputType),
 					errors.Pos(gotCall.Pos),
