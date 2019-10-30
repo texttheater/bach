@@ -169,7 +169,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 	action := func(inputState states.State, args []states.Action) states.State {
 		argValues := make([]values.Value, len(argTypes))
 		argInputState := states.State{
-			Value:     &values.NullValue{},
+			Value:     values.NullValue{},
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
 		}

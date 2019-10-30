@@ -14,7 +14,7 @@ func initNull() {
 			nil,
 			types.NullType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				return &values.NullValue{}
+				return values.NullValue{}
 			},
 		),
 	})
