@@ -60,7 +60,7 @@ func (t TypeVariable) Partition(u Type) (Type, Type) {
 }
 
 func (t TypeVariable) String() string {
-	return t.Name
+	return "<" + t.Name + ">"
 }
 
 func (t TypeVariable) ElementType() Type {
