@@ -50,6 +50,8 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 		}
 		bodyOutputState := bodyAction(bodyInputState, nil)
 		return states.State{
+			Error:     bodyOutputState.Error,
+			Drop:      bodyOutputState.Drop,
 			Value:     bodyOutputState.Value,
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
