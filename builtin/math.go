@@ -121,7 +121,7 @@ func initMath() {
 			},
 		),
 		functions.SimpleFuncer(
-			&types.SeqType{types.NumType{}},
+			&types.ArrType{types.NumType{}},
 			"sum",
 			nil,
 			types.NumType{},
@@ -135,7 +135,7 @@ func initMath() {
 			},
 		),
 		functions.SimpleFuncer(
-			&types.SeqType{types.NumType{}},
+			&types.ArrType{types.NumType{}},
 			"avg",
 			nil,
 			types.NumType{},

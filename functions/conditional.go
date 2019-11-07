@@ -268,6 +268,7 @@ func (p ArrPattern) Position() lexer.Position {
 	return p.Pos
 }
 
+// TODO prefix-tail patterns
 func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, error) {
 	// compute element input types
 	elementInputTypes := make([]types.Type, len(p.ElementPatterns))
@@ -359,20 +360,24 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	matcher := func(inputState states.State) (*states.VariableStack, bool) {
 		varStack := inputState.Stack
 		switch v := inputState.Value.(type) {
-		case values.ArrValue:
-			if len(v) != len(elementMatchers) {
-				return nil, false
-			}
-			for i, elMatcher := range elementMatchers {
+		case *values.ArrValue:
+			for _, elMatcher := range elementMatchers {
+				if v.IsEmpty() {
+					return nil, false
+				}
 				var ok bool
 				varStack, ok = elMatcher(states.State{
-					Value:     v[i],
+					Value:     v.Hd,
 					Stack:     varStack,
 					TypeStack: inputState.TypeStack,
 				})
 				if !ok {
 					return nil, false
 				}
+				v = v.Tl
+			}
+			if !v.IsEmpty() {
+				return nil, false
 			}
 			if p.Name != nil {
 				varStack = &states.VariableStack{

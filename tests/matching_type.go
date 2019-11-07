@@ -44,16 +44,16 @@ func TestMatchingType(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[1, 2, 3] is Seq<Num> then each +1 all arr ok`,
+		`[1, 2, 3] is Arr<Num> then each +1 all ok`,
 		&types.ArrType{types.NumType{}},
-		values.ArrValue([]values.Value{values.NumValue(2), values.NumValue(3), values.NumValue(4)}),
+		values.NewArrValue([]values.Value{values.NumValue(2), values.NumValue(3), values.NumValue(4)}),
 		nil,
 		t,
 	)
-	TestProgram( // Intersective matching: pattern says Seq<Any> but Bach knows it got Seq<Num>
-		`[1, 2, 3] is Seq<Any> then each +1 all arr ok`,
+	TestProgram( // Intersective matching: pattern says Arr<Any> but Bach knows it got Arr<Num>
+		`[1, 2, 3] is Arr<Any> then each +1 all ok`,
 		&types.ArrType{types.NumType{}},
-		values.ArrValue([]values.Value{values.NumValue(2), values.NumValue(3), values.NumValue(4)}),
+		values.NewArrValue([]values.Value{values.NumValue(2), values.NumValue(3), values.NumValue(4)}),
 		nil,
 		t,
 	)

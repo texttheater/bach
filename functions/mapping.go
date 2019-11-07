@@ -26,11 +26,11 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 		)
 	}
 	// make sure the input type is a sequence type
-	if !types.AnySeqType.Subsumes(inputShape.Type) {
+	if !types.AnyArrType.Subsumes(inputShape.Type) {
 		return Shape{}, nil, errors.E(
-			errors.Code(errors.MappingRequiresSeqType),
+			errors.Code(errors.MappingRequiresArrType),
 			errors.Pos(x.Pos),
-			errors.WantType(types.AnySeqType),
+			errors.WantType(types.AnyArrType),
 			errors.GotType(inputShape.Type),
 		)
 	}
@@ -45,7 +45,9 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 	}
 	// create output shape
 	outputShape := Shape{
-		Type:  &types.SeqType{bodyOutputShape.Type},
+		Type: &types.ArrType{
+			ElType: bodyOutputShape.Type,
+		},
 		Stack: inputShape.Stack,
 	}
 	// create action
@@ -66,7 +68,9 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 			close(channel)
 		}()
 		return states.State{
-			Value:     values.SeqValue{bodyOutputShape.Type, channel},
+			Value: &values.ArrValue{
+				Ch: channel,
+			},
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
 		}

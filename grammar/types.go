@@ -28,7 +28,6 @@ type NonDisjunctiveType struct {
 	BoolType     *BoolType     `| @@`
 	NumType      *NumType      `| @@`
 	StrType      *StrType      `| @@`
-	SeqType      *SeqType      `| @@`
 	ArrType      *ArrType      `| @@`
 	TupType      *TupType      `| @@`
 	ObjType      *ObjType      `| @@`
@@ -54,9 +53,6 @@ func (g *NonDisjunctiveType) Ast() types.Type {
 	}
 	if g.StrType != nil {
 		return g.StrType.Ast()
-	}
-	if g.SeqType != nil {
-		return g.SeqType.Ast()
 	}
 	if g.ArrType != nil {
 		return g.ArrType.Ast()
@@ -122,16 +118,6 @@ type StrType struct {
 
 func (g *StrType) Ast() types.Type {
 	return types.StrType{}
-}
-
-type SeqType struct {
-	Pos         lexer.Position `"Seq<"`
-	ElementType *Type          `@@ ">"`
-}
-
-func (g *SeqType) Ast() types.Type {
-	elType := g.ElementType.Ast()
-	return &types.SeqType{elType}
 }
 
 type ArrType struct {

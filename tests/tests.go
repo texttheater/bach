@@ -43,7 +43,7 @@ func TestProgram(program string, wantType types.Type, wantValue values.Value, wa
 			t.Logf("Got type:       %s", gotType)
 			t.Logf("Got value:      %s", gotValue)
 			t.Fail()
-		} else if !reflect.DeepEqual(wantValue, gotValue) {
+		} else if !wantValue.Equal(gotValue) {
 			t.Log("ERROR: Program has unexpected output value.")
 			t.Logf("Program:        %s", program)
 			t.Logf("Expected type:  %s", wantType)

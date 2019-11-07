@@ -13,9 +13,7 @@ func init() {
 	initLogic()
 	initMath()
 	initText()
-	initSeq()
 	initArr()
-	initConv()
 	initTypes()
 	initValues()
 }

@@ -9,6 +9,7 @@ type Value interface {
 	Out() string
 	Iter() <-chan Value
 	Inhabits(types.Type, *BindingStack) bool
+	Equal(Value) bool
 }
 
 func inhabits(v Value, t types.UnionType, stack *BindingStack) bool {

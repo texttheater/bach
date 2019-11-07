@@ -18,11 +18,16 @@ func initText() {
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				str, _ := inputValue.(values.StrValue)
 				fields := strings.Fields(string(str))
-				fieldsValue := make([]values.Value, len(fields))
-				for i, field := range fields {
-					fieldsValue[i] = values.StrValue(field)
+				channel := make(chan values.Value)
+				go func() {
+					for _, field := range fields {
+						channel <- values.StrValue(field)
+					}
+					close(channel)
+				}()
+				return &values.ArrValue{
+					Ch: channel,
 				}
-				return values.ArrValue(fieldsValue)
 			},
 		),
 	})

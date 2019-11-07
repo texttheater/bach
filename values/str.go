@@ -34,3 +34,12 @@ func (v StrValue) Inhabits(t types.Type, stack *BindingStack) bool {
 		return false
 	}
 }
+
+func (v StrValue) Equal(w Value) bool {
+	switch w := w.(type) {
+	case StrValue:
+		return v == w
+	default:
+		return false
+	}
+}

@@ -57,3 +57,24 @@ func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) bool {
 		return false
 	}
 }
+
+func (v ObjValue) Equal(w Value) bool {
+	switch w := w.(type) {
+	case ObjValue:
+		if len(v) != len(w) {
+			return false
+		}
+		for k, l := range v {
+			m, ok := w[k]
+			if !ok {
+				return false
+			}
+			if !l.Equal(m) {
+				return false
+			}
+		}
+		return true
+	default:
+		return false
+	}
+}

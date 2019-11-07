@@ -10,7 +10,7 @@ const (
 	ParamDoesNotMatch
 	FunctionBodyHasWrongOutputType
 	ConditionMustBeBool
-	MappingRequiresSeqType
+	MappingRequiresArrType
 	ComposeWithVoid
 	VoidProgram
 	NonExhaustiveMatch
@@ -36,8 +36,8 @@ func (code ErrorCode) String() string {
 		return "FunctionBodyHasWrongOutputType"
 	case ConditionMustBeBool:
 		return "ConditionMustBeBool"
-	case MappingRequiresSeqType:
-		return "MappingRequiresSeqType"
+	case MappingRequiresArrType:
+		return "MappingRequiresArrType"
 	case ComposeWithVoid:
 		return "ComposeWithVoid"
 	case VoidProgram:
@@ -77,8 +77,8 @@ func (code ErrorCode) DefaultMessage() string {
 		return "The function body has the wrong output type."
 	case ConditionMustBeBool:
 		return "The condition must be boolean."
-	case MappingRequiresSeqType:
-		return "The input to a mapping must be a sequence."
+	case MappingRequiresArrType:
+		return "The input to a mapping must be an array."
 	case ComposeWithVoid:
 		return "Cannot compose with a function whose return type is Void."
 	case VoidProgram:
@@ -118,7 +118,7 @@ func (code ErrorCode) Kind() string {
 		return "Type error"
 	case ConditionMustBeBool:
 		return "Type error"
-	case MappingRequiresSeqType:
+	case MappingRequiresArrType:
 		return "Type error"
 	case ComposeWithVoid:
 		return "Type error"

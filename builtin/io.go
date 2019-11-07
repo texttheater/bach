@@ -28,7 +28,7 @@ func initIO() {
 			types.ReaderType{},
 			"lines",
 			nil,
-			&types.SeqType{types.StrType{}},
+			&types.ArrType{types.StrType{}},
 			func(inputValue values.Value, argValues []values.Value) values.Value {
 				reader, _ := inputValue.(values.ReaderValue)
 				lines := make(chan values.Value)
@@ -39,7 +39,9 @@ func initIO() {
 					}
 					close(lines)
 				}()
-				return values.SeqValue{types.StrType{}, lines}
+				return &values.ArrValue{
+					Ch: lines,
+				}
 			},
 		),
 		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*functions.Parameter) (functions.Shape, states.Action, bool, error) {

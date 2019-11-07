@@ -26,7 +26,7 @@ func TestMatchingArr(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[1, 2, 3] each id all arr is [Num, Num, Num] then true else false ok`,
+		`[1, 2, 3] each id all is [Num, Num, Num] then true else false ok`,
 		types.BoolType{},
 		values.BoolValue(true),
 		nil,

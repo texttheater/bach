@@ -35,3 +35,12 @@ func (v NumValue) Inhabits(t types.Type, stack *BindingStack) bool {
 		return false
 	}
 }
+
+func (v NumValue) Equal(w Value) bool {
+	switch w := w.(type) {
+	case NumValue:
+		return v == w
+	default:
+		return false
+	}
+}

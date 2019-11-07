@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/values"
 )
 
 type errorAttribute func(err *e)
@@ -67,7 +68,7 @@ func GotType(gotType interface{}) errorAttribute {
 	}
 }
 
-func GotValue(gotValue interface{}) errorAttribute {
+func GotValue(gotValue values.Value) errorAttribute {
 	return func(err *e) {
 		err.GotValue = gotValue
 	}
@@ -130,7 +131,7 @@ type e struct {
 	Message   *string
 	WantType  interface{}
 	GotType   interface{}
-	GotValue  interface{}
+	GotValue  values.Value
 	InputType interface{}
 	Name      *string
 	ArgNum    *int
@@ -284,7 +285,7 @@ func Match(err1, err2 error) bool {
 	if e1.GotType != nil && !reflect.DeepEqual(e1.GotType, e2.GotType) {
 		return false
 	}
-	if e1.GotValue != nil && !reflect.DeepEqual(e1.GotValue, e2.GotValue) {
+	if e1.GotValue != nil && !e1.GotValue.Equal(e2.GotValue) {
 		return false
 	}
 	if e1.InputType != nil && !reflect.DeepEqual(e1.InputType, e2.InputType) {

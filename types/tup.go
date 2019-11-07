@@ -93,21 +93,6 @@ func (t TupType) Partition(u Type) (Type, Type) {
 			return TupType(elTypes), VoidType{}
 		}
 		return TupType(elTypes), t
-	case *SeqType:
-		elTypes := make([]Type, len(t))
-		allSubsumed := true
-		for i, elType := range t {
-			intersection, _ := elType.Partition(u.ElType)
-			if (VoidType{}).Subsumes(intersection) {
-				return VoidType{}, t
-			}
-			allSubsumed = allSubsumed && intersection.Subsumes(elType)
-			elTypes[i] = intersection
-		}
-		if allSubsumed {
-			return TupType(elTypes), VoidType{}
-		}
-		return TupType(elTypes), t
 	case UnionType:
 		return u.inversePartition(t)
 	case AnyType:

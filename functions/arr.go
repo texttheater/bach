@@ -40,13 +40,17 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 		Stack: inputShape.Stack,
 	}
 	action := func(inputState states.State, args []states.Action) states.State {
-		elementValues := make([]values.Value, len(elementActions))
-		for i, elAction := range elementActions {
-			elValue := elAction(inputState, nil).Value
-			elementValues[i] = elValue
-		}
+		channel := make(chan values.Value)
+		go func() {
+			for _, elAction := range elementActions {
+				channel <- elAction(inputState, nil).Value
+			}
+			close(channel)
+		}()
 		return states.State{
-			Value:     values.ArrValue(elementValues),
+			Value: &values.ArrValue{
+				Ch: channel,
+			},
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
 		}

@@ -37,3 +37,7 @@ func (v ReaderValue) Inhabits(t types.Type, stack *BindingStack) bool {
 		return false
 	}
 }
+
+func (v ReaderValue) Equal(w Value) bool {
+	return v == w
+}

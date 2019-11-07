@@ -35,3 +35,12 @@ func (v NullValue) Inhabits(t types.Type, stack *BindingStack) bool {
 		return false
 	}
 }
+
+func (v NullValue) Equal(w Value) bool {
+	switch w.(type) {
+	case NullValue:
+		return true
+	default:
+		return false
+	}
+}
