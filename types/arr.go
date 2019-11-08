@@ -16,13 +16,8 @@ func (t *ArrType) Subsumes(u Type) bool {
 	switch u := u.(type) {
 	case VoidType:
 		return true
-	case TupType:
-		for _, el := range u {
-			if !t.ElType.Subsumes(el) {
-				return false
-			}
-		}
-		return true
+	case *NearrType:
+		return t.ElType.Subsumes(u.HeadType) && t.Subsumes(u.TailType)
 	case *ArrType:
 		return t.ElType.Subsumes(u.ElType)
 	case UnionType:
@@ -36,13 +31,8 @@ func (t *ArrType) Bind(u Type, bindings map[string]Type) bool {
 	switch u := u.(type) {
 	case VoidType:
 		return true
-	case TupType:
-		for _, el := range u {
-			if !t.ElType.Bind(el, bindings) {
-				return false
-			}
-		}
-		return true
+	case *NearrType:
+		return t.ElType.Bind(u.HeadType, bindings) && t.Bind(u.TailType, bindings)
 	case *ArrType:
 		return t.ElType.Bind(u.ElType, bindings)
 	case UnionType:
@@ -60,21 +50,21 @@ func (t *ArrType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
 	case VoidType:
 		return u, t
-	case TupType:
-		elTypes := make([]Type, len(u))
-		for i, elType := range u {
-			intersection, _ := t.ElType.Partition(elType)
-			if (VoidType{}).Subsumes(intersection) {
-				return VoidType{}, t
-			}
-			elTypes[i] = intersection
-		}
-		return TupType(elTypes), t
-	case *ArrType:
-		intersection, _ := t.ElType.Partition(u.ElType)
-		if (VoidType{}).Subsumes(intersection) {
+	case *NearrType:
+		headIntersection, _ := t.ElType.Partition(u.HeadType)
+		if (VoidType{}).Subsumes(headIntersection) {
 			return VoidType{}, t
 		}
+		tailIntersection, _ := t.Partition(u.TailType)
+		if (VoidType{}).Subsumes(tailIntersection) {
+			return VoidType{}, t
+		}
+		return &NearrType{
+			HeadType: headIntersection,
+			TailType: tailIntersection,
+		}, t
+	case *ArrType:
+		intersection, _ := t.ElType.Partition(u.ElType)
 		if intersection.Subsumes(t.ElType) {
 			return &ArrType{intersection}, VoidType{}
 		}

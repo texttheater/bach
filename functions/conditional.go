@@ -261,6 +261,7 @@ type Matcher func(states.State) (*states.VariableStack, bool)
 type ArrPattern struct {
 	Pos             lexer.Position
 	ElementPatterns []Pattern
+	RestPattern     Pattern
 	Name            *string
 }
 
@@ -268,53 +269,49 @@ func (p ArrPattern) Position() lexer.Position {
 	return p.Pos
 }
 
-// TODO prefix-tail patterns
+// spreadInputType spreads the input type for an array pattern over its
+// elements and rest.
+func spreadInputType(inputType types.Type, elementTypes []types.Type) (restType types.Type, ok bool) {
+	switch t := inputType.(type) {
+	case *types.NearrType:
+		if len(elementTypes) == 0 {
+			return nil, false
+		}
+		elementTypes[0] = t.HeadType
+		return spreadInputType(t.TailType, elementTypes[1:])
+	case *types.ArrType:
+		for i := range elementTypes {
+			elementTypes[i] = t.ElType
+		}
+		return t, true
+	case types.UnionType:
+		for i := range elementTypes {
+			elementTypes[i] = types.VoidType{}
+		}
+		var restType types.Type = types.VoidType{}
+		anyOk := false
+		for _, disjunct := range t {
+			disjunctElementTypes := make([]types.Type, len(elementTypes))
+			disjunctRestType, ok := spreadInputType(disjunct, disjunctElementTypes)
+			if ok {
+				for i := range elementTypes {
+					elementTypes[i] = types.Union(elementTypes[i], disjunctElementTypes[i])
+				}
+				restType = types.Union(restType, disjunctRestType)
+				anyOk = true
+			}
+		}
+		return restType, anyOk
+	default:
+		return nil, false
+	}
+}
+
 func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, error) {
 	// compute element input types
 	elementInputTypes := make([]types.Type, len(p.ElementPatterns))
-	switch t := inputShape.Type.(type) {
-	case types.TupType:
-		if len(t) != len(elementInputTypes) {
-			return Shape{}, types.VoidType{}, nil, nil
-		}
-		for i, elType := range t {
-			elementInputTypes[i] = elType
-		}
-	case *types.ArrType:
-		for i := range elementInputTypes {
-			elementInputTypes[i] = t.ElType
-		}
-	case types.UnionType:
-		for i := range elementInputTypes {
-			elementInputTypes[i] = types.VoidType{}
-		}
-		for _, disjunct := range t {
-			switch d := disjunct.(type) {
-			case types.TupType:
-				if len(d) != len(elementInputTypes) {
-					continue
-				}
-				for i := range elementInputTypes {
-					elementInputTypes[i] = types.Union(
-						elementInputTypes[i],
-						d[i],
-					)
-				}
-			case *types.ArrType:
-				for i := range elementInputTypes {
-					elementInputTypes[i] = types.Union(
-						elementInputTypes[i],
-						d.ElType,
-					)
-				}
-			}
-		}
-		for _, elInputType := range elementInputTypes {
-			if (types.VoidType{}).Subsumes(elInputType) {
-				return Shape{}, types.VoidType{}, nil, nil
-			}
-		}
-	default:
+	restInputType, ok := spreadInputType(inputShape.Type, elementInputTypes)
+	if !ok {
 		return Shape{}, types.VoidType{}, nil, nil
 	}
 	// process element patterns
@@ -333,8 +330,17 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 		elementTypes[i] = elShape.Type
 		elementMatchers[i] = elMatcher
 	}
+	// process rest pattern
+	restShape, _, restMatcher, err := p.RestPattern.Typecheck(Shape{
+		Type:  restInputType,
+		Stack: funcerStack,
+	})
+	if err != nil {
+		return Shape{}, nil, nil, err
+	}
+	funcerStack = restShape.Stack
 	// determine the type of values this pattern will match
-	pType := types.TupType(elementTypes)
+	pType := types.NewNearrType(elementTypes, restShape.Type)
 	// partition the input type and check for impossible match
 	intersection, complement := inputShape.Type.Partition(pType)
 	if (types.VoidType{}).Subsumes(intersection) {
@@ -367,16 +373,21 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 				}
 				var ok bool
 				varStack, ok = elMatcher(states.State{
-					Value:     v.Hd,
+					Value:     v.Head,
 					Stack:     varStack,
 					TypeStack: inputState.TypeStack,
 				})
 				if !ok {
 					return nil, false
 				}
-				v = v.Tl
+				v = v.Tail
 			}
-			if !v.IsEmpty() {
+			varStack, ok = restMatcher(states.State{
+				Value:     v,
+				Stack:     varStack,
+				TypeStack: inputState.TypeStack,
+			})
+			if !ok {
 				return nil, false
 			}
 			if p.Name != nil {

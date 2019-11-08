@@ -69,7 +69,7 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 		}()
 		return states.State{
 			Value: &values.ArrValue{
-				Ch: channel,
+				Channel: channel,
 			},
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,

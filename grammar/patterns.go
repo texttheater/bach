@@ -87,7 +87,15 @@ func (g *ArrPattern) Ast() (functions.Pattern, error) {
 			elPatterns[i+1] = p
 		}
 	}
-	return &functions.ArrPattern{g.Pos, elPatterns, g.Name}, nil
+	return &functions.ArrPattern{
+		Pos:             g.Pos,
+		ElementPatterns: elPatterns,
+		RestPattern: functions.TypePattern{ // FIXME
+			Pos:  g.Pos,
+			Type: &types.ArrType{types.VoidType{}},
+		},
+		Name: g.Name,
+	}, nil
 }
 
 type ObjPattern struct {

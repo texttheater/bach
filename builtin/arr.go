@@ -37,7 +37,7 @@ func initArr() {
 					close(channel)
 				}()
 				return &values.ArrValue{
-					Ch: channel,
+					Channel: channel,
 				}
 			},
 		),

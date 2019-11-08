@@ -15,37 +15,37 @@ func NewArrValue(elements []Value) *ArrValue {
 		close(channel)
 	}()
 	return &ArrValue{
-		Ch: channel,
+		Channel: channel,
 	}
 }
 
 type ArrValue struct {
-	Ch <-chan Value
-	Hd Value
-	Tl *ArrValue
+	Channel <-chan Value
+	Head    Value
+	Tail    *ArrValue
 }
 
 func (v *ArrValue) Eval() {
-	if v.Ch == nil {
+	if v.Channel == nil {
 		return
 	}
-	v.Hd = <-v.Ch
-	v.Tl = &ArrValue{
-		Ch: v.Ch,
+	v.Head = <-v.Channel
+	v.Tail = &ArrValue{
+		Channel: v.Channel,
 	}
-	v.Ch = nil
+	v.Channel = nil
 }
 
 func (v *ArrValue) IsEmpty() bool {
 	v.Eval()
-	return v.Hd == nil
+	return v.Head == nil
 }
 
 func (v *ArrValue) Length() int {
 	length := 0
 	for !v.IsEmpty() {
 		length += 1
-		v = v.Tl
+		v = v.Tail
 	}
 	return length
 }
@@ -54,12 +54,12 @@ func (v *ArrValue) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("[")
 	if !v.IsEmpty() {
-		buffer.WriteString(v.Hd.String())
-		v = v.Tl
+		buffer.WriteString(v.Head.String())
+		v = v.Tail
 		for !v.IsEmpty() {
 			buffer.WriteString(", ")
-			buffer.WriteString(v.Hd.String())
-			v = v.Tl
+			buffer.WriteString(v.Head.String())
+			v = v.Tail
 		}
 	}
 	buffer.WriteString("]")
@@ -74,8 +74,8 @@ func (v *ArrValue) Iter() <-chan Value {
 	channel := make(chan Value)
 	go func() {
 		for !v.IsEmpty() {
-			channel <- v.Hd
-			v = v.Tl
+			channel <- v.Head
+			v = v.Tail
 		}
 		close(channel)
 	}()
@@ -84,29 +84,23 @@ func (v *ArrValue) Iter() <-chan Value {
 
 func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) bool {
 	switch t := t.(type) {
-	case types.TupType:
-		for i := range t {
-			if v.IsEmpty() {
-				return false
-			}
-			if !v.Hd.Inhabits(t[i], stack) {
-				return false
-			}
-			v = v.Tl
-		}
-		if !v.IsEmpty() {
+	case *types.NearrType:
+		if v.IsEmpty() {
 			return false
 		}
-		return true
+		if !v.Head.Inhabits(t.HeadType, stack) {
+			return false
+		}
+		return v.Tail.Inhabits(t.TailType, stack)
 	case *types.ArrType:
 		if (types.AnyType{}).Subsumes(t.ElType) {
 			return true
 		}
 		for !v.IsEmpty() {
-			if !v.Hd.Inhabits(t.ElType, stack) {
+			if !v.Head.Inhabits(t.ElType, stack) {
 				return false
 			}
-			v = v.Tl
+			v = v.Tail
 		}
 		return true
 	case types.UnionType:
@@ -130,10 +124,10 @@ func (v *ArrValue) Equal(w Value) bool {
 		if w.IsEmpty() {
 			return false
 		}
-		if !v.Hd.Equal(w.Hd) {
+		if !v.Head.Equal(w.Head) {
 			return false
 		}
-		return v.Tl.Equal(w.Tl)
+		return v.Tail.Equal(w.Tail)
 	default:
 		return false
 	}

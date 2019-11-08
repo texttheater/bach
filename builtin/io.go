@@ -40,7 +40,7 @@ func initIO() {
 					close(lines)
 				}()
 				return &values.ArrValue{
-					Ch: lines,
+					Channel: lines,
 				}
 			},
 		),
