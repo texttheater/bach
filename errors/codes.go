@@ -11,6 +11,7 @@ const (
 	FunctionBodyHasWrongOutputType
 	ConditionMustBeBool
 	MappingRequiresArrType
+	RestRequiresArrType
 	ComposeWithVoid
 	VoidProgram
 	NonExhaustiveMatch
@@ -38,6 +39,8 @@ func (code ErrorCode) String() string {
 		return "ConditionMustBeBool"
 	case MappingRequiresArrType:
 		return "MappingRequiresArrType"
+	case RestRequiresArrType:
+		return "RestRequiresArrType"
 	case ComposeWithVoid:
 		return "ComposeWithVoid"
 	case VoidProgram:
@@ -79,6 +82,8 @@ func (code ErrorCode) DefaultMessage() string {
 		return "The condition must be boolean."
 	case MappingRequiresArrType:
 		return "The input to a mapping must be an array."
+	case RestRequiresArrType:
+		return "The rest of an array must itself be an array."
 	case ComposeWithVoid:
 		return "Cannot compose with a function whose return type is Void."
 	case VoidProgram:
@@ -119,6 +124,8 @@ func (code ErrorCode) Kind() string {
 	case ConditionMustBeBool:
 		return "Type error"
 	case MappingRequiresArrType:
+		return "Type error"
+	case RestRequiresArrType:
 		return "Type error"
 	case ComposeWithVoid:
 		return "Type error"

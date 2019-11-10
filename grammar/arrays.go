@@ -8,11 +8,13 @@ import (
 type Array struct {
 	Pos      lexer.Position `"["`
 	Element  *Composition   `( @@`
-	Elements []*Composition `  ( "," @@ )* )? "]"`
+	Elements []*Composition `  ( "," @@ )*`
+	Rest     *Composition   `  ( ";" @@ )? )? "]"`
 }
 
 func (g *Array) Ast() (functions.Expression, error) {
 	var elements []functions.Expression
+	var rest functions.Expression
 	if g.Element != nil {
 		elements = make([]functions.Expression, 1+len(g.Elements))
 		var err error
@@ -26,9 +28,16 @@ func (g *Array) Ast() (functions.Expression, error) {
 				return nil, err
 			}
 		}
+		if g.Rest != nil {
+			rest, err = g.Rest.Ast()
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 	return &functions.ArrExpression{
 		Pos:      g.Pos,
 		Elements: elements,
+		Rest:     rest,
 	}, nil
 }

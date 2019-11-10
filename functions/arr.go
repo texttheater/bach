@@ -11,6 +11,8 @@ import (
 type ArrExpression struct {
 	Pos      lexer.Position
 	Elements []Expression
+	RestPos  lexer.Position
+	Rest     Expression
 }
 
 func (x ArrExpression) Position() lexer.Position {
@@ -18,42 +20,69 @@ func (x ArrExpression) Position() lexer.Position {
 }
 
 func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
+	// make sure we got no params
 	if len(params) > 0 {
 		return Shape{}, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
-	elementTypes := make([]types.Type, len(x.Elements))
-	elementActions := make([]states.Action, len(x.Elements))
-	for i := len(x.Elements) - 1; i >= 0; i-- {
-		elExpression := x.Elements[i]
-		elOutputShape, elAction, err := elExpression.Typecheck(inputShape, nil)
+	// typecheck rest
+	var outputType types.Type
+	var action states.Action
+	if x.Rest == nil {
+		outputType = types.VoidArrType
+		action = func(inputState states.State, args []states.Action) states.State {
+			return states.State{
+				Value: &values.ArrValue{}, // empty array
+				Stack: inputState.Stack,
+			}
+		}
+	} else {
+		var restShape Shape
+		var err error
+		restShape, action, err = x.Rest.Typecheck(inputShape, nil)
 		if err != nil {
 			return Shape{}, nil, err
 		}
-		elementTypes[i] = elOutputShape.Type
-		elementActions[i] = elAction
+		if !(types.AnyArrType).Subsumes(restShape.Type) {
+			return Shape{}, nil, errors.E(
+				errors.Code(errors.RestRequiresArrType),
+				errors.Pos(x.RestPos),
+				errors.WantType(types.AnyArrType),
+				errors.GotType(restShape.Type),
+			)
+		}
+		outputType = restShape.Type
 	}
-	outputShape := Shape{
-		Type:  types.TupType(elementTypes),
-		Stack: inputShape.Stack,
-	}
-	action := func(inputState states.State, args []states.Action) states.State {
-		channel := make(chan values.Value)
-		go func() {
-			for _, elAction := range elementActions {
-				channel <- elAction(inputState, nil).Value
+	// typecheck elements
+	for i := len(x.Elements) - 1; i >= 0; i-- {
+		elementShape, elementAction, err := x.Elements[i].Typecheck(inputShape, nil)
+		if err != nil {
+			return Shape{}, nil, err
+		}
+		outputType = &types.NearrType{
+			HeadType: elementShape.Type,
+			TailType: outputType,
+		}
+		tailAction := action
+		action = func(inputState states.State, args []states.Action) states.State {
+			headState := elementAction(inputState, nil)
+			tailState := tailAction(inputState, nil)
+			return states.State{
+				Value: &values.ArrValue{
+					Head: headState.Value,
+					Tail: tailState.Value.(*values.ArrValue),
+				},
+				Stack: inputState.Stack,
 			}
-			close(channel)
-		}()
-		return states.State{
-			Value: &values.ArrValue{
-				Channel: channel,
-			},
-			Stack:     inputState.Stack,
-			TypeStack: inputState.TypeStack,
 		}
 	}
+	// make output shape
+	outputShape := Shape{
+		Type:  outputType,
+		Stack: inputShape.Stack,
+	}
+	// return
 	return outputShape, action, nil
 }
