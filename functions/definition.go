@@ -63,10 +63,11 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 	// add parameter funcers for use in the body
 	bodyStack := functionStack
 	for i, param := range x.Params {
+		id := param
 		paramAction := func(inputState states.State, args []states.Action) states.State {
 			stack := inputState.Stack
 			for stack != nil {
-				if stack.Head.ID == param {
+				if stack.Head.ID == id {
 					return stack.Head.Action(inputState, args)
 				}
 				stack = stack.Tail
