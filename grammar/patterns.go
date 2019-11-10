@@ -66,7 +66,8 @@ func (g *TypePattern) Ast() (functions.Pattern, error) {
 type ArrPattern struct {
 	Pos      lexer.Position `"["`
 	Element  *Pattern       `( @@`
-	Elements []*Pattern     `  ( "," @@ )* )? "]"`
+	Elements []*Pattern     `  ( "," @@ )*`
+	Rest     *Pattern       `  ( ";" @@ )? )? "]"`
 	Name     *string        `( @Lid | @Op1 | @Op2 )?`
 }
 
@@ -87,14 +88,24 @@ func (g *ArrPattern) Ast() (functions.Pattern, error) {
 			elPatterns[i+1] = p
 		}
 	}
+	var restPattern functions.Pattern
+	if g.Rest == nil {
+		restPattern = functions.TypePattern{
+			Pos:  g.Pos,
+			Type: &types.ArrType{types.VoidType{}},
+		}
+	} else {
+		var err error
+		restPattern, err = g.Rest.Ast()
+		if err != nil {
+			return nil, err
+		}
+	}
 	return &functions.ArrPattern{
 		Pos:             g.Pos,
 		ElementPatterns: elPatterns,
-		RestPattern: functions.TypePattern{ // FIXME
-			Pos:  g.Pos,
-			Type: &types.ArrType{types.VoidType{}},
-		},
-		Name: g.Name,
+		RestPattern:     restPattern,
+		Name:            g.Name,
 	}, nil
 }
 

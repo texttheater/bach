@@ -275,11 +275,20 @@ func spreadInputType(inputType types.Type, elementTypes []types.Type) (restType 
 	switch t := inputType.(type) {
 	case *types.NearrType:
 		if len(elementTypes) == 0 {
-			return nil, false
+			return t, true
 		}
 		elementTypes[0] = t.HeadType
 		return spreadInputType(t.TailType, elementTypes[1:])
 	case *types.ArrType:
+		// Optional: fail if the pattern wants to match more elements
+		// then the value can contain, as per its type. For now, it is
+		// is commented out and will instead lead to an error message
+		// about a surplus element not having type Void. That's a bit
+		// opaque but has the advantage of indicating the place where
+		// the array pattern is too long.
+		//if (types.VoidType{}).Subsumes(t.ElType) && len(elementTypes) > 0 {
+		//	return nil, false
+		//}
 		for i := range elementTypes {
 			elementTypes[i] = t.ElType
 		}
@@ -308,11 +317,14 @@ func spreadInputType(inputType types.Type, elementTypes []types.Type) (restType 
 }
 
 func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, error) {
-	// compute element input types
+	// compute element and rest input types
 	elementInputTypes := make([]types.Type, len(p.ElementPatterns))
 	restInputType, ok := spreadInputType(inputShape.Type, elementInputTypes)
 	if !ok {
-		return Shape{}, types.VoidType{}, nil, nil
+		return Shape{}, nil, nil, errors.E(
+			errors.Code(errors.ImpossibleMatch),
+			errors.Pos(p.Pos),
+		)
 	}
 	// process element patterns
 	funcerStack := inputShape.Stack
@@ -357,10 +369,9 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 		Stack: funcerStack,
 	}
 	if p.Name != nil {
-		outputShape.Stack = &FuncerStack{
-			Head: VariableFuncer(p, *p.Name, outputShape.Type),
-			Tail: outputShape.Stack,
-		}
+		outputShape.Stack = outputShape.Stack.Push(
+			VariableFuncer(p, *p.Name, outputShape.Type),
+		)
 	}
 	// build matcher
 	matcher := func(inputState states.State) (*states.VariableStack, bool) {
