@@ -90,4 +90,63 @@ func TestMatchingArr(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgram(
+		`[] is [a] then a ok`,
+		nil,
+		nil,
+		errors.E(
+			errors.Code(errors.ImpossibleMatch),
+		),
+		t,
+	)
+	TestProgram(
+		`[1] is [a, b] then a ok`,
+		nil,
+		nil,
+		errors.E(
+			errors.Code(errors.ImpossibleMatch),
+		),
+		t,
+	)
+	TestProgram(
+		`[1, 2, 3] is [head;tail] then tail ok`,
+		&types.NearrType{
+			HeadType: types.NumType{},
+			TailType: &types.NearrType{
+				HeadType: types.NumType{},
+				TailType: types.VoidArrType,
+			},
+		},
+		values.NewArrValue(
+			[]values.Value{
+				values.NumValue(2),
+				values.NumValue(3),
+			},
+		),
+		nil,
+		t,
+	)
+	TestProgram(
+		`[1, 2, 3] is [a, b;rest] then rest ok`,
+		&types.NearrType{
+			HeadType: types.NumType{},
+			TailType: types.VoidArrType,
+		},
+		values.NewArrValue(
+			[]values.Value{
+				values.NumValue(3),
+			},
+		),
+		nil,
+		t,
+	)
+	TestProgram(
+		`[1, 2, 3] is [a, b, c;rest] then rest ok`,
+		types.VoidArrType,
+		values.NewArrValue(
+			[]values.Value{},
+		),
+		nil,
+		t,
+	)
 }

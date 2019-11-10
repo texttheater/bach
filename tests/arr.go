@@ -88,4 +88,40 @@ func TestArrays(t *testing.T) {
 		),
 		t,
 	)
+	TestProgram(
+		`[1;[]]`,
+		types.TupType(
+			[]types.Type{
+				types.NumType{},
+			},
+		),
+		values.NewArrValue(
+			[]values.Value{
+				values.NumValue(1),
+			},
+		),
+		nil,
+		t,
+	)
+	TestProgram(
+		`[3, 4] =rest [1, 2;rest]`,
+		types.TupType(
+			[]types.Type{
+				types.NumType{},
+				types.NumType{},
+				types.NumType{},
+				types.NumType{},
+			},
+		),
+		values.NewArrValue(
+			[]values.Value{
+				values.NumValue(1),
+				values.NumValue(2),
+				values.NumValue(3),
+				values.NumValue(4),
+			},
+		),
+		nil,
+		t,
+	)
 }
