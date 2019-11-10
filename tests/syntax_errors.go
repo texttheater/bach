@@ -7,5 +7,31 @@ import (
 )
 
 func TestSyntaxErrors(t *testing.T) {
-	TestProgram("&", nil, nil, errors.E(errors.Code(errors.Syntax)), t)
+	TestProgram(
+		"&",
+		nil,
+		nil,
+		errors.E(
+			errors.Code(errors.Syntax),
+		),
+		t,
+	)
+	TestProgram(
+		"drop",
+		nil,
+		nil,
+		errors.E(
+			errors.Code(errors.Syntax),
+		),
+		t,
+	)
+	TestProgram(
+		"if true then drop else true ok",
+		nil,
+		nil,
+		errors.E(
+			errors.Code(errors.Syntax),
+		),
+		t,
+	)
 }
