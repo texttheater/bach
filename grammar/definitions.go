@@ -42,7 +42,7 @@ func (g *Definition) Ast() (functions.Expression, error) {
 			if err != nil {
 				return nil, err
 			}
-			paramNames[i+1] = g.ParamNames[i+1]
+			paramNames[i+1] = g.ParamNames[i]
 		}
 	}
 	outputType := g.OutputType.Ast()
