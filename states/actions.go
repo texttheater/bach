@@ -6,6 +6,10 @@ import (
 
 type Action func(inputState State, args []Action) State
 
+// TODO remove SetArg; currently one builtin funcer uses it; we should provide
+// a better abstraction to builtin funcers making sure that partial application
+// is handled correctly.
+
 func (a Action) SetArg(arg Action) Action {
 	return func(inputState State, outerArgs []Action) State {
 		args := make([]Action, len(outerArgs)+1)

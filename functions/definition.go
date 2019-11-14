@@ -35,7 +35,7 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 	// make action for function
 	funAction := func(inputState states.State, args []states.Action) states.State {
 		// bind parameters to arguments by adding corresponding
-		// Variable objects to the body input state.
+		// Variable objects to the body input state
 		bodyInputStack := bodyInputStackStub
 		for i, param := range x.Params {
 			bodyInputStack = bodyInputStack.Push(states.Variable{

@@ -221,6 +221,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 		}
 		// typecheck and set parameters filled by this call
 		funAction := action
+		argActions := make([]states.Action, len(gotCall.Args))
 		for i := range gotCall.Args {
 			argInputShape := Shape{
 				Type:  params[i].InputType.Instantiate(bindings), // TODO what if we don't have the binding yet at this stage?
@@ -239,7 +240,23 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 					errors.GotType(argOutputShape.Type),
 				)
 			}
-			funAction = funAction.SetArg(argAction)
+			argActions[i] = argAction
+		}
+		// pass input state to arguments
+		funAction2 := func(inputState states.State, args []states.Action) states.State {
+			args2 := make([]states.Action, len(argActions)+len(args))
+			for i := range argActions {
+				args2[i] = func(argInputState states.State, argArgs []states.Action) states.State {
+					argInputState.Stack = inputState.Stack
+					argOutputState := argActions[i](argInputState, argArgs)
+					argOutputState.Stack = inputState.Stack // TODO what about Drop, Error?
+					return argOutputState
+				}
+			}
+			for i := 0; i < len(args); i++ {
+				args2[len(argActions)+i] = args[i]
+			}
+			return funAction(inputState, args2)
 		}
 		// typecheck parameters not filled by the call
 		for i, gotParam := range gotParams {
@@ -260,7 +277,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 			Stack: gotInputShape.Stack,
 		}
 		// set new type variables on action
-		funAction2 := func(inputState states.State, args []states.Action) states.State {
+		funAction3 := func(inputState states.State, args []states.Action) states.State {
 			typeStack := inputState.TypeStack
 			for n, t := range bindings {
 				typeStack = typeStack.Push(values.Binding{
@@ -275,9 +292,9 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 				Stack:     inputState.Stack,
 				TypeStack: typeStack,
 			}
-			return funAction(inputState, args)
+			return funAction2(inputState, args)
 		}
 		// return
-		return outputShape, funAction2, true, nil
+		return outputShape, funAction3, true, nil
 	}
 }
