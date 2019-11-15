@@ -266,7 +266,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 				return Shape{}, nil, false, errors.E(
 					errors.Code(errors.ParamDoesNotMatch),
 					errors.Pos(gotCall.Pos),
-					errors.ParamNum(i),
+					errors.ParamNum(i+1),
 					errors.WantParam(gotParam),
 					errors.GotParam(wantParam),
 				)

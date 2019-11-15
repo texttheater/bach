@@ -58,7 +58,7 @@ func initRegexp() {
 					return functions.Shape{}, nil, false, errors.E(
 						errors.Code(errors.ParamDoesNotMatch),
 						errors.Pos(gotCall.Pos),
-						errors.ParamNum(0),
+						errors.ParamNum(1),
 						errors.WantParam(gotParams[0]),
 						errors.GotParam(wantParam),
 					)

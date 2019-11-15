@@ -33,6 +33,8 @@ func (code ErrorCode) String() string {
 		return "NoSuchFunction"
 	case ArgHasWrongOutputType:
 		return "ArgHasWrongOutputType"
+	case ParamDoesNotMatch:
+		return "ParamDoesNotMatch"
 	case FunctionBodyHasWrongOutputType:
 		return "FunctionBodyHasWrongOutputType"
 	case ConditionMustBeBool:
