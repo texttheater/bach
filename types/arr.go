@@ -32,7 +32,7 @@ func (t *ArrType) Bind(u Type, bindings map[string]Type) bool {
 	case VoidType:
 		return true
 	case *NearrType:
-		return t.ElType.Bind(u.HeadType, bindings) && t.Bind(u.TailType, bindings)
+		return t.ElType.Bind(u.ElementType(), bindings)
 	case *ArrType:
 		return t.ElType.Bind(u.ElType, bindings)
 	case UnionType:
