@@ -52,7 +52,19 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgram(`for Any def f(a Num, b Num) Tup<Num, Num> as [a, b] ok f(2, 3)`,
+		types.TupType([]types.Type{types.NumType{}, types.NumType{}}),
+		values.NewArrValue([]values.Value{values.NumValue(2), values.NumValue(3)}),
+		nil,
+		t,
+	)
 	TestProgram(`for Num def fac Num as if ==0 then 1 else =n *(n -1 fac) ok ok 3 fac`,
+		types.NumType{},
+		values.NumValue(6),
+		nil,
+		t,
+	)
+	TestProgram(`for Any def fac(n Num) Num as n if ==0 then 1 else fac(n -1) *n ok ok fac(3)`,
 		types.NumType{},
 		values.NumValue(6),
 		nil,
@@ -64,13 +76,6 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		t,
 	)
-	// FIXME this panics - recursion with arguments still buggy
-	//TestProgram(`for Any def fac(n Num) Num as n if ==0 then 1 else fac(n -1) *n ok ok fac(3)`,
-	//	types.NumType{},
-	//	values.NumValue(6),
-	//	nil,
-	//	t,
-	//)
 	TestProgram(`for <A>|Null def must <A> as is Null then reject else id ok ok null must`,
 		types.TypeVariable{
 			Name: "A",

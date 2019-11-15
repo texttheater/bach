@@ -242,13 +242,14 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 			}
 			argActions[i] = argAction
 		}
-		// pass input state to arguments
+		// pass input variable stack to arguments
 		funAction2 := func(inputState states.State, args []states.Action) states.State {
 			args2 := make([]states.Action, len(argActions)+len(args))
 			for i := range argActions {
+				argAction := argActions[i]
 				args2[i] = func(argInputState states.State, argArgs []states.Action) states.State {
 					argInputState.Stack = inputState.Stack
-					argOutputState := argActions[i](argInputState, argArgs)
+					argOutputState := argAction(argInputState, argArgs)
 					argOutputState.Stack = inputState.Stack // TODO what about Drop, Error?
 					return argOutputState
 				}
