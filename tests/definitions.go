@@ -105,4 +105,10 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgram(`for Arr<<A>> def fold(start <B>, op for <B> (<A>) <B>) <B> as is [head;tail] then start op(head) =newStart tail fold(newStart, op) else start ok ok [2, 3, 4] fold(1, *)`,
+		types.NumType{},
+		values.NumValue(24),
+		nil,
+		t,
+	)
 }
