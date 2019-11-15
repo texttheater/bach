@@ -70,6 +70,12 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgram(`for Arr<Num> def fold(start Num, op for Num (Num) Num) Num as is [head;tail] then start op(head) =newStart tail fold(newStart, op) else start ok ok [1, 2, 3] fold(0, +)`,
+		types.NumType{},
+		values.NumValue(6),
+		nil,
+		t,
+	)
 	TestProgram(`for <A> def apply(f for <A> <B>) <B> as f ok 1 apply(+1)`,
 		types.NumType{},
 		values.NumValue(2),
