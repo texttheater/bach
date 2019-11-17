@@ -149,4 +149,16 @@ func TestMatchingArr(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgram(
+		`for Arr<Num> def plusOne Arr<Num> as is [head;tail] then [head +1;tail plusOne] else [] ok ok [1, 2] plusOne`,
+		&types.ArrType{
+			ElType: types.NumType{},
+		},
+		values.NewArrValue([]values.Value{
+			values.NumValue(2),
+			values.NumValue(3),
+		}),
+		nil,
+		t,
+	)
 }

@@ -31,16 +31,19 @@ func initIO() {
 			&types.ArrType{types.StrType{}},
 			func(inputValue values.Value, argValues []values.Value) values.Value {
 				reader, _ := inputValue.(values.ReaderValue)
-				lines := make(chan values.Value)
 				scanner := bufio.NewScanner(reader.Reader)
-				go func() {
-					for scanner.Scan() {
-						lines <- values.StrValue(scanner.Text())
+				var next func() (values.Value, *values.ArrValue)
+				next = func() (values.Value, *values.ArrValue) {
+					ok := scanner.Scan()
+					if !ok {
+						return nil, nil
 					}
-					close(lines)
-				}()
+					return values.StrValue(scanner.Text()), &values.ArrValue{
+						Func: next,
+					}
+				}
 				return &values.ArrValue{
-					Channel: lines,
+					Func: next,
 				}
 			},
 		),

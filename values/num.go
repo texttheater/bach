@@ -1,7 +1,6 @@
 package values
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/texttheater/bach/types"
@@ -15,10 +14,6 @@ func (v NumValue) String() string {
 
 func (v NumValue) Out() string {
 	return v.String()
-}
-
-func (v NumValue) Iter() <-chan Value {
-	panic(fmt.Sprintf("%s is not a sequence", v))
 }
 
 func (v NumValue) Inhabits(t types.Type, stack *BindingStack) bool {

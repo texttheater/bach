@@ -16,10 +16,6 @@ func (v StrValue) Out() string {
 	return string(v)
 }
 
-func (v StrValue) Iter() <-chan Value {
-	panic(fmt.Sprintf("%s is not a sequence", v))
-}
-
 func (v StrValue) Inhabits(t types.Type, stack *BindingStack) bool {
 	switch t := t.(type) {
 	case types.StrType:

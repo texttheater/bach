@@ -7,7 +7,6 @@ import (
 type Value interface {
 	String() string
 	Out() string
-	Iter() <-chan Value
 	Inhabits(types.Type, *BindingStack) bool
 	Equal(Value) bool
 }

@@ -29,15 +29,20 @@ func initArr() {
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
 				start := argumentValues[0].(values.NumValue)
 				end := argumentValues[1].(values.NumValue)
-				channel := make(chan values.Value)
-				go func() {
-					for i := start; i < end; i++ {
-						channel <- values.NumValue(i)
+				i := start
+				var next func() (values.Value, *values.ArrValue)
+				next = func() (values.Value, *values.ArrValue) {
+					if i >= end {
+						return nil, nil
 					}
-					close(channel)
-				}()
+					head := values.NumValue(i)
+					i++
+					return head, &values.ArrValue{
+						Func: next,
+					}
+				}
 				return &values.ArrValue{
-					Channel: channel,
+					Func: next,
 				}
 			},
 		),

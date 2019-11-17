@@ -126,10 +126,15 @@ func initMath() {
 			nil,
 			types.NumType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+				arr := inputValue.(*values.ArrValue)
 				sum := 0.0
-				for numValue := range inputValue.Iter() {
-					num, _ := numValue.(values.NumValue)
-					sum += float64(num)
+				for {
+					arr.Eval()
+					if arr.Head == nil {
+						break
+					}
+					sum += float64(arr.Head.(values.NumValue))
+					arr = arr.Tail
 				}
 				return values.NumValue(sum)
 			},
@@ -140,11 +145,15 @@ func initMath() {
 			nil,
 			types.NumType{},
 			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+				arr := inputValue.(*values.ArrValue)
 				sum := 0.0
 				count := 0.0
-				for numValue := range inputValue.Iter() {
-					num, _ := numValue.(values.NumValue)
-					sum += float64(num)
+				for {
+					arr.Eval()
+					if arr.Head == nil {
+						break
+					}
+					sum += float64(arr.Head.(values.NumValue))
 					count += 1.0
 				}
 				return values.NumValue(sum / count)

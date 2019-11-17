@@ -1,6 +1,7 @@
 package tests
 
 import (
+	//"log"
 	"reflect"
 	"testing"
 
@@ -11,6 +12,7 @@ import (
 )
 
 func TestProgram(program string, wantType types.Type, wantValue values.Value, wantError error, t *testing.T) {
+	//log.Print(program)
 	gotType, gotValue, gotErr := interpreter.InterpretString(program)
 	if wantError != nil {
 		if gotErr == nil {

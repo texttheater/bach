@@ -7,33 +7,35 @@ import (
 )
 
 func NewArrValue(elements []Value) *ArrValue {
-	channel := make(chan Value)
-	go func() {
-		for _, el := range elements {
-			channel <- el
+	i := 0
+	var next func() (Value, *ArrValue)
+	next = func() (Value, *ArrValue) {
+		if i >= len(elements) {
+			return nil, nil
 		}
-		close(channel)
-	}()
+		head := elements[i]
+		i++
+		return head, &ArrValue{
+			Func: next,
+		}
+	}
 	return &ArrValue{
-		Channel: channel,
+		Func: next,
 	}
 }
 
 type ArrValue struct {
-	Channel <-chan Value
-	Head    Value
-	Tail    *ArrValue
+	Func func() (Value, *ArrValue)
+	Head Value
+	Tail *ArrValue
 }
 
 func (v *ArrValue) Eval() {
-	if v.Channel == nil {
+	if v.Func == nil {
 		return
 	}
-	v.Head = <-v.Channel
-	v.Tail = &ArrValue{
-		Channel: v.Channel,
-	}
-	v.Channel = nil
+	v.Head, v.Tail = v.Func()
+	v.Func = nil
 }
 
 func (v *ArrValue) IsEmpty() bool {
@@ -68,18 +70,6 @@ func (v *ArrValue) String() string {
 
 func (v *ArrValue) Out() string {
 	return v.String()
-}
-
-func (v *ArrValue) Iter() <-chan Value {
-	channel := make(chan Value)
-	go func() {
-		for !v.IsEmpty() {
-			channel <- v.Head
-			v = v.Tail
-		}
-		close(channel)
-	}()
-	return channel
 }
 
 func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) bool {

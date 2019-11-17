@@ -33,16 +33,5 @@ func InterpretString(program string) (types.Type, values.Value, error) {
 	if outputState.Error != nil {
 		return nil, nil, outputState.Error
 	}
-	drain(outputShape.Type, outputState.Value)
 	return outputShape.Type, outputState.Value, nil
-}
-
-func drain(t types.Type, v values.Value) {
-	if !types.AnyArrType.Subsumes(t) {
-		return
-	}
-	eType := t.ElementType()
-	for e := range v.Iter() {
-		drain(eType, e)
-	}
 }

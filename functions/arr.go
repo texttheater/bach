@@ -67,12 +67,13 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 		}
 		tailAction := action
 		action = func(inputState states.State, args []states.Action) states.State {
-			headState := elementAction(inputState, nil)
-			tailState := tailAction(inputState, nil)
 			return states.State{
 				Value: &values.ArrValue{
-					Head: headState.Value,
-					Tail: tailState.Value.(*values.ArrValue),
+					Func: func() (values.Value, *values.ArrValue) {
+						headState := elementAction(inputState, nil)
+						tailState := tailAction(inputState, nil)
+						return headState.Value, tailState.Value.(*values.ArrValue) // FIXME handle errors
+					},
 				},
 				Stack: inputState.Stack,
 			}

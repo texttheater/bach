@@ -52,24 +52,30 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 	}
 	// create action
 	action := func(inputState states.State, args []states.Action) states.State {
-		channel := make(chan values.Value)
-		go func() {
-			for el := range inputState.Value.Iter() {
-				bodyInputState := states.State{
-					Value:     el,
-					Stack:     inputState.Stack,
-					TypeStack: inputState.TypeStack,
-				}
-				bodyOutputState := bodyAction(bodyInputState, nil)
-				if !bodyOutputState.Drop {
-					channel <- bodyOutputState.Value
-				}
+		arr := inputState.Value.(*values.ArrValue)
+		var next func() (values.Value, *values.ArrValue)
+		next = func() (values.Value, *values.ArrValue) {
+			arr.Eval()
+			if arr.Head == nil {
+				return nil, nil
 			}
-			close(channel)
-		}()
+			bodyInputState := states.State{
+				Value:     arr.Head,
+				Stack:     inputState.Stack,
+				TypeStack: inputState.TypeStack,
+			}
+			bodyOutputState := bodyAction(bodyInputState, nil)
+			arr = arr.Tail
+			if bodyOutputState.Drop {
+				return next() // FIXME handle errors
+			}
+			return bodyOutputState.Value, &values.ArrValue{
+				Func: next,
+			}
+		}
 		return states.State{
 			Value: &values.ArrValue{
-				Channel: channel,
+				Func: next,
 			},
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
