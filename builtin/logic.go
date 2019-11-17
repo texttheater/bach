@@ -13,8 +13,8 @@ func initLogic() {
 			"true",
 			nil,
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				return values.BoolValue(true)
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
+				return values.BoolValue(true), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -22,8 +22,8 @@ func initLogic() {
 			"false",
 			nil,
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				return values.BoolValue(false)
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
+				return values.BoolValue(false), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -31,10 +31,10 @@ func initLogic() {
 			"and",
 			[]types.Type{types.BoolType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputBool := inputValue.(values.BoolValue)
 				argumentBool := argumentValues[0].(values.BoolValue)
-				return values.BoolValue(inputBool && argumentBool)
+				return values.BoolValue(inputBool && argumentBool), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -42,10 +42,10 @@ func initLogic() {
 			"or",
 			[]types.Type{types.BoolType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputBool := inputValue.(values.BoolValue)
 				argumentBool := argumentValues[0].(values.BoolValue)
-				return values.BoolValue(inputBool || argumentBool)
+				return values.BoolValue(inputBool || argumentBool), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -53,9 +53,9 @@ func initLogic() {
 			"not",
 			nil,
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputBool := inputValue.(values.BoolValue)
-				return values.BoolValue(!inputBool)
+				return values.BoolValue(!inputBool), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -63,10 +63,10 @@ func initLogic() {
 			"==",
 			[]types.Type{types.BoolType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputBool := inputValue.(values.BoolValue)
 				argumentBool := argumentValues[0].(values.BoolValue)
-				return values.BoolValue(inputBool == argumentBool)
+				return values.BoolValue(inputBool == argumentBool), nil
 			},
 		),
 	})

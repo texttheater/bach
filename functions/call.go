@@ -153,7 +153,7 @@ func (p Parameter) String() string {
 
 type Funcer func(gotInputShape Shape, gotCall CallExpression, gotParams []*Parameter) (outputShape Shape, action states.Action, ok bool, err error)
 
-type Kernel func(inputValue values.Value, argValues []values.Value) values.Value
+type Kernel func(inputValue values.Value, argValues []values.Value) (values.Value, error)
 
 func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, kernel Kernel) Funcer {
 	// make parameters from argument types
@@ -176,8 +176,10 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 		for i, arg := range args {
 			argValues[i] = arg(argInputState, nil).Value
 		}
+		value, err := kernel(inputState.Value, argValues)
 		return states.State{
-			Value:     kernel(inputState.Value, argValues),
+			Value:     value,
+			Error:     err,
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
 		}

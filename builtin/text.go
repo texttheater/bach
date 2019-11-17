@@ -15,7 +15,7 @@ func initText() {
 			"split",
 			nil,
 			&types.ArrType{types.StrType{}},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				str, _ := inputValue.(values.StrValue)
 				fields := strings.Fields(string(str))
 				i := 0
@@ -32,7 +32,7 @@ func initText() {
 				}
 				return &values.ArrValue{
 					Func: next,
-				}
+				}, nil
 			},
 		),
 	})

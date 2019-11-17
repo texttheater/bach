@@ -18,10 +18,10 @@ func initIO() {
 			"in",
 			nil,
 			types.ReaderType{},
-			func(inputValue values.Value, argValues []values.Value) values.Value {
+			func(inputValue values.Value, argValues []values.Value) (values.Value, error) {
 				return values.ReaderValue{
 					os.Stdin,
-				}
+				}, nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -29,7 +29,7 @@ func initIO() {
 			"lines",
 			nil,
 			&types.ArrType{types.StrType{}},
-			func(inputValue values.Value, argValues []values.Value) values.Value {
+			func(inputValue values.Value, argValues []values.Value) (values.Value, error) {
 				reader, _ := inputValue.(values.ReaderValue)
 				scanner := bufio.NewScanner(reader.Reader)
 				var next func() (values.Value, *values.ArrValue)
@@ -44,7 +44,7 @@ func initIO() {
 				}
 				return &values.ArrValue{
 					Func: next,
-				}
+				}, nil
 			},
 		),
 		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*functions.Parameter) (functions.Shape, states.Action, bool, error) {

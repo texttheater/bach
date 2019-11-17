@@ -13,10 +13,10 @@ func initArr() {
 			"length",
 			nil,
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				arr, _ := inputValue.(*values.ArrValue)
 				length := arr.Length()
-				return values.NumValue(length)
+				return values.NumValue(length), nil
 			},
 		),
 	})
@@ -26,7 +26,7 @@ func initArr() {
 			"range",
 			[]types.Type{types.NumType{}, types.NumType{}},
 			&types.ArrType{types.NumType{}},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				start := argumentValues[0].(values.NumValue)
 				end := argumentValues[1].(values.NumValue)
 				i := start
@@ -43,7 +43,7 @@ func initArr() {
 				}
 				return &values.ArrValue{
 					Func: next,
-				}
+				}, nil
 			},
 		),
 	})

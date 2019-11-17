@@ -15,10 +15,10 @@ func initMath() {
 			"+",
 			[]types.Type{types.NumType{}},
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(inputNum + argumentNum)
+				return values.NumValue(inputNum + argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -26,10 +26,10 @@ func initMath() {
 			"-",
 			[]types.Type{types.NumType{}},
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(inputNum - argumentNum)
+				return values.NumValue(inputNum - argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -37,10 +37,10 @@ func initMath() {
 			"*",
 			[]types.Type{types.NumType{}},
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(inputNum * argumentNum)
+				return values.NumValue(inputNum * argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -48,10 +48,10 @@ func initMath() {
 			"/",
 			[]types.Type{types.NumType{}},
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(inputNum / argumentNum)
+				return values.NumValue(inputNum / argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -59,10 +59,10 @@ func initMath() {
 			"%",
 			[]types.Type{types.NumType{}},
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(math.Mod(float64(inputNum), float64(argumentNum)))
+				return values.NumValue(math.Mod(float64(inputNum), float64(argumentNum))), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -70,10 +70,10 @@ func initMath() {
 			"<",
 			[]types.Type{types.NumType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum < argumentNum)
+				return values.BoolValue(inputNum < argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -81,10 +81,10 @@ func initMath() {
 			">",
 			[]types.Type{types.NumType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum > argumentNum)
+				return values.BoolValue(inputNum > argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -92,10 +92,10 @@ func initMath() {
 			"==",
 			[]types.Type{types.NumType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum == argumentNum)
+				return values.BoolValue(inputNum == argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -103,10 +103,10 @@ func initMath() {
 			"<=",
 			[]types.Type{types.NumType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum <= argumentNum)
+				return values.BoolValue(inputNum <= argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -114,10 +114,10 @@ func initMath() {
 			">=",
 			[]types.Type{types.NumType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				inputNum := inputValue.(values.NumValue)
 				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum >= argumentNum)
+				return values.BoolValue(inputNum >= argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -125,7 +125,7 @@ func initMath() {
 			"sum",
 			nil,
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				arr := inputValue.(*values.ArrValue)
 				sum := 0.0
 				for {
@@ -136,7 +136,7 @@ func initMath() {
 					sum += float64(arr.Head.(values.NumValue))
 					arr = arr.Tail
 				}
-				return values.NumValue(sum)
+				return values.NumValue(sum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -144,7 +144,7 @@ func initMath() {
 			"avg",
 			nil,
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
 				arr := inputValue.(*values.ArrValue)
 				sum := 0.0
 				count := 0.0
@@ -156,7 +156,7 @@ func initMath() {
 					sum += float64(arr.Head.(values.NumValue))
 					count += 1.0
 				}
-				return values.NumValue(sum / count)
+				return values.NumValue(sum / count), nil
 			},
 		),
 	})

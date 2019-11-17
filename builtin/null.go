@@ -13,8 +13,8 @@ func initNull() {
 			"null",
 			nil,
 			types.NullType{},
-			func(inputValue values.Value, argumentValues []values.Value) values.Value {
-				return values.NullValue{}
+			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
+				return values.NullValue{}, nil
 			},
 		),
 	})
