@@ -32,15 +32,15 @@ func initIO() {
 			func(inputValue values.Value, argValues []values.Value) (values.Value, error) {
 				reader, _ := inputValue.(values.ReaderValue)
 				scanner := bufio.NewScanner(reader.Reader)
-				var next func() (values.Value, *values.ArrValue)
-				next = func() (values.Value, *values.ArrValue) {
+				var next func() (values.Value, *values.ArrValue, error)
+				next = func() (values.Value, *values.ArrValue, error) {
 					ok := scanner.Scan()
 					if !ok {
-						return nil, nil
+						return nil, nil, nil
 					}
 					return values.StrValue(scanner.Text()), &values.ArrValue{
 						Func: next,
-					}
+					}, nil
 				}
 				return &values.ArrValue{
 					Func: next,

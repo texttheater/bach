@@ -30,16 +30,16 @@ func initArr() {
 				start := argumentValues[0].(values.NumValue)
 				end := argumentValues[1].(values.NumValue)
 				i := start
-				var next func() (values.Value, *values.ArrValue)
-				next = func() (values.Value, *values.ArrValue) {
+				var next func() (values.Value, *values.ArrValue, error)
+				next = func() (values.Value, *values.ArrValue, error) {
 					if i >= end {
-						return nil, nil
+						return nil, nil, nil
 					}
 					head := values.NumValue(i)
 					i++
 					return head, &values.ArrValue{
 						Func: next,
-					}
+					}, nil
 				}
 				return &values.ArrValue{
 					Func: next,

@@ -19,16 +19,16 @@ func initText() {
 				str, _ := inputValue.(values.StrValue)
 				fields := strings.Fields(string(str))
 				i := 0
-				var next func() (values.Value, *values.ArrValue)
-				next = func() (values.Value, *values.ArrValue) {
+				var next func() (values.Value, *values.ArrValue, error)
+				next = func() (values.Value, *values.ArrValue, error) {
 					if i >= len(fields) {
-						return nil, nil
+						return nil, nil, nil
 					}
 					head := values.StrValue(fields[i])
 					i++
 					return head, &values.ArrValue{
 						Func: next,
-					}
+					}, nil
 				}
 				return &values.ArrValue{
 					Func: next,

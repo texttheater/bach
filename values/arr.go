@@ -8,16 +8,16 @@ import (
 
 func NewArrValue(elements []Value) *ArrValue {
 	i := 0
-	var next func() (Value, *ArrValue)
-	next = func() (Value, *ArrValue) {
+	var next func() (Value, *ArrValue, error)
+	next = func() (Value, *ArrValue, error) {
 		if i >= len(elements) {
-			return nil, nil
+			return nil, nil, nil
 		}
 		head := elements[i]
 		i++
 		return head, &ArrValue{
 			Func: next,
-		}
+		}, nil
 	}
 	return &ArrValue{
 		Func: next,
@@ -25,17 +25,19 @@ func NewArrValue(elements []Value) *ArrValue {
 }
 
 type ArrValue struct {
-	Func func() (Value, *ArrValue)
+	Func func() (Value, *ArrValue, error)
 	Head Value
 	Tail *ArrValue
 }
 
-func (v *ArrValue) Eval() {
+func (v *ArrValue) Eval() error {
 	if v.Func == nil {
-		return
+		return nil
 	}
-	v.Head, v.Tail = v.Func()
+	var err error
+	v.Head, v.Tail, err = v.Func()
 	v.Func = nil
+	return err
 }
 
 func (v *ArrValue) IsEmpty() bool {
