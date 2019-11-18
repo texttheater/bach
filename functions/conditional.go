@@ -166,7 +166,12 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 	}
 	// make action
 	action := func(inputState states.State, args []states.Action) states.State {
-		matcherVarStack, ok := matcher(inputState)
+		matcherVarStack, ok, err := matcher(inputState)
+		if err != nil {
+			return states.State{
+				Error: err,
+			}
+		}
 		if ok {
 			guardInputState := states.State{
 				Value:     inputState.Value,
@@ -192,7 +197,12 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 			}
 		}
 		for i := range elisMatchers {
-			matcherVarStack, ok := elisMatchers[i](inputState)
+			matcherVarStack, ok, err := elisMatchers[i](inputState)
+			if err != nil {
+				return states.State{
+					Error: err,
+				}
+			}
 			if ok {
 				guardInputState := states.State{
 					Value:     inputState.Value,
@@ -256,7 +266,7 @@ type Pattern interface {
 	Typecheck(inputShape Shape) (outputShape Shape, restType types.Type, matcher Matcher, err error)
 }
 
-type Matcher func(states.State) (*states.VariableStack, bool)
+type Matcher func(states.State) (*states.VariableStack, bool, error)
 
 type ArrPattern struct {
 	Pos             lexer.Position
@@ -374,32 +384,38 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 		)
 	}
 	// build matcher
-	matcher := func(inputState states.State) (*states.VariableStack, bool) {
+	matcher := func(inputState states.State) (*states.VariableStack, bool, error) {
 		varStack := inputState.Stack
 		switch v := inputState.Value.(type) {
 		case *values.ArrValue:
 			for _, elMatcher := range elementMatchers {
 				if v.IsEmpty() {
-					return nil, false
+					return nil, false, nil
 				}
 				var ok bool
-				varStack, ok = elMatcher(states.State{
+				varStack, ok, err = elMatcher(states.State{
 					Value:     v.Head,
 					Stack:     varStack,
 					TypeStack: inputState.TypeStack,
 				})
+				if err != nil {
+					return nil, false, err
+				}
 				if !ok {
-					return nil, false
+					return nil, false, nil
 				}
 				v = v.Tail
 			}
-			varStack, ok = restMatcher(states.State{
+			varStack, ok, err = restMatcher(states.State{
 				Value:     v,
 				Stack:     varStack,
 				TypeStack: inputState.TypeStack,
 			})
+			if err != nil {
+				return nil, false, err
+			}
 			if !ok {
-				return nil, false
+				return nil, false, nil
 			}
 			if p.Name != nil {
 				varStack = &states.VariableStack{
@@ -410,9 +426,9 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 					Tail: varStack,
 				}
 			}
-			return varStack, true
+			return varStack, true, nil
 		default:
-			return nil, false
+			return nil, false, nil
 		}
 	}
 	// return
@@ -506,22 +522,26 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 		}
 	}
 	// build matcher
-	matcher := func(inputState states.State) (*states.VariableStack, bool) {
+	matcher := func(inputState states.State) (*states.VariableStack, bool, error) {
 		varStack := inputState.Stack
 		switch v := inputState.Value.(type) {
 		case values.ObjValue:
 			for prop, valMatcher := range propMatcherMap {
 				value, ok := v[prop]
 				if !ok {
-					return nil, false
+					return nil, false, nil
 				}
-				varStack, ok = valMatcher(states.State{
+				var err error
+				varStack, ok, err = valMatcher(states.State{
 					Value:     value,
 					Stack:     varStack,
 					TypeStack: inputState.TypeStack,
 				})
+				if err != nil {
+					return nil, false, err
+				}
 				if !ok {
-					return nil, false
+					return nil, false, nil
 				}
 			}
 			if p.Name != nil {
@@ -533,9 +553,9 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 					Tail: varStack,
 				}
 			}
-			return varStack, true
+			return varStack, true, nil
 		default:
-			return nil, false
+			return nil, false, nil
 		}
 	}
 	// return
@@ -575,7 +595,7 @@ func (p TypePattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, er
 		}
 	}
 	// build matcher
-	matcher := func(inputState states.State) (*states.VariableStack, bool) {
+	matcher := func(inputState states.State) (*states.VariableStack, bool, error) {
 		// TODO For efficiency, we should check inhabitation of a more
 		// general type than p.Type if that is equivalent.
 		if inputState.Value.Inhabits(p.Type, inputState.TypeStack) {
@@ -589,9 +609,9 @@ func (p TypePattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, er
 					Tail: varStack,
 				}
 			}
-			return varStack, true
+			return varStack, true, nil
 		}
-		return nil, false
+		return nil, false, nil
 	}
 	// return
 	return outputShape, complement, matcher, nil
