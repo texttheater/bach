@@ -10,7 +10,7 @@ func initArr() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
 		functions.SimpleFuncer(
 			types.AnyArrType,
-			"length",
+			"len",
 			nil,
 			types.NumType{},
 			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
