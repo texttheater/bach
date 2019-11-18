@@ -38,7 +38,6 @@ func main() {
 			errors.Explain(err, program)
 			os.Exit(1)
 		}
-		fmt.Println("here")
 		fmt.Println(str)
 	}
 }
