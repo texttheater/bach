@@ -55,7 +55,10 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 		arr := inputState.Value.(*values.ArrValue)
 		var next func() (values.Value, *values.ArrValue, error)
 		next = func() (values.Value, *values.ArrValue, error) {
-			arr.Eval()
+			err := arr.Eval()
+			if err != nil {
+				return nil, nil, err
+			}
 			if arr.Head == nil {
 				return nil, nil, nil
 			}
@@ -65,9 +68,12 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 				TypeStack: inputState.TypeStack,
 			}
 			bodyOutputState := bodyAction(bodyInputState, nil)
+			if bodyOutputState.Error != nil {
+				return nil, nil, bodyOutputState.Error
+			}
 			arr = arr.Tail
 			if bodyOutputState.Drop {
-				return next() // FIXME handle errors
+				return next()
 			}
 			return bodyOutputState.Value, &values.ArrValue{
 				Func: next,

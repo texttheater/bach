@@ -129,7 +129,10 @@ func initMath() {
 				arr := inputValue.(*values.ArrValue)
 				sum := 0.0
 				for {
-					arr.Eval()
+					err := arr.Eval()
+					if err != nil {
+						return nil, err
+					}
 					if arr.Head == nil {
 						break
 					}
@@ -149,7 +152,10 @@ func initMath() {
 				sum := 0.0
 				count := 0.0
 				for {
-					arr.Eval()
+					err := arr.Eval()
+					if err != nil {
+						return nil, err
+					}
 					if arr.Head == nil {
 						break
 					}

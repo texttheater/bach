@@ -14,9 +14,21 @@ func initArr() {
 			nil,
 			types.NumType{},
 			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
+				length := 0
 				arr, _ := inputValue.(*values.ArrValue)
-				length := arr.Length()
-				return values.NumValue(length), nil
+				err := arr.Eval()
+				if err != nil {
+					return nil, err
+				}
+				for arr.Head != nil {
+					length += 1
+					arr = arr.Tail
+					err = arr.Eval()
+					if err != nil {
+						return nil, err
+					}
+				}
+				return values.NumValue(float64(length)), nil
 			},
 		),
 	})

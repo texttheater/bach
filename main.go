@@ -33,6 +33,12 @@ func main() {
 		os.Exit(1)
 	}
 	if o != "" {
-		fmt.Println(value)
+		str, err := value.String()
+		if err != nil {
+			errors.Explain(err, program)
+			os.Exit(1)
+		}
+		fmt.Println("here")
+		fmt.Println(str)
 	}
 }

@@ -40,31 +40,25 @@ func (v *ArrValue) Eval() error {
 	return err
 }
 
-func (v *ArrValue) IsEmpty() bool {
-	v.Eval()
-	return v.Head == nil
-}
-
-func (v *ArrValue) Length() int {
-	length := 0
-	for !v.IsEmpty() {
-		length += 1
-		v = v.Tail
-	}
-	return length
-}
-
 func (v *ArrValue) String() (string, error) {
 	var buffer bytes.Buffer
 	buffer.WriteString("[")
-	if !v.IsEmpty() {
+	err := v.Eval()
+	if err != nil {
+		return "", err
+	}
+	if v.Head != nil {
 		head, err := v.Head.String()
 		if err != nil {
 			return "", err
 		}
 		buffer.WriteString(head)
 		v = v.Tail
-		for !v.IsEmpty() {
+		err = v.Eval()
+		if err != nil {
+			return "", err
+		}
+		for v.Head != nil {
 			buffer.WriteString(", ")
 			head, err := v.Head.String()
 			if err != nil {
@@ -72,6 +66,10 @@ func (v *ArrValue) String() (string, error) {
 			}
 			buffer.WriteString(head)
 			v = v.Tail
+			err = v.Eval()
+			if err != nil {
+				return "", err
+			}
 		}
 	}
 	buffer.WriteString("]")
@@ -85,7 +83,11 @@ func (v *ArrValue) Out() (string, error) {
 func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case *types.NearrType:
-		if v.IsEmpty() {
+		err := v.Eval()
+		if err != nil {
+			return false, err
+		}
+		if v.Head == nil {
 			return false, nil
 		}
 		if ok, err := v.Head.Inhabits(t.HeadType, stack); !ok {
@@ -96,11 +98,19 @@ func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 		if (types.AnyType{}).Subsumes(t.ElType) {
 			return true, nil
 		}
-		for !v.IsEmpty() {
+		err := v.Eval()
+		if err != nil {
+			return false, err
+		}
+		for v.Head != nil {
 			if ok, err := v.Head.Inhabits(t.ElType, stack); !ok {
 				return false, err
 			}
 			v = v.Tail
+			err := v.Eval()
+			if err != nil {
+				return false, err
+			}
 		}
 		return true, nil
 	case types.UnionType:
@@ -117,10 +127,18 @@ func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 func (v *ArrValue) Equal(w Value) (bool, error) {
 	switch w := w.(type) {
 	case *ArrValue:
-		if v.IsEmpty() {
-			return w.IsEmpty(), nil
+		err := v.Eval()
+		if err != nil {
+			return false, err
 		}
-		if w.IsEmpty() {
+		err = w.Eval()
+		if err != nil {
+			return false, err
+		}
+		if v.Head == nil {
+			return w.Head == nil, nil
+		}
+		if w.Head == nil {
 			return false, nil
 		}
 		if ok, err := v.Head.Equal(w.Head); !ok {

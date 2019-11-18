@@ -59,7 +59,13 @@ func initIO() {
 				Stack: gotInputShape.Stack,
 			}
 			action := func(inputState states.State, args []states.Action) states.State {
-				fmt.Println(inputState.Value.Out())
+				str, err := inputState.Value.Out()
+				if err != nil {
+					return states.State{
+						Error: err,
+					}
+				}
+				fmt.Println(str)
 				return inputState
 			}
 			return outputShape, action, true, nil
@@ -76,7 +82,13 @@ func initIO() {
 				Stack: gotInputShape.Stack,
 			}
 			action := func(inputState states.State, args []states.Action) states.State {
-				fmt.Fprintln(os.Stderr, inputState.Value)
+				str, err := inputState.Value.Out()
+				if err != nil {
+					return states.State{
+						Error: err,
+					}
+				}
+				fmt.Fprintln(os.Stderr, str)
 				return inputState
 			}
 			return outputShape, action, true, nil

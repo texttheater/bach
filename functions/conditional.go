@@ -389,7 +389,11 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 		switch v := inputState.Value.(type) {
 		case *values.ArrValue:
 			for _, elMatcher := range elementMatchers {
-				if v.IsEmpty() {
+				err := v.Eval()
+				if err != nil {
+					return nil, false, err
+				}
+				if v.Head == nil {
 					return nil, false, nil
 				}
 				var ok bool
