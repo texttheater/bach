@@ -35,9 +35,13 @@ func (g *Array) Ast() (functions.Expression, error) {
 			}
 		}
 	}
-	return &functions.ArrExpression{
+	x := &functions.ArrExpression{
 		Pos:      g.Pos,
 		Elements: elements,
 		Rest:     rest,
-	}, nil
+	}
+	if g.Rest != nil {
+		x.RestPos = g.Rest.Pos
+	}
+	return x, nil
 }
