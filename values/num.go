@@ -8,34 +8,34 @@ import (
 
 type NumValue float64
 
-func (v NumValue) String() string {
-	return strconv.FormatFloat(float64(v), 'f', -1, 64)
+func (v NumValue) String() (string, error) {
+	return strconv.FormatFloat(float64(v), 'f', -1, 64), nil
 }
 
-func (v NumValue) Out() string {
+func (v NumValue) Out() (string, error) {
 	return v.String()
 }
 
-func (v NumValue) Inhabits(t types.Type, stack *BindingStack) bool {
+func (v NumValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case types.NumType:
-		return true
+		return true, nil
 	case types.UnionType:
 		return inhabits(v, t, stack)
 	case types.AnyType:
-		return true
+		return true, nil
 	case types.TypeVariable:
 		return stack.Inhabits(v, t)
 	default:
-		return false
+		return false, nil
 	}
 }
 
-func (v NumValue) Equal(w Value) bool {
+func (v NumValue) Equal(w Value) (bool, error) {
 	switch w := w.(type) {
 	case NumValue:
-		return v == w
+		return v == w, nil
 	default:
-		return false
+		return false, nil
 	}
 }

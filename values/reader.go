@@ -10,29 +10,29 @@ type ReaderValue struct {
 	Reader io.Reader
 }
 
-func (v ReaderValue) String() string {
-	return "<reader>"
+func (v ReaderValue) String() (string, error) {
+	return "<reader>", nil
 }
 
-func (v ReaderValue) Out() string {
+func (v ReaderValue) Out() (string, error) {
 	return v.String()
 }
 
-func (v ReaderValue) Inhabits(t types.Type, stack *BindingStack) bool {
+func (v ReaderValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case types.ReaderType:
-		return true
+		return true, nil
 	case types.UnionType:
 		return inhabits(v, t, stack)
 	case types.AnyType:
-		return true
+		return true, nil
 	case types.TypeVariable:
 		return stack.Inhabits(v, t)
 	default:
-		return false
+		return false, nil
 	}
 }
 
-func (v ReaderValue) Equal(w Value) bool {
-	return v == w
+func (v ReaderValue) Equal(w Value) (bool, error) {
+	return v == w, nil
 }

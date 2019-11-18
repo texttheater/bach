@@ -46,5 +46,9 @@ type RejectError struct {
 }
 
 func (e RejectError) Error() string {
-	return e.Value.String() + ": value rejected"
+	str, err := e.Value.String()
+	if err != nil {
+		return err.Error()
+	}
+	return str + ": value rejected"
 }

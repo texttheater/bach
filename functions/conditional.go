@@ -398,11 +398,8 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 					Stack:     varStack,
 					TypeStack: inputState.TypeStack,
 				})
-				if err != nil {
-					return nil, false, err
-				}
 				if !ok {
-					return nil, false, nil
+					return nil, false, err
 				}
 				v = v.Tail
 			}
@@ -411,11 +408,8 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 				Stack:     varStack,
 				TypeStack: inputState.TypeStack,
 			})
-			if err != nil {
-				return nil, false, err
-			}
 			if !ok {
-				return nil, false, nil
+				return nil, false, err
 			}
 			if p.Name != nil {
 				varStack = &states.VariableStack{
@@ -537,11 +531,8 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 					Stack:     varStack,
 					TypeStack: inputState.TypeStack,
 				})
-				if err != nil {
-					return nil, false, err
-				}
 				if !ok {
-					return nil, false, nil
+					return nil, false, err
 				}
 			}
 			if p.Name != nil {
@@ -598,20 +589,20 @@ func (p TypePattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, er
 	matcher := func(inputState states.State) (*states.VariableStack, bool, error) {
 		// TODO For efficiency, we should check inhabitation of a more
 		// general type than p.Type if that is equivalent.
-		if inputState.Value.Inhabits(p.Type, inputState.TypeStack) {
-			varStack := inputState.Stack
-			if p.Name != nil {
-				varStack = &states.VariableStack{
-					Head: states.Variable{
-						ID:     p,
-						Action: states.SimpleAction(inputState.Value),
-					},
-					Tail: varStack,
-				}
-			}
-			return varStack, true, nil
+		if ok, err := inputState.Value.Inhabits(p.Type, inputState.TypeStack); !ok {
+			return nil, false, err
 		}
-		return nil, false, nil
+		varStack := inputState.Stack
+		if p.Name != nil {
+			varStack = &states.VariableStack{
+				Head: states.Variable{
+					ID:     p,
+					Action: states.SimpleAction(inputState.Value),
+				},
+				Tail: varStack,
+			}
+		}
+		return varStack, true, nil
 	}
 	// return
 	return outputShape, complement, matcher, nil

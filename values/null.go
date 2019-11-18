@@ -7,34 +7,34 @@ import (
 type NullValue struct {
 }
 
-func (v NullValue) String() string {
-	return "null"
+func (v NullValue) String() (string, error) {
+	return "null", nil
 }
 
-func (v NullValue) Out() string {
+func (v NullValue) Out() (string, error) {
 	return v.String()
 }
 
-func (v NullValue) Inhabits(t types.Type, stack *BindingStack) bool {
+func (v NullValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case types.NullType:
-		return true
+		return true, nil
 	case types.UnionType:
 		return inhabits(v, t, stack)
 	case types.AnyType:
-		return true
+		return true, nil
 	case types.TypeVariable:
 		return stack.Inhabits(v, t)
 	default:
-		return false
+		return false, nil
 	}
 }
 
-func (v NullValue) Equal(w Value) bool {
+func (v NullValue) Equal(w Value) (bool, error) {
 	switch w.(type) {
 	case NullValue:
-		return true
+		return true, nil
 	default:
-		return false
+		return false, nil
 	}
 }

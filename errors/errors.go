@@ -285,8 +285,10 @@ func Match(err1, err2 error) bool {
 	if e1.GotType != nil && !reflect.DeepEqual(e1.GotType, e2.GotType) {
 		return false
 	}
-	if e1.GotValue != nil && !e1.GotValue.Equal(e2.GotValue) {
-		return false
+	if e1.GotValue != nil {
+		if ok, _ := e1.GotValue.Equal(e2.GotValue); !ok {
+			return false
+		}
 	}
 	if e1.InputType != nil && !reflect.DeepEqual(e1.InputType, e2.InputType) {
 		return false

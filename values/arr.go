@@ -54,73 +54,80 @@ func (v *ArrValue) Length() int {
 	return length
 }
 
-func (v *ArrValue) String() string {
+func (v *ArrValue) String() (string, error) {
 	var buffer bytes.Buffer
 	buffer.WriteString("[")
 	if !v.IsEmpty() {
-		buffer.WriteString(v.Head.String())
+		head, err := v.Head.String()
+		if err != nil {
+			return "", err
+		}
+		buffer.WriteString(head)
 		v = v.Tail
 		for !v.IsEmpty() {
 			buffer.WriteString(", ")
-			buffer.WriteString(v.Head.String())
+			head, err := v.Head.String()
+			if err != nil {
+				return "", err
+			}
+			buffer.WriteString(head)
 			v = v.Tail
 		}
 	}
 	buffer.WriteString("]")
-	return buffer.String()
+	return buffer.String(), nil
 }
 
-func (v *ArrValue) Out() string {
+func (v *ArrValue) Out() (string, error) {
 	return v.String()
 }
 
-func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) bool {
+func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case *types.NearrType:
 		if v.IsEmpty() {
-			return false
+			return false, nil
 		}
-		if !v.Head.Inhabits(t.HeadType, stack) {
-			return false
+		if ok, err := v.Head.Inhabits(t.HeadType, stack); !ok {
+			return false, err
 		}
 		return v.Tail.Inhabits(t.TailType, stack)
 	case *types.ArrType:
 		if (types.AnyType{}).Subsumes(t.ElType) {
-			return true
+			return true, nil
 		}
 		for !v.IsEmpty() {
-			if !v.Head.Inhabits(t.ElType, stack) {
-				return false
+			if ok, err := v.Head.Inhabits(t.ElType, stack); !ok {
+				return false, err
 			}
 			v = v.Tail
 		}
-		return true
+		return true, nil
 	case types.UnionType:
 		return inhabits(v, t, stack)
 	case types.AnyType:
-		return true
+		return true, nil
 	case types.TypeVariable:
 		return stack.Inhabits(v, t)
 	default:
-		return false
-
+		return false, nil
 	}
 }
 
-func (v *ArrValue) Equal(w Value) bool {
+func (v *ArrValue) Equal(w Value) (bool, error) {
 	switch w := w.(type) {
 	case *ArrValue:
 		if v.IsEmpty() {
-			return w.IsEmpty()
+			return w.IsEmpty(), nil
 		}
 		if w.IsEmpty() {
-			return false
+			return false, nil
 		}
-		if !v.Head.Equal(w.Head) {
-			return false
+		if ok, err := v.Head.Equal(w.Head); !ok {
+			return false, err
 		}
 		return v.Tail.Equal(w.Tail)
 	default:
-		return false
+		return false, nil
 	}
 }

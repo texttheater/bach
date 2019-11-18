@@ -16,9 +16,9 @@ func (s *BindingStack) Push(element Binding) *BindingStack {
 	}
 }
 
-func (s *BindingStack) Inhabits(v Value, t types.TypeVariable) bool {
+func (s *BindingStack) Inhabits(v Value, t types.TypeVariable) (bool, error) {
 	if s == nil {
-		return false
+		return false, nil
 	}
 	if s.Head.Name == t.Name {
 		return v.Inhabits(s.Head.Type, s)

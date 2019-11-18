@@ -8,34 +8,34 @@ import (
 
 type StrValue string
 
-func (v StrValue) String() string {
-	return fmt.Sprintf("%q", string(v))
+func (v StrValue) String() (string, error) {
+	return fmt.Sprintf("%q", string(v)), nil
 }
 
-func (v StrValue) Out() string {
-	return string(v)
+func (v StrValue) Out() (string, error) {
+	return string(v), nil
 }
 
-func (v StrValue) Inhabits(t types.Type, stack *BindingStack) bool {
+func (v StrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case types.StrType:
-		return true
+		return true, nil
 	case types.UnionType:
 		return inhabits(v, t, stack)
 	case types.AnyType:
-		return true
+		return true, nil
 	case types.TypeVariable:
 		return stack.Inhabits(v, t)
 	default:
-		return false
+		return false, nil
 	}
 }
 
-func (v StrValue) Equal(w Value) bool {
+func (v StrValue) Equal(w Value) (bool, error) {
 	switch w := w.(type) {
 	case StrValue:
-		return v == w
+		return v == w, nil
 	default:
-		return false
+		return false, nil
 	}
 }
