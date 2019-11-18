@@ -124,4 +124,35 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgram(
+		`[1;2]`,
+		nil,
+		nil,
+		errors.E(
+			errors.Code(errors.RestRequiresArrType),
+			errors.WantType(types.AnyArrType),
+			errors.GotType(types.NumType{}),
+		),
+		t,
+	)
+	TestProgram(
+		`[1 if ==2 then true else reject ok] out`,
+		nil,
+		nil,
+		errors.E(
+			errors.Code(errors.UnexpectedValue),
+			errors.GotValue(values.NumValue(1)),
+		),
+		t,
+	)
+	TestProgram(
+		`[true, 1 if ==2 then true else reject ok] out`,
+		nil,
+		nil,
+		errors.E(
+			errors.Code(errors.UnexpectedValue),
+			errors.GotValue(values.NumValue(1)),
+		),
+		t,
+	)
 }
