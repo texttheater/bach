@@ -52,7 +52,6 @@ type SComponent struct {
 	Conditional *Conditional `| @@`
 	Filter      *Filter      `| @@`
 	Regexp      *Regexp      `| @@`
-	Reject      *Reject      `| @@`
 }
 
 func (g *SComponent) Ast() (functions.Expression, error) {
@@ -94,9 +93,6 @@ func (g *SComponent) Ast() (functions.Expression, error) {
 	if g.Regexp != nil {
 		return g.Regexp.Ast()
 	}
-	if g.Reject != nil {
-		return g.Reject.Ast()
-	}
 	panic("invalid component")
 }
 
@@ -112,7 +108,6 @@ type PComponent struct {
 	Filter     *Filter     `| @@`
 	Regexp     *Regexp     `| @@`
 	Drop       *Drop       `| @@`
-	Reject     *Reject     `| @@`
 }
 
 func (g *PComponent) Ast() (functions.Expression, error) {
@@ -154,9 +149,6 @@ func (g *PComponent) Ast() (functions.Expression, error) {
 	if g.Drop != nil {
 		return g.Drop.Ast()
 	}
-	if g.Reject != nil {
-		return g.Reject.Ast()
-	}
 	panic("invalid component")
 }
 
@@ -195,7 +187,6 @@ type QComponent struct {
 	Filter      *Filter      `| @@`
 	Regexp      *Regexp      `| @@`
 	Drop        *Drop        `| @@`
-	Reject      *Reject      `| @@`
 }
 
 func (g *QComponent) Ast() (functions.Expression, error) {
@@ -239,9 +230,6 @@ func (g *QComponent) Ast() (functions.Expression, error) {
 	}
 	if g.Drop != nil {
 		return g.Drop.Ast()
-	}
-	if g.Reject != nil {
-		return g.Reject.Ast()
 	}
 	panic("invalid component")
 }

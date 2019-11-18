@@ -11,9 +11,11 @@ type Conditional struct {
 	Pattern      *Pattern       `( "is" @@`
 	Guard        *Composition   `  ( "with" @@)?`
 	Condition    *Composition   `| "if" @@ )`
-	Consequent   *Composition   `"then" @@` // long form
+	Consequent   *Composition   `"then" ( @@`
+	Reject       *Reject        `       | @@ )`
 	Alternatives []*Alternative `( @@ )*`
-	Alternative  *Composition   `( "else" @@ )? "ok"`
+	Alternative  *Composition   `( "else" ( @@`
+	AltReject    *Reject        `         | @@ ) )? "ok"`
 }
 
 type Alternative struct {
@@ -21,7 +23,8 @@ type Alternative struct {
 	Pattern    *Pattern     `( "elis" @@`
 	Guard      *Composition `  ( "with" @@ )?`
 	Condition  *Composition `| "elif" @@ )`
-	Consequent *Composition `"then" @@`
+	Consequent *Composition `"then" ( @@`
+	Reject     *Reject      `       | @@ )`
 }
 
 func (g *Conditional) Ast() (functions.Expression, error) {
@@ -49,7 +52,12 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 			}
 		}
 	}
-	consequent, err := g.Consequent.Ast()
+	var consequent functions.Expression
+	if g.Consequent != nil {
+		consequent, err = g.Consequent.Ast()
+	} else {
+		consequent, err = g.Reject.Ast()
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +87,11 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 				}
 			}
 		}
-		alternativeConsequents[i], err = alternative.Consequent.Ast()
+		if alternative.Consequent != nil {
+			alternativeConsequents[i], err = alternative.Consequent.Ast()
+		} else {
+			alternativeConsequents[i], err = alternative.Reject.Ast()
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -87,9 +99,11 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 	var alternative functions.Expression
 	if g.Alternative != nil {
 		alternative, err = g.Alternative.Ast()
-		if err != nil {
-			return nil, err
-		}
+	} else if g.AltReject != nil {
+		alternative, err = g.AltReject.Ast()
+	}
+	if err != nil {
+		return nil, err
 	}
 	return &functions.ConditionalExpression{
 		Pos:                    g.Pos,

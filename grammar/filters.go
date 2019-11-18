@@ -67,12 +67,14 @@ type FilterFromConditional struct {
 
 type FilterFromConsequentLong struct {
 	Pos            lexer.Position
-	Consequent     *QComposition             `"then" @@`
+	Consequent     *QComposition             `"then" ( @@`
+	Reject         *Reject                   `       | @@ )`
 	Pattern        *Pattern                  `( ( "elis" @@`
 	Guard          *Composition              `    ( "with" @@ )?`
 	Condition      *Composition              `  | "elif" @@ )`
 	FromConsequent *FilterFromConsequentLong `  @@`
-	Alternative    *QComposition             `| ( "else" @@ )?`
+	Alternative    *QComposition             `| ( "else" ( @@`
+	AltReject      *Reject                   `           | @@ ) )?`
 	FromComponent  *FilterFromComponent      `  "ok" ( @@ | "all" ) )`
 }
 
@@ -155,6 +157,12 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 		}
 		if c.Alternative != nil {
 			alternative, err := c.Alternative.Ast()
+			if err != nil {
+				return nil, err
+			}
+			x.Alternative = alternative
+		} else if c.Reject != nil {
+			alternative, err := c.AltReject.Ast()
 			if err != nil {
 				return nil, err
 			}
