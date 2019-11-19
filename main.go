@@ -32,12 +32,12 @@ func main() {
 		errors.Explain(err, program)
 		os.Exit(1)
 	}
+	str, err := value.String() // HACK to force evaluation
+	if err != nil {
+		errors.Explain(err, program)
+		os.Exit(1)
+	}
 	if o != "" {
-		str, err := value.String()
-		if err != nil {
-			errors.Explain(err, program)
-			os.Exit(1)
-		}
 		fmt.Println(str)
 	}
 }
