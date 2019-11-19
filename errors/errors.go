@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -183,11 +184,14 @@ func (err *e) Error() string {
 	if err.GotParam != nil {
 		m["GotParam"] = fmt.Sprintf("%s", err.GotParam)
 	}
-	out, err2 := json.Marshal(m)
+	buffer := new(bytes.Buffer)
+	encoder := json.NewEncoder(buffer)
+	encoder.SetEscapeHTML(false)
+	err2 := encoder.Encode(m)
 	if err2 != nil {
 		panic(err2)
 	}
-	return string(out)
+	return buffer.String()
 }
 
 func Explain(err error, program string) {
