@@ -160,7 +160,7 @@ func (err *e) Error() string {
 		m["GotType"] = fmt.Sprintf("%s", err.GotType)
 	}
 	if err.GotValue != nil {
-		m["GotValue"] = fmt.Sprintf("%s", err.GotValue)
+		m["GotValue"], _ = err.GotValue.String()
 	}
 	if err.InputType != nil {
 		m["InputType"] = fmt.Sprintf("%s", err.InputType)
