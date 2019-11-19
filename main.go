@@ -7,6 +7,7 @@ import (
 
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/interpreter"
+	"github.com/texttheater/bach/values"
 )
 
 func main() {
@@ -32,12 +33,37 @@ func main() {
 		errors.Explain(err, program)
 		os.Exit(1)
 	}
-	str, err := value.String() // HACK to force evaluation
-	if err != nil {
-		errors.Explain(err, program)
-		os.Exit(1)
-	}
 	if o != "" {
+		str, err := value.String()
+		if err != nil {
+			errors.Explain(err, program)
+			os.Exit(1)
+		}
 		fmt.Println(str)
+	} else {
+		err := forceEvaluation(value)
+		if err != nil {
+			errors.Explain(err, program)
+			os.Exit(1)
+		}
 	}
+}
+
+func forceEvaluation(v values.Value) error {
+	switch v := v.(type) {
+	case *values.ArrValue:
+		err := v.Eval()
+		if err != nil {
+			return err
+		}
+		if v.Head != nil {
+			forceEvaluation(v.Head)
+			forceEvaluation(v.Tail)
+		}
+	case values.ObjValue:
+		for _, w := range v {
+			forceEvaluation(w)
+		}
+	}
+	return nil
 }
