@@ -70,82 +70,82 @@ func TestCalls(t *testing.T) {
 		errors.E(errors.Code(errors.ArgHasWrongOutputType), errors.ArgNum(0), errors.WantType(types.StrType{}), errors.GotType(types.NumType{})), t,
 	)
 	TestProgram(
-		`for Any def f(g for Num Num) Num as 1 g ok`,
+		`for Any def f(for Num g Num) Num as 1 g ok`,
 		types.NullType{},
 		values.NullValue{},
 		nil,
 		t,
 	)
 	TestProgram(
-		`for Any def f(g for Num Num) Num as 1 g ok f(g)`,
+		`for Any def f(for Num g Num) Num as 1 g ok f(g)`,
 		nil,
 		nil,
 		errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NumType{}), errors.Name("g"), errors.NumParams(0)), t,
 	)
 	TestProgram(
-		`for Any def f(g for Num Num) Num as 1 g ok f(1)`,
+		`for Any def f(for Num g Num) Num as 1 g ok f(1)`,
 		types.NumType{},
 		values.NumValue(1),
 		nil,
 		t,
 	)
 	TestProgram(
-		`for Any def f(g for Num Num) Num as 1 g ok f(+1)`,
+		`for Any def f(for Num g Num) Num as 1 g ok f(+1)`,
 		types.NumType{},
 		values.NumValue(2),
 		nil,
 		t,
 	)
 	TestProgram(
-		`for Any def f(g for Num Num) Num as 1 g ok f(+2)`,
+		`for Any def f(for Num g Num) Num as 1 g ok f(+2)`,
 		types.NumType{},
 		values.NumValue(3),
 		nil,
 		t,
 	)
 	TestProgram(
-		`for Any def f(g for Num Num) Num as 1 g ok f(*10)`,
+		`for Any def f(for Num g Num) Num as 1 g ok f(*10)`,
 		types.NumType{},
 		values.NumValue(10),
 		nil,
 		t,
 	)
 	TestProgram(
-		`for Any def f(g for Num (Num) Num) Num as 1 g ok`,
+		`for Any def f(for Num g(Num) Num) Num as 1 g ok`,
 		nil,
 		nil,
 		errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NumType{}), errors.Name("g"), errors.NumParams(0)), t,
 	)
 	TestProgram(
-		`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok`,
+		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok`,
 		types.NullType{},
 		values.NullValue{},
 		nil,
 		t,
 	)
 	TestProgram(
-		`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok f(+)`,
+		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok f(+)`,
 		types.NumType{},
 		values.NumValue(3),
 		nil,
 		t,
 	)
 	TestProgram(
-		`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok f(*)`,
+		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok f(*)`,
 		types.NumType{},
 		values.NumValue(2),
 		nil,
 		t,
 	)
 	TestProgram(
-		`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok f(/)`,
+		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok f(/)`,
 		types.NumType{},
 		values.NumValue(0.5),
 		nil,
 		t,
 	)
 	TestProgram(
-		`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok f(+1)`,
+		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok f(+1)`,
 		nil,
 		nil,
 		errors.E(
@@ -157,14 +157,14 @@ func TestCalls(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok`,
+		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok`,
 		types.NullType{},
 		values.NullValue{},
 		nil,
 		t,
 	)
 	TestProgram(
-		`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok f(g)`,
+		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok f(g)`,
 		nil,
 		nil,
 		errors.E(
@@ -184,7 +184,7 @@ func TestCalls(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`for Any def f(g for Num (Num) Num) Num as 1 g(2) ok for Any def g(x for Str Num) Num as "abc" x ok f(g)`,
+		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok for Any def g(for Str x Num) Num as "abc" x ok f(g)`,
 		nil,
 		nil,
 		errors.E(
