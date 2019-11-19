@@ -18,6 +18,7 @@ type Call struct {
 	Op2Num      *Op2Num      `| @@`
 	Op1Lid      *Op1Lid      `| @@`
 	Op2Lid      *Op2Lid      `| @@`
+	NameString  *NameString  `| @@`
 	NameRegexp  *NameRegexp  `| @@`
 	NameArglist *NameArglist `| @@`
 	Name        *string      `| ( @Lid | @Op1 | @Op2 )`
@@ -35,6 +36,9 @@ func (g *Call) Ast() (functions.Expression, error) {
 	}
 	if g.Op2Lid != nil {
 		return g.Op2Lid.Ast()
+	}
+	if g.NameString != nil {
+		return g.NameString.Ast()
 	}
 	if g.NameRegexp != nil {
 		return g.NameRegexp.Ast()
@@ -293,7 +297,7 @@ type NameString struct {
 func (g *NameString) Ast() (functions.Expression, error) {
 	i := strings.Index(g.NameStr, "\"")
 	name := g.NameStr[:i]
-	str, err := strconv.Unquote(g.NameStr[i : len(g.NameStr)-1])
+	str, err := strconv.Unquote(g.NameStr[i:len(g.NameStr)])
 	if err != nil {
 		return nil, err
 	}
