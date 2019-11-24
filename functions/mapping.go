@@ -51,7 +51,7 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 		Stack: inputShape.Stack,
 	}
 	// create action
-	action := func(inputState states.State, args []states.Action) states.State {
+	action := func(inputState states.State, args []states.Action) (states.State, bool, error) {
 		arr := inputState.Value.(*values.ArrValue)
 		var next func() (values.Value, *values.ArrValue, error)
 		next = func() (values.Value, *values.ArrValue, error) {
@@ -67,12 +67,12 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 				Stack:     inputState.Stack,
 				TypeStack: inputState.TypeStack,
 			}
-			bodyOutputState := bodyAction(bodyInputState, nil)
-			if bodyOutputState.Error != nil {
-				return nil, nil, bodyOutputState.Error
+			bodyOutputState, drop, err := bodyAction(bodyInputState, nil)
+			if err != nil {
+				return nil, nil, err
 			}
 			arr = arr.Tail
-			if bodyOutputState.Drop {
+			if drop {
 				return next()
 			}
 			return bodyOutputState.Value, &values.ArrValue{
@@ -85,7 +85,7 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 			},
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
-		}
+		}, false, nil
 	}
 	return outputShape, action, nil
 }

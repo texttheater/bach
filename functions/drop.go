@@ -29,10 +29,8 @@ func (x DropExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 		Stack: nil,
 	}
 	// create action
-	action := func(inputState states.State, args []states.Action) states.State {
-		return states.State{
-			Drop: true,
-		}
+	action := func(inputState states.State, args []states.Action) (states.State, bool, error) {
+		return states.State{}, true, nil
 	}
 	// return
 	return outputShape, action, nil

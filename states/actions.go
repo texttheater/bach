@@ -4,14 +4,14 @@ import (
 	"github.com/texttheater/bach/values"
 )
 
-type Action func(inputState State, args []Action) State
+type Action func(inputState State, args []Action) (State, bool, error)
 
 // TODO remove SetArg; currently one builtin funcer uses it; we should provide
 // a better abstraction to builtin funcers making sure that partial application
 // is handled correctly.
 
 func (a Action) SetArg(arg Action) Action {
-	return func(inputState State, outerArgs []Action) State {
+	return func(inputState State, outerArgs []Action) (State, bool, error) {
 		args := make([]Action, len(outerArgs)+1)
 		args[0] = arg
 		for i, outerArg := range outerArgs {
@@ -22,11 +22,11 @@ func (a Action) SetArg(arg Action) Action {
 }
 
 func SimpleAction(value values.Value) Action {
-	return func(inputState State, args []Action) State {
+	return func(inputState State, args []Action) (State, bool, error) {
 		return State{
 			Value:     value,
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
-		}
+		}, false, nil
 	}
 }

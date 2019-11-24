@@ -20,14 +20,14 @@ func initTypes() {
 				Type:  types.StrType{},
 				Stack: gotInputShape.Stack,
 			}
-			action := func(inputState states.State, args []states.Action) states.State {
+			action := func(inputState states.State, args []states.Action) (states.State, bool, error) {
 				outputValue := values.StrValue(gotInputShape.Type.String())
 				outputState := states.State{
 					Value:     outputValue,
 					Stack:     inputState.Stack,
 					TypeStack: inputState.TypeStack,
 				}
-				return outputState
+				return outputState, false, nil
 			}
 			return outputShape, action, true, nil
 		},

@@ -5,8 +5,6 @@ import (
 )
 
 type State struct {
-	Error     error
-	Drop      bool
 	Value     values.Value
 	Stack     *VariableStack
 	TypeStack *values.BindingStack
@@ -26,7 +24,7 @@ func (s *VariableStack) Push(element Variable) *VariableStack {
 
 type Variable struct {
 	ID     interface{}
-	Action Action
+	Action Action // TODO this should be just a Value, right?
 }
 
 var InitialState = State{

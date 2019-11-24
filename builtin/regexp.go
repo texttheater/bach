@@ -23,7 +23,7 @@ func initRegexp() {
 				return functions.Shape{}, nil, false, nil
 			}
 			// create action
-			action := states.Action(func(inputState states.State, args []states.Action) states.State {
+			action := states.Action(func(inputState states.State, args []states.Action) (states.State, bool, error) {
 				return args[0](inputState, nil)
 			})
 			// typecheck parameter

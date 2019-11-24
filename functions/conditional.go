@@ -165,12 +165,10 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		outputType = types.Union(outputType, alternativeOutputShape.Type)
 	}
 	// make action
-	action := func(inputState states.State, args []states.Action) states.State {
+	action := func(inputState states.State, args []states.Action) (states.State, bool, error) {
 		matcherVarStack, ok, err := matcher(inputState)
 		if err != nil {
-			return states.State{
-				Error: err,
-			}
+			return states.State{}, false, err
 		}
 		if ok {
 			guardInputState := states.State{
@@ -178,7 +176,10 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 				Stack:     matcherVarStack,
 				TypeStack: inputState.TypeStack,
 			}
-			guardState := guardAction(guardInputState, nil)
+			guardState, _, err := guardAction(guardInputState, nil)
+			if err != nil {
+				return states.State{}, false, err
+			}
 			boolGuardValue := guardState.Value.(values.BoolValue)
 			if boolGuardValue {
 				consequentInputState := states.State{
@@ -186,22 +187,24 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 					Stack:     guardState.Stack,
 					TypeStack: inputState.TypeStack,
 				}
-				consequentOutputState := consequentAction(consequentInputState, nil)
+				consequentOutputState, drop, err := consequentAction(consequentInputState, nil)
+				if err != nil {
+					return states.State{}, false, wrap(err, x.Pos)
+				}
+				if drop {
+					return states.State{}, true, nil
+				}
 				return states.State{
-					Error:     wrap(consequentOutputState.Error, x.Pos),
-					Drop:      consequentOutputState.Drop,
 					Value:     consequentOutputState.Value,
 					Stack:     inputState.Stack,
 					TypeStack: inputState.TypeStack,
-				}
+				}, false, nil
 			}
 		}
 		for i := range elisMatchers {
 			matcherVarStack, ok, err := elisMatchers[i](inputState)
 			if err != nil {
-				return states.State{
-					Error: err,
-				}
+				return states.State{}, false, err
 			}
 			if ok {
 				guardInputState := states.State{
@@ -209,7 +212,10 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 					Stack:     matcherVarStack,
 					TypeStack: inputState.TypeStack,
 				}
-				guardState := elisGuardActions[i](guardInputState, nil)
+				guardState, _, err := elisGuardActions[i](guardInputState, nil)
+				if err != nil {
+					return states.State{}, false, err
+				}
 				boolGuardValue := guardState.Value.(values.BoolValue)
 				if boolGuardValue {
 					consequentInputState := states.State{
@@ -217,25 +223,33 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 						Stack:     guardState.Stack,
 						TypeStack: inputState.TypeStack,
 					}
-					consequentOutputState := elisConsequentActions[i](consequentInputState, nil)
+					consequentOutputState, drop, err := elisConsequentActions[i](consequentInputState, nil)
+					if err != nil {
+						return states.State{}, false, wrap(err, x.Pos)
+					}
+					if drop {
+						return states.State{}, true, nil
+					}
 					return states.State{
-						Error:     wrap(consequentOutputState.Error, x.Pos),
-						Drop:      consequentOutputState.Drop,
 						Value:     consequentOutputState.Value,
 						Stack:     inputState.Stack,
 						TypeStack: inputState.TypeStack,
-					}
+					}, false, nil
 				}
 			}
 		}
-		alternativeOutputState := alternativeAction(inputState, nil)
+		alternativeOutputState, drop, err := alternativeAction(inputState, nil)
+		if err != nil {
+			return states.State{}, false, wrap(err, x.Pos)
+		}
+		if drop {
+			return states.State{}, true, nil
+		}
 		return states.State{
-			Error:     wrap(alternativeOutputState.Error, x.Pos),
-			Drop:      alternativeOutputState.Drop,
 			Value:     alternativeOutputState.Value,
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
-		}
+		}, false, nil
 	}
 	// return
 	outputShape := Shape{
