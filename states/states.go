@@ -24,7 +24,7 @@ func (s *VariableStack) Push(element Variable) *VariableStack {
 
 type Variable struct {
 	ID     interface{}
-	Action Action // TODO this should be just a Value, right?
+	Action Action
 }
 
 var InitialState = State{
