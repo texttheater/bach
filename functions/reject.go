@@ -30,10 +30,10 @@ func (x RejectExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 		Stack: nil,
 	}
 	// create action
-	action := func(inputState states.State, args []states.Action) (states.State, bool, error) {
-		return states.State{}, false, RejectError{
+	action := func(inputState states.State, args []states.Action) states.Thunk {
+		return states.EagerThunk(states.State{}, false, RejectError{
 			Value: inputState.Value,
-		}
+		})
 	}
 	// return
 	return outputShape, action, nil

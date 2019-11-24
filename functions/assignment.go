@@ -25,15 +25,15 @@ func (x AssignmentExpression) Typecheck(inputShape Shape, params []*Parameter) (
 	}
 	variableFuncer := VariableFuncer(x, x.Name, inputShape.Type)
 	outputShape := Shape{inputShape.Type, inputShape.Stack.Push(variableFuncer)}
-	action := func(inputState states.State, args []states.Action) (states.State, bool, error) {
-		return states.State{
+	action := func(inputState states.State, args []states.Action) states.Thunk {
+		return states.EagerThunk(states.State{
 			Value: inputState.Value,
 			Stack: inputState.Stack.Push(states.Variable{
 				ID:     x,
 				Action: states.SimpleAction(inputState.Value),
 			}),
 			TypeStack: inputState.TypeStack,
-		}, false, nil
+		}, false, nil)
 	}
 	return outputShape, action, nil
 }

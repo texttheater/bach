@@ -14,8 +14,8 @@ func initValues() {
 			if gotCall.Name != "id" {
 				return functions.Shape{}, nil, false, nil
 			}
-			action := func(inputState states.State, args []states.Action) (states.State, bool, error) {
-				return inputState, false, nil
+			action := func(inputState states.State, args []states.Action) states.Thunk {
+				return states.EagerThunk(inputState, false, nil)
 			}
 			return gotInputShape, action, true, nil
 		},

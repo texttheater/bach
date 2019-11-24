@@ -14,7 +14,7 @@ func (x IdentityExpression) Position() lexer.Position {
 }
 
 func (x IdentityExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
-	return inputShape, func(inputState states.State, args []states.Action) (states.State, bool, error) {
-		return inputState, false, nil
+	return inputShape, func(inputState states.State, args []states.Action) states.Thunk {
+		return states.EagerThunk(inputState, false, nil)
 	}, nil
 }

@@ -58,13 +58,13 @@ func initIO() {
 				Type:  gotInputShape.Type,
 				Stack: gotInputShape.Stack,
 			}
-			action := func(inputState states.State, args []states.Action) (states.State, bool, error) {
+			action := func(inputState states.State, args []states.Action) states.Thunk {
 				str, err := inputState.Value.Out()
 				if err != nil {
-					return states.State{}, false, err
+					return states.EagerThunk(states.State{}, false, err)
 				}
 				fmt.Println(str)
-				return inputState, false, nil
+				return states.EagerThunk(inputState, false, nil)
 			}
 			return outputShape, action, true, nil
 		},
@@ -79,13 +79,13 @@ func initIO() {
 				Type:  gotInputShape.Type,
 				Stack: gotInputShape.Stack,
 			}
-			action := func(inputState states.State, args []states.Action) (states.State, bool, error) {
+			action := func(inputState states.State, args []states.Action) states.Thunk {
 				str, err := inputState.Value.Out()
 				if err != nil {
-					return states.State{}, false, err
+					return states.EagerThunk(states.State{}, false, err)
 				}
 				fmt.Fprintln(os.Stderr, str)
-				return inputState, false, nil
+				return states.EagerThunk(inputState, false, nil)
 			}
 			return outputShape, action, true, nil
 		},

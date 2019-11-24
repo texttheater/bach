@@ -165,10 +165,10 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		outputType = types.Union(outputType, alternativeOutputShape.Type)
 	}
 	// make action
-	action := func(inputState states.State, args []states.Action) (states.State, bool, error) {
+	action := func(inputState states.State, args []states.Action) states.Thunk {
 		matcherVarStack, ok, err := matcher(inputState)
 		if err != nil {
-			return states.State{}, false, err
+			return states.EagerThunk(states.State{}, false, err)
 		}
 		if ok {
 			guardInputState := states.State{
@@ -176,9 +176,9 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 				Stack:     matcherVarStack,
 				TypeStack: inputState.TypeStack,
 			}
-			guardState, _, err := guardAction(guardInputState, nil)
+			guardState, _, err := guardAction(guardInputState, nil).Eval()
 			if err != nil {
-				return states.State{}, false, err
+				return states.EagerThunk(states.State{}, false, err)
 			}
 			boolGuardValue := guardState.Value.(values.BoolValue)
 			if boolGuardValue {
@@ -187,24 +187,24 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 					Stack:     guardState.Stack,
 					TypeStack: inputState.TypeStack,
 				}
-				consequentOutputState, drop, err := consequentAction(consequentInputState, nil)
+				consequentOutputState, drop, err := consequentAction(consequentInputState, nil).Eval()
 				if err != nil {
-					return states.State{}, false, wrap(err, x.Pos)
+					return states.EagerThunk(states.State{}, false, wrap(err, x.Pos))
 				}
 				if drop {
-					return states.State{}, true, nil
+					return states.EagerThunk(states.State{}, true, nil)
 				}
-				return states.State{
+				return states.EagerThunk(states.State{
 					Value:     consequentOutputState.Value,
 					Stack:     inputState.Stack,
 					TypeStack: inputState.TypeStack,
-				}, false, nil
+				}, false, nil)
 			}
 		}
 		for i := range elisMatchers {
 			matcherVarStack, ok, err := elisMatchers[i](inputState)
 			if err != nil {
-				return states.State{}, false, err
+				return states.EagerThunk(states.State{}, false, err)
 			}
 			if ok {
 				guardInputState := states.State{
@@ -212,9 +212,9 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 					Stack:     matcherVarStack,
 					TypeStack: inputState.TypeStack,
 				}
-				guardState, _, err := elisGuardActions[i](guardInputState, nil)
+				guardState, _, err := elisGuardActions[i](guardInputState, nil).Eval()
 				if err != nil {
-					return states.State{}, false, err
+					return states.EagerThunk(states.State{}, false, err)
 				}
 				boolGuardValue := guardState.Value.(values.BoolValue)
 				if boolGuardValue {
@@ -223,33 +223,33 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 						Stack:     guardState.Stack,
 						TypeStack: inputState.TypeStack,
 					}
-					consequentOutputState, drop, err := elisConsequentActions[i](consequentInputState, nil)
+					consequentOutputState, drop, err := elisConsequentActions[i](consequentInputState, nil).Eval()
 					if err != nil {
-						return states.State{}, false, wrap(err, x.Pos)
+						return states.EagerThunk(states.State{}, false, wrap(err, x.Pos))
 					}
 					if drop {
-						return states.State{}, true, nil
+						return states.EagerThunk(states.State{}, true, nil)
 					}
-					return states.State{
+					return states.EagerThunk(states.State{
 						Value:     consequentOutputState.Value,
 						Stack:     inputState.Stack,
 						TypeStack: inputState.TypeStack,
-					}, false, nil
+					}, false, nil)
 				}
 			}
 		}
-		alternativeOutputState, drop, err := alternativeAction(inputState, nil)
+		alternativeOutputState, drop, err := alternativeAction(inputState, nil).Eval()
 		if err != nil {
-			return states.State{}, false, wrap(err, x.Pos)
+			return states.EagerThunk(states.State{}, false, wrap(err, x.Pos))
 		}
 		if drop {
-			return states.State{}, true, nil
+			return states.EagerThunk(states.State{}, true, nil)
 		}
-		return states.State{
+		return states.EagerThunk(states.State{
 			Value:     alternativeOutputState.Value,
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
-		}, false, nil
+		}, false, nil)
 	}
 	// return
 	outputShape := Shape{

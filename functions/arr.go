@@ -32,11 +32,11 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 	var action states.Action
 	if x.Rest == nil {
 		outputType = types.VoidArrType
-		action = func(inputState states.State, args []states.Action) (states.State, bool, error) {
-			return states.State{
+		action = func(inputState states.State, args []states.Action) states.Thunk {
+			return states.EagerThunk(states.State{
 				Value: &values.ArrValue{}, // empty array
 				Stack: inputState.Stack,
-			}, false, nil
+			}, false, nil)
 		}
 	} else {
 		var restShape Shape
@@ -66,15 +66,15 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 			TailType: outputType,
 		}
 		tailAction := action
-		action = func(inputState states.State, args []states.Action) (states.State, bool, error) {
-			return states.State{
+		action = func(inputState states.State, args []states.Action) states.Thunk {
+			return states.EagerThunk(states.State{
 				Value: &values.ArrValue{
 					Func: func() (values.Value, *values.ArrValue, error) {
-						headState, _, err := elementAction(inputState, nil)
+						headState, _, err := elementAction(inputState, nil).Eval()
 						if err != nil {
 							return nil, nil, err
 						}
-						tailState, _, err := tailAction(inputState, nil)
+						tailState, _, err := tailAction(inputState, nil).Eval()
 						if err != nil {
 							return nil, nil, err
 						}
@@ -82,7 +82,7 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 					},
 				},
 				Stack: inputState.Stack,
-			}, false, nil
+			}, false, nil)
 		}
 	}
 	// make output shape

@@ -29,7 +29,7 @@ func InterpretString(program string) (types.Type, values.Value, error) {
 		)
 	}
 	// evaluate
-	outputState, _, err := action(states.InitialState, nil)
+	outputState, _, err := action(states.InitialState, nil).Eval()
 	if err != nil {
 		return nil, nil, err
 	}

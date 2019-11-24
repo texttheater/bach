@@ -52,15 +52,15 @@ func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 		Type:  types.Union(types.NullType{}, matchType),
 		Stack: inputShape.Stack,
 	}
-	action := func(inputState states.State, args []states.Action) (states.State, bool, error) {
+	action := func(inputState states.State, args []states.Action) states.Thunk {
 		inputString := string(inputState.Value.(values.StrValue))
 		match := x.Regexp.FindStringSubmatchIndex(inputString)
 		if match == nil {
-			return states.State{
+			return states.EagerThunk(states.State{
 				Value:     values.NullValue{},
 				Stack:     inputState.Stack,
 				TypeStack: inputState.TypeStack,
-			}, false, nil
+			}, false, nil)
 		}
 		propValueMap := make(map[string]values.Value)
 		if propTypeMap["start"].Subsumes(types.NumType{}) {
@@ -80,11 +80,11 @@ func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 				propValueMap[name] = submatch
 			}
 		}
-		return states.State{
+		return states.EagerThunk(states.State{
 			Value:     values.ObjValue(propValueMap),
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
-		}, false, nil
+		}, false, nil)
 	}
 	return outputShape, action, nil
 }
