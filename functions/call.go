@@ -3,6 +3,7 @@ package functions
 import (
 	"bytes"
 	"fmt"
+	"log"
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
@@ -46,8 +47,16 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 			stack = stack.Tail
 			continue
 		}
+		// make call lazy
+		action := func(inputState states.State, args []states.Action) states.Thunk {
+			log.Print("call to ", x.Name, " is being delayed")
+			return func() (states.State, bool, error, states.Thunk) {
+				log.Print("call to ", x.Name, " is being evaluated")
+				return states.State{}, false, nil, funAction(inputState, args)
+			}
+		}
 		// return
-		return funOutputShape, funAction, nil
+		return funOutputShape, action, nil
 	}
 }
 

@@ -57,9 +57,6 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 			Stack:     bodyInputStack,
 			TypeStack: inputState.TypeStack,
 		}
-		//return func() (states.State, bool, error, states.Thunk) {
-		//	return bodyAction(bodyInputState, nil)
-		//}
 		bodyOutputState, _, err := bodyAction(bodyInputState, nil).Eval()
 		if err != nil {
 			return states.EagerThunk(states.State{}, false, err)
