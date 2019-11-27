@@ -58,24 +58,6 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		t,
 	)
-	TestProgram(`for Num def fac Num as if ==0 then 1 else =n *(n -1 fac) ok ok 3 fac`,
-		types.NumType{},
-		values.NumValue(6),
-		nil,
-		t,
-	)
-	TestProgram(`for Any def fac(n Num) Num as n if ==0 then 1 else fac(n -1) *n ok ok fac(3)`,
-		types.NumType{},
-		values.NumValue(6),
-		nil,
-		t,
-	)
-	TestProgram(`for Arr<Num> def fold(start Num, for Num op(Num) Num) Num as is [head;tail] then start op(head) =newStart tail fold(newStart, op) else start ok ok [1, 2, 3] fold(0, +)`,
-		types.NumType{},
-		values.NumValue(6),
-		nil,
-		t,
-	)
 	TestProgram(`for <A> def apply(for <A> f <B>) <B> as f ok 1 apply(+1)`,
 		types.NumType{},
 		values.NumValue(2),
@@ -102,12 +84,6 @@ func TestDefinitions(t *testing.T) {
 	TestProgram(`for <A>|Null def must <A> as is <A> then id else reject ok ok null must`,
 		types.NullType{},
 		values.NullValue{},
-		nil,
-		t,
-	)
-	TestProgram(`for Arr<<A>> def fold(start <B>, for <B> op(<A>) <B>) <B> as is [head;tail] then start op(head) =newStart tail fold(newStart, op) else start ok ok [2, 3, 4] fold(1, *)`,
-		types.NumType{},
-		values.NumValue(24),
 		nil,
 		t,
 	)
