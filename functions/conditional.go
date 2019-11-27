@@ -168,7 +168,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 	action := func(inputState states.State, args []states.Action) states.Thunk {
 		matcherVarStack, ok, err := matcher(inputState)
 		if err != nil {
-			return states.EagerThunk(states.State{}, false, err)
+			return states.Thunk{State: states.State{}, Drop: false, Err: err}
 		}
 		if ok {
 			guardInputState := states.State{
@@ -178,7 +178,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 			}
 			guardState, _, err := guardAction(guardInputState, nil).Eval()
 			if err != nil {
-				return states.EagerThunk(states.State{}, false, err)
+				return states.Thunk{State: states.State{}, Drop: false, Err: err}
 			}
 			boolGuardValue := guardState.Value.(values.BoolValue)
 			if boolGuardValue {
@@ -193,7 +193,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		for i := range elisMatchers {
 			matcherVarStack, ok, err := elisMatchers[i](inputState)
 			if err != nil {
-				return states.EagerThunk(states.State{}, false, err)
+				return states.Thunk{State: states.State{}, Drop: false, Err: err}
 			}
 			if ok {
 				guardInputState := states.State{
@@ -203,7 +203,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 				}
 				guardState, _, err := elisGuardActions[i](guardInputState, nil).Eval()
 				if err != nil {
-					return states.EagerThunk(states.State{}, false, err)
+					return states.Thunk{State: states.State{}, Drop: false, Err: err}
 				}
 				boolGuardValue := guardState.Value.(values.BoolValue)
 				if boolGuardValue {
@@ -230,23 +230,23 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 // location information about the conditional, and the value that was not
 // handled.
 func replaceRejectError(thunk states.Thunk, pos lexer.Position) states.Thunk {
-	return func() (states.State, bool, error, states.Thunk) {
-		state, drop, err, thunk := thunk()
-		if thunk != nil {
-			return states.State{}, false, nil, replaceRejectError(thunk, pos)
+	if thunk.Func == nil {
+		if thunk.Err == nil {
+			return thunk
 		}
-		if err == nil {
-			return state, drop, nil, nil
-		}
-		if rejectError, ok := err.(RejectError); ok {
-			err = errors.E(
+		if rejectError, ok := thunk.Err.(RejectError); ok {
+			thunk.Err = errors.E(
 				errors.Pos(pos),
 				errors.Code(errors.UnexpectedValue),
 				errors.GotValue(rejectError.Value),
 			)
 		}
-		return states.State{}, false, err, nil
-
+		return thunk
+	}
+	return states.Thunk{
+		Func: func() states.Thunk {
+			return replaceRejectError(thunk.Func(), pos)
+		},
 	}
 }
 

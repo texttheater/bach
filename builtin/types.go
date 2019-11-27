@@ -27,7 +27,7 @@ func initTypes() {
 					Stack:     inputState.Stack,
 					TypeStack: inputState.TypeStack,
 				}
-				return states.EagerThunk(outputState, false, nil)
+				return states.Thunk{State: outputState, Drop: false, Err: nil}
 			}
 			return outputShape, action, true, nil
 		},

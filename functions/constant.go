@@ -27,11 +27,12 @@ func (x ConstantExpression) Typecheck(inputShape Shape, params []*Parameter) (Sh
 	}
 	outputShape := Shape{x.Type, inputShape.Stack}
 	action := func(inputState states.State, args []states.Action) states.Thunk {
-		return states.EagerThunk(states.State{
+		return states.Thunk{State: states.State{
 			Value:     x.Value,
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
-		}, false, nil)
+		}, Drop: false, Err: nil}
+
 	}
 	return outputShape, action, nil
 }

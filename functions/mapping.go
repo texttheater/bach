@@ -79,13 +79,14 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 				Func: next,
 			}, nil
 		}
-		return states.EagerThunk(states.State{
+		return states.Thunk{State: states.State{
 			Value: &values.ArrValue{
 				Func: next,
 			},
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
-		}, false, nil)
+		}, Drop: false, Err: nil}
+
 	}
 	return outputShape, action, nil
 }

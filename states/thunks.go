@@ -1,19 +1,19 @@
 package states
 
-type Thunk func() (State, bool, error, Thunk)
-
-func (t Thunk) Eval() (State, bool, error) {
-	var state State
-	var drop bool
-	var err error
-	for t != nil {
-		state, drop, err, t = t()
-	}
-	return state, drop, err
+type Thunk struct {
+	Func  func() Thunk
+	State State
+	Drop  bool
+	Err   error
 }
 
-func EagerThunk(state State, drop bool, err error) Thunk {
-	return func() (State, bool, error, Thunk) {
-		return state, drop, err, nil
+func (t Thunk) Eval() (State, bool, error) {
+	for t.Func != nil {
+		thunk := t.Func()
+		t.State = thunk.State
+		t.Drop = thunk.Drop
+		t.Err = thunk.Err
+		t.Func = thunk.Func
 	}
+	return t.State, t.Drop, t.Err
 }

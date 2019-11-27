@@ -23,10 +23,14 @@ func (a Action) SetArg(arg Action) Action {
 
 func SimpleAction(value values.Value) Action {
 	return func(inputState State, args []Action) Thunk {
-		return EagerThunk(State{
-			Value:     value,
-			Stack:     inputState.Stack,
-			TypeStack: inputState.TypeStack,
-		}, false, nil)
+		return Thunk{
+			State: State{
+				Value:     value,
+				Stack:     inputState.Stack,
+				TypeStack: inputState.TypeStack,
+			},
+			Drop: false,
+			Err:  nil,
+		}
 	}
 }

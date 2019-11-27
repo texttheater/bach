@@ -43,15 +43,16 @@ func (x ObjExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 		for key, valAction := range keyActionMap {
 			valState, _, err := valAction(inputState, nil).Eval()
 			if err != nil {
-				return states.EagerThunk(states.State{}, false, err)
+				return states.Thunk{State: states.State{}, Drop: false, Err: err}
 			}
 			propValMap[key] = valState.Value
 		}
-		return states.EagerThunk(states.State{
+		return states.Thunk{State: states.State{
 			Value:     values.ObjValue(propValMap),
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
-		}, false, nil)
+		}, Drop: false, Err: nil}
+
 	}
 	return outputShape, action, nil
 }

@@ -15,7 +15,7 @@ func initValues() {
 				return functions.Shape{}, nil, false, nil
 			}
 			action := func(inputState states.State, args []states.Action) states.Thunk {
-				return states.EagerThunk(inputState, false, nil)
+				return states.Thunk{State: inputState, Drop: false, Err: nil}
 			}
 			return gotInputShape, action, true, nil
 		},

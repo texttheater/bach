@@ -50,8 +50,10 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 		// This makes deep recursion run in constant space, but
 		// unfortunately very slow!
 		action := func(inputState states.State, args []states.Action) states.Thunk {
-			return func() (states.State, bool, error, states.Thunk) {
-				return states.State{}, false, nil, funAction(inputState, args)
+			return states.Thunk{
+				Func: func() states.Thunk {
+					return funAction(inputState, args)
+				},
 			}
 		}
 		// return
@@ -184,19 +186,20 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 		for i, arg := range args {
 			argState, _, err := arg(argInputState, nil).Eval()
 			if err != nil {
-				return states.EagerThunk(states.State{}, false, err)
+				return states.Thunk{State: states.State{}, Drop: false, Err: err}
 			}
 			argValues[i] = argState.Value
 		}
 		value, err := kernel(inputState.Value, argValues)
 		if err != nil {
-			return states.EagerThunk(states.State{}, false, err)
+			return states.Thunk{State: states.State{}, Drop: false, Err: err}
 		}
-		return states.EagerThunk(states.State{
+		return states.Thunk{State: states.State{
 			Value:     value,
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
-		}, false, nil)
+		}, Drop: false, Err: nil}
+
 	}
 	// return
 	return RegularFuncer(wantInputType, wantName, params, outputType, action)
@@ -209,13 +212,14 @@ func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
 			if stack.Head.ID == id {
 				varState, _, err := stack.Head.Action(states.InitialState, nil).Eval()
 				if err != nil {
-					return states.EagerThunk(states.State{}, false, err)
+					return states.Thunk{State: states.State{}, Drop: false, Err: err}
 				}
-				return states.EagerThunk(states.State{
+				return states.Thunk{State: states.State{
 					Value:     varState.Value,
 					Stack:     inputState.Stack,
 					TypeStack: inputState.TypeStack,
-				}, false, nil)
+				}, Drop: false, Err: nil}
+
 			}
 			stack = stack.Tail
 		}
@@ -271,10 +275,10 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 					argInputState.Stack = inputState.Stack
 					argOutputState, _, err := argAction(argInputState, argArgs).Eval()
 					if err != nil {
-						return states.EagerThunk(states.State{}, false, err)
+						return states.Thunk{State: states.State{}, Drop: false, Err: err}
 					}
 					argOutputState.Stack = inputState.Stack
-					return states.EagerThunk(argOutputState, false, nil)
+					return states.Thunk{State: argOutputState, Drop: false, Err: nil}
 				}
 			}
 			for i := 0; i < len(args); i++ {
