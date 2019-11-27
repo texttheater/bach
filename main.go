@@ -7,7 +7,7 @@ import (
 
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/interpreter"
-	"github.com/texttheater/bach/values"
+	"github.com/texttheater/bach/states"
 )
 
 func main() {
@@ -49,9 +49,9 @@ func main() {
 	}
 }
 
-func forceEvaluation(v values.Value) error {
+func forceEvaluation(v states.Value) error {
 	switch v := v.(type) {
-	case *values.ArrValue:
+	case *states.ArrValue:
 		for {
 			err := v.Eval()
 			if err != nil {
@@ -66,7 +66,7 @@ func forceEvaluation(v values.Value) error {
 			}
 			v = v.Tail
 		}
-	case values.ObjValue:
+	case states.ObjValue:
 		for _, w := range v {
 			err := forceEvaluation(w)
 			if err != nil {

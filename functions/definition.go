@@ -5,7 +5,6 @@ import (
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 type DefinitionExpression struct {
@@ -116,7 +115,7 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 // replaceStacks replaces the stacks in the eventual output state of a thunk
 // with the stacks of the original input state, so functions don't leak their
 // stacks
-func replaceStacks(thunk states.Thunk, stack *states.VariableStack, typeStack *values.BindingStack) states.Thunk {
+func replaceStacks(thunk states.Thunk, stack *states.VariableStack, typeStack *states.BindingStack) states.Thunk {
 	if thunk.Func == nil {
 		thunk.State.Stack = stack
 		thunk.State.TypeStack = typeStack

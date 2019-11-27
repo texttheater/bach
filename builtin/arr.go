@@ -2,8 +2,8 @@ package builtin
 
 import (
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 func initArr() {
@@ -13,9 +13,9 @@ func initArr() {
 			"len",
 			nil,
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				length := 0
-				arr, _ := inputValue.(*values.ArrValue)
+				arr, _ := inputValue.(*states.ArrValue)
 				err := arr.Eval()
 				if err != nil {
 					return nil, err
@@ -28,7 +28,7 @@ func initArr() {
 						return nil, err
 					}
 				}
-				return values.NumValue(float64(length)), nil
+				return states.NumValue(float64(length)), nil
 			},
 		),
 	})
@@ -38,22 +38,22 @@ func initArr() {
 			"range",
 			[]types.Type{types.NumType{}, types.NumType{}},
 			&types.ArrType{types.NumType{}},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				start := argumentValues[0].(values.NumValue)
-				end := argumentValues[1].(values.NumValue)
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				start := argumentValues[0].(states.NumValue)
+				end := argumentValues[1].(states.NumValue)
 				i := start
-				var next func() (values.Value, *values.ArrValue, error)
-				next = func() (values.Value, *values.ArrValue, error) {
+				var next func() (states.Value, *states.ArrValue, error)
+				next = func() (states.Value, *states.ArrValue, error) {
 					if i >= end {
 						return nil, nil, nil
 					}
-					head := values.NumValue(i)
+					head := states.NumValue(i)
 					i++
-					return head, &values.ArrValue{
+					return head, &states.ArrValue{
 						Func: next,
 					}, nil
 				}
-				return &values.ArrValue{
+				return &states.ArrValue{
 					Func: next,
 				}, nil
 			},

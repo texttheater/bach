@@ -4,8 +4,8 @@ import (
 	"math"
 
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 func initMath() {
@@ -15,10 +15,10 @@ func initMath() {
 			"+",
 			[]types.Type{types.NumType{}},
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(inputNum + argumentNum), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputNum := inputValue.(states.NumValue)
+				argumentNum := argumentValues[0].(states.NumValue)
+				return states.NumValue(inputNum + argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -26,10 +26,10 @@ func initMath() {
 			"-",
 			[]types.Type{types.NumType{}},
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(inputNum - argumentNum), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputNum := inputValue.(states.NumValue)
+				argumentNum := argumentValues[0].(states.NumValue)
+				return states.NumValue(inputNum - argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -37,10 +37,10 @@ func initMath() {
 			"*",
 			[]types.Type{types.NumType{}},
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(inputNum * argumentNum), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputNum := inputValue.(states.NumValue)
+				argumentNum := argumentValues[0].(states.NumValue)
+				return states.NumValue(inputNum * argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -48,10 +48,10 @@ func initMath() {
 			"/",
 			[]types.Type{types.NumType{}},
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(inputNum / argumentNum), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputNum := inputValue.(states.NumValue)
+				argumentNum := argumentValues[0].(states.NumValue)
+				return states.NumValue(inputNum / argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -59,10 +59,10 @@ func initMath() {
 			"%",
 			[]types.Type{types.NumType{}},
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.NumValue(math.Mod(float64(inputNum), float64(argumentNum))), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputNum := inputValue.(states.NumValue)
+				argumentNum := argumentValues[0].(states.NumValue)
+				return states.NumValue(math.Mod(float64(inputNum), float64(argumentNum))), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -70,10 +70,10 @@ func initMath() {
 			"<",
 			[]types.Type{types.NumType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum < argumentNum), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputNum := inputValue.(states.NumValue)
+				argumentNum := argumentValues[0].(states.NumValue)
+				return states.BoolValue(inputNum < argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -81,10 +81,10 @@ func initMath() {
 			">",
 			[]types.Type{types.NumType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum > argumentNum), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputNum := inputValue.(states.NumValue)
+				argumentNum := argumentValues[0].(states.NumValue)
+				return states.BoolValue(inputNum > argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -92,10 +92,10 @@ func initMath() {
 			"==",
 			[]types.Type{types.NumType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum == argumentNum), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputNum := inputValue.(states.NumValue)
+				argumentNum := argumentValues[0].(states.NumValue)
+				return states.BoolValue(inputNum == argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -103,10 +103,10 @@ func initMath() {
 			"<=",
 			[]types.Type{types.NumType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum <= argumentNum), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputNum := inputValue.(states.NumValue)
+				argumentNum := argumentValues[0].(states.NumValue)
+				return states.BoolValue(inputNum <= argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -114,10 +114,10 @@ func initMath() {
 			">=",
 			[]types.Type{types.NumType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputNum := inputValue.(values.NumValue)
-				argumentNum := argumentValues[0].(values.NumValue)
-				return values.BoolValue(inputNum >= argumentNum), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputNum := inputValue.(states.NumValue)
+				argumentNum := argumentValues[0].(states.NumValue)
+				return states.BoolValue(inputNum >= argumentNum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -125,8 +125,8 @@ func initMath() {
 			"sum",
 			nil,
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				arr := inputValue.(*values.ArrValue)
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				arr := inputValue.(*states.ArrValue)
 				sum := 0.0
 				for {
 					err := arr.Eval()
@@ -136,10 +136,10 @@ func initMath() {
 					if arr.Head == nil {
 						break
 					}
-					sum += float64(arr.Head.(values.NumValue))
+					sum += float64(arr.Head.(states.NumValue))
 					arr = arr.Tail
 				}
-				return values.NumValue(sum), nil
+				return states.NumValue(sum), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -147,8 +147,8 @@ func initMath() {
 			"avg",
 			nil,
 			types.NumType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				arr := inputValue.(*values.ArrValue)
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				arr := inputValue.(*states.ArrValue)
 				sum := 0.0
 				count := 0.0
 				for {
@@ -159,10 +159,10 @@ func initMath() {
 					if arr.Head == nil {
 						break
 					}
-					sum += float64(arr.Head.(values.NumValue))
+					sum += float64(arr.Head.(states.NumValue))
 					count += 1.0
 				}
-				return values.NumValue(sum / count), nil
+				return states.NumValue(sum / count), nil
 			},
 		),
 	})

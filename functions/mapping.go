@@ -5,7 +5,6 @@ import (
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 type MappingExpression struct {
@@ -52,9 +51,9 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 	}
 	// create action
 	action := func(inputState states.State, args []states.Action) states.Thunk {
-		arr := inputState.Value.(*values.ArrValue)
-		var next func() (values.Value, *values.ArrValue, error)
-		next = func() (values.Value, *values.ArrValue, error) {
+		arr := inputState.Value.(*states.ArrValue)
+		var next func() (states.Value, *states.ArrValue, error)
+		next = func() (states.Value, *states.ArrValue, error) {
 			err := arr.Eval()
 			if err != nil {
 				return nil, nil, err
@@ -75,12 +74,12 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 			if drop {
 				return next()
 			}
-			return bodyOutputState.Value, &values.ArrValue{
+			return bodyOutputState.Value, &states.ArrValue{
 				Func: next,
 			}, nil
 		}
 		return states.Thunk{State: states.State{
-			Value: &values.ArrValue{
+			Value: &states.ArrValue{
 				Func: next,
 			},
 			Stack:     inputState.Stack,

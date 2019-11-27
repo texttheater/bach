@@ -1,9 +1,5 @@
 package states
 
-import (
-	"github.com/texttheater/bach/values"
-)
-
 type Action func(inputState State, args []Action) Thunk
 
 // TODO remove SetArg; currently one builtin funcer uses it; we should provide
@@ -21,7 +17,7 @@ func (a Action) SetArg(arg Action) Action {
 	}
 }
 
-func SimpleAction(value values.Value) Action {
+func SimpleAction(value Value) Action {
 	return func(inputState State, args []Action) Thunk {
 		return Thunk{
 			State: State{

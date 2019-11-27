@@ -2,8 +2,8 @@ package builtin
 
 import (
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 func initLogic() {
@@ -13,8 +13,8 @@ func initLogic() {
 			"true",
 			nil,
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				return values.BoolValue(true), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.BoolValue(true), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -22,8 +22,8 @@ func initLogic() {
 			"false",
 			nil,
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				return values.BoolValue(false), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.BoolValue(false), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -31,10 +31,10 @@ func initLogic() {
 			"and",
 			[]types.Type{types.BoolType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputBool := inputValue.(values.BoolValue)
-				argumentBool := argumentValues[0].(values.BoolValue)
-				return values.BoolValue(inputBool && argumentBool), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputBool := inputValue.(states.BoolValue)
+				argumentBool := argumentValues[0].(states.BoolValue)
+				return states.BoolValue(inputBool && argumentBool), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -42,10 +42,10 @@ func initLogic() {
 			"or",
 			[]types.Type{types.BoolType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputBool := inputValue.(values.BoolValue)
-				argumentBool := argumentValues[0].(values.BoolValue)
-				return values.BoolValue(inputBool || argumentBool), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputBool := inputValue.(states.BoolValue)
+				argumentBool := argumentValues[0].(states.BoolValue)
+				return states.BoolValue(inputBool || argumentBool), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -53,9 +53,9 @@ func initLogic() {
 			"not",
 			nil,
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputBool := inputValue.(values.BoolValue)
-				return values.BoolValue(!inputBool), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputBool := inputValue.(states.BoolValue)
+				return states.BoolValue(!inputBool), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -63,10 +63,10 @@ func initLogic() {
 			"==",
 			[]types.Type{types.BoolType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				inputBool := inputValue.(values.BoolValue)
-				argumentBool := argumentValues[0].(values.BoolValue)
-				return values.BoolValue(inputBool == argumentBool), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputBool := inputValue.(states.BoolValue)
+				argumentBool := argumentValues[0].(states.BoolValue)
+				return states.BoolValue(inputBool == argumentBool), nil
 			},
 		),
 	})

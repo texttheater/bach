@@ -5,15 +5,15 @@ import (
 
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 func TestCalls(t *testing.T) {
 	TestProgram(
 		`for Num def f Num as =x x ok for Str def f Str as =x x ok`,
 		types.NullType{},
-		values.NullValue{},
+		states.NullValue{},
 		nil,
 		t,
 	)
@@ -26,7 +26,7 @@ func TestCalls(t *testing.T) {
 	TestProgram(
 		`for Num def f Num as =x x ok for Str def f Str as =x x ok 2 f`,
 		types.NumType{},
-		values.NumValue(2),
+		states.NumValue(2),
 		nil,
 		t,
 	)
@@ -39,21 +39,21 @@ func TestCalls(t *testing.T) {
 	TestProgram(
 		`for Any def f(x Num) Num as x ok`,
 		types.NullType{},
-		values.NullValue{},
+		states.NullValue{},
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(x Num) Num as x ok f(1)`,
 		types.NumType{},
-		values.NumValue(1),
+		states.NumValue(1),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok`,
 		types.NullType{},
-		values.NullValue{},
+		states.NullValue{},
 		nil,
 		t,
 	)
@@ -72,7 +72,7 @@ func TestCalls(t *testing.T) {
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok`,
 		types.NullType{},
-		values.NullValue{},
+		states.NullValue{},
 		nil,
 		t,
 	)
@@ -85,28 +85,28 @@ func TestCalls(t *testing.T) {
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok f(1)`,
 		types.NumType{},
-		values.NumValue(1),
+		states.NumValue(1),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok f(+1)`,
 		types.NumType{},
-		values.NumValue(2),
+		states.NumValue(2),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok f(+2)`,
 		types.NumType{},
-		values.NumValue(3),
+		states.NumValue(3),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok f(*10)`,
 		types.NumType{},
-		values.NumValue(10),
+		states.NumValue(10),
 		nil,
 		t,
 	)
@@ -119,28 +119,28 @@ func TestCalls(t *testing.T) {
 	TestProgram(
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok`,
 		types.NullType{},
-		values.NullValue{},
+		states.NullValue{},
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok f(+)`,
 		types.NumType{},
-		values.NumValue(3),
+		states.NumValue(3),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok f(*)`,
 		types.NumType{},
-		values.NumValue(2),
+		states.NumValue(2),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok f(/)`,
 		types.NumType{},
-		values.NumValue(0.5),
+		states.NumValue(0.5),
 		nil,
 		t,
 	)
@@ -159,7 +159,7 @@ func TestCalls(t *testing.T) {
 	TestProgram(
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok`,
 		types.NullType{},
-		values.NullValue{},
+		states.NullValue{},
 		nil,
 		t,
 	)

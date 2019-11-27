@@ -6,12 +6,11 @@ import (
 	"github.com/texttheater/bach/grammar"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 // InterpretString takes a Bach program as a string, interprets it and returns
 // the result type and value.
-func InterpretString(program string) (types.Type, values.Value, error) {
+func InterpretString(program string) (types.Type, states.Value, error) {
 	// parse
 	x, err := grammar.Parse(program)
 	if err != nil {

@@ -5,7 +5,6 @@ import (
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 type ConditionalExpression struct {
@@ -42,7 +41,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 	var guardAction states.Action
 	if x.Guard == nil {
 		guardOutputShape = patternOutputShape
-		guardAction = states.SimpleAction(values.BoolValue(true))
+		guardAction = states.SimpleAction(states.BoolValue(true))
 	} else {
 		guardOutputShape, guardAction, err = x.Guard.Typecheck(patternOutputShape, nil)
 		if err != nil {
@@ -98,7 +97,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		var guardOutputShape Shape
 		if x.AlternativeGuards[i] == nil {
 			guardOutputShape = patternOutputShape
-			elisGuardActions[i] = states.SimpleAction(values.BoolValue(true))
+			elisGuardActions[i] = states.SimpleAction(states.BoolValue(true))
 		} else {
 			guardOutputShape, elisGuardActions[i], err = x.AlternativeGuards[i].Typecheck(patternOutputShape, nil)
 			if err != nil {
@@ -180,7 +179,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 			if err != nil {
 				return states.Thunk{State: states.State{}, Drop: false, Err: err}
 			}
-			boolGuardValue := guardState.Value.(values.BoolValue)
+			boolGuardValue := guardState.Value.(states.BoolValue)
 			if boolGuardValue {
 				consequentInputState := states.State{
 					Value:     inputState.Value,
@@ -205,7 +204,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 				if err != nil {
 					return states.Thunk{State: states.State{}, Drop: false, Err: err}
 				}
-				boolGuardValue := guardState.Value.(values.BoolValue)
+				boolGuardValue := guardState.Value.(states.BoolValue)
 				if boolGuardValue {
 					consequentInputState := states.State{
 						Value:     inputState.Value,
@@ -378,7 +377,7 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	matcher := func(inputState states.State) (*states.VariableStack, bool, error) {
 		varStack := inputState.Stack
 		switch v := inputState.Value.(type) {
-		case *values.ArrValue:
+		case *states.ArrValue:
 			for _, elMatcher := range elementMatchers {
 				err := v.Eval()
 				if err != nil {
@@ -514,7 +513,7 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	matcher := func(inputState states.State) (*states.VariableStack, bool, error) {
 		varStack := inputState.Stack
 		switch v := inputState.Value.(type) {
-		case values.ObjValue:
+		case states.ObjValue:
 			for prop, valMatcher := range propMatcherMap {
 				value, ok := v[prop]
 				if !ok {

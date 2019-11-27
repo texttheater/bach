@@ -8,7 +8,6 @@ import (
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 type RegexpExpression struct {
@@ -53,28 +52,28 @@ func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 		Stack: inputShape.Stack,
 	}
 	action := func(inputState states.State, args []states.Action) states.Thunk {
-		inputString := string(inputState.Value.(values.StrValue))
+		inputString := string(inputState.Value.(states.StrValue))
 		match := x.Regexp.FindStringSubmatchIndex(inputString)
 		if match == nil {
 			return states.Thunk{State: states.State{
-				Value:     values.NullValue{},
+				Value:     states.NullValue{},
 				Stack:     inputState.Stack,
 				TypeStack: inputState.TypeStack,
 			}, Drop: false, Err: nil}
 
 		}
-		propValueMap := make(map[string]values.Value)
+		propValueMap := make(map[string]states.Value)
 		if propTypeMap["start"].Subsumes(types.NumType{}) {
-			propValueMap["start"] = values.NumValue(match[0])
+			propValueMap["start"] = states.NumValue(match[0])
 		}
 		for i, name := range x.Regexp.SubexpNames() {
 			fromIndex := match[2*i]
 			toIndex := match[2*i+1]
-			var submatch values.Value
+			var submatch states.Value
 			if fromIndex == -1 {
-				submatch = values.NullValue{}
+				submatch = states.NullValue{}
 			} else {
-				submatch = values.StrValue(inputString[fromIndex:toIndex])
+				submatch = states.StrValue(inputString[fromIndex:toIndex])
 			}
 			propValueMap[strconv.Itoa(i)] = submatch
 			if name != "" {
@@ -82,7 +81,7 @@ func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 			}
 		}
 		return states.Thunk{State: states.State{
-			Value:     values.ObjValue(propValueMap),
+			Value:     states.ObjValue(propValueMap),
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
 		}, Drop: false, Err: nil}

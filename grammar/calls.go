@@ -8,8 +8,8 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 type Call struct {
@@ -76,7 +76,7 @@ func (g *Op1Num) Ast() (functions.Expression, error) {
 			&functions.ConstantExpression{
 				Pos:   numPos,
 				Type:  types.NumType{},
-				Value: values.NumValue(num),
+				Value: states.NumValue(num),
 			},
 		},
 	}, nil
@@ -102,7 +102,7 @@ func (g *Op2Num) Ast() (functions.Expression, error) {
 			&functions.ConstantExpression{
 				Pos:   numPos,
 				Type:  types.NumType{},
-				Value: values.NumValue(num),
+				Value: states.NumValue(num),
 			},
 		},
 	}, nil
@@ -310,7 +310,7 @@ func (g *NameString) Ast() (functions.Expression, error) {
 			&functions.ConstantExpression{
 				Pos:   strPos,
 				Type:  types.StrType{},
-				Value: values.StrValue(str),
+				Value: states.StrValue(str),
 			},
 		},
 	}, nil

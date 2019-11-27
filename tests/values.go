@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 func TestValues(t *testing.T) {
@@ -15,7 +15,7 @@ func TestValues(t *testing.T) {
 		nil,
 		errors.E(
 			errors.Code(errors.UnexpectedValue),
-			errors.GotValue(values.BoolValue(false)),
+			errors.GotValue(states.BoolValue(false)),
 		),
 		t,
 	)

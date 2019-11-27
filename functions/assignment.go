@@ -4,7 +4,6 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
-	"github.com/texttheater/bach/values"
 )
 
 type AssignmentExpression struct {
@@ -40,10 +39,10 @@ func (x AssignmentExpression) Typecheck(inputShape Shape, params []*Parameter) (
 }
 
 type valueStack struct {
-	Head values.Value
+	Head states.Value
 	Tail *valueStack
 }
 
-func (s *valueStack) Push(element values.Value) *valueStack {
+func (s *valueStack) Push(element states.Value) *valueStack {
 	return &valueStack{element, s}
 }

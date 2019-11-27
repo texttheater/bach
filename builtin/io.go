@@ -8,7 +8,6 @@ import (
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 func initIO() {
@@ -18,8 +17,8 @@ func initIO() {
 			"in",
 			nil,
 			types.ReaderType{},
-			func(inputValue values.Value, argValues []values.Value) (values.Value, error) {
-				return values.ReaderValue{
+			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
+				return states.ReaderValue{
 					os.Stdin,
 				}, nil
 			},
@@ -29,20 +28,20 @@ func initIO() {
 			"lines",
 			nil,
 			&types.ArrType{types.StrType{}},
-			func(inputValue values.Value, argValues []values.Value) (values.Value, error) {
-				reader, _ := inputValue.(values.ReaderValue)
+			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
+				reader, _ := inputValue.(states.ReaderValue)
 				scanner := bufio.NewScanner(reader.Reader)
-				var next func() (values.Value, *values.ArrValue, error)
-				next = func() (values.Value, *values.ArrValue, error) {
+				var next func() (states.Value, *states.ArrValue, error)
+				next = func() (states.Value, *states.ArrValue, error) {
 					ok := scanner.Scan()
 					if !ok {
 						return nil, nil, nil
 					}
-					return values.StrValue(scanner.Text()), &values.ArrValue{
+					return states.StrValue(scanner.Text()), &states.ArrValue{
 						Func: next,
 					}, nil
 				}
-				return &values.ArrValue{
+				return &states.ArrValue{
 					Func: next,
 				}, nil
 			},

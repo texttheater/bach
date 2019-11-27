@@ -5,7 +5,6 @@ import (
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 type ArrExpression struct {
@@ -34,7 +33,7 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 		outputType = types.VoidArrType
 		action = func(inputState states.State, args []states.Action) states.Thunk {
 			return states.Thunk{State: states.State{
-				Value: &values.ArrValue{},
+				Value: &states.ArrValue{},
 				Stack: inputState.Stack,
 			}, Drop: false, Err: nil}
 
@@ -69,8 +68,8 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 		tailAction := action
 		action = func(inputState states.State, args []states.Action) states.Thunk {
 			return states.Thunk{State: states.State{
-				Value: &values.ArrValue{
-					Func: func() (values.Value, *values.ArrValue, error) {
+				Value: &states.ArrValue{
+					Func: func() (states.Value, *states.ArrValue, error) {
 						headState, _, err := elementAction(inputState, nil).Eval()
 						if err != nil {
 							return nil, nil, err
@@ -79,7 +78,7 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 						if err != nil {
 							return nil, nil, err
 						}
-						return headState.Value, tailState.Value.(*values.ArrValue), nil
+						return headState.Value, tailState.Value.(*states.ArrValue), nil
 					},
 				},
 				Stack: inputState.Stack,

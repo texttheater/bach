@@ -4,7 +4,6 @@ import (
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 func initTypes() {
@@ -21,7 +20,7 @@ func initTypes() {
 				Stack: gotInputShape.Stack,
 			}
 			action := func(inputState states.State, args []states.Action) states.Thunk {
-				outputValue := values.StrValue(gotInputShape.Type.String())
+				outputValue := states.StrValue(gotInputShape.Type.String())
 				outputState := states.State{
 					Value:     outputValue,
 					Stack:     inputState.Stack,

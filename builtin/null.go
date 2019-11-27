@@ -2,8 +2,8 @@ package builtin
 
 import (
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 func initNull() {
@@ -13,8 +13,8 @@ func initNull() {
 			"null",
 			nil,
 			types.NullType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				return values.NullValue{}, nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NullValue{}, nil
 			},
 		),
 	})

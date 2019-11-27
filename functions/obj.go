@@ -5,7 +5,6 @@ import (
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 type ObjExpression struct {
@@ -39,7 +38,7 @@ func (x ObjExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 		Stack: inputShape.Stack,
 	}
 	action := func(inputState states.State, args []states.Action) states.Thunk {
-		propValMap := make(map[string]values.Value)
+		propValMap := make(map[string]states.Value)
 		for key, valAction := range keyActionMap {
 			valState, _, err := valAction(inputState, nil).Eval()
 			if err != nil {
@@ -48,7 +47,7 @@ func (x ObjExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 			propValMap[key] = valState.Value
 		}
 		return states.Thunk{State: states.State{
-			Value:     values.ObjValue(propValMap),
+			Value:     states.ObjValue(propValMap),
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
 		}, Drop: false, Err: nil}

@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 func TestRegexp(t *testing.T) {
@@ -22,12 +22,12 @@ func TestRegexp(t *testing.T) {
 				},
 			),
 		),
-		values.ObjValue(
-			map[string]values.Value{
-				"start": values.NumValue(1),
-				"0":     values.StrValue("bccd"),
-				"1":     values.StrValue("cc"),
-				"cs":    values.StrValue("cc"),
+		states.ObjValue(
+			map[string]states.Value{
+				"start": states.NumValue(1),
+				"0":     states.StrValue("bccd"),
+				"1":     states.StrValue("cc"),
+				"cs":    states.StrValue("cc"),
 			},
 		),
 		nil,
@@ -46,7 +46,7 @@ func TestRegexp(t *testing.T) {
 				},
 			),
 		),
-		values.NullValue{},
+		states.NullValue{},
 		nil,
 		t,
 	)

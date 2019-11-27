@@ -7,11 +7,11 @@ import (
 
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/interpreter"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
-func TestProgram(program string, wantType types.Type, wantValue values.Value, wantError error, t *testing.T) {
+func TestProgram(program string, wantType types.Type, wantValue states.Value, wantError error, t *testing.T) {
 	//log.Print(program)
 	var wantValueStr string
 	if wantValue != nil {

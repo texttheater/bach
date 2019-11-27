@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 func initText() {
@@ -16,22 +16,22 @@ func initText() {
 			"split",
 			nil,
 			&types.ArrType{types.StrType{}},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				str, _ := inputValue.(values.StrValue)
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str, _ := inputValue.(states.StrValue)
 				fields := strings.Fields(string(str))
 				i := 0
-				var next func() (values.Value, *values.ArrValue, error)
-				next = func() (values.Value, *values.ArrValue, error) {
+				var next func() (states.Value, *states.ArrValue, error)
+				next = func() (states.Value, *states.ArrValue, error) {
 					if i >= len(fields) {
 						return nil, nil, nil
 					}
-					head := values.StrValue(fields[i])
+					head := states.StrValue(fields[i])
 					i++
-					return head, &values.ArrValue{
+					return head, &states.ArrValue{
 						Func: next,
 					}, nil
 				}
-				return &values.ArrValue{
+				return &states.ArrValue{
 					Func: next,
 				}, nil
 			},
@@ -41,14 +41,14 @@ func initText() {
 			"join",
 			nil, // TODO separator
 			types.StrType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				arr, _ := inputValue.(*values.ArrValue)
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				arr, _ := inputValue.(*states.ArrValue)
 				err := arr.Eval()
 				if err != nil {
 					return nil, err
 				}
 				if arr.Head == nil {
-					return values.StrValue(""), nil
+					return states.StrValue(""), nil
 				}
 				var buffer bytes.Buffer
 				str, err := arr.Head.Out()
@@ -74,7 +74,7 @@ func initText() {
 						return nil, err
 					}
 				}
-				return values.StrValue(buffer.String()), nil
+				return states.StrValue(buffer.String()), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -82,10 +82,10 @@ func initText() {
 			"==",
 			[]types.Type{types.StrType{}},
 			types.BoolType{},
-			func(inputValue values.Value, argumentValues []values.Value) (values.Value, error) {
-				str1 := string(inputValue.(values.StrValue))
-				str2 := string(argumentValues[0].(values.StrValue))
-				return values.BoolValue(str1 == str2), nil
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str1 := string(inputValue.(states.StrValue))
+				str2 := string(argumentValues[0].(states.StrValue))
+				return states.BoolValue(str1 == str2), nil
 			},
 		),
 	})

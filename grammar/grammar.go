@@ -3,8 +3,8 @@ package grammar
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 // A composition consists of components. There are different types of
@@ -59,14 +59,14 @@ func (g *SComponent) Ast() (functions.Expression, error) {
 		return &functions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.NumType{},
-			Value: values.NumValue(*g.Num),
+			Value: states.NumValue(*g.Num),
 		}, nil
 	}
 	if g.Str != nil {
 		return &functions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.StrType{},
-			Value: values.StrValue(*g.Str),
+			Value: states.StrValue(*g.Str),
 		}, nil
 	}
 	if g.Array != nil {
@@ -115,14 +115,14 @@ func (g *PComponent) Ast() (functions.Expression, error) {
 		return &functions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.NumType{},
-			Value: values.NumValue(*g.Num),
+			Value: states.NumValue(*g.Num),
 		}, nil
 	}
 	if g.Str != nil {
 		return &functions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.StrType{},
-			Value: values.StrValue(*g.Str),
+			Value: states.StrValue(*g.Str),
 		}, nil
 	}
 	if g.Array != nil {
@@ -194,14 +194,14 @@ func (g *QComponent) Ast() (functions.Expression, error) {
 		return &functions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.NumType{},
-			Value: values.NumValue(*g.Num),
+			Value: states.NumValue(*g.Num),
 		}, nil
 	}
 	if g.Str != nil {
 		return &functions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.StrType{},
-			Value: values.StrValue(*g.Str),
+			Value: states.StrValue(*g.Str),
 		}, nil
 	}
 	if g.Array != nil {

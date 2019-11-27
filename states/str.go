@@ -1,24 +1,24 @@
-package values
+package states
 
 import (
-	"strconv"
+	"fmt"
 
 	"github.com/texttheater/bach/types"
 )
 
-type BoolValue bool
+type StrValue string
 
-func (v BoolValue) String() (string, error) {
-	return strconv.FormatBool(bool(v)), nil
+func (v StrValue) String() (string, error) {
+	return fmt.Sprintf("%q", string(v)), nil
 }
 
-func (v BoolValue) Out() (string, error) {
-	return v.String()
+func (v StrValue) Out() (string, error) {
+	return string(v), nil
 }
 
-func (v BoolValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
+func (v StrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
-	case types.BoolType:
+	case types.StrType:
 		return true, nil
 	case types.UnionType:
 		return inhabits(v, t, stack)
@@ -31,9 +31,9 @@ func (v BoolValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	}
 }
 
-func (v BoolValue) Equal(w Value) (bool, error) {
+func (v StrValue) Equal(w Value) (bool, error) {
 	switch w := w.(type) {
-	case BoolValue:
+	case StrValue:
 		return v == w, nil
 	default:
 		return false, nil

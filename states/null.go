@@ -1,4 +1,4 @@
-package values
+package states
 
 import (
 	"github.com/texttheater/bach/types"

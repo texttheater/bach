@@ -8,7 +8,6 @@ import (
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 type CallExpression struct {
@@ -163,7 +162,7 @@ func (p Parameter) String() string {
 
 type Funcer func(gotInputShape Shape, gotCall CallExpression, gotParams []*Parameter) (outputShape Shape, action states.Action, ok bool, err error)
 
-type Kernel func(inputValue values.Value, argValues []values.Value) (values.Value, error)
+type Kernel func(inputValue states.Value, argValues []states.Value) (states.Value, error)
 
 func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, kernel Kernel) Funcer {
 	// make parameters from argument types
@@ -177,9 +176,9 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 	}
 	// make action from kernel
 	action := func(inputState states.State, args []states.Action) states.Thunk {
-		argValues := make([]values.Value, len(argTypes))
+		argValues := make([]states.Value, len(argTypes))
 		argInputState := states.State{
-			Value:     values.NullValue{},
+			Value:     states.NullValue{},
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
 		}
@@ -308,7 +307,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 		funAction3 := func(inputState states.State, args []states.Action) states.Thunk {
 			typeStack := inputState.TypeStack
 			for n, t := range bindings {
-				typeStack = typeStack.Push(values.Binding{
+				typeStack = typeStack.Push(states.Binding{
 					Name: n,
 					Type: t,
 				})

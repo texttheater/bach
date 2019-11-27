@@ -5,13 +5,12 @@ import (
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 type ConstantExpression struct {
 	Pos   lexer.Position
 	Type  types.Type
-	Value values.Value
+	Value states.Value
 }
 
 func (x ConstantExpression) Position() lexer.Position {

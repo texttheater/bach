@@ -1,13 +1,9 @@
 package states
 
-import (
-	"github.com/texttheater/bach/values"
-)
-
 type State struct {
-	Value     values.Value
+	Value     Value
 	Stack     *VariableStack
-	TypeStack *values.BindingStack
+	TypeStack *BindingStack
 }
 
 type VariableStack struct {
@@ -28,5 +24,5 @@ type Variable struct {
 }
 
 var InitialState = State{
-	Value: values.NullValue{},
+	Value: NullValue{},
 }

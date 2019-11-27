@@ -4,48 +4,48 @@ import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
-	"github.com/texttheater/bach/values"
 )
 
 func TestArrays(t *testing.T) {
 	TestProgram(
 		`[]`,
 		types.TupType([]types.Type{}),
-		values.NewArrValue([]values.Value{}),
+		states.NewArrValue([]states.Value{}),
 		nil,
 		t,
 	)
 	TestProgram(
 		`[1]`,
 		types.TupType([]types.Type{types.NumType{}}),
-		values.NewArrValue([]values.Value{values.NumValue(1)}),
+		states.NewArrValue([]states.Value{states.NumValue(1)}),
 		nil,
 		t,
 	)
 	TestProgram(
 		`[1, 2, 3]`,
 		types.TupType([]types.Type{types.NumType{}, types.NumType{}, types.NumType{}}),
-		values.NewArrValue([]values.Value{values.NumValue(1),
-			values.NumValue(2),
-			values.NumValue(3)}),
+		states.NewArrValue([]states.Value{states.NumValue(1),
+			states.NumValue(2),
+			states.NumValue(3)}),
 		nil,
 		t,
 	)
 	TestProgram(
 		`[1, "a"]`,
 		types.TupType([]types.Type{types.NumType{}, types.StrType{}}),
-		values.NewArrValue([]values.Value{values.NumValue(1),
-			values.StrValue("a")}),
+		states.NewArrValue([]states.Value{states.NumValue(1),
+			states.StrValue("a")}),
 		nil,
 		t,
 	)
 	TestProgram(
 		`[[1, 2], ["a", "b"]]`,
 		types.TupType([]types.Type{types.TupType([]types.Type{types.NumType{}, types.NumType{}}), types.TupType([]types.Type{types.StrType{}, types.StrType{}})}),
-		values.NewArrValue([]values.Value{values.NewArrValue([]values.Value{values.NumValue(1),
-			values.NumValue(2)}),
-			values.NewArrValue([]values.Value{values.StrValue("a"), values.StrValue("b")})}),
+		states.NewArrValue([]states.Value{states.NewArrValue([]states.Value{states.NumValue(1),
+			states.NumValue(2)}),
+			states.NewArrValue([]states.Value{states.StrValue("a"), states.StrValue("b")})}),
 		nil,
 		t,
 	)
@@ -54,11 +54,11 @@ func TestArrays(t *testing.T) {
 		&types.ArrType{
 			types.NumType{},
 		},
-		values.NewArrValue(
-			[]values.Value{
-				values.NumValue(1),
-				values.NumValue(2),
-				values.NumValue(3),
+		states.NewArrValue(
+			[]states.Value{
+				states.NumValue(1),
+				states.NumValue(2),
+				states.NumValue(3),
 			},
 		),
 		nil,
@@ -69,11 +69,11 @@ func TestArrays(t *testing.T) {
 		&types.ArrType{
 			types.NumType{},
 		},
-		values.NewArrValue(
-			[]values.Value{
-				values.NumValue(2),
-				values.NumValue(4),
-				values.NumValue(6),
+		states.NewArrValue(
+			[]states.Value{
+				states.NumValue(2),
+				states.NumValue(4),
+				states.NumValue(6),
 			},
 		),
 		nil,
@@ -95,9 +95,9 @@ func TestArrays(t *testing.T) {
 				types.NumType{},
 			},
 		),
-		values.NewArrValue(
-			[]values.Value{
-				values.NumValue(1),
+		states.NewArrValue(
+			[]states.Value{
+				states.NumValue(1),
 			},
 		),
 		nil,
@@ -113,12 +113,12 @@ func TestArrays(t *testing.T) {
 				types.NumType{},
 			},
 		),
-		values.NewArrValue(
-			[]values.Value{
-				values.NumValue(1),
-				values.NumValue(2),
-				values.NumValue(3),
-				values.NumValue(4),
+		states.NewArrValue(
+			[]states.Value{
+				states.NumValue(1),
+				states.NumValue(2),
+				states.NumValue(3),
+				states.NumValue(4),
 			},
 		),
 		nil,
@@ -141,7 +141,7 @@ func TestArrays(t *testing.T) {
 		nil,
 		errors.E(
 			errors.Code(errors.UnexpectedValue),
-			errors.GotValue(values.NumValue(1)),
+			errors.GotValue(states.NumValue(1)),
 		),
 		t,
 	)
@@ -151,7 +151,7 @@ func TestArrays(t *testing.T) {
 		nil,
 		errors.E(
 			errors.Code(errors.UnexpectedValue),
-			errors.GotValue(values.NumValue(1)),
+			errors.GotValue(states.NumValue(1)),
 		),
 		t,
 	)

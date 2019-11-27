@@ -1,4 +1,4 @@
-package values
+package states
 
 import (
 	"strconv"
@@ -6,19 +6,19 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-type NumValue float64
+type BoolValue bool
 
-func (v NumValue) String() (string, error) {
-	return strconv.FormatFloat(float64(v), 'f', -1, 64), nil
+func (v BoolValue) String() (string, error) {
+	return strconv.FormatBool(bool(v)), nil
 }
 
-func (v NumValue) Out() (string, error) {
+func (v BoolValue) Out() (string, error) {
 	return v.String()
 }
 
-func (v NumValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
+func (v BoolValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
-	case types.NumType:
+	case types.BoolType:
 		return true, nil
 	case types.UnionType:
 		return inhabits(v, t, stack)
@@ -31,9 +31,9 @@ func (v NumValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	}
 }
 
-func (v NumValue) Equal(w Value) (bool, error) {
+func (v BoolValue) Equal(w Value) (bool, error) {
 	switch w := w.(type) {
-	case NumValue:
+	case BoolValue:
 		return v == w, nil
 	default:
 		return false, nil
