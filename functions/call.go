@@ -46,14 +46,8 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 			stack = stack.Tail
 			continue
 		}
-		// make call lazy
-		action := func(inputState states.State, args []states.Action) states.Thunk {
-			return func() (states.State, bool, error, states.Thunk) {
-				return states.State{}, false, nil, funAction(inputState, args)
-			}
-		}
 		// return
-		return funOutputShape, action, nil
+		return funOutputShape, funAction, nil
 	}
 }
 
