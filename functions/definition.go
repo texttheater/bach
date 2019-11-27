@@ -5,6 +5,7 @@ import (
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
+	"github.com/texttheater/bach/values"
 )
 
 type DefinitionExpression struct {
@@ -57,7 +58,7 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 			Stack:     bodyInputStack,
 			TypeStack: inputState.TypeStack,
 		}
-		return replaceStacks(bodyAction(bodyInputState, nil), inputState)
+		return replaceStacks(bodyAction(bodyInputState, nil), inputState.Stack, inputState.TypeStack)
 	}
 	// make a funcer for the defined function, add it to the function stack
 	funFuncer := RegularFuncer(x.InputType, x.Name, x.Params, x.OutputType, funAction)
@@ -115,17 +116,17 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 // replaceStacks replaces the stacks in the eventual output state of a thunk
 // with the stacks of the original input state, so functions don't leak their
 // stacks
-func replaceStacks(thunk states.Thunk, inputState states.State) states.Thunk {
+func replaceStacks(thunk states.Thunk, stack *states.VariableStack, typeStack *values.BindingStack) states.Thunk {
 	return func() (states.State, bool, error, states.Thunk) {
 		state, _, err, thunk := thunk()
 		if thunk != nil {
-			return states.State{}, false, nil, replaceStacks(thunk, inputState)
+			return states.State{}, false, nil, replaceStacks(thunk, stack, typeStack)
 		}
 		if err != nil {
 			return states.State{}, false, err, nil
 		}
-		state.Stack = inputState.Stack
-		state.TypeStack = inputState.TypeStack
+		state.Stack = stack
+		state.TypeStack = typeStack
 		return state, false, nil, nil
 	}
 }
