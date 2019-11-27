@@ -23,27 +23,31 @@ func initIO() {
 				}, nil
 			},
 		),
-		functions.SimpleFuncer(
+		functions.RegularFuncer(
 			types.ReaderType{},
 			"lines",
 			nil,
 			&types.ArrType{types.StrType{}},
-			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
-				reader, _ := inputValue.(states.ReaderValue)
+			func(inputState states.State, args []states.Action) *states.Thunk {
+				reader := inputState.Value.(states.ReaderValue)
 				scanner := bufio.NewScanner(reader.Reader)
-				var next func() (states.Value, *states.ArrValue, error)
-				next = func() (states.Value, *states.ArrValue, error) {
+				var next func() *states.Thunk
+				next = func() *states.Thunk {
 					ok := scanner.Scan()
 					if !ok {
-						return nil, nil, nil
+						return states.ThunkFromValue((*states.ArrValue)(nil))
 					}
-					return states.StrValue(scanner.Text()), &states.ArrValue{
-						Func: next,
-					}, nil
+					return states.ThunkFromValue(&states.ArrValue{
+						Head: states.StrValue(scanner.Text()),
+						Tail: &states.Thunk{
+							Func: func() *states.Thunk {
+								return next()
+							},
+						},
+					})
+
 				}
-				return &states.ArrValue{
-					Func: next,
-				}, nil
+				return next()
 			},
 		),
 		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*functions.Parameter) (functions.Shape, states.Action, bool, error) {
@@ -57,13 +61,17 @@ func initIO() {
 				Type:  gotInputShape.Type,
 				Stack: gotInputShape.Stack,
 			}
-			action := func(inputState states.State, args []states.Action) states.Thunk {
+			action := func(inputState states.State, args []states.Action) *states.Thunk {
 				str, err := inputState.Value.Out()
 				if err != nil {
-					return states.Thunk{State: states.State{}, Drop: false, Err: err}
+					return &states.Thunk{
+						Err: err,
+					}
 				}
 				fmt.Println(str)
-				return states.Thunk{State: inputState, Drop: false, Err: nil}
+				return &states.Thunk{
+					State: inputState,
+				}
 			}
 			return outputShape, action, true, nil
 		},
@@ -78,13 +86,17 @@ func initIO() {
 				Type:  gotInputShape.Type,
 				Stack: gotInputShape.Stack,
 			}
-			action := func(inputState states.State, args []states.Action) states.Thunk {
+			action := func(inputState states.State, args []states.Action) *states.Thunk {
 				str, err := inputState.Value.Out()
 				if err != nil {
-					return states.Thunk{State: states.State{}, Drop: false, Err: err}
+					return &states.Thunk{
+						Err: err,
+					}
 				}
 				fmt.Fprintln(os.Stderr, str)
-				return states.Thunk{State: inputState, Drop: false, Err: nil}
+				return &states.Thunk{
+					State: inputState,
+				}
 			}
 			return outputShape, action, true, nil
 		},

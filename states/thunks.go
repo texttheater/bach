@@ -1,13 +1,13 @@
 package states
 
 type Thunk struct {
-	Func  func() Thunk
+	Func  func() *Thunk
 	State State
 	Drop  bool
 	Err   error
 }
 
-func (t Thunk) Eval() (State, bool, error) {
+func (t *Thunk) Eval() (State, bool, error) {
 	for t.Func != nil {
 		thunk := t.Func()
 		t.State = thunk.State
@@ -16,4 +16,12 @@ func (t Thunk) Eval() (State, bool, error) {
 		t.Func = thunk.Func
 	}
 	return t.State, t.Drop, t.Err
+}
+
+func ThunkFromValue(v Value) *Thunk {
+	return &Thunk{
+		State: State{
+			Value: v,
+		},
+	}
 }

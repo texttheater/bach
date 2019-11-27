@@ -128,16 +128,13 @@ func initMath() {
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				arr := inputValue.(*states.ArrValue)
 				sum := 0.0
-				for {
-					err := arr.Eval()
+				for arr != nil {
+					sum += float64(arr.Head.(states.NumValue))
+					var err error
+					arr, err = arr.GetTail()
 					if err != nil {
 						return nil, err
 					}
-					if arr.Head == nil {
-						break
-					}
-					sum += float64(arr.Head.(states.NumValue))
-					arr = arr.Tail
 				}
 				return states.NumValue(sum), nil
 			},
@@ -151,16 +148,14 @@ func initMath() {
 				arr := inputValue.(*states.ArrValue)
 				sum := 0.0
 				count := 0.0
-				for {
-					err := arr.Eval()
+				for arr != nil {
+					sum += float64(arr.Head.(states.NumValue))
+					count += 1.0
+					var err error
+					arr, err = arr.GetTail()
 					if err != nil {
 						return nil, err
 					}
-					if arr.Head == nil {
-						break
-					}
-					sum += float64(arr.Head.(states.NumValue))
-					count += 1.0
 				}
 				return states.NumValue(sum / count), nil
 			},

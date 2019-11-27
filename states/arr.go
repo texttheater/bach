@@ -7,69 +7,58 @@ import (
 )
 
 func NewArrValue(elements []Value) *ArrValue {
-	i := 0
-	var next func() (Value, *ArrValue, error)
-	next = func() (Value, *ArrValue, error) {
-		if i >= len(elements) {
-			return nil, nil, nil
+	var arrFrom func(i int) *ArrValue
+	arrFrom = func(i int) *ArrValue {
+		if i == len(elements) {
+			return nil
 		}
-		head := elements[i]
-		i++
-		return head, &ArrValue{
-			Func: next,
-		}, nil
+		return &ArrValue{
+			Head: elements[i],
+			Tail: &Thunk{
+				Func: func() *Thunk {
+					return &Thunk{
+						State: State{
+							Value: arrFrom(i + 1),
+						},
+					}
+				},
+			},
+		}
 	}
-	return &ArrValue{
-		Func: next,
-	}
+	return arrFrom(0)
 }
 
 type ArrValue struct {
-	Func func() (Value, *ArrValue, error)
 	Head Value
-	Tail *ArrValue
+	Tail *Thunk
 }
 
-func (v *ArrValue) Eval() error {
-	if v.Func == nil {
-		return nil
+func (v *ArrValue) GetTail() (*ArrValue, error) {
+	state, _, err := v.Tail.Eval()
+	if err != nil {
+		return nil, err
 	}
-	var err error
-	v.Head, v.Tail, err = v.Func()
-	v.Func = nil
-	return err
+	if state.Value == nil {
+		return nil, nil
+	}
+	return state.Value.(*ArrValue), nil
 }
 
 func (v *ArrValue) String() (string, error) {
 	var buffer bytes.Buffer
 	buffer.WriteString("[")
-	err := v.Eval()
-	if err != nil {
-		return "", err
-	}
-	if v.Head != nil {
+	if v != nil {
 		head, err := v.Head.String()
-		if err != nil {
-			return "", err
-		}
 		buffer.WriteString(head)
-		v = v.Tail
-		err = v.Eval()
+		v, err = v.GetTail()
 		if err != nil {
 			return "", err
 		}
-		for v.Head != nil {
+		for v != nil {
 			buffer.WriteString(", ")
-			head, err := v.Head.String()
-			if err != nil {
-				return "", err
-			}
+			head, err = v.Head.String()
 			buffer.WriteString(head)
-			v = v.Tail
-			err = v.Eval()
-			if err != nil {
-				return "", err
-			}
+			v, err = v.GetTail()
 		}
 	}
 	buffer.WriteString("]")
@@ -83,31 +72,34 @@ func (v *ArrValue) Out() (string, error) {
 func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case *types.NearrType:
-		err := v.Eval()
+		if v == nil {
+			return false, nil
+		}
+		ok, err := v.Head.Inhabits(t.HeadType, stack)
 		if err != nil {
 			return false, err
 		}
-		if v.Head == nil {
+		if !ok {
 			return false, nil
 		}
-		if ok, err := v.Head.Inhabits(t.HeadType, stack); !ok {
+		tail, err := v.GetTail()
+		if err != nil {
 			return false, err
 		}
-		return v.Tail.Inhabits(t.TailType, stack)
+		return tail.Inhabits(t.TailType, stack)
 	case *types.ArrType:
 		if (types.AnyType{}).Subsumes(t.ElType) {
 			return true, nil
 		}
-		err := v.Eval()
-		if err != nil {
-			return false, err
-		}
-		for v.Head != nil {
-			if ok, err := v.Head.Inhabits(t.ElType, stack); !ok {
+		for v != nil {
+			ok, err := v.Head.Inhabits(t.ElType, stack)
+			if err != nil {
 				return false, err
 			}
-			v = v.Tail
-			err := v.Eval()
+			if !ok {
+				return false, nil
+			}
+			v, err = v.GetTail()
 			if err != nil {
 				return false, err
 			}
@@ -127,24 +119,28 @@ func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 func (v *ArrValue) Equal(w Value) (bool, error) {
 	switch w := w.(type) {
 	case *ArrValue:
-		err := v.Eval()
-		if err != nil {
-			return false, err
+		if v == nil {
+			return w == nil, nil
 		}
-		err = w.Eval()
-		if err != nil {
-			return false, err
-		}
-		if v.Head == nil {
-			return w.Head == nil, nil
-		}
-		if w.Head == nil {
+		if w == nil {
 			return false, nil
 		}
-		if ok, err := v.Head.Equal(w.Head); !ok {
+		ok, err := v.Head.Equal(w.Head)
+		if err != nil {
 			return false, err
 		}
-		return v.Tail.Equal(w.Tail)
+		if !ok {
+			return false, nil
+		}
+		vTail, err := v.GetTail()
+		if err != nil {
+			return false, err
+		}
+		wTail, err := w.GetTail()
+		if err != nil {
+			return false, err
+		}
+		return vTail.Equal(wTail)
 	default:
 		return false, nil
 	}

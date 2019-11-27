@@ -52,19 +52,15 @@ func main() {
 func forceEvaluation(v states.Value) error {
 	switch v := v.(type) {
 	case *states.ArrValue:
-		for {
-			err := v.Eval()
+		for v != nil {
+			err := forceEvaluation(v.Head)
 			if err != nil {
 				return err
 			}
-			if v.Head == nil {
-				return nil
-			}
-			err = forceEvaluation(v.Head)
+			v, err = v.GetTail()
 			if err != nil {
 				return err
 			}
-			v = v.Tail
 		}
 	case states.ObjValue:
 		for _, w := range v {

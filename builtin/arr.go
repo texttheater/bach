@@ -15,15 +15,11 @@ func initArr() {
 			types.NumType{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				length := 0
-				arr, _ := inputValue.(*states.ArrValue)
-				err := arr.Eval()
-				if err != nil {
-					return nil, err
-				}
-				for arr.Head != nil {
-					length += 1
-					arr = arr.Tail
-					err = arr.Eval()
+				arr := inputValue.(*states.ArrValue)
+				for arr != nil {
+					length++
+					var err error
+					arr, err = arr.GetTail()
 					if err != nil {
 						return nil, err
 					}
@@ -33,29 +29,45 @@ func initArr() {
 		),
 	})
 	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		functions.SimpleFuncer(
+		functions.RegularFuncer(
 			types.AnyType{},
 			"range",
-			[]types.Type{types.NumType{}, types.NumType{}},
+			[]*functions.Parameter{
+				functions.SimpleParam(types.NumType{}),
+				functions.SimpleParam(types.NumType{}),
+			},
 			&types.ArrType{types.NumType{}},
-			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				start := argumentValues[0].(states.NumValue)
-				end := argumentValues[1].(states.NumValue)
-				i := start
-				var next func() (states.Value, *states.ArrValue, error)
-				next = func() (states.Value, *states.ArrValue, error) {
-					if i >= end {
-						return nil, nil, nil
+			func(inputState states.State, args []states.Action) *states.Thunk {
+				state0, _, err := args[0](inputState, nil).Eval()
+				if err != nil {
+					return &states.Thunk{
+						Err: err,
 					}
-					head := states.NumValue(i)
-					i++
-					return head, &states.ArrValue{
-						Func: next,
-					}, nil
 				}
-				return &states.ArrValue{
-					Func: next,
-				}, nil
+				start := float64(state0.Value.(states.NumValue))
+				state1, _, err := args[1](inputState, nil).Eval()
+				if err != nil {
+					return &states.Thunk{
+						Err: err,
+					}
+				}
+				end := float64(state1.Value.(states.NumValue))
+				var next func(float64) *states.Thunk
+				next = func(i float64) *states.Thunk {
+					if i >= end {
+						return states.ThunkFromValue((*states.ArrValue)(nil))
+					}
+					return states.ThunkFromValue(&states.ArrValue{
+						Head: states.NumValue(i),
+						Tail: &states.Thunk{
+							Func: func() *states.Thunk {
+								return next(i + 1)
+							},
+						},
+					})
+
+				}
+				return next(start)
 			},
 		),
 	})

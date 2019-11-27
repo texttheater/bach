@@ -14,8 +14,10 @@ func initValues() {
 			if gotCall.Name != "id" {
 				return functions.Shape{}, nil, false, nil
 			}
-			action := func(inputState states.State, args []states.Action) states.Thunk {
-				return states.Thunk{State: inputState, Drop: false, Err: nil}
+			action := func(inputState states.State, args []states.Action) *states.Thunk {
+				return &states.Thunk{
+					State: inputState,
+				}
 			}
 			return gotInputShape, action, true, nil
 		},

@@ -11,29 +11,33 @@ import (
 
 func initText() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		functions.SimpleFuncer(
+		functions.RegularFuncer(
 			types.StrType{},
 			"split",
 			nil,
 			&types.ArrType{types.StrType{}},
-			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				str, _ := inputValue.(states.StrValue)
+			func(inputState states.State, args []states.Action) *states.Thunk {
+				str, _ := inputState.Value.(states.StrValue)
 				fields := strings.Fields(string(str))
 				i := 0
-				var next func() (states.Value, *states.ArrValue, error)
-				next = func() (states.Value, *states.ArrValue, error) {
+				var next func() *states.Thunk
+				next = func() *states.Thunk {
 					if i >= len(fields) {
-						return nil, nil, nil
+						return states.ThunkFromValue((*states.ArrValue)(nil))
 					}
-					head := states.StrValue(fields[i])
-					i++
-					return head, &states.ArrValue{
-						Func: next,
-					}, nil
+					return states.ThunkFromValue(
+						&states.ArrValue{
+							Head: states.StrValue(fields[i]),
+							Tail: &states.Thunk{
+								Func: func() *states.Thunk {
+									i++
+									return next()
+								},
+							},
+						},
+					)
 				}
-				return &states.ArrValue{
-					Func: next,
-				}, nil
+				return next()
 			},
 		),
 		functions.SimpleFuncer(
@@ -43,21 +47,13 @@ func initText() {
 			types.StrType{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				arr, _ := inputValue.(*states.ArrValue)
-				err := arr.Eval()
-				if err != nil {
-					return nil, err
-				}
-				if arr.Head == nil {
-					return states.StrValue(""), nil
-				}
 				var buffer bytes.Buffer
 				str, err := arr.Head.Out()
 				if err != nil {
 					return nil, err
 				}
 				buffer.WriteString(str)
-				arr = arr.Tail
-				err = arr.Eval()
+				arr, err = arr.GetTail()
 				if err != nil {
 					return nil, err
 				}
@@ -68,8 +64,7 @@ func initText() {
 						return nil, err
 					}
 					buffer.WriteString(str)
-					arr = arr.Tail
-					err = arr.Eval()
+					arr, err = arr.GetTail()
 					if err != nil {
 						return nil, err
 					}

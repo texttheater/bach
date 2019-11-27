@@ -48,9 +48,9 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 		// make call lazy
 		// This makes deep recursion run in constant space, but
 		// unfortunately very slow!
-		action := func(inputState states.State, args []states.Action) states.Thunk {
-			return states.Thunk{
-				Func: func() states.Thunk {
+		action := func(inputState states.State, args []states.Action) *states.Thunk {
+			return &states.Thunk{
+				Func: func() *states.Thunk {
 					return funAction(inputState, args)
 				},
 			}
@@ -89,6 +89,14 @@ func (s *FuncerStack) String() string {
 		stack = stack.Tail
 	}
 	return fmt.Sprintf("%v", slice)
+}
+
+func SimpleParam(outputType types.Type) *Parameter {
+	return &Parameter{
+		InputType:  types.AnyType{},
+		Params:     nil,
+		OutputType: outputType,
+	}
 }
 
 type Parameter struct {
@@ -175,7 +183,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 		}
 	}
 	// make action from kernel
-	action := func(inputState states.State, args []states.Action) states.Thunk {
+	action := func(inputState states.State, args []states.Action) *states.Thunk {
 		argValues := make([]states.Value, len(argTypes))
 		argInputState := states.State{
 			Value:     states.NullValue{},
@@ -185,19 +193,21 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 		for i, arg := range args {
 			argState, _, err := arg(argInputState, nil).Eval()
 			if err != nil {
-				return states.Thunk{State: states.State{}, Drop: false, Err: err}
+				return &states.Thunk{Err: err}
+
 			}
 			argValues[i] = argState.Value
 		}
 		value, err := kernel(inputState.Value, argValues)
 		if err != nil {
-			return states.Thunk{State: states.State{}, Drop: false, Err: err}
+			return &states.Thunk{Err: err}
+
 		}
-		return states.Thunk{State: states.State{
+		return &states.Thunk{State: states.State{
 			Value:     value,
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
-		}, Drop: false, Err: nil}
+		}}
 
 	}
 	// return
@@ -205,19 +215,21 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 }
 
 func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
-	varAction := func(inputState states.State, args []states.Action) states.Thunk {
+	varAction := func(inputState states.State, args []states.Action) *states.Thunk {
 		stack := inputState.Stack
 		for stack != nil {
 			if stack.Head.ID == id {
 				varState, _, err := stack.Head.Action(states.InitialState, nil).Eval()
 				if err != nil {
-					return states.Thunk{State: states.State{}, Drop: false, Err: err}
+					return &states.Thunk{
+						Err: err,
+					}
 				}
-				return states.Thunk{State: states.State{
+				return &states.Thunk{State: states.State{
 					Value:     varState.Value,
 					Stack:     inputState.Stack,
 					TypeStack: inputState.TypeStack,
-				}, Drop: false, Err: nil}
+				}}
 
 			}
 			stack = stack.Tail
@@ -266,18 +278,20 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 			argActions[i] = argAction
 		}
 		// pass input variable stack to arguments
-		funAction2 := func(inputState states.State, args []states.Action) states.Thunk {
+		funAction2 := func(inputState states.State, args []states.Action) *states.Thunk {
 			args2 := make([]states.Action, len(argActions)+len(args))
 			for i := range argActions {
 				argAction := argActions[i]
-				args2[i] = func(argInputState states.State, argArgs []states.Action) states.Thunk {
+				args2[i] = func(argInputState states.State, argArgs []states.Action) *states.Thunk {
 					argInputState.Stack = inputState.Stack
 					argOutputState, _, err := argAction(argInputState, argArgs).Eval()
 					if err != nil {
-						return states.Thunk{State: states.State{}, Drop: false, Err: err}
+						return &states.Thunk{Err: err}
+
 					}
 					argOutputState.Stack = inputState.Stack
-					return states.Thunk{State: argOutputState, Drop: false, Err: nil}
+					return &states.Thunk{State: argOutputState}
+
 				}
 			}
 			for i := 0; i < len(args); i++ {
@@ -304,7 +318,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 			Stack: gotInputShape.Stack,
 		}
 		// set new type variables on action
-		funAction3 := func(inputState states.State, args []states.Action) states.Thunk {
+		funAction3 := func(inputState states.State, args []states.Action) *states.Thunk {
 			typeStack := inputState.TypeStack
 			for n, t := range bindings {
 				typeStack = typeStack.Push(states.Binding{

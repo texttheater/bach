@@ -164,10 +164,12 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		outputType = types.Union(outputType, alternativeOutputShape.Type)
 	}
 	// make action
-	action := func(inputState states.State, args []states.Action) states.Thunk {
+	action := func(inputState states.State, args []states.Action) *states.Thunk {
 		matcherVarStack, ok, err := matcher(inputState)
 		if err != nil {
-			return states.Thunk{State: states.State{}, Drop: false, Err: err}
+			return &states.Thunk{
+				Err: err,
+			}
 		}
 		if ok {
 			guardInputState := states.State{
@@ -177,7 +179,9 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 			}
 			guardState, _, err := guardAction(guardInputState, nil).Eval()
 			if err != nil {
-				return states.Thunk{State: states.State{}, Drop: false, Err: err}
+				return &states.Thunk{
+					Err: err,
+				}
 			}
 			boolGuardValue := guardState.Value.(states.BoolValue)
 			if boolGuardValue {
@@ -192,7 +196,9 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		for i := range elisMatchers {
 			matcherVarStack, ok, err := elisMatchers[i](inputState)
 			if err != nil {
-				return states.Thunk{State: states.State{}, Drop: false, Err: err}
+				return &states.Thunk{
+					Err: err,
+				}
 			}
 			if ok {
 				guardInputState := states.State{
@@ -202,7 +208,9 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 				}
 				guardState, _, err := elisGuardActions[i](guardInputState, nil).Eval()
 				if err != nil {
-					return states.Thunk{State: states.State{}, Drop: false, Err: err}
+					return &states.Thunk{
+						Err: err,
+					}
 				}
 				boolGuardValue := guardState.Value.(states.BoolValue)
 				if boolGuardValue {
@@ -228,7 +236,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 // replaceRejectError replaces a RejectError with an explainable error with
 // location information about the conditional, and the value that was not
 // handled.
-func replaceRejectError(thunk states.Thunk, pos lexer.Position) states.Thunk {
+func replaceRejectError(thunk *states.Thunk, pos lexer.Position) *states.Thunk {
 	if thunk.Func == nil {
 		if thunk.Err == nil {
 			return thunk
@@ -242,8 +250,8 @@ func replaceRejectError(thunk states.Thunk, pos lexer.Position) states.Thunk {
 		}
 		return thunk
 	}
-	return states.Thunk{
-		Func: func() states.Thunk {
+	return &states.Thunk{
+		Func: func() *states.Thunk {
 			return replaceRejectError(thunk.Func(), pos)
 		},
 	}
@@ -379,11 +387,7 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 		switch v := inputState.Value.(type) {
 		case *states.ArrValue:
 			for _, elMatcher := range elementMatchers {
-				err := v.Eval()
-				if err != nil {
-					return nil, false, err
-				}
-				if v.Head == nil {
+				if v == nil {
 					return nil, false, nil
 				}
 				var ok bool
@@ -395,7 +399,10 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 				if !ok {
 					return nil, false, err
 				}
-				v = v.Tail
+				v, err = v.GetTail()
+				if err != nil {
+					return nil, false, err
+				}
 			}
 			varStack, ok, err = restMatcher(states.State{
 				Value:     v,

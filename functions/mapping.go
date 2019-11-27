@@ -50,16 +50,12 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 		Stack: inputShape.Stack,
 	}
 	// create action
-	action := func(inputState states.State, args []states.Action) states.Thunk {
+	action := func(inputState states.State, args []states.Action) *states.Thunk {
 		arr := inputState.Value.(*states.ArrValue)
-		var next func() (states.Value, *states.ArrValue, error)
-		next = func() (states.Value, *states.ArrValue, error) {
-			err := arr.Eval()
-			if err != nil {
-				return nil, nil, err
-			}
-			if arr.Head == nil {
-				return nil, nil, nil
+		var next func() *states.Thunk
+		next = func() *states.Thunk {
+			if arr == nil {
+				return states.ThunkFromValue((*states.ArrValue)(nil))
 			}
 			bodyInputState := states.State{
 				Value:     arr.Head,
@@ -68,24 +64,31 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 			}
 			bodyOutputState, drop, err := bodyAction(bodyInputState, nil).Eval()
 			if err != nil {
-				return nil, nil, err
+				return &states.Thunk{
+					Err: err,
+				}
 			}
-			arr = arr.Tail
+			arr, err = arr.GetTail()
+			if err != nil {
+				return &states.Thunk{
+					Err: err,
+				}
+			}
 			if drop {
 				return next()
 			}
-			return bodyOutputState.Value, &states.ArrValue{
-				Func: next,
-			}, nil
-		}
-		return states.Thunk{State: states.State{
-			Value: &states.ArrValue{
-				Func: next,
-			},
-			Stack:     inputState.Stack,
-			TypeStack: inputState.TypeStack,
-		}, Drop: false, Err: nil}
+			return states.ThunkFromValue(
+				&states.ArrValue{
+					Head: bodyOutputState.Value,
+					Tail: &states.Thunk{
+						Func: func() *states.Thunk {
+							return next()
+						},
+					},
+				})
 
+		}
+		return next()
 	}
 	return outputShape, action, nil
 }
