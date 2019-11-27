@@ -151,7 +151,7 @@ func (p Parameter) String() string {
 		buffer.WriteString("(")
 		buffer.WriteString(p.Params[0].String())
 		for _, param := range p.Params[1:] {
-			buffer.WriteString(",")
+			buffer.WriteString(", ")
 			buffer.WriteString(param.String())
 		}
 		buffer.WriteString(") ")
