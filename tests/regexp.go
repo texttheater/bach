@@ -13,23 +13,19 @@ func TestRegexp(t *testing.T) {
 		`"abccd" ~b(?P<cs>c*)d~`,
 		types.Union(
 			types.NullType{},
-			types.NewObjType(
-				map[string]types.Type{
-					"start": types.NumType{},
-					"0":     types.StrType{},
-					"1":     types.Union(types.NullType{}, types.StrType{}),
-					"cs":    types.Union(types.NullType{}, types.StrType{}),
-				},
-			),
+			types.NewObjType(map[string]types.Type{
+				"start": types.NumType{},
+				"0":     types.StrType{},
+				"1":     types.Union(types.NullType{}, types.StrType{}),
+				"cs":    types.Union(types.NullType{}, types.StrType{}),
+			}),
 		),
-		states.ObjValue(
-			map[string]states.Value{
-				"start": states.NumValue(1),
-				"0":     states.StrValue("bccd"),
-				"1":     states.StrValue("cc"),
-				"cs":    states.StrValue("cc"),
-			},
-		),
+		states.ObjValueFromMap(map[string]states.Value{
+			"start": states.NumValue(1),
+			"0":     states.StrValue("bccd"),
+			"1":     states.StrValue("cc"),
+			"cs":    states.StrValue("cc"),
+		}),
 		nil,
 		t,
 	)
@@ -37,14 +33,12 @@ func TestRegexp(t *testing.T) {
 		`"def" ~^b(?P<cs>c*)d~`,
 		types.Union(
 			types.NullType{},
-			types.NewObjType(
-				map[string]types.Type{
-					"start": types.NumType{},
-					"0":     types.StrType{},
-					"1":     types.Union(types.NullType{}, types.StrType{}),
-					"cs":    types.Union(types.NullType{}, types.StrType{}),
-				},
-			),
+			types.NewObjType(map[string]types.Type{
+				"start": types.NumType{},
+				"0":     types.StrType{},
+				"1":     types.Union(types.NullType{}, types.StrType{}),
+				"cs":    types.Union(types.NullType{}, types.StrType{}),
+			}),
 		),
 		states.NullValue{},
 		nil,
@@ -54,14 +48,12 @@ func TestRegexp(t *testing.T) {
 		`"abccd" ~^b(?P<cs>*)d~`,
 		types.Union(
 			types.NullType{},
-			types.NewObjType(
-				map[string]types.Type{
-					"start": types.NumType{},
-					"0":     types.StrType{},
-					"1":     types.Union(types.NullType{}, types.StrType{}),
-					"cs":    types.Union(types.NullType{}, types.StrType{}),
-				},
-			),
+			types.NewObjType(map[string]types.Type{
+				"start": types.NumType{},
+				"0":     types.StrType{},
+				"1":     types.Union(types.NullType{}, types.StrType{}),
+				"cs":    types.Union(types.NullType{}, types.StrType{}),
+			}),
 		),
 		nil,
 		errors.E(

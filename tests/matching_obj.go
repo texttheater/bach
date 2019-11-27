@@ -60,7 +60,9 @@ func TestMatchingObj(t *testing.T) {
 	TestProgram(
 		`if true then {a: 1} else {b: 2} ok`,
 		types.Union(types.NewObjType(map[string]types.Type{"a": types.NumType{}}), types.NewObjType(map[string]types.Type{"b": types.NumType{}})),
-		states.ObjValue{"a": states.NumValue(1)},
+		states.ObjValueFromMap(map[string]states.Value{
+			"a": states.NumValue(1),
+		}),
 		nil,
 		t,
 	)

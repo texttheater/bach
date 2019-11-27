@@ -522,13 +522,16 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 		switch v := inputState.Value.(type) {
 		case states.ObjValue:
 			for prop, valMatcher := range propMatcherMap {
-				value, ok := v[prop]
+				thunk, ok := v[prop]
 				if !ok {
 					return nil, false, nil
 				}
-				var err error
+				state, _, err := thunk.Eval()
+				if err != nil {
+					return nil, false, err
+				}
 				varStack, ok, err = valMatcher(states.State{
-					Value:     value,
+					Value:     state.Value,
 					Stack:     varStack,
 					TypeStack: inputState.TypeStack,
 				})

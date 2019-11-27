@@ -38,21 +38,15 @@ func (x ObjExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 		Stack: inputShape.Stack,
 	}
 	action := func(inputState states.State, args []states.Action) *states.Thunk {
-		propValMap := make(map[string]states.Value)
+		propThunkMap := make(map[string]*states.Thunk)
 		for key, valAction := range keyActionMap {
-			valState, _, err := valAction(inputState, nil).Eval()
-			if err != nil {
-				return &states.Thunk{Err: err}
-
-			}
-			propValMap[key] = valState.Value
+			propThunkMap[key] = valAction(inputState, nil)
 		}
 		return &states.Thunk{State: states.State{
-			Value:     states.ObjValue(propValMap),
+			Value:     states.ObjValue(propThunkMap),
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
 		}}
-
 	}
 	return outputShape, action, nil
 }

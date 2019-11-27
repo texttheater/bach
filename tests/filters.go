@@ -28,10 +28,10 @@ func TestFilters(t *testing.T) {
 			"n": types.NumType{},
 		})},
 		states.NewArrValue([]states.Value{
-			states.ObjValue(map[string]states.Value{
+			states.ObjValueFromMap(map[string]states.Value{
 				"n": states.NumValue(1),
 			}),
-			states.ObjValue(map[string]states.Value{
+			states.ObjValueFromMap(map[string]states.Value{
 				"n": states.NumValue(3),
 			}),
 		}),

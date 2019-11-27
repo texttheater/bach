@@ -6,7 +6,15 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-type ObjValue map[string]Value
+func ObjValueFromMap(m map[string]Value) ObjValue {
+	propThunkMap := make(map[string]*Thunk)
+	for k, v := range m {
+		propThunkMap[k] = ThunkFromValue(v)
+	}
+	return propThunkMap
+}
+
+type ObjValue map[string]*Thunk
 
 func (v ObjValue) String() (string, error) {
 	var buffer bytes.Buffer
@@ -18,7 +26,11 @@ func (v ObjValue) String() (string, error) {
 		}
 		buffer.WriteString(k)
 		buffer.WriteString(": ")
-		wString, err := w.String()
+		state, _, err := w.Eval()
+		if err != nil {
+			return "", err
+		}
+		wString, err := state.Value.String()
 		if err != nil {
 			return "", err
 		}
@@ -37,11 +49,15 @@ func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case types.ObjType:
 		for prop, wantType := range t.PropTypeMap {
-			gotValue, ok := v[prop]
+			thunk, ok := v[prop]
 			if !ok {
 				return false, nil
 			}
-			if ok, err := gotValue.Inhabits(wantType, stack); !ok {
+			state, _, err := thunk.Eval()
+			if err != nil {
+				return false, err
+			}
+			if ok, err := state.Value.Inhabits(wantType, stack); !ok {
 				return false, err
 			}
 		}
@@ -63,13 +79,25 @@ func (v ObjValue) Equal(w Value) (bool, error) {
 		if len(v) != len(w) {
 			return false, nil
 		}
-		for k, l := range v {
-			m, ok := w[k]
+		for prop, vThunk := range v {
+			wThunk, ok := w[prop]
 			if !ok {
 				return false, nil
 			}
-			if ok, err := l.Equal(m); !ok {
+			vState, _, err := vThunk.Eval()
+			if err != nil {
 				return false, err
+			}
+			wState, _, err := wThunk.Eval()
+			if err != nil {
+				return false, err
+			}
+			equal, err := vState.Value.Equal(wState.Value)
+			if err != nil {
+				return false, err
+			}
+			if !equal {
+				return false, nil
 			}
 		}
 		return true, nil

@@ -64,10 +64,11 @@ func forceEvaluation(v states.Value) error {
 		}
 	case states.ObjValue:
 		for _, w := range v {
-			err := forceEvaluation(w)
+			state, _, err := w.Eval()
 			if err != nil {
 				return err
 			}
+			forceEvaluation(state.Value)
 		}
 	}
 	return nil
