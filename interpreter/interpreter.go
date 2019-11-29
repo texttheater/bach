@@ -28,9 +28,9 @@ func InterpretString(program string) (types.Type, states.Value, error) {
 		)
 	}
 	// evaluate
-	outputState, _, err := action(states.InitialState, nil).Eval()
-	if err != nil {
-		return nil, nil, err
+	res := action(states.InitialState, nil).Eval()
+	if res.Error != nil {
+		return nil, nil, res.Error
 	}
-	return outputShape.Type, outputState.Value, nil
+	return outputShape.Type, res.State.Value, nil
 }

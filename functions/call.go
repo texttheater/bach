@@ -191,23 +191,22 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 			TypeStack: inputState.TypeStack,
 		}
 		for i, arg := range args {
-			argState, _, err := arg(argInputState, nil).Eval()
-			if err != nil {
-				return &states.Thunk{Err: err}
-
+			res := arg(argInputState, nil).Eval()
+			if res.Error != nil {
+				return states.ThunkFromError(res.Error)
 			}
-			argValues[i] = argState.Value
+			argValues[i] = res.State.Value
 		}
 		value, err := kernel(inputState.Value, argValues)
 		if err != nil {
-			return &states.Thunk{Err: err}
+			return states.ThunkFromError(err)
 
 		}
-		return &states.Thunk{State: states.State{
+		return states.ThunkFromState(states.State{
 			Value:     value,
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
-		}}
+		})
 
 	}
 	// return
@@ -219,17 +218,15 @@ func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
 		stack := inputState.Stack
 		for stack != nil {
 			if stack.Head.ID == id {
-				varState, _, err := stack.Head.Action(states.InitialState, nil).Eval()
-				if err != nil {
-					return &states.Thunk{
-						Err: err,
-					}
+				res := stack.Head.Action(states.InitialState, nil).Eval()
+				if res.Error != nil {
+					return states.ThunkFromError(res.Error)
 				}
-				return &states.Thunk{State: states.State{
-					Value:     varState.Value,
+				return states.ThunkFromState(states.State{
+					Value:     res.State.Value,
 					Stack:     inputState.Stack,
 					TypeStack: inputState.TypeStack,
-				}}
+				})
 
 			}
 			stack = stack.Tail
@@ -284,14 +281,13 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 				argAction := argActions[i]
 				args2[i] = func(argInputState states.State, argArgs []states.Action) *states.Thunk {
 					argInputState.Stack = inputState.Stack
-					argOutputState, _, err := argAction(argInputState, argArgs).Eval()
-					if err != nil {
-						return &states.Thunk{Err: err}
-
+					res := argAction(argInputState, argArgs).Eval()
+					if res.Error != nil {
+						return states.ThunkFromError(res.Error)
 					}
+					argOutputState := res.State
 					argOutputState.Stack = inputState.Stack
-					return &states.Thunk{State: argOutputState}
-
+					return states.ThunkFromState(argOutputState)
 				}
 			}
 			for i := 0; i < len(args); i++ {

@@ -19,14 +19,10 @@ func (a Action) SetArg(arg Action) Action {
 
 func SimpleAction(value Value) Action {
 	return func(inputState State, args []Action) *Thunk {
-		return &Thunk{
-			State: State{
-				Value:     value,
-				Stack:     inputState.Stack,
-				TypeStack: inputState.TypeStack,
-			},
-			Drop: false,
-			Err:  nil,
-		}
+		return ThunkFromState(State{
+			Value:     value,
+			Stack:     inputState.Stack,
+			TypeStack: inputState.TypeStack,
+		})
 	}
 }

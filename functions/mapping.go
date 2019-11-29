@@ -62,24 +62,21 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 				Stack:     inputState.Stack,
 				TypeStack: inputState.TypeStack,
 			}
-			bodyOutputState, drop, err := bodyAction(bodyInputState, nil).Eval()
-			if err != nil {
-				return &states.Thunk{
-					Err: err,
-				}
+			res := bodyAction(bodyInputState, nil).Eval()
+			if res.Error != nil {
+				return states.ThunkFromError(res.Error)
 			}
+			var err error
 			arr, err = arr.GetTail()
 			if err != nil {
-				return &states.Thunk{
-					Err: err,
-				}
+				return states.ThunkFromError(err)
 			}
-			if drop {
+			if res.Drop {
 				return next()
 			}
 			return states.ThunkFromValue(
 				&states.ArrValue{
-					Head: bodyOutputState.Value,
+					Head: res.State.Value,
 					Tail: &states.Thunk{
 						Func: func() *states.Thunk {
 							return next()

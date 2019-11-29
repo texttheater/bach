@@ -30,9 +30,9 @@ func (x RejectExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 	}
 	// create action
 	action := func(inputState states.State, args []states.Action) *states.Thunk {
-		return &states.Thunk{Err: RejectError{
+		return states.ThunkFromError(RejectError{
 			Value: inputState.Value,
-		}}
+		})
 
 	}
 	// return

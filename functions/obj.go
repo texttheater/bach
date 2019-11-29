@@ -42,11 +42,11 @@ func (x ObjExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 		for key, valAction := range keyActionMap {
 			propThunkMap[key] = valAction(inputState, nil)
 		}
-		return &states.Thunk{State: states.State{
+		return states.ThunkFromState(states.State{
 			Value:     states.ObjValue(propThunkMap),
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
-		}}
+		})
 	}
 	return outputShape, action, nil
 }

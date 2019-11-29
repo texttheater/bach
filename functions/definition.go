@@ -42,17 +42,14 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 			bodyInputStack = bodyInputStack.Push(states.Variable{
 				ID: param,
 				Action: func(argInputState states.State, argArgs []states.Action) *states.Thunk {
-					outputState, _, err := arg(argInputState, argArgs).Eval()
-					if err != nil {
-						return &states.Thunk{
-							Err: err,
-						}
+					res := arg(argInputState, argArgs).Eval()
+					if res.Error != nil {
+						return states.ThunkFromError(res.Error)
 					}
+					outputState := res.State
 					outputState.Stack = argInputState.Stack
 					outputState.TypeStack = argInputState.TypeStack // TODO right?
-					return &states.Thunk{
-						State: outputState,
-					}
+					return states.ThunkFromState(outputState)
 				},
 			})
 		}
@@ -110,7 +107,7 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 	// define action (crucially, setting body input stack)
 	action := func(inputState states.State, args []states.Action) *states.Thunk {
 		bodyInputStackStub = inputState.Stack
-		return &states.Thunk{State: inputState}
+		return states.ThunkFromState(inputState)
 
 	}
 	// return
@@ -122,9 +119,14 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 // stacks
 func replaceStacks(thunk *states.Thunk, stack *states.VariableStack, typeStack *states.BindingStack) *states.Thunk {
 	if thunk.Func == nil {
-		thunk.State.Stack = stack
-		thunk.State.TypeStack = typeStack
-		return thunk
+		if thunk.Result.Error != nil {
+			return states.ThunkFromError(thunk.Result.Error)
+		}
+		return states.ThunkFromState(states.State{
+			Value:     thunk.Result.State.Value,
+			Stack:     stack,
+			TypeStack: typeStack,
+		})
 	}
 	return &states.Thunk{
 		Func: func() *states.Thunk {

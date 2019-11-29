@@ -38,20 +38,16 @@ func initArr() {
 			},
 			&types.ArrType{types.NumType{}},
 			func(inputState states.State, args []states.Action) *states.Thunk {
-				state0, _, err := args[0](inputState, nil).Eval()
-				if err != nil {
-					return &states.Thunk{
-						Err: err,
-					}
+				res0 := args[0](inputState, nil).Eval()
+				if res0.Error != nil {
+					return states.ThunkFromError(res0.Error)
 				}
-				start := float64(state0.Value.(states.NumValue))
-				state1, _, err := args[1](inputState, nil).Eval()
-				if err != nil {
-					return &states.Thunk{
-						Err: err,
-					}
+				start := float64(res0.State.Value.(states.NumValue))
+				res1 := args[1](inputState, nil).Eval()
+				if res1.Error != nil {
+					return states.ThunkFromError(res1.Error)
 				}
-				end := float64(state1.Value.(states.NumValue))
+				end := float64(res1.State.Value.(states.NumValue))
 				var next func(float64) *states.Thunk
 				next = func(i float64) *states.Thunk {
 					if i >= end {

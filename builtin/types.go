@@ -26,9 +26,7 @@ func initTypes() {
 					Stack:     inputState.Stack,
 					TypeStack: inputState.TypeStack,
 				}
-				return &states.Thunk{
-					State: outputState,
-				}
+				return states.ThunkFromState(outputState)
 			}
 			return outputShape, action, true, nil
 		},

@@ -39,18 +39,18 @@ func (x CompositionExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		return Shape{}, nil, err
 	}
 	action := func(inputState states.State, args []states.Action) *states.Thunk {
-		middleState, drop, err := lAction(inputState, nil).Eval()
-		if err != nil {
+		res := lAction(inputState, nil).Eval()
+		if res.Error != nil {
+			return states.ThunkFromError(res.Error)
+		}
+		if res.Drop {
 			return &states.Thunk{
-				Err: err,
+				Result: states.Result{
+					Drop: true,
+				},
 			}
 		}
-		if drop {
-			return &states.Thunk{
-				Drop: true,
-			}
-		}
-		return rAction(middleState, nil)
+		return rAction(res.State, nil)
 	}
 	return outputShape, action, nil
 }

@@ -32,11 +32,10 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 	if x.Rest == nil {
 		outputType = types.VoidArrType
 		action = func(inputState states.State, args []states.Action) *states.Thunk {
-			return &states.Thunk{State: states.State{
+			return states.ThunkFromState(states.State{
 				Value: (*states.ArrValue)(nil),
 				Stack: inputState.Stack,
-			}}
-
+			})
 		}
 	} else {
 		var restShape Shape
@@ -67,20 +66,17 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 		}
 		tailAction := action
 		action = func(inputState states.State, args []states.Action) *states.Thunk {
-			s, _, err := elementAction(inputState, nil).Eval()
-			if err != nil {
-				return &states.Thunk{
-					Err: err,
-				}
+			res := elementAction(inputState, nil).Eval()
+			if res.Error != nil {
+				return states.ThunkFromError(res.Error)
 			}
-			return &states.Thunk{State: states.State{
+			return states.ThunkFromState(states.State{
 				Value: &states.ArrValue{
-					Head: s.Value,
+					Head: res.State.Value,
 					Tail: tailAction(inputState, nil),
 				},
 				Stack: inputState.Stack,
-			}}
-
+			})
 		}
 	}
 	// make output shape

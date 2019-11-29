@@ -55,11 +55,11 @@ func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 		inputString := string(inputState.Value.(states.StrValue))
 		match := x.Regexp.FindStringSubmatchIndex(inputString)
 		if match == nil {
-			return &states.Thunk{State: states.State{
+			return states.ThunkFromState(states.State{
 				Value:     states.NullValue{},
 				Stack:     inputState.Stack,
 				TypeStack: inputState.TypeStack,
-			}}
+			})
 
 		}
 		propThunkMap := make(map[string]*states.Thunk)
@@ -80,11 +80,11 @@ func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 				propThunkMap[name] = states.ThunkFromValue(submatch)
 			}
 		}
-		return &states.Thunk{State: states.State{
+		return states.ThunkFromState(states.State{
 			Value:     states.ObjValue(propThunkMap),
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
-		}}
+		})
 
 	}
 	return outputShape, action, nil

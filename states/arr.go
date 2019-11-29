@@ -16,11 +16,7 @@ func NewArrValue(elements []Value) *ArrValue {
 			Head: elements[i],
 			Tail: &Thunk{
 				Func: func() *Thunk {
-					return &Thunk{
-						State: State{
-							Value: arrFrom(i + 1),
-						},
-					}
+					return ThunkFromValue(arrFrom(i + 1))
 				},
 			},
 		}
@@ -34,14 +30,14 @@ type ArrValue struct {
 }
 
 func (v *ArrValue) GetTail() (*ArrValue, error) {
-	state, _, err := v.Tail.Eval()
-	if err != nil {
-		return nil, err
+	res := v.Tail.Eval()
+	if res.Error != nil {
+		return nil, res.Error
 	}
-	if state.Value == nil {
+	if res.State.Value == nil {
 		return nil, nil
 	}
-	return state.Value.(*ArrValue), nil
+	return res.State.Value.(*ArrValue), nil
 }
 
 func (v *ArrValue) String() (string, error) {

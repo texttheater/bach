@@ -26,11 +26,11 @@ func (v ObjValue) String() (string, error) {
 		}
 		buffer.WriteString(k)
 		buffer.WriteString(": ")
-		state, _, err := w.Eval()
-		if err != nil {
-			return "", err
+		res := w.Eval()
+		if res.Error != nil {
+			return "", res.Error
 		}
-		wString, err := state.Value.String()
+		wString, err := res.State.Value.String()
 		if err != nil {
 			return "", err
 		}
@@ -53,11 +53,11 @@ func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 			if !ok {
 				return false, nil
 			}
-			state, _, err := thunk.Eval()
-			if err != nil {
-				return false, err
+			res := thunk.Eval()
+			if res.Error != nil {
+				return false, res.Error
 			}
-			if ok, err := state.Value.Inhabits(wantType, stack); !ok {
+			if ok, err := res.State.Value.Inhabits(wantType, stack); !ok {
 				return false, err
 			}
 		}
@@ -84,15 +84,15 @@ func (v ObjValue) Equal(w Value) (bool, error) {
 			if !ok {
 				return false, nil
 			}
-			vState, _, err := vThunk.Eval()
-			if err != nil {
-				return false, err
+			vRes := vThunk.Eval()
+			if vRes.Error != nil {
+				return false, vRes.Error
 			}
-			wState, _, err := wThunk.Eval()
-			if err != nil {
-				return false, err
+			wRes := wThunk.Eval()
+			if wRes.Error != nil {
+				return false, wRes.Error
 			}
-			equal, err := vState.Value.Equal(wState.Value)
+			equal, err := vRes.State.Value.Equal(wRes.State.Value)
 			if err != nil {
 				return false, err
 			}

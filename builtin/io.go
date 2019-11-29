@@ -64,14 +64,11 @@ func initIO() {
 			action := func(inputState states.State, args []states.Action) *states.Thunk {
 				str, err := inputState.Value.Out()
 				if err != nil {
-					return &states.Thunk{
-						Err: err,
-					}
+					return states.ThunkFromError(err)
+
 				}
 				fmt.Println(str)
-				return &states.Thunk{
-					State: inputState,
-				}
+				return states.ThunkFromState(inputState)
 			}
 			return outputShape, action, true, nil
 		},
@@ -89,14 +86,11 @@ func initIO() {
 			action := func(inputState states.State, args []states.Action) *states.Thunk {
 				str, err := inputState.Value.Out()
 				if err != nil {
-					return &states.Thunk{
-						Err: err,
-					}
+					return states.ThunkFromError(err)
+
 				}
 				fmt.Fprintln(os.Stderr, str)
-				return &states.Thunk{
-					State: inputState,
-				}
+				return states.ThunkFromState(inputState)
 			}
 			return outputShape, action, true, nil
 		},

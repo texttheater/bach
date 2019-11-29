@@ -1,27 +1,43 @@
 package states
 
 type Thunk struct {
-	Func  func() *Thunk
-	State State
-	Drop  bool
-	Err   error
+	Func   func() *Thunk
+	Result Result
 }
 
-func (t *Thunk) Eval() (State, bool, error) {
+type Result struct {
+	State State
+	Drop  bool
+	Error error
+}
+
+func (t *Thunk) Eval() Result {
 	for t.Func != nil {
 		thunk := t.Func()
-		t.State = thunk.State
-		t.Drop = thunk.Drop
-		t.Err = thunk.Err
 		t.Func = thunk.Func
+		t.Result = thunk.Result
 	}
-	return t.State, t.Drop, t.Err
+	return t.Result
 }
 
 func ThunkFromValue(v Value) *Thunk {
+	return ThunkFromState(State{
+		Value: v,
+	})
+}
+
+func ThunkFromError(err error) *Thunk {
 	return &Thunk{
-		State: State{
-			Value: v,
+		Result: Result{
+			Error: err,
+		},
+	}
+}
+
+func ThunkFromState(state State) *Thunk {
+	return &Thunk{
+		Result: Result{
+			State: state,
 		},
 	}
 }
