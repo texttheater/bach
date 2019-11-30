@@ -9,7 +9,7 @@ import (
 type NumValue float64
 
 func (v NumValue) String() (string, error) {
-	return strconv.FormatFloat(float64(v), 'f', -1, 64), nil
+	return strconv.FormatFloat(float64(v), 'g', -1, 64), nil
 }
 
 func (v NumValue) Out() (string, error) {
