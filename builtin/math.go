@@ -154,5 +154,43 @@ func initMath() {
 				return states.NumValue(sum / count), nil
 			},
 		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"inf",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(math.Inf(1)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"nan",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(math.NaN()), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"isFinite",
+			nil,
+			types.BoolType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				n := float64(inputValue.(states.NumValue))
+				return states.BoolValue(!math.IsInf(n, 0)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"isNaN",
+			nil,
+			types.BoolType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				n := float64(inputValue.(states.NumValue))
+				return states.BoolValue(math.IsNaN(n)), nil
+			},
+		),
 	})
 }
