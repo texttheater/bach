@@ -232,7 +232,8 @@ func Explain(err error, program string) {
 		fmt.Fprintln(os.Stderr, "Got type:  ", e.GotType)
 	}
 	if e.GotValue != nil {
-		fmt.Fprintln(os.Stderr, "Got value: ", e.GotValue)
+		gotValueStr, _ := e.GotValue.String()
+		fmt.Fprintln(os.Stderr, "Got value: ", gotValueStr)
 	}
 	if e.InputType != nil {
 		fmt.Fprintln(os.Stderr, "Input type:", e.InputType)
