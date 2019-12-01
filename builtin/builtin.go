@@ -16,4 +16,5 @@ func init() {
 	initArr()
 	initTypes()
 	initValues()
+	initControl()
 }

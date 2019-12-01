@@ -103,7 +103,7 @@ func (code ErrorCode) DefaultMessage() string {
 	case BadRegexp:
 		return "error parsing regexp"
 	case UnexpectedValue:
-		return "Conditional got an unexpected input value."
+		return "Function got an unexpected input value."
 	default:
 		return "unknown error"
 	}
