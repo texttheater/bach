@@ -1,7 +1,6 @@
 package builtin
 
 import (
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -20,10 +19,9 @@ func initControl() {
 					return states.ThunkFromError(err)
 				}
 				if !inhabits {
-					return states.ThunkFromError(errors.E(
-						errors.Code(errors.UnexpectedValue),
-						errors.GotValue(inputState.Value),
-					))
+					return states.ThunkFromError(functions.RejectError{
+						Value: inputState.Value,
+					})
 				}
 				return states.ThunkFromValue(inputState.Value)
 			},

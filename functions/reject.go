@@ -50,3 +50,27 @@ func (e RejectError) Error() string {
 	}
 	return str + ": value rejected"
 }
+
+// ReplaceRejectError replaces a RejectError with an explainable error with
+// location information about the component, and the value that was not
+// handled.
+func ReplaceRejectError(thunk *states.Thunk, pos lexer.Position) *states.Thunk {
+	if thunk.Func == nil {
+		if thunk.Result.Error == nil {
+			return thunk
+		}
+		if rejectError, ok := thunk.Result.Error.(RejectError); ok {
+			return states.ThunkFromError(errors.E(
+				errors.Pos(pos),
+				errors.Code(errors.UnexpectedValue),
+				errors.GotValue(rejectError.Value),
+			))
+		}
+		return thunk
+	}
+	return &states.Thunk{
+		Func: func() *states.Thunk {
+			return ReplaceRejectError(thunk.Func(), pos)
+		},
+	}
+}

@@ -187,7 +187,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 					Stack:     res.State.Stack,
 					TypeStack: inputState.TypeStack,
 				}
-				return replaceRejectError(consequentAction(consequentInputState, nil), x.Pos)
+				return ReplaceRejectError(consequentAction(consequentInputState, nil), x.Pos)
 			}
 		}
 		for i := range elisMatchers {
@@ -213,11 +213,11 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 						Stack:     res.State.Stack,
 						TypeStack: inputState.TypeStack,
 					}
-					return replaceRejectError(elisConsequentActions[i](consequentInputState, nil), x.Pos)
+					return ReplaceRejectError(elisConsequentActions[i](consequentInputState, nil), x.Pos)
 				}
 			}
 		}
-		return replaceRejectError(alternativeAction(inputState, nil), x.Pos)
+		return ReplaceRejectError(alternativeAction(inputState, nil), x.Pos)
 	}
 	// return
 	outputShape := Shape{
@@ -225,30 +225,6 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		inputShape.Stack,
 	}
 	return outputShape, action, nil
-}
-
-// replaceRejectError replaces a RejectError with an explainable error with
-// location information about the conditional, and the value that was not
-// handled.
-func replaceRejectError(thunk *states.Thunk, pos lexer.Position) *states.Thunk {
-	if thunk.Func == nil {
-		if thunk.Result.Error == nil {
-			return thunk
-		}
-		if rejectError, ok := thunk.Result.Error.(RejectError); ok {
-			return states.ThunkFromError(errors.E(
-				errors.Pos(pos),
-				errors.Code(errors.UnexpectedValue),
-				errors.GotValue(rejectError.Value),
-			))
-		}
-		return thunk
-	}
-	return &states.Thunk{
-		Func: func() *states.Thunk {
-			return replaceRejectError(thunk.Func(), pos)
-		},
-	}
 }
 
 // pattern/matcher kinda analogous to expression/action
