@@ -41,3 +41,36 @@ func ThunkFromState(state State) *Thunk {
 		},
 	}
 }
+
+func IterFromValue(v Value) func() (Value, bool, error) {
+	return func() (Value, bool, error) {
+		arr := v.(*ArrValue)
+		if arr == nil {
+			return nil, false, nil
+		}
+		var err error
+		v, err = arr.GetTail()
+		if err != nil {
+			return nil, false, err
+		}
+		return arr.Head, true, nil
+	}
+}
+
+func ThunkFromIter(iter func() (Value, bool, error)) *Thunk {
+	value, ok, err := iter()
+	if err != nil {
+		return ThunkFromError(err)
+	}
+	if !ok {
+		return ThunkFromValue((*ArrValue)(nil))
+	}
+	return ThunkFromValue(&ArrValue{
+		Head: value,
+		Tail: &Thunk{
+			Func: func() *Thunk {
+				return ThunkFromIter(iter)
+			},
+		},
+	})
+}
