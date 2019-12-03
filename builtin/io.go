@@ -49,49 +49,33 @@ func initIO() {
 				return states.ThunkFromChannel(output)
 			},
 		),
-		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*functions.Parameter) (functions.Shape, states.Action, bool, error) {
-			if len(gotCall.Args)+len(gotParams) != 0 {
-				return functions.Shape{}, nil, false, nil
-			}
-			if gotCall.Name != "out" {
-				return functions.Shape{}, nil, false, nil
-			}
-			outputShape := functions.Shape{
-				Type:  gotInputShape.Type,
-				Stack: gotInputShape.Stack,
-			}
-			action := func(inputState states.State, args []states.Action) *states.Thunk {
-				str, err := inputState.Value.Out()
+		functions.SimpleFuncer(
+			types.TypeVariable{"$"},
+			"out",
+			nil,
+			types.TypeVariable{"$"},
+			func(inputValue states.Value, args []states.Value) (states.Value, error) {
+				str, err := inputValue.Out()
 				if err != nil {
-					return states.ThunkFromError(err)
-
+					return nil, err
 				}
 				fmt.Println(str)
-				return states.ThunkFromState(inputState)
-			}
-			return outputShape, action, true, nil
-		},
-		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*functions.Parameter) (functions.Shape, states.Action, bool, error) {
-			if len(gotCall.Args)+len(gotParams) != 0 {
-				return functions.Shape{}, nil, false, nil
-			}
-			if gotCall.Name != "err" {
-				return functions.Shape{}, nil, false, nil
-			}
-			outputShape := functions.Shape{
-				Type:  gotInputShape.Type,
-				Stack: gotInputShape.Stack,
-			}
-			action := func(inputState states.State, args []states.Action) *states.Thunk {
-				str, err := inputState.Value.Out()
+				return inputValue, nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.TypeVariable{"$"},
+			"err",
+			nil,
+			types.TypeVariable{"$"},
+			func(inputValue states.Value, args []states.Value) (states.Value, error) {
+				str, err := inputValue.Out()
 				if err != nil {
-					return states.ThunkFromError(err)
-
+					return nil, err
 				}
 				fmt.Fprintln(os.Stderr, str)
-				return states.ThunkFromState(inputState)
-			}
-			return outputShape, action, true, nil
-		},
+				return inputValue, nil
+			},
+		),
 	})
 }
