@@ -46,16 +46,28 @@ func initText() {
 			nil, // TODO separator
 			types.StrType{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				arr, _ := inputValue.(*states.ArrValue)
 				var buffer bytes.Buffer
-				for res := range states.ChannelFromValue(inputValue) {
-					if res.Error != nil {
-						return nil, res.Error
-					}
-					str, err := res.State.Value.Out()
+				str, err := arr.Head.Out()
+				if err != nil {
+					return nil, err
+				}
+				buffer.WriteString(str)
+				arr, err = arr.GetTail()
+				if err != nil {
+					return nil, err
+				}
+				for arr.Head != nil {
+					// TODO separator
+					str, err = arr.Head.Out()
 					if err != nil {
 						return nil, err
 					}
 					buffer.WriteString(str)
+					arr, err = arr.GetTail()
+					if err != nil {
+						return nil, err
+					}
 				}
 				return states.StrValue(buffer.String()), nil
 			},
