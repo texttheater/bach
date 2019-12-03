@@ -41,26 +41,3 @@ func ThunkFromState(state State) *Thunk {
 		},
 	}
 }
-
-func ChannelFromValue(value Value) <-chan Result {
-	channel := make(chan Result)
-	go func() {
-		defer close(channel)
-		arr := value.(*ArrValue)
-		for arr != nil {
-			channel <- Result{
-				State: State{
-					Value: arr.Head,
-				},
-			}
-			var err error
-			arr, err = arr.GetTail()
-			if err != nil {
-				channel <- Result{
-					Error: err,
-				}
-			}
-		}
-	}()
-	return channel
-}
