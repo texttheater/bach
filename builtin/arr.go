@@ -42,18 +42,22 @@ func initArr() {
 					return states.ThunkFromError(res1.Error)
 				}
 				end := float64(res1.State.Value.(states.NumValue))
-				output := make(chan states.Result)
-				go func() {
-					defer close(output)
-					for i := start; i <= end; i++ {
-						output <- states.Result{
-							State: states.State{
-								Value: states.NumValue(i),
-							},
-						}
+				var next func(float64) *states.Thunk
+				next = func(i float64) *states.Thunk {
+					if i > end {
+						return states.ThunkFromValue((*states.ArrValue)(nil))
 					}
-				}()
-				return states.ThunkFromChannel(output)
+					return states.ThunkFromValue(&states.ArrValue{
+						Head: states.NumValue(i),
+						Tail: &states.Thunk{
+							Func: func() *states.Thunk {
+								return next(i + 1)
+							},
+						},
+					})
+
+				}
+				return next(start)
 			},
 		),
 	})
