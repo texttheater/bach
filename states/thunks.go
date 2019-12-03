@@ -64,25 +64,3 @@ func ChannelFromValue(value Value) <-chan Result {
 	}()
 	return channel
 }
-
-func ThunkFromChannel(channel <-chan Result) *Thunk {
-	var next func() *Thunk
-	next = func() *Thunk {
-		res, ok := <-channel
-		if !ok {
-			return ThunkFromValue((*ArrValue)(nil))
-		}
-		if res.Error != nil {
-			return ThunkFromError(res.Error)
-		}
-		return ThunkFromValue(&ArrValue{
-			Head: res.State.Value,
-			Tail: &Thunk{
-				Func: func() *Thunk {
-					return next()
-				},
-			},
-		})
-	}
-	return next()
-}
