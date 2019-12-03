@@ -92,5 +92,16 @@ func initText() {
 				return states.BoolValue(str1 == str2), nil
 			},
 		),
+		functions.SimpleFuncer(
+			types.StrType{},
+			"+",
+			[]types.Type{types.StrType{}},
+			types.StrType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str1 := string(inputValue.(states.StrValue))
+				str2 := string(argumentValues[0].(states.StrValue))
+				return states.StrValue(str1 + str2), nil
+			},
+		),
 	})
 }
