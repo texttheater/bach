@@ -17,4 +17,5 @@ func init() {
 	initTypes()
 	initValues()
 	initControl()
+	initNet()
 }
