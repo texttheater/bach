@@ -126,12 +126,15 @@ func initMath() {
 			nil,
 			types.NumType{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				arr := inputValue.(*states.ArrValue)
 				sum := 0.0
-				for res := range states.ChannelFromValue(inputValue) {
-					if res.Error != nil {
-						return nil, res.Error
+				for arr != nil {
+					sum += float64(arr.Head.(states.NumValue))
+					var err error
+					arr, err = arr.GetTail()
+					if err != nil {
+						return nil, err
 					}
-					sum += float64(res.State.Value.(states.NumValue))
 				}
 				return states.NumValue(sum), nil
 			},
