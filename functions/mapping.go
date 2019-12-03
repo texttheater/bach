@@ -51,28 +51,41 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 	}
 	// create action
 	action := func(inputState states.State, args []states.Action) *states.Thunk {
-		input := states.ChannelFromValue(inputState.Value)
-		output := make(chan states.Result)
-		go func() {
-			defer close(output)
-			for res := range input {
-				if res.Error != nil {
-					output <- res
-					return
-				}
-				bodyInputState := states.State{
-					Value:     res.State.Value,
-					Stack:     inputState.Stack,
-					TypeStack: inputState.TypeStack,
-				}
-				res = bodyAction(bodyInputState, nil).Eval()
-				if res.Drop {
-					continue
-				}
-				output <- res
+		arr := inputState.Value.(*states.ArrValue)
+		var next func() *states.Thunk
+		next = func() *states.Thunk {
+			if arr == nil {
+				return states.ThunkFromValue((*states.ArrValue)(nil))
 			}
-		}()
-		return states.ThunkFromChannel(output)
+			bodyInputState := states.State{
+				Value:     arr.Head,
+				Stack:     inputState.Stack,
+				TypeStack: inputState.TypeStack,
+			}
+			res := bodyAction(bodyInputState, nil).Eval()
+			if res.Error != nil {
+				return states.ThunkFromError(res.Error)
+			}
+			var err error
+			arr, err = arr.GetTail()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			if res.Drop {
+				return next()
+			}
+			return states.ThunkFromValue(
+				&states.ArrValue{
+					Head: res.State.Value,
+					Tail: &states.Thunk{
+						Func: func() *states.Thunk {
+							return next()
+						},
+					},
+				})
+
+		}
+		return next()
 	}
 	return outputShape, action, nil
 }
