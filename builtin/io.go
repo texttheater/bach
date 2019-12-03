@@ -65,6 +65,24 @@ func initIO() {
 		),
 		functions.SimpleFuncer(
 			types.TypeVariable{"$"},
+			"out",
+			[]types.Type{
+				types.StrType{},
+			},
+			types.TypeVariable{"$"},
+			func(inputValue states.Value, args []states.Value) (states.Value, error) {
+				str, err := inputValue.Out()
+				if err != nil {
+					return nil, err
+				}
+				end := string(args[0].(states.StrValue))
+				fmt.Print(str)
+				fmt.Print(end)
+				return inputValue, nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.TypeVariable{"$"},
 			"err",
 			nil,
 			types.TypeVariable{"$"},
@@ -74,6 +92,24 @@ func initIO() {
 					return nil, err
 				}
 				fmt.Fprintln(os.Stderr, str)
+				return inputValue, nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.TypeVariable{"$"},
+			"err",
+			[]types.Type{
+				types.StrType{},
+			},
+			types.TypeVariable{"$"},
+			func(inputValue states.Value, args []states.Value) (states.Value, error) {
+				str, err := inputValue.Out()
+				if err != nil {
+					return nil, err
+				}
+				end := string(args[0].(states.StrValue))
+				fmt.Fprint(os.Stderr, str)
+				fmt.Fprint(os.Stderr, end)
 				return inputValue, nil
 			},
 		),
