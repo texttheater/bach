@@ -45,7 +45,7 @@ func initArr() {
 				output := make(chan states.Result)
 				go func() {
 					defer close(output)
-					for i := start; i < end; i++ {
+					for i := start; i <= end; i++ {
 						output <- states.Result{
 							State: states.State{
 								Value: states.NumValue(i),
