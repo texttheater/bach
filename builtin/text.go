@@ -43,7 +43,7 @@ func initText() {
 		functions.SimpleFuncer(
 			&types.ArrType{types.StrType{}},
 			"join",
-			nil,
+			nil, // TODO separator
 			types.StrType{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				var buffer bytes.Buffer
@@ -56,34 +56,6 @@ func initText() {
 						return nil, err
 					}
 					buffer.WriteString(str)
-				}
-				return states.StrValue(buffer.String()), nil
-			},
-		),
-		functions.SimpleFuncer(
-			&types.ArrType{types.StrType{}},
-			"join",
-			[]types.Type{
-				types.StrType{},
-			},
-			types.StrType{},
-			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				sep := string(argumentValues[0].(states.StrValue))
-				var buffer bytes.Buffer
-				firstWritten := false
-				for res := range states.ChannelFromValue(inputValue) {
-					if res.Error != nil {
-						return nil, res.Error
-					}
-					str, err := res.State.Value.Out()
-					if err != nil {
-						return nil, err
-					}
-					if firstWritten {
-						buffer.WriteString(sep)
-					}
-					buffer.WriteString(str)
-					firstWritten = true
 				}
 				return states.StrValue(buffer.String()), nil
 			},
