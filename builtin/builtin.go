@@ -16,6 +16,7 @@ func init() {
 	initArr()
 	initTypes()
 	initValues()
+	initRegexp()
 	initControl()
 	initNet()
 }
