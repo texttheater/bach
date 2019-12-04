@@ -126,17 +126,18 @@ func initMath() {
 			nil,
 			types.NumType{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				arr := inputValue.(*states.ArrValue)
+				iter := states.IterFromValue(inputValue)
 				sum := 0.0
-				for arr != nil {
-					sum += float64(arr.Head.(states.NumValue))
-					var err error
-					arr, err = arr.GetTail()
+				for {
+					value, ok, err := iter()
 					if err != nil {
 						return nil, err
 					}
+					if !ok {
+						return states.NumValue(sum), nil
+					}
+					sum += float64(value.(states.NumValue))
 				}
-				return states.NumValue(sum), nil
 			},
 		),
 		functions.SimpleFuncer(
