@@ -31,23 +31,15 @@ func initIO() {
 			func(inputState states.State, args []states.Action) *states.Thunk {
 				reader := inputState.Value.(states.ReaderValue)
 				scanner := bufio.NewScanner(reader.Reader)
-				var next func() *states.Thunk
-				next = func() *states.Thunk {
+				var next func() (states.Value, bool, error)
+				next = func() (states.Value, bool, error) {
 					ok := scanner.Scan()
 					if !ok {
-						return states.ThunkFromValue((*states.ArrValue)(nil))
+						return nil, false, nil
 					}
-					return states.ThunkFromValue(&states.ArrValue{
-						Head: states.StrValue(scanner.Text()),
-						Tail: &states.Thunk{
-							Func: func() *states.Thunk {
-								return next()
-							},
-						},
-					})
-
+					return states.StrValue(scanner.Text()), true, nil
 				}
-				return next()
+				return states.ThunkFromIter(next)
 			},
 		),
 		functions.SimpleFuncer(
