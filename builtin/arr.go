@@ -50,8 +50,8 @@ func initArr() {
 				}
 				end := float64(res1.State.Value.(states.NumValue))
 				i := start
-				var next func() (states.Value, bool, error)
-				next = func() (states.Value, bool, error) {
+				var iter func() (states.Value, bool, error)
+				iter = func() (states.Value, bool, error) {
 					if i > end {
 						return nil, false, nil
 					}
@@ -59,7 +59,7 @@ func initArr() {
 					i++
 					return v, true, nil
 				}
-				return states.ThunkFromIter(next)
+				return states.ThunkFromIter(iter)
 			},
 		),
 	})

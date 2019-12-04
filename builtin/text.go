@@ -19,9 +19,9 @@ func initText() {
 			func(inputState states.State, args []states.Action) *states.Thunk {
 				str := string(inputState.Value.(states.StrValue))
 				fields := strings.Fields(str)
-				var next func() (states.Value, bool, error)
+				var iter func() (states.Value, bool, error)
 				i := 0
-				next = func() (states.Value, bool, error) {
+				iter = func() (states.Value, bool, error) {
 					if i >= len(fields) {
 						return nil, false, nil
 					}
@@ -29,7 +29,7 @@ func initText() {
 					i++
 					return v, true, nil
 				}
-				return states.ThunkFromIter(next)
+				return states.ThunkFromIter(iter)
 			},
 		),
 		functions.SimpleFuncer(
