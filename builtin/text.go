@@ -61,6 +61,32 @@ func initText() {
 			},
 		),
 		functions.SimpleFuncer(
+			&types.ArrType{types.StrType{}},
+			"join",
+			[]types.Type{types.StrType{}},
+			types.StrType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				iter := states.IterFromValue(inputValue)
+				sep := string(argumentValues[0].(states.StrValue))
+				var buffer bytes.Buffer
+				firstWritten := false
+				for {
+					value, ok, err := iter()
+					if err != nil {
+						return nil, err
+					}
+					if !ok {
+						return states.StrValue(buffer.String()), nil
+					}
+					if firstWritten {
+						buffer.WriteString(sep)
+					}
+					buffer.WriteString(string(value.(states.StrValue)))
+					firstWritten = true
+				}
+			},
+		),
+		functions.SimpleFuncer(
 			types.StrType{},
 			"==",
 			[]types.Type{types.StrType{}},
