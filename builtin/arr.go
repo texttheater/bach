@@ -49,22 +49,17 @@ func initArr() {
 					return states.ThunkFromError(res1.Error)
 				}
 				end := float64(res1.State.Value.(states.NumValue))
-				var next func(float64) *states.Thunk
-				next = func(i float64) *states.Thunk {
+				i := start
+				var next func() (states.Value, bool, error)
+				next = func() (states.Value, bool, error) {
 					if i > end {
-						return states.ThunkFromValue((*states.ArrValue)(nil))
+						return nil, false, nil
 					}
-					return states.ThunkFromValue(&states.ArrValue{
-						Head: states.NumValue(i),
-						Tail: &states.Thunk{
-							Func: func() *states.Thunk {
-								return next(i + 1)
-							},
-						},
-					})
-
+					v := states.NumValue(i)
+					i++
+					return v, true, nil
 				}
-				return next(start)
+				return states.ThunkFromIter(next)
 			},
 		),
 	})
