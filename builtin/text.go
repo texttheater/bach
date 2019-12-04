@@ -43,33 +43,21 @@ func initText() {
 		functions.SimpleFuncer(
 			&types.ArrType{types.StrType{}},
 			"join",
-			nil, // TODO separator
+			nil,
 			types.StrType{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				arr, _ := inputValue.(*states.ArrValue)
+				iter := states.IterFromValue(inputValue)
 				var buffer bytes.Buffer
-				str, err := arr.Head.Out()
-				if err != nil {
-					return nil, err
-				}
-				buffer.WriteString(str)
-				arr, err = arr.GetTail()
-				if err != nil {
-					return nil, err
-				}
-				for arr.Head != nil {
-					// TODO separator
-					str, err = arr.Head.Out()
+				for {
+					value, ok, err := iter()
 					if err != nil {
 						return nil, err
 					}
-					buffer.WriteString(str)
-					arr, err = arr.GetTail()
-					if err != nil {
-						return nil, err
+					if !ok {
+						return states.StrValue(buffer.String()), nil
 					}
+					buffer.WriteString(string(value.(states.StrValue)))
 				}
-				return states.StrValue(buffer.String()), nil
 			},
 		),
 		functions.SimpleFuncer(
