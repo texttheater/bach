@@ -17,27 +17,19 @@ func initText() {
 			nil,
 			&types.ArrType{types.StrType{}},
 			func(inputState states.State, args []states.Action) *states.Thunk {
-				str, _ := inputState.Value.(states.StrValue)
-				fields := strings.Fields(string(str))
+				str := string(inputState.Value.(states.StrValue))
+				fields := strings.Fields(str)
+				var next func() (states.Value, bool, error)
 				i := 0
-				var next func() *states.Thunk
-				next = func() *states.Thunk {
+				next = func() (states.Value, bool, error) {
 					if i >= len(fields) {
-						return states.ThunkFromValue((*states.ArrValue)(nil))
+						return nil, false, nil
 					}
-					return states.ThunkFromValue(
-						&states.ArrValue{
-							Head: states.StrValue(fields[i]),
-							Tail: &states.Thunk{
-								Func: func() *states.Thunk {
-									i++
-									return next()
-								},
-							},
-						},
-					)
+					v := states.StrValue(fields[i])
+					i++
+					return v, true, nil
 				}
-				return next()
+				return states.ThunkFromIter(next)
 			},
 		),
 		functions.SimpleFuncer(
