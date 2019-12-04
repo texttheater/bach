@@ -15,16 +15,17 @@ func initArr() {
 			types.NumType{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				length := 0
-				arr := inputValue.(*states.ArrValue)
-				for arr != nil {
-					length++
-					var err error
-					arr, err = arr.GetTail()
+				iter := states.IterFromValue(inputValue)
+				for {
+					_, ok, err := iter()
 					if err != nil {
 						return nil, err
 					}
+					if !ok {
+						return states.NumValue(float64(length)), nil
+					}
+					length += 1
 				}
-				return states.NumValue(float64(length)), nil
 			},
 		),
 	})
