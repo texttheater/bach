@@ -1,5 +1,8 @@
 [The Bach Programming Language](./the-bach-programming-language.md)
 - [Introduction](./introduction.md)
+	- [Why Bach?](./why-bach.md)
+	- [Installation](./installation.md)
+	- [First Steps](./first-steps.md)
 - [Types](./types.md)
 	- [Simple Types](./simple-types.md)
 	- [Array Types](./array-types.md)
