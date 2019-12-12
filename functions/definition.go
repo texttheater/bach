@@ -40,17 +40,8 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 		for i, param := range x.Params {
 			arg := args[i]
 			bodyInputStack = bodyInputStack.Push(states.Variable{
-				ID: param,
-				Action: func(argInputState states.State, argArgs []states.Action) *states.Thunk {
-					res := arg(argInputState, argArgs).Eval()
-					if res.Error != nil {
-						return states.ThunkFromError(res.Error)
-					}
-					outputState := res.State
-					outputState.Stack = argInputState.Stack
-					outputState.TypeStack = argInputState.TypeStack // TODO right?
-					return states.ThunkFromState(outputState)
-				},
+				ID:     param,
+				Action: arg,
 			})
 		}
 		bodyInputState := states.State{
