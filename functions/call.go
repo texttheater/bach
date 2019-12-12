@@ -51,7 +51,10 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 		action := func(inputState states.State, args []states.Action) *states.Thunk {
 			return &states.Thunk{
 				Func: func() *states.Thunk {
-					return ReplaceRejectError(funAction(inputState, args), x.Pos)
+					thunk := funAction(inputState, args)
+					thunk = ReplaceRejectError(thunk, x.Pos)
+					thunk = replaceStacks(thunk, inputState.Stack, inputState.TypeStack)
+					return thunk
 				},
 			}
 		}
@@ -331,5 +334,26 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 		}
 		// return
 		return outputShape, funAction3, true, nil
+	}
+}
+
+// replaceStacks replaces the stacks in the eventual output state of a thunk
+// with the stacks of the original input state, so functions don't leak their
+// stacks
+func replaceStacks(thunk *states.Thunk, stack *states.VariableStack, typeStack *states.BindingStack) *states.Thunk {
+	if thunk.Func == nil {
+		if thunk.Result.Error != nil {
+			return states.ThunkFromError(thunk.Result.Error)
+		}
+		return states.ThunkFromState(states.State{
+			Value:     thunk.Result.State.Value,
+			Stack:     stack,
+			TypeStack: typeStack,
+		})
+	}
+	return &states.Thunk{
+		Func: func() *states.Thunk {
+			return replaceStacks(thunk.Func(), stack, typeStack)
+		},
 	}
 }

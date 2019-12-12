@@ -58,7 +58,7 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 			Stack:     bodyInputStack,
 			TypeStack: inputState.TypeStack,
 		}
-		return replaceStacks(bodyAction(bodyInputState, nil), inputState.Stack, inputState.TypeStack)
+		return bodyAction(bodyInputState, nil)
 	}
 	// make a funcer for the defined function, add it to the function stack
 	funFuncer := RegularFuncer(x.InputType, x.Name, x.Params, x.OutputType, funAction)
@@ -112,25 +112,4 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 	}
 	// return
 	return outputShape, action, nil
-}
-
-// replaceStacks replaces the stacks in the eventual output state of a thunk
-// with the stacks of the original input state, so functions don't leak their
-// stacks
-func replaceStacks(thunk *states.Thunk, stack *states.VariableStack, typeStack *states.BindingStack) *states.Thunk {
-	if thunk.Func == nil {
-		if thunk.Result.Error != nil {
-			return states.ThunkFromError(thunk.Result.Error)
-		}
-		return states.ThunkFromState(states.State{
-			Value:     thunk.Result.State.Value,
-			Stack:     stack,
-			TypeStack: typeStack,
-		})
-	}
-	return &states.Thunk{
-		Func: func() *states.Thunk {
-			return replaceStacks(thunk.Func(), stack, typeStack)
-		},
-	}
 }
