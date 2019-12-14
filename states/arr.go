@@ -34,10 +34,10 @@ func (v *ArrValue) GetTail() (*ArrValue, error) {
 	if res.Error != nil {
 		return nil, res.Error
 	}
-	if res.State.Value == nil {
+	if res.Value == nil {
 		return nil, nil
 	}
-	return res.State.Value.(*ArrValue), nil
+	return res.Value.(*ArrValue), nil
 }
 
 func (v *ArrValue) String() (string, error) {

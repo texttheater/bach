@@ -1,12 +1,14 @@
 package states
 
 type Thunk struct {
-	Func   func() *Thunk
-	Result Result
+	Func      func() *Thunk
+	Result    Result
+	Stack     *VariableStack
+	TypeStack *BindingStack
 }
 
 type Result struct {
-	State State
+	Value Value
 	Drop  bool
 	Error error
 }
@@ -37,8 +39,10 @@ func ThunkFromError(err error) *Thunk {
 func ThunkFromState(state State) *Thunk {
 	return &Thunk{
 		Result: Result{
-			State: state,
+			Value: state.Value,
 		},
+		Stack:     state.Stack,
+		TypeStack: state.TypeStack,
 	}
 }
 

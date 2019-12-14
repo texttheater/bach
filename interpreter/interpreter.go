@@ -32,5 +32,5 @@ func InterpretString(program string) (types.Type, states.Value, error) {
 	if res.Error != nil {
 		return nil, nil, res.Error
 	}
-	return outputShape.Type, res.State.Value, nil
+	return outputShape.Type, res.Value, nil
 }

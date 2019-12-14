@@ -30,7 +30,7 @@ func (v ObjValue) String() (string, error) {
 		if res.Error != nil {
 			return "", res.Error
 		}
-		wString, err := res.State.Value.String()
+		wString, err := res.Value.String()
 		if err != nil {
 			return "", err
 		}
@@ -57,7 +57,7 @@ func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 			if res.Error != nil {
 				return false, res.Error
 			}
-			if ok, err := res.State.Value.Inhabits(wantType, stack); !ok {
+			if ok, err := res.Value.Inhabits(wantType, stack); !ok {
 				return false, err
 			}
 		}
@@ -92,7 +92,7 @@ func (v ObjValue) Equal(w Value) (bool, error) {
 			if wRes.Error != nil {
 				return false, wRes.Error
 			}
-			equal, err := vRes.State.Value.Equal(wRes.State.Value)
+			equal, err := vRes.Value.Equal(wRes.Value)
 			if err != nil {
 				return false, err
 			}

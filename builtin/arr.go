@@ -43,12 +43,12 @@ func initArr() {
 				if res0.Error != nil {
 					return states.ThunkFromError(res0.Error)
 				}
-				start := float64(res0.State.Value.(states.NumValue))
+				start := float64(res0.Value.(states.NumValue))
 				res1 := args[1](inputState, nil).Eval()
 				if res1.Error != nil {
 					return states.ThunkFromError(res1.Error)
 				}
-				end := float64(res1.State.Value.(states.NumValue))
+				end := float64(res1.Value.(states.NumValue))
 				i := start
 				var iter func() (states.Value, bool, error)
 				iter = func() (states.Value, bool, error) {

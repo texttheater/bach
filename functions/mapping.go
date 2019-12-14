@@ -73,7 +73,7 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 			if res.Drop {
 				return output()
 			}
-			return res.State.Value, true, nil
+			return res.Value, true, nil
 		}
 		return states.ThunkFromIter(output)
 	}

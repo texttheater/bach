@@ -72,7 +72,7 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 			}
 			return states.ThunkFromState(states.State{
 				Value: &states.ArrValue{
-					Head: res.State.Value,
+					Head: res.Value,
 					Tail: tailAction(inputState, nil),
 				},
 				Stack: inputState.Stack,

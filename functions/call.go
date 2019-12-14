@@ -53,9 +53,10 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 				Func: func() *states.Thunk {
 					thunk := funAction(inputState, args)
 					thunk = ReplaceRejectError(thunk, x.Pos)
-					thunk = replaceStacks(thunk, inputState.Stack, inputState.TypeStack)
 					return thunk
 				},
+				Stack:     inputState.Stack,
+				TypeStack: inputState.TypeStack,
 			}
 		}
 		// return
@@ -198,7 +199,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 			if res.Error != nil {
 				return states.ThunkFromError(res.Error)
 			}
-			argValues[i] = res.State.Value
+			argValues[i] = res.Value
 		}
 		value, err := kernel(inputState.Value, argValues)
 		if err != nil {
@@ -226,7 +227,7 @@ func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
 					return states.ThunkFromError(res.Error)
 				}
 				return states.ThunkFromState(states.State{
-					Value:     res.State.Value,
+					Value:     res.Value,
 					Stack:     inputState.Stack,
 					TypeStack: inputState.TypeStack,
 				})
@@ -288,9 +289,11 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 					if res.Error != nil {
 						return states.ThunkFromError(res.Error)
 					}
-					argOutputState := res.State
-					argOutputState.Stack = inputState.Stack
-					return states.ThunkFromState(argOutputState)
+					return states.ThunkFromState(states.State{
+						Value:     res.Value,
+						Stack:     inputState.Stack,
+						TypeStack: inputState.TypeStack, // TODO right?
+					})
 				}
 			}
 			for i := 0; i < len(args); i++ {
@@ -334,26 +337,5 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 		}
 		// return
 		return outputShape, funAction3, true, nil
-	}
-}
-
-// replaceStacks replaces the stacks in the eventual output state of a thunk
-// with the stacks of the original input state, so functions don't leak their
-// stacks
-func replaceStacks(thunk *states.Thunk, stack *states.VariableStack, typeStack *states.BindingStack) *states.Thunk {
-	if thunk.Func == nil {
-		if thunk.Result.Error != nil {
-			return states.ThunkFromError(thunk.Result.Error)
-		}
-		return states.ThunkFromState(states.State{
-			Value:     thunk.Result.State.Value,
-			Stack:     stack,
-			TypeStack: typeStack,
-		})
-	}
-	return &states.Thunk{
-		Func: func() *states.Thunk {
-			return replaceStacks(thunk.Func(), stack, typeStack)
-		},
 	}
 }

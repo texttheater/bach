@@ -68,7 +68,7 @@ func forceEvaluation(v states.Value) error {
 			if res.Error != nil {
 				return res.Error
 			}
-			forceEvaluation(res.State.Value)
+			forceEvaluation(res.Value)
 		}
 	}
 	return nil

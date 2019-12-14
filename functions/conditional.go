@@ -176,15 +176,16 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 				Stack:     matcherVarStack,
 				TypeStack: inputState.TypeStack,
 			}
-			res := guardAction(guardInputState, nil).Eval()
+			thunk := guardAction(guardInputState, nil)
+			res := thunk.Eval()
 			if res.Error != nil {
 				return states.ThunkFromError(res.Error)
 			}
-			boolGuardValue := res.State.Value.(states.BoolValue)
+			boolGuardValue := res.Value.(states.BoolValue)
 			if boolGuardValue {
 				consequentInputState := states.State{
 					Value:     inputState.Value,
-					Stack:     res.State.Stack,
+					Stack:     thunk.Stack,
 					TypeStack: inputState.TypeStack,
 				}
 				return ReplaceRejectError(consequentAction(consequentInputState, nil), x.Pos)
@@ -202,15 +203,16 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 					Stack:     matcherVarStack,
 					TypeStack: inputState.TypeStack,
 				}
-				res := elisGuardActions[i](guardInputState, nil).Eval()
+				thunk := elisGuardActions[i](guardInputState, nil)
+				res := thunk.Eval()
 				if res.Error != nil {
 					return states.ThunkFromError(res.Error)
 				}
-				boolGuardValue := res.State.Value.(states.BoolValue)
+				boolGuardValue := res.Value.(states.BoolValue)
 				if boolGuardValue {
 					consequentInputState := states.State{
 						Value:     inputState.Value,
-						Stack:     res.State.Stack,
+						Stack:     thunk.Stack,
 						TypeStack: inputState.TypeStack,
 					}
 					return ReplaceRejectError(elisConsequentActions[i](consequentInputState, nil), x.Pos)
@@ -502,7 +504,7 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 				}
 				var err error
 				varStack, ok, err = valMatcher(states.State{
-					Value:     res.State.Value,
+					Value:     res.Value,
 					Stack:     varStack,
 					TypeStack: inputState.TypeStack,
 				})
