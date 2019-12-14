@@ -23,7 +23,10 @@ func (x AssignmentExpression) Typecheck(inputShape Shape, params []*Parameter) (
 		)
 	}
 	variableFuncer := VariableFuncer(x, x.Name, inputShape.Type)
-	outputShape := Shape{inputShape.Type, inputShape.Stack.Push(variableFuncer)}
+	outputShape := Shape{
+		Type:  inputShape.Type,
+		Stack: inputShape.Stack.Push(variableFuncer),
+	}
 	action := func(inputState states.State, args []states.Action) *states.Thunk {
 		return states.ThunkFromState(states.State{
 			Value: inputState.Value,
@@ -35,13 +38,4 @@ func (x AssignmentExpression) Typecheck(inputShape Shape, params []*Parameter) (
 		})
 	}
 	return outputShape, action, nil
-}
-
-type valueStack struct {
-	Head states.Value
-	Tail *valueStack
-}
-
-func (s *valueStack) Push(element states.Value) *valueStack {
-	return &valueStack{element, s}
 }
