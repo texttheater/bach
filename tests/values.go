@@ -10,7 +10,7 @@ import (
 
 func TestValues(t *testing.T) {
 	TestProgram(
-		`false if id then 1 else reject ok`,
+		`false if id then 1 else fatal ok`,
 		types.NumType{},
 		nil,
 		errors.E(

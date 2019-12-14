@@ -43,7 +43,7 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Semi>\;)` +
 		// the following will be scanned as Name, but mapped to the
 		// appropriate token types by ToKeyword (see below)
-		`|(?P<Keyword>for|def|as|ok|if|then|elif|else|each|is|elis|with|drop|reject)` +
+		`|(?P<Keyword>for|def|as|ok|if|then|elif|else|each|is|elis|with|drop)` +
 		`|(?P<TypeKeyword>Void|Null|Reader|Bool|Num|Str|Arr|Tup|Obj|Any)`,
 ))
 

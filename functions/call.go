@@ -51,9 +51,7 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 		action := func(inputState states.State, args []states.Action) *states.Thunk {
 			return &states.Thunk{
 				Func: func() *states.Thunk {
-					thunk := funAction(inputState, args)
-					thunk = ReplaceRejectError(thunk, x.Pos)
-					return thunk
+					return funAction(inputState, args)
 				},
 				Stack:     inputState.Stack,
 				TypeStack: inputState.TypeStack,

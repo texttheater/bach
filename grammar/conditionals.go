@@ -11,11 +11,9 @@ type Conditional struct {
 	Pattern      *Pattern       `( "is" @@`
 	Guard        *Composition   `  ( "with" @@)?`
 	Condition    *Composition   `| "if" @@ )`
-	Consequent   *Composition   `"then" ( @@`
-	Reject       *Reject        `       | @@ )`
+	Consequent   *Composition   `"then" @@`
 	Alternatives []*Alternative `( @@ )*`
-	Alternative  *Composition   `( "else" ( @@`
-	AltReject    *Reject        `         | @@ ) )? "ok"`
+	Alternative  *Composition   `( "else" @@ )? "ok"`
 }
 
 type Alternative struct {
@@ -23,8 +21,7 @@ type Alternative struct {
 	Pattern    *Pattern     `( "elis" @@`
 	Guard      *Composition `  ( "with" @@ )?`
 	Condition  *Composition `| "elif" @@ )`
-	Consequent *Composition `"then" ( @@`
-	Reject     *Reject      `       | @@ )`
+	Consequent *Composition `"then" @@`
 }
 
 func (g *Conditional) Ast() (functions.Expression, error) {
@@ -53,11 +50,7 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 		}
 	}
 	var consequent functions.Expression
-	if g.Consequent != nil {
-		consequent, err = g.Consequent.Ast()
-	} else {
-		consequent, err = g.Reject.Ast()
-	}
+	consequent, err = g.Consequent.Ast()
 	if err != nil {
 		return nil, err
 	}
@@ -87,11 +80,7 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 				}
 			}
 		}
-		if alternative.Consequent != nil {
-			alternativeConsequents[i], err = alternative.Consequent.Ast()
-		} else {
-			alternativeConsequents[i], err = alternative.Reject.Ast()
-		}
+		alternativeConsequents[i], err = alternative.Consequent.Ast()
 		if err != nil {
 			return nil, err
 		}
@@ -99,8 +88,6 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 	var alternative functions.Expression
 	if g.Alternative != nil {
 		alternative, err = g.Alternative.Ast()
-	} else if g.AltReject != nil {
-		alternative, err = g.AltReject.Ast()
 	}
 	if err != nil {
 		return nil, err

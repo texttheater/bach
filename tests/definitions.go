@@ -64,7 +64,7 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		t,
 	)
-	TestProgram(`for <A>|Null def myMust <A> as is Null then reject else id ok ok null myMust`,
+	TestProgram(`for <A>|Null def myMust <A> as is Null then fatal else id ok ok null myMust`,
 		types.TypeVariable{
 			Name: "A",
 		},
@@ -75,13 +75,13 @@ func TestDefinitions(t *testing.T) {
 		),
 		t,
 	)
-	TestProgram(`for <A>|Null def myMust <A> as is Null then reject else id ok ok 1 myMust`,
+	TestProgram(`for <A>|Null def myMust <A> as is Null then fatal else id ok ok 1 myMust`,
 		types.NumType{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
-	TestProgram(`for <A>|Null def myMust <A> as is <A> then id else reject ok ok null myMust`,
+	TestProgram(`for <A>|Null def myMust <A> as is <A> then id else fatal ok ok null myMust`,
 		types.NullType{},
 		states.NullValue{},
 		nil,

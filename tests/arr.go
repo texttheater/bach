@@ -136,7 +136,7 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[1 if ==2 then true else reject ok] out`,
+		`[1 if ==2 then true else fatal ok] out`,
 		nil,
 		nil,
 		errors.E(
@@ -146,7 +146,7 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[true, 1 if ==2 then true else reject ok] out`,
+		`[true, 1 if ==2 then true else fatal ok] out`,
 		nil,
 		nil,
 		errors.E(

@@ -188,7 +188,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 					Stack:     thunk.Stack,
 					TypeStack: inputState.TypeStack,
 				}
-				return ReplaceRejectError(consequentAction(consequentInputState, nil), x.Pos)
+				return consequentAction(consequentInputState, nil)
 			}
 		}
 		for i := range elisMatchers {
@@ -215,11 +215,11 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 						Stack:     thunk.Stack,
 						TypeStack: inputState.TypeStack,
 					}
-					return ReplaceRejectError(elisConsequentActions[i](consequentInputState, nil), x.Pos)
+					return elisConsequentActions[i](consequentInputState, nil)
 				}
 			}
 		}
-		return ReplaceRejectError(alternativeAction(inputState, nil), x.Pos)
+		return alternativeAction(inputState, nil)
 	}
 	// return
 	outputShape := Shape{
