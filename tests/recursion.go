@@ -8,6 +8,14 @@ import (
 )
 
 func TestRecursion(t *testing.T) {
+	// simplest tail recursion example
+	TestProgram(
+		`for Num def f Num as if ==0 then 0 else -1 f ok ok 10000 f`,
+		types.NumType{},
+		states.NumValue(0),
+		nil,
+		t,
+	)
 	// naive recursive factorial
 	TestProgram(
 		`for Num def fac Num as if ==0 then 1 else =n -1 fac *n ok ok 3 fac`,
