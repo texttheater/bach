@@ -1,5 +1,9 @@
 package states
 
+import (
+	"fmt"
+)
+
 type State struct {
 	Value     Value
 	Stack     *VariableStack
@@ -54,6 +58,15 @@ func (s *IDStack) AddAll(t *IDStack) *IDStack {
 		t = t.Tail
 	}
 	return s
+}
+
+func (s *IDStack) String() string {
+	var slice []interface{}
+	for s != nil {
+		slice = append(slice, s.Head)
+		s = s.Tail
+	}
+	return fmt.Sprintf("%s", slice)
 }
 
 var InitialState = State{
