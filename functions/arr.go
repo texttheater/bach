@@ -18,10 +18,10 @@ func (x ArrExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
+func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no params
 	if len(params) > 0 {
-		return Shape{}, nil, errors.E(
+		return Shape{}, nil, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
@@ -29,6 +29,7 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 	// typecheck rest
 	var outputType types.Type
 	var action states.Action
+	var ids *states.IDStack
 	if x.Rest == nil {
 		outputType = types.VoidArrType
 		action = func(inputState states.State, args []states.Action) *states.Thunk {
@@ -39,26 +40,28 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 		}
 	} else {
 		var restShape Shape
+		var restIDs *states.IDStack
 		var err error
-		restShape, action, err = x.Rest.Typecheck(inputShape, nil)
+		restShape, action, restIDs, err = x.Rest.Typecheck(inputShape, nil)
 		if err != nil {
-			return Shape{}, nil, err
+			return Shape{}, nil, nil, err
 		}
 		if !(types.AnyArrType).Subsumes(restShape.Type) {
-			return Shape{}, nil, errors.E(
+			return Shape{}, nil, nil, errors.E(
 				errors.Code(errors.RestRequiresArrType),
 				errors.Pos(x.RestPos),
 				errors.WantType(types.AnyArrType),
 				errors.GotType(restShape.Type),
 			)
 		}
+		ids = ids.AddAll(restIDs)
 		outputType = restShape.Type
 	}
 	// typecheck elements
 	for i := len(x.Elements) - 1; i >= 0; i-- {
-		elementShape, elementAction, err := x.Elements[i].Typecheck(inputShape, nil)
+		elementShape, elementAction, elementIDs, err := x.Elements[i].Typecheck(inputShape, nil)
 		if err != nil {
-			return Shape{}, nil, err
+			return Shape{}, nil, nil, err
 		}
 		outputType = &types.NearrType{
 			HeadType: elementShape.Type,
@@ -78,6 +81,7 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 				Stack: inputState.Stack,
 			})
 		}
+		ids = ids.AddAll(elementIDs)
 	}
 	// make output shape
 	outputShape := Shape{
@@ -85,5 +89,5 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 		Stack: inputShape.Stack,
 	}
 	// return
-	return outputShape, action, nil
+	return outputShape, action, ids, nil
 }

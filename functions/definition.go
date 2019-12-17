@@ -21,10 +21,10 @@ func (x DefinitionExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
+func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return Shape{}, nil, errors.E(
+		return Shape{}, nil, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
@@ -52,7 +52,7 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 		return bodyAction(bodyInputState, nil)
 	}
 	// make a funcer for the defined function, add it to the function stack
-	funFuncer := RegularFuncer(x.InputType, x.Name, x.Params, x.OutputType, funAction)
+	funFuncer := RegularFuncer(x.InputType, x.Name, x.Params, x.OutputType, funAction, nil)
 	functionStack := inputShape.Stack.Push(funFuncer)
 	// add parameter funcers for use in the body
 	bodyStack := functionStack
@@ -68,7 +68,9 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 			}
 			panic("action not found")
 		}
-		paramFuncer := RegularFuncer(param.InputType, x.ParamNames[i], param.Params, param.OutputType, paramAction)
+		paramFuncer := RegularFuncer(param.InputType, x.ParamNames[i], param.Params, param.OutputType, paramAction, &states.IDStack{
+			Head: id,
+		})
 		bodyStack = bodyStack.Push(paramFuncer)
 	}
 	// define body input context
@@ -77,13 +79,14 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 		Stack: bodyStack,
 	}
 	// typecheck body (crucially, setting body action)
-	bodyOutputShape, bodyAction, err := x.Body.Typecheck(bodyInputShape, nil)
+	bodyOutputShape, bodyAction, bodyIDs, err := x.Body.Typecheck(bodyInputShape, nil)
 	if err != nil {
-		return Shape{}, nil, err
+		return Shape{}, nil, nil, err
 	}
+	ids := bodyIDs
 	// check body output type
 	if !x.OutputType.Subsumes(bodyOutputShape.Type) {
-		return Shape{}, nil, errors.E(
+		return Shape{}, nil, nil, errors.E(
 			errors.Code(errors.FunctionBodyHasWrongOutputType),
 			errors.Pos(x.Body.Position()),
 			errors.WantType(x.OutputType),
@@ -102,5 +105,5 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 
 	}
 	// return
-	return outputShape, action, nil
+	return outputShape, action, ids, nil
 }

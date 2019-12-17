@@ -9,15 +9,15 @@ import (
 
 func initControl() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*functions.Parameter) (functions.Shape, states.Action, bool, error) {
+		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*functions.Parameter) (functions.Shape, states.Action, *states.IDStack, bool, error) {
 			if len(gotParams) != 0 {
-				return functions.Shape{}, nil, false, nil
+				return functions.Shape{}, nil, nil, false, nil
 			}
 			if len(gotCall.Args) != 0 {
-				return functions.Shape{}, nil, false, nil
+				return functions.Shape{}, nil, nil, false, nil
 			}
 			if gotCall.Name != "fatal" {
-				return functions.Shape{}, nil, false, nil
+				return functions.Shape{}, nil, nil, false, nil
 			}
 			outputShape := functions.Shape{
 				Type:  types.VoidType{},
@@ -33,21 +33,21 @@ func initControl() {
 					),
 				)
 			}
-			return outputShape, action, true, nil
+			return outputShape, action, nil, true, nil
 		},
-		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*functions.Parameter) (functions.Shape, states.Action, bool, error) {
+		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*functions.Parameter) (functions.Shape, states.Action, *states.IDStack, bool, error) {
 			if len(gotParams) != 0 {
-				return functions.Shape{}, nil, false, nil
+				return functions.Shape{}, nil, nil, false, nil
 			}
 			if len(gotCall.Args) != 0 {
-				return functions.Shape{}, nil, false, nil
+				return functions.Shape{}, nil, nil, false, nil
 			}
 			if gotCall.Name != "must" {
-				return functions.Shape{}, nil, false, nil
+				return functions.Shape{}, nil, nil, false, nil
 			}
 			u, ok := gotInputShape.Type.(types.UnionType)
 			if !ok {
-				return functions.Shape{}, nil, false, nil
+				return functions.Shape{}, nil, nil, false, nil
 			}
 			nullTypeFound := false
 			var outputType types.Type = types.VoidType{}
@@ -59,7 +59,7 @@ func initControl() {
 				}
 			}
 			if !nullTypeFound {
-				return functions.Shape{}, nil, false, nil
+				return functions.Shape{}, nil, nil, false, nil
 			}
 			outputShape := functions.Shape{
 				Type:  outputType,
@@ -82,7 +82,7 @@ func initControl() {
 				}
 				return states.ThunkFromState(inputState)
 			}
-			return outputShape, action, true, nil
+			return outputShape, action, nil, true, nil
 		},
 	})
 }

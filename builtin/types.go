@@ -8,12 +8,12 @@ import (
 
 func initTypes() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*functions.Parameter) (functions.Shape, states.Action, bool, error) {
+		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*functions.Parameter) (functions.Shape, states.Action, *states.IDStack, bool, error) {
 			if len(gotCall.Args)+len(gotParams) != 0 {
-				return functions.Shape{}, nil, false, nil
+				return functions.Shape{}, nil, nil, false, nil
 			}
 			if gotCall.Name != "type" {
-				return functions.Shape{}, nil, false, nil
+				return functions.Shape{}, nil, nil, false, nil
 			}
 			outputShape := functions.Shape{
 				Type:  types.StrType{},
@@ -28,7 +28,7 @@ func initTypes() {
 				}
 				return states.ThunkFromState(outputState)
 			}
-			return outputShape, action, true, nil
+			return outputShape, action, nil, true, nil
 		},
 	})
 }

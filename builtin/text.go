@@ -31,6 +31,7 @@ func initText() {
 				}
 				return states.ThunkFromIter(iter)
 			},
+			nil,
 		),
 		functions.SimpleFuncer(
 			&types.ArrType{types.StrType{}},

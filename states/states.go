@@ -23,6 +23,39 @@ type Variable struct {
 	Action Action
 }
 
+type IDStack struct {
+	Head interface{}
+	Tail *IDStack
+}
+
+func (s *IDStack) Contains(element interface{}) bool {
+	for s != nil {
+		if s.Head == element {
+			return true
+		}
+		s = s.Tail
+	}
+	return false
+}
+
+func (s *IDStack) Add(element interface{}) *IDStack {
+	if s.Contains(element) {
+		return s
+	}
+	return &IDStack{
+		Head: element,
+		Tail: s,
+	}
+}
+
+func (s *IDStack) AddAll(t *IDStack) *IDStack {
+	for t != nil {
+		s = s.Add(t.Head)
+		t = t.Tail
+	}
+	return s
+}
+
 var InitialState = State{
 	Value: NullValue{},
 }

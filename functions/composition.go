@@ -17,26 +17,26 @@ func (x CompositionExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x CompositionExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
+func (x CompositionExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
 	if len(params) > 0 {
-		return Shape{}, nil, errors.E(
+		return Shape{}, nil, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
-	middleShape, lAction, err := x.Left.Typecheck(inputShape, nil)
+	middleShape, lAction, ids, err := x.Left.Typecheck(inputShape, nil)
 	if err != nil {
-		return Shape{}, nil, err
+		return Shape{}, nil, nil, err
 	}
 	if (types.VoidType{}).Subsumes(middleShape.Type) {
-		return Shape{}, nil, errors.E(
+		return Shape{}, nil, nil, errors.E(
 			errors.Code(errors.ComposeWithVoid),
 			errors.Pos(x.Right.Position()),
 		)
 	}
-	outputShape, rAction, err := x.Right.Typecheck(middleShape, nil)
+	outputShape, rAction, rIDs, err := x.Right.Typecheck(middleShape, nil)
 	if err != nil {
-		return Shape{}, nil, err
+		return Shape{}, nil, nil, err
 	}
 	action := func(inputState states.State, args []states.Action) *states.Thunk {
 		thunk := lAction(inputState, nil)
@@ -58,7 +58,8 @@ func (x CompositionExpression) Typecheck(inputShape Shape, params []*Parameter) 
 		}
 		return rAction(state, nil)
 	}
-	return outputShape, action, nil
+	ids = ids.AddAll(rIDs)
+	return outputShape, action, ids, nil
 }
 
 func Compose(pos lexer.Position, l Expression, r Expression) Expression {

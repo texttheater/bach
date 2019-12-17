@@ -41,6 +41,7 @@ func initIO() {
 				}
 				return states.ThunkFromIter(iter)
 			},
+			nil,
 		),
 		functions.SimpleFuncer(
 			types.TypeVariable{"$"},

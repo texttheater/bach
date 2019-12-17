@@ -16,22 +16,24 @@ func (x ObjExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x ObjExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
+func (x ObjExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
 	if len(params) > 0 {
-		return Shape{}, nil, errors.E(
+		return Shape{}, nil, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
 	keyTypeMap := make(map[string]types.Type)
 	keyActionMap := make(map[string]states.Action)
+	var ids *states.IDStack
 	for key, valExpression := range x.PropValMap {
-		keyOutputShape, keyAction, err := valExpression.Typecheck(inputShape, nil)
+		keyOutputShape, keyAction, keyIDs, err := valExpression.Typecheck(inputShape, nil)
 		if err != nil {
-			return Shape{}, nil, err
+			return Shape{}, nil, nil, err
 		}
 		keyTypeMap[key] = keyOutputShape.Type
 		keyActionMap[key] = keyAction
+		ids = ids.AddAll(keyIDs)
 	}
 	outputShape := Shape{
 		Type:  types.NewObjType(keyTypeMap),
@@ -48,5 +50,5 @@ func (x ObjExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 			TypeStack: inputState.TypeStack,
 		})
 	}
-	return outputShape, action, nil
+	return outputShape, action, ids, nil
 }

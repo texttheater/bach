@@ -22,6 +22,7 @@ func initRegexp() {
 			func(inputState states.State, args []states.Action) *states.Thunk {
 				return args[0](inputState, nil)
 			},
+			nil,
 		),
 	})
 }

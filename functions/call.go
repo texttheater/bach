@@ -20,14 +20,14 @@ func (x CallExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
+func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// go down the function stack and find the function invoked by this
 	// call
 	stack := inputShape.Stack
 	for {
 		// reached bottom of stack without finding a matching funcer
 		if stack == nil {
-			return Shape{}, nil, errors.E(
+			return Shape{}, nil, nil, errors.E(
 				errors.Code(errors.NoSuchFunction),
 				errors.Pos(x.Pos),
 				errors.InputType(inputShape.Type),
@@ -37,9 +37,9 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 		}
 		// try the funcer on top of the stack
 		funcer := stack.Head
-		funOutputShape, funAction, ok, err := funcer(inputShape, x, params)
+		funOutputShape, funAction, ids, ok, err := funcer(inputShape, x, params)
 		if err != nil {
-			return Shape{}, nil, err
+			return Shape{}, nil, nil, err
 		}
 		if !ok {
 			stack = stack.Tail
@@ -58,7 +58,7 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 			}
 		}
 		// return
-		return funOutputShape, action, nil
+		return funOutputShape, action, ids, nil
 	}
 }
 
@@ -170,7 +170,7 @@ func (p Parameter) String() string {
 	return buffer.String()
 }
 
-type Funcer func(gotInputShape Shape, gotCall CallExpression, gotParams []*Parameter) (outputShape Shape, action states.Action, ok bool, err error)
+type Funcer func(gotInputShape Shape, gotCall CallExpression, gotParams []*Parameter) (outputShape Shape, action states.Action, ids *states.IDStack, ok bool, err error)
 
 type Kernel func(inputValue states.Value, argValues []states.Value) (states.Value, error)
 
@@ -212,7 +212,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 
 	}
 	// return
-	return RegularFuncer(wantInputType, wantName, params, outputType, action)
+	return RegularFuncer(wantInputType, wantName, params, outputType, action, nil)
 }
 
 func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
@@ -235,23 +235,25 @@ func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
 		}
 		panic(fmt.Sprintf("variable %s not found", name))
 	}
-	return RegularFuncer(types.AnyType{}, name, nil, varType, varAction)
+	return RegularFuncer(types.AnyType{}, name, nil, varType, varAction, &states.IDStack{
+		Head: id,
+	})
 }
 
-func RegularFuncer(wantInputType types.Type, wantName string, params []*Parameter, outputType types.Type, action states.Action) Funcer {
-	return func(gotInputShape Shape, gotCall CallExpression, gotParams []*Parameter) (Shape, states.Action, bool, error) {
+func RegularFuncer(wantInputType types.Type, wantName string, params []*Parameter, outputType types.Type, action states.Action, ids *states.IDStack) Funcer {
+	return func(gotInputShape Shape, gotCall CallExpression, gotParams []*Parameter) (Shape, states.Action, *states.IDStack, bool, error) {
 		// match number of parameters
 		if len(gotCall.Args)+len(gotParams) != len(params) {
-			return Shape{}, nil, false, nil
+			return Shape{}, nil, nil, false, nil
 		}
 		// match name
 		if gotCall.Name != wantName {
-			return Shape{}, nil, false, nil
+			return Shape{}, nil, nil, false, nil
 		}
 		// match input type
 		bindings := make(map[string]types.Type)
 		if !wantInputType.Bind(gotInputShape.Type, bindings) {
-			return Shape{}, nil, false, nil
+			return Shape{}, nil, nil, false, nil
 		}
 		// typecheck and set parameters filled by this call
 		funAction := action
@@ -261,12 +263,12 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 				Type:  params[i].InputType.Instantiate(bindings), // TODO what if we don't have the binding yet at this stage?
 				Stack: gotInputShape.Stack,
 			}
-			argOutputShape, argAction, err := gotCall.Args[i].Typecheck(argInputShape, instantiate(params[i].Params, bindings))
+			argOutputShape, argAction, argIDs, err := gotCall.Args[i].Typecheck(argInputShape, instantiate(params[i].Params, bindings))
 			if err != nil {
-				return Shape{}, nil, false, err
+				return Shape{}, nil, nil, false, err
 			}
 			if !params[i].OutputType.Bind(argOutputShape.Type, bindings) {
-				return Shape{}, nil, false, errors.E(
+				return Shape{}, nil, nil, false, errors.E(
 					errors.Code(errors.ArgHasWrongOutputType),
 					errors.Pos(gotCall.Pos),
 					errors.ArgNum(i),
@@ -275,6 +277,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 				)
 			}
 			argActions[i] = argAction
+			ids = ids.AddAll(argIDs)
 		}
 		// pass input variable stack to arguments
 		funAction2 := func(inputState states.State, args []states.Action) *states.Thunk {
@@ -282,7 +285,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 			for i := range argActions {
 				argAction := argActions[i]
 				args2[i] = func(argInputState states.State, argArgs []states.Action) *states.Thunk {
-					argInputState.Stack = inputState.Stack
+					argInputState.Stack = inputState.Stack // FIXME pass only what is needed to avoid memory leak
 					res := argAction(argInputState, argArgs).Eval()
 					if res.Error != nil {
 						return states.ThunkFromError(res.Error)
@@ -303,7 +306,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 		for i, gotParam := range gotParams {
 			wantParam := params[len(gotCall.Args)+i].Instantiate(bindings)
 			if !gotParam.Subsumes(wantParam) {
-				return Shape{}, nil, false, errors.E(
+				return Shape{}, nil, nil, false, errors.E(
 					errors.Code(errors.ParamDoesNotMatch),
 					errors.Pos(gotCall.Pos),
 					errors.ParamNum(i+1),
@@ -334,6 +337,6 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 			return funAction2(inputState, args)
 		}
 		// return
-		return outputShape, funAction3, true, nil
+		return outputShape, funAction3, ids, true, nil
 	}
 }

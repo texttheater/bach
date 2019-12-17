@@ -61,6 +61,7 @@ func initArr() {
 				}
 				return states.ThunkFromIter(iter)
 			},
+			nil,
 		),
 	})
 }

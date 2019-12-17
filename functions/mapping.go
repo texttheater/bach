@@ -16,17 +16,17 @@ func (x MappingExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, error) {
+func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return Shape{}, nil, errors.E(
+		return Shape{}, nil, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
 	// make sure the input type is a sequence type
 	if !types.AnyArrType.Subsumes(inputShape.Type) {
-		return Shape{}, nil, errors.E(
+		return Shape{}, nil, nil, errors.E(
 			errors.Code(errors.MappingRequiresArrType),
 			errors.Pos(x.Pos),
 			errors.WantType(types.AnyArrType),
@@ -38,10 +38,11 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 		Type:  inputShape.Type.ElementType(),
 		Stack: inputShape.Stack,
 	}
-	bodyOutputShape, bodyAction, err := x.Body.Typecheck(bodyInputShape, nil)
+	bodyOutputShape, bodyAction, bodyIDs, err := x.Body.Typecheck(bodyInputShape, nil)
 	if err != nil {
-		return Shape{}, nil, err
+		return Shape{}, nil, nil, err
 	}
+	ids := bodyIDs
 	// create output shape
 	outputShape := Shape{
 		Type: &types.ArrType{
@@ -77,5 +78,5 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 		}
 		return states.ThunkFromIter(output)
 	}
-	return outputShape, action, nil
+	return outputShape, action, ids, nil
 }

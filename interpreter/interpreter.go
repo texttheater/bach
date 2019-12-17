@@ -17,7 +17,7 @@ func InterpretString(program string) (types.Type, states.Value, error) {
 		return nil, nil, err
 	}
 	// type-check
-	outputShape, action, err := x.Typecheck(builtin.InitialShape, nil)
+	outputShape, action, _, err := x.Typecheck(builtin.InitialShape, nil)
 	if err != nil {
 		return nil, nil, err
 	}
