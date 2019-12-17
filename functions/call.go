@@ -258,6 +258,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 		// typecheck and set parameters filled by this call
 		funAction := action
 		argActions := make([]states.Action, len(gotCall.Args))
+		argIDss := make([]*states.IDStack, len(gotCall.Args))
 		for i := range gotCall.Args {
 			argInputShape := Shape{
 				Type:  params[i].InputType.Instantiate(bindings), // TODO what if we don't have the binding yet at this stage?
@@ -277,15 +278,18 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 				)
 			}
 			argActions[i] = argAction
+			argIDss[i] = argIDs
 			ids = ids.AddAll(argIDs)
 		}
 		// pass input variable stack to arguments
 		funAction2 := func(inputState states.State, args []states.Action) *states.Thunk {
 			args2 := make([]states.Action, len(argActions)+len(args))
 			for i := range argActions {
+				i := i
 				argAction := argActions[i]
 				args2[i] = func(argInputState states.State, argArgs []states.Action) *states.Thunk {
-					argInputState.Stack = inputState.Stack // FIXME pass only what is needed to avoid memory leak
+					prunedStack := inputState.Stack.Keep(argIDss[i]) // pass only what is needed to avoid memory leak
+					argInputState.Stack = prunedStack
 					res := argAction(argInputState, argArgs).Eval()
 					if res.Error != nil {
 						return states.ThunkFromError(res.Error)

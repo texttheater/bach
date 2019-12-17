@@ -22,6 +22,27 @@ func (s *VariableStack) Push(element Variable) *VariableStack {
 	}
 }
 
+func (s *VariableStack) Keep(ids *IDStack) *VariableStack {
+	var first *VariableStack
+	var current *VariableStack
+	for s != nil {
+		if ids.Contains(s.Head.ID) {
+			next := &VariableStack{
+				Head: s.Head,
+			}
+			if current == nil {
+				first = next
+				current = next
+			} else {
+				current.Tail = next
+				current = next
+			}
+		}
+		s = s.Tail
+	}
+	return first
+}
+
 type Variable struct {
 	ID     interface{}
 	Action Action
