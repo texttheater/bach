@@ -46,8 +46,6 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape,
 			continue
 		}
 		// make call lazy
-		// This makes deep recursion run in constant space, but
-		// unfortunately very slow!
 		action := func(inputState states.State, args []states.Action) *states.Thunk {
 			return &states.Thunk{
 				Func: func() *states.Thunk {
