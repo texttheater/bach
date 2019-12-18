@@ -33,13 +33,6 @@ func (s *BindingStack) Update(name string, t types.Type) *BindingStack {
 	}
 }
 
-func (s *BindingStack) Push(element Binding) *BindingStack {
-	return &BindingStack{
-		Head: element,
-		Tail: s,
-	}
-}
-
 func (s *BindingStack) Inhabits(v Value, t types.TypeVariable) (bool, error) {
 	if s == nil {
 		return false, nil
