@@ -285,12 +285,11 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 		funAction2 := func(inputState states.State, args []states.Action) *states.Thunk {
 			args2 := make([]states.Action, len(argActions)+len(args))
 			for i := range argActions {
+				prunedStack := inputState.Stack.Keep(argIDss[i]) // pass only what is needed to avoid memory leak
 				i := i
-				argAction := argActions[i]
 				args2[i] = func(argInputState states.State, argArgs []states.Action) *states.Thunk {
-					prunedStack := inputState.Stack.Keep(argIDss[i]) // pass only what is needed to avoid memory leak
 					argInputState.Stack = prunedStack
-					return argAction(argInputState, argArgs)
+					return argActions[i](argInputState, argArgs)
 				}
 			}
 			for i := 0; i < len(args); i++ {
