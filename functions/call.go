@@ -315,17 +315,8 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 		}
 		// set new type variables on action
 		funAction3 := func(inputState states.State, args []states.Action) *states.Thunk {
-			typeStack := inputState.TypeStack
 			for n, t := range bindings {
-				typeStack = typeStack.Push(states.Binding{
-					Name: n,
-					Type: t,
-				})
-			}
-			inputState = states.State{
-				Value:     inputState.Value,
-				Stack:     inputState.Stack,
-				TypeStack: typeStack,
+				inputState.TypeStack = inputState.TypeStack.Update(n, t)
 			}
 			return funAction2(inputState, args)
 		}
