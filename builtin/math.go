@@ -265,5 +265,77 @@ func initMath() {
 				return states.BoolValue(a >= -9007199254740991 && a <= 9007199254740991), nil
 			},
 		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"e",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(math.E), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"ln2",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(math.Ln2), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"ln10",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(math.Ln10), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"log2e",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(math.Log2E), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"log10e",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(math.Log10E), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"pi",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(math.Pi), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"sqrt1_2",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(0.7071067811865476), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"sqrt2",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(math.Sqrt2), nil
+			},
+		),
 	})
 }
