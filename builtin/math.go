@@ -200,5 +200,70 @@ func initMath() {
 				return states.BoolValue(math.IsNaN(n)), nil
 			},
 		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"epsilon",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(math.Nextafter(1, 2) - 1), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"largestSafeInteger",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(9007199254740991), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"largestNum",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(math.MaxFloat64), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"smallestSafeInteger",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(-9007199254740991), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.AnyType{},
+			"smallestPositiveNum",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				return states.NumValue(math.SmallestNonzeroFloat64), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"isInteger",
+			nil,
+			types.BoolType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				a := float64(inputValue.(states.NumValue))
+				return states.BoolValue(a == float64(int(a))), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"isSafeInteger",
+			nil,
+			types.BoolType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				a := float64(inputValue.(states.NumValue))
+				return states.BoolValue(a >= -9007199254740991 && a <= 9007199254740991), nil
+			},
+		),
 	})
 }
