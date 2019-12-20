@@ -35,6 +35,20 @@ func initMath() {
 			},
 		),
 		functions.SimpleFuncer(
+			types.AnyType{},
+			"-",
+			[]types.Type{types.NumType{}},
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(argumentValues[0].(states.NumValue))
+				if math.Signbit(x) {
+					return states.NumValue(math.Copysign(x, 1)), nil
+				} else {
+					return states.NumValue(math.Copysign(x, -1)), nil
+				}
+			},
+		),
+		functions.SimpleFuncer(
 			types.NumType{},
 			"*",
 			[]types.Type{types.NumType{}},
