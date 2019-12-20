@@ -16,6 +16,7 @@ func TestMath(t *testing.T) {
 	TestProgram("0 -1 *2", types.NumType{}, states.NumValue(-2), nil, t)
 	TestProgram("-1 *2", types.NumType{}, states.NumValue(-2), nil, t)
 	TestProgram("-0 *2", types.NumType{}, states.NumValue(math.Copysign(0, -1)), nil, t)
+	TestProgram("2 **5", types.NumType{}, states.NumValue(32), nil, t)
 	TestProgram("15 %7", types.NumType{}, states.NumValue(1), nil, t)
 	TestProgram("2 >3", types.BoolType{}, states.BoolValue(false), nil, t)
 	TestProgram("2 <3", types.BoolType{}, states.BoolValue(true), nil, t)
