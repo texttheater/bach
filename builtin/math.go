@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"math"
+	"math/bits"
 
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/states"
@@ -251,8 +252,8 @@ func initMath() {
 			nil,
 			types.BoolType{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				a := float64(inputValue.(states.NumValue))
-				return states.BoolValue(a == float64(int(a))), nil
+				x := float64(inputValue.(states.NumValue))
+				return states.BoolValue(x == float64(int(x))), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -261,8 +262,8 @@ func initMath() {
 			nil,
 			types.BoolType{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				a := float64(inputValue.(states.NumValue))
-				return states.BoolValue(a >= -9007199254740991 && a <= 9007199254740991), nil
+				x := float64(inputValue.(states.NumValue))
+				return states.BoolValue(x >= -9007199254740991 && x <= 9007199254740991), nil
 			},
 		),
 		functions.SimpleFuncer(
@@ -335,6 +336,179 @@ func initMath() {
 			types.NumType{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(math.Sqrt2), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"abs",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Abs(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"acos",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Acos(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"acosh",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Acosh(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"asin",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Asin(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"asinh",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Asinh(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"atan",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Atan(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"atanh",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Atanh(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"atan2",
+			[]types.Type{
+				types.NumType{},
+			},
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				y := float64(inputValue.(states.NumValue))
+				x := float64(argumentValues[0].(states.NumValue))
+				return states.NumValue(math.Atan2(y, x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"cbrt",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Cbrt(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"ceil",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Ceil(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"clz32",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := uint32(inputValue.(states.NumValue))
+				return states.NumValue(bits.LeadingZeros32(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"cos",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Cos(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"cosh",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Cos(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"exp",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Exp(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"expm1",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Expm1(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"floor",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(math.Floor(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			types.NumType{},
+			"fround",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.NumValue(float32(x)), nil
 			},
 		),
 	})
