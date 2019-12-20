@@ -7,6 +7,7 @@ import (
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
+	"github.com/texttheater/golang-variadic-hypot/varhypot"
 )
 
 func initMath() {
@@ -509,6 +510,26 @@ func initMath() {
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(float32(x)), nil
+			},
+		),
+		functions.SimpleFuncer(
+			&types.ArrType{types.NumType{}},
+			"hypot",
+			nil,
+			types.NumType{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				v := inputValue.(*states.ArrValue)
+				x := make([]float64, 0)
+				for v != nil {
+					x = append(x, float64(v.Head.(states.NumValue)))
+					var err error
+					v, err = v.GetTail()
+					if err != nil {
+						return nil, err
+					}
+				}
+				hypot := varhypot.Hypot(x...)
+				return states.NumValue(float64(hypot)), nil
 			},
 		),
 	})
