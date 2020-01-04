@@ -7,7 +7,7 @@ import (
 )
 
 func TestInterp(t *testing.T) {
-	tests.TestSyntaxErrors(t)
+	tests.TestGrammar(t)
 	tests.TestTypeErrors(t)
 	tests.TestLiterals(t)
 	tests.TestMath(t)

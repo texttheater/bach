@@ -13,7 +13,6 @@ func Parse(input string) (functions.Expression, error) {
 		participle.Lexer(LexerDefinition),
 		participle.Unquote("Str"),
 		participle.Map(ToKeyword, "Lid"),
-		participle.UseLookahead(0),
 	)
 	if err != nil {
 		if lexerError, ok := err.(*lexer.Error); ok {
