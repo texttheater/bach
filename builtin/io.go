@@ -44,10 +44,14 @@ func initIO() {
 			nil,
 		),
 		functions.SimpleFuncer(
-			types.TypeVariable{"$"},
+			types.TypeVariable{
+				Name: "$",
+			},
 			"out",
 			nil,
-			types.TypeVariable{"$"},
+			types.TypeVariable{
+				Name: "$",
+			},
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
 				str, err := inputValue.Out()
 				if err != nil {
@@ -58,12 +62,16 @@ func initIO() {
 			},
 		),
 		functions.SimpleFuncer(
-			types.TypeVariable{"$"},
+			types.TypeVariable{
+				Name: "$",
+			},
 			"out",
 			[]types.Type{
 				types.StrType{},
 			},
-			types.TypeVariable{"$"},
+			types.TypeVariable{
+				Name: "$",
+			},
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
 				str, err := inputValue.Out()
 				if err != nil {
@@ -76,10 +84,14 @@ func initIO() {
 			},
 		),
 		functions.SimpleFuncer(
-			types.TypeVariable{"$"},
+			types.TypeVariable{
+				Name: "$",
+			},
 			"err",
 			nil,
-			types.TypeVariable{"$"},
+			types.TypeVariable{
+				Name: "$",
+			},
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
 				str, err := inputValue.Out()
 				if err != nil {
@@ -90,12 +102,16 @@ func initIO() {
 			},
 		),
 		functions.SimpleFuncer(
-			types.TypeVariable{"$"},
+			types.TypeVariable{
+				Name: "$",
+			},
 			"err",
 			[]types.Type{
 				types.StrType{},
 			},
-			types.TypeVariable{"$"},
+			types.TypeVariable{
+				Name: "$",
+			},
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
 				str, err := inputValue.Out()
 				if err != nil {

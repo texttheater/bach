@@ -1,7 +1,8 @@
 package types
 
 type TypeVariable struct {
-	Name string
+	Name       string
+	UpperBound Type
 }
 
 func (t TypeVariable) Subsumes(u Type) bool {
@@ -18,7 +19,11 @@ func (t TypeVariable) Subsumes(u Type) bool {
 func (t TypeVariable) Bind(u Type, bindings map[string]Type) bool {
 	instType, ok := bindings[t.Name]
 	if !ok {
-		instType = AnyType{}
+		if t.UpperBound == nil {
+			instType = AnyType{}
+		} else {
+			instType = t.UpperBound
+		}
 	}
 	var newInstType Type
 	// pick the more specific type

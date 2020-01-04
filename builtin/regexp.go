@@ -14,11 +14,15 @@ func initRegexp() {
 			"findFirst",
 			[]*functions.Parameter{
 				&functions.Parameter{
-					InputType:  types.StrType{},
-					OutputType: types.TypeVariable{"$"}, // TODO constrain to Objs of some sort?
+					InputType: types.StrType{},
+					OutputType: types.TypeVariable{
+						Name: "$",
+					}, // TODO constrain to Objs of some sort?
 				},
 			},
-			types.TypeVariable{"$"},
+			types.TypeVariable{
+				Name: "$",
+			},
 			func(inputState states.State, args []states.Action) *states.Thunk {
 				return args[0](inputState, nil)
 			},
