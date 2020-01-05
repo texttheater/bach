@@ -41,7 +41,10 @@ func (t TypeVariable) Bind(u Type, bindings map[string]Type) bool {
 func (t TypeVariable) Instantiate(bindings map[string]Type) Type {
 	instType, ok := bindings[t.Name]
 	if !ok {
-		return t
+		if t.UpperBound != nil {
+			return t.UpperBound
+		}
+		return t // TODO should we return types.AnyType{}?
 	}
 	return instType
 }
