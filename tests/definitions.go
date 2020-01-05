@@ -104,13 +104,16 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		errors.E(
 			errors.Code(errors.ArgHasWrongOutputType),
-			errors.WantType(types.Union(
-				types.NullType{},
-				types.NewObjType(map[string]types.Type{
-					"start": types.NumType{},
-					"0":     types.StrType{},
-				}),
-			)),
+			errors.WantType(types.TypeVariable{
+				Name: "A",
+				UpperBound: types.Union(
+					types.NullType{},
+					types.NewObjType(map[string]types.Type{
+						"start": types.NumType{},
+						"0":     types.StrType{},
+					})),
+			},
+			),
 			errors.GotType(types.AnyObjType),
 			errors.ArgNum(1),
 		),
@@ -139,6 +142,32 @@ func TestDefinitions(t *testing.T) {
 			"a": states.ThunkFromValue(states.NumValue(1)),
 		}),
 		nil,
+		t,
+	)
+	// generics with bounds
+	TestProgram(
+		`for Any def f(for Any g <A Arr<Any>>) <A> as g ok f([1, "a"])`,
+		types.TupType([]types.Type{
+			types.NumType{},
+			types.StrType{},
+		}),
+		states.NewArrValue([]states.Value{
+			states.NumValue(1),
+			states.StrValue("a"),
+		}),
+		nil,
+		t,
+	)
+	TestProgram(
+		`for Any def f(for Any g <A Arr<Any>>) <A> as g ok f("a")`,
+		nil,
+		nil,
+		errors.E(
+			errors.Code(errors.ArgHasWrongOutputType),
+			errors.ArgNum(1),
+			errors.WantType(types.TypeVariable{"A", types.AnyArrType}),
+			errors.GotType(types.StrType{}),
+		),
 		t,
 	)
 }
