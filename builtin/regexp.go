@@ -17,7 +17,14 @@ func initRegexp() {
 					InputType: types.StrType{},
 					OutputType: types.TypeVariable{
 						Name: "$",
-					}, // TODO constrain to Objs of some sort?
+						UpperBound: types.Union(
+							types.NullType{},
+							types.NewObjType(map[string]types.Type{
+								"start": types.NumType{},
+								"0":     types.StrType{},
+							}),
+						),
+					},
 				},
 			},
 			types.TypeVariable{

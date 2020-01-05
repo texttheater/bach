@@ -98,4 +98,22 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgram(
+		`for Str def f Obj<> as {} ok "abc" findFirst(f)`,
+		nil,
+		nil,
+		errors.E(
+			errors.Code(errors.ArgHasWrongOutputType),
+			errors.WantType(types.Union(
+				types.NullType{},
+				types.NewObjType(map[string]types.Type{
+					"start": types.NumType{},
+					"0":     types.StrType{},
+				}),
+			)),
+			errors.GotType(types.AnyObjType),
+			errors.ArgNum(1),
+		),
+		t,
+	)
 }
