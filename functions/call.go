@@ -275,6 +275,15 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 					errors.GotType(argOutputShape.Type),
 				)
 			}
+			if !params[i].OutputType.Instantiate(bindings).Subsumes(argOutputShape.Type) {
+				return Shape{}, nil, nil, false, errors.E(
+					errors.Code(errors.ArgHasWrongOutputType),
+					errors.Pos(gotCall.Pos),
+					errors.ArgNum(i+1),
+					errors.WantType(params[i].OutputType.Instantiate(bindings)),
+					errors.GotType(argOutputShape.Type),
+				)
+			}
 			argActions[i] = argAction
 			argIDss[i] = argIDs
 			ids = ids.AddAll(argIDs)
