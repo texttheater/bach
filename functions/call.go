@@ -270,7 +270,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 				return Shape{}, nil, nil, false, errors.E(
 					errors.Code(errors.ArgHasWrongOutputType),
 					errors.Pos(gotCall.Pos),
-					errors.ArgNum(i),
+					errors.ArgNum(i+1),
 					errors.WantType(params[i].OutputType),
 					errors.GotType(argOutputShape.Type),
 				)
