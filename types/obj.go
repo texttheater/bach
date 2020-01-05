@@ -11,7 +11,7 @@ type ObjType struct {
 }
 
 var AnyObjType = ObjType{
-	Props:       nil,
+	Props:       []string{},
 	PropTypeMap: make(map[string]Type),
 }
 
