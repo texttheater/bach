@@ -43,7 +43,7 @@ func (t *ArrType) Bind(u Type, bindings map[string]Type) bool {
 }
 
 func (t *ArrType) Instantiate(bindings map[string]Type) Type {
-	return t
+	return &ArrType{t.ElType.Instantiate(bindings)}
 }
 
 func (t *ArrType) Partition(u Type) (Type, Type) {
