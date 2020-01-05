@@ -16,7 +16,7 @@ func initRegexp() {
 				&functions.Parameter{
 					InputType: types.StrType{},
 					OutputType: types.TypeVariable{
-						Name: "$",
+						Name: "A",
 						UpperBound: types.Union(
 							types.NullType{},
 							types.NewObjType(map[string]types.Type{
@@ -28,7 +28,7 @@ func initRegexp() {
 				},
 			},
 			types.TypeVariable{
-				Name: "$",
+				Name: "A",
 			},
 			func(inputState states.State, args []states.Action) *states.Thunk {
 				return args[0](inputState, nil)
@@ -42,7 +42,7 @@ func initRegexp() {
 				&functions.Parameter{
 					InputType: types.StrType{},
 					OutputType: types.TypeVariable{
-						Name: "$",
+						Name: "A",
 						UpperBound: types.Union(
 							types.NullType{},
 							types.NewObjType(map[string]types.Type{
@@ -54,7 +54,7 @@ func initRegexp() {
 				},
 			},
 			&types.ArrType{types.TypeVariable{
-				Name: "$",
+				Name: "A",
 			}},
 			func(inputState states.State, args []states.Action) *states.Thunk {
 				offset := 0
