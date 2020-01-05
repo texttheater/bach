@@ -253,6 +253,9 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 		if !wantInputType.Bind(gotInputShape.Type, bindings) {
 			return Shape{}, nil, nil, false, nil
 		}
+		if !wantInputType.Instantiate(bindings).Subsumes(gotInputShape.Type) {
+			return Shape{}, nil, nil, false, nil
+		}
 		// typecheck and set parameters filled by this call
 		funAction := action
 		argActions := make([]states.Action, len(gotCall.Args))
