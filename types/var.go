@@ -1,5 +1,9 @@
 package types
 
+import (
+	"bytes"
+)
+
 type TypeVariable struct {
 	Name       string
 	UpperBound Type
@@ -65,7 +69,15 @@ func (t TypeVariable) Partition(u Type) (Type, Type) {
 }
 
 func (t TypeVariable) String() string {
-	return "<" + t.Name + ">"
+	var buffer bytes.Buffer
+	buffer.WriteString("<")
+	buffer.WriteString(t.Name)
+	if t.UpperBound != nil {
+		buffer.WriteString(" ")
+		buffer.WriteString(t.UpperBound.String())
+	}
+	buffer.WriteString(">")
+	return buffer.String()
 }
 
 func (t TypeVariable) ElementType() Type {
