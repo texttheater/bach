@@ -284,7 +284,7 @@ func Match(err1, err2 error) bool {
 	if e1.Message != nil && *e2.Message != *e1.Message {
 		return false
 	}
-	if e1.WantType != nil && !reflect.DeepEqual(e1.WantType, e1.WantType) {
+	if e1.WantType != nil && !reflect.DeepEqual(e1.WantType, e2.WantType) {
 		return false
 	}
 	if e1.GotType != nil && !reflect.DeepEqual(e1.GotType, e2.GotType) {
