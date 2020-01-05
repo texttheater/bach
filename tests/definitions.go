@@ -116,4 +116,29 @@ func TestDefinitions(t *testing.T) {
 		),
 		t,
 	)
+	TestProgram(
+		`for <A Obj<a: Num>> def f <A> as id ok {} f`,
+		types.NewObjType(map[string]types.Type{
+			"a": types.NumType{},
+		}),
+		nil,
+		errors.E(
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.AnyObjType),
+			errors.Name("f"),
+			errors.NumParams(0),
+		),
+		t,
+	)
+	TestProgram(
+		`for <A Obj<a: Num>> def f <A> as id ok {a: 1} f`,
+		types.NewObjType(map[string]types.Type{
+			"a": types.NumType{},
+		}),
+		states.ObjValue(map[string]*states.Thunk{
+			"a": states.ThunkFromValue(states.NumValue(1)),
+		}),
+		nil,
+		t,
+	)
 }

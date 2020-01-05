@@ -178,12 +178,17 @@ func (g *AnyType) Ast() types.Type {
 }
 
 type TypeVariable struct {
-	Pos       lexer.Position
-	LangleLid string `@LangleLid ">"`
+	Pos        lexer.Position
+	LangleLid  string `@LangleLid`
+	UpperBound *Type  `( @@ )? ">"`
 }
 
 func (g *TypeVariable) Ast() types.Type {
-	return types.TypeVariable{
+	t := types.TypeVariable{
 		Name: g.LangleLid[1:len(g.LangleLid)],
 	}
+	if g.UpperBound != nil {
+		t.UpperBound = g.UpperBound.Ast()
+	}
+	return t
 }
