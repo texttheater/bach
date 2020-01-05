@@ -271,7 +271,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*Paramete
 					errors.Code(errors.ArgHasWrongOutputType),
 					errors.Pos(gotCall.Pos),
 					errors.ArgNum(i+1),
-					errors.WantType(params[i].OutputType),
+					errors.WantType(params[i].OutputType.Instantiate(bindings)),
 					errors.GotType(argOutputShape.Type),
 				)
 			}
