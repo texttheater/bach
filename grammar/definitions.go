@@ -8,7 +8,7 @@ import (
 
 type Definition struct {
 	Pos        lexer.Position
-	InputType  *Type             `"for" @@`
+	InputType  *TypeTemplate     `"for" @@`
 	Name       *string           `"def" ( ( @Lid | @Op1 | @Op2 )`
 	NameLpar   *string           `      | @NameLpar`
 	Parameter  *NamedParameter   `        @@`
@@ -73,12 +73,12 @@ func (g *NamedParameter) Ast() (*functions.Parameter, string, error) {
 
 type NamedParameterLongForm struct {
 	Pos        lexer.Position
-	InputType  *Type        `"for" @@`
-	Name       *string      `( ( @Lid | @Op1 | @Op2 )`
-	NameLpar   *string      `| @NameLpar`
-	Parameter  *Parameter   `  @@`
-	Params     []*Parameter `  ( "," @@ )* ")" )`
-	OutputType *Type        `@@`
+	InputType  *TypeTemplate `"for" @@`
+	Name       *string       `( ( @Lid | @Op1 | @Op2 )`
+	NameLpar   *string       `| @NameLpar`
+	Parameter  *Parameter    `  @@`
+	Params     []*Parameter  `  ( "," @@ )* ")" )`
+	OutputType *TypeTemplate `@@`
 }
 
 func (g *NamedParameterLongForm) Ast() (*functions.Parameter, string, error) {
@@ -112,8 +112,8 @@ func (g *NamedParameterLongForm) Ast() (*functions.Parameter, string, error) {
 
 type NamedParameterShortForm struct {
 	Pos        lexer.Position
-	Name       string `( @Lid | @Op1 | @Op2)`
-	OutputType *Type  `@@`
+	Name       string        `( @Lid | @Op1 | @Op2)`
+	OutputType *TypeTemplate `@@`
 }
 
 func (g *NamedParameterShortForm) Ast() (*functions.Parameter, string, error) {
@@ -126,10 +126,10 @@ func (g *NamedParameterShortForm) Ast() (*functions.Parameter, string, error) {
 
 type Parameter struct {
 	Pos        lexer.Position
-	InputType  *Type        `( "for" @@`
-	Parameter  *Parameter   `  ( "(" @@`
-	Params     []*Parameter `    ( "," @@ )* ")" )? )?`
-	OutputType *Type        `@@`
+	InputType  *TypeTemplate `( "for" @@`
+	Parameter  *Parameter    `  ( "(" @@`
+	Params     []*Parameter  `    ( "," @@ )* ")" )? )?`
+	OutputType *TypeTemplate `@@`
 }
 
 func (g *Parameter) Ast() (*functions.Parameter, error) {
