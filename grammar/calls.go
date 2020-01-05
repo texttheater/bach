@@ -110,7 +110,7 @@ func (g *Op2Num) Ast() (functions.Expression, error) {
 
 type Op1Lid struct {
 	Pos    lexer.Position
-	Op1Lid string `@Op1Lid`
+	Op1Lid string `@LangleLid | @Op1Lid`
 }
 
 func (g *Op1Lid) Ast() (functions.Expression, error) {

@@ -8,12 +8,11 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 	`([\s]+)` +
 		// tokens starting type literals
 		`|(?P<TypeKeywordLangle>(?:Void|Null|Bool|Num|Str|Seq|Arr|Tup|Obj|Any)<)` +
-		// type variables
-		`|(?P<Typevar><[\p{L}_][\p{L}_0-9]*>)` +
 		// tokens starting calls
 		`|(?P<Op1Num>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op2Num>(?:==|<=|>=|\*\*)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-		`|(?P<Op1Lid>[+\-*/%<>](?:[\p{L}_][\p{L}_0-9]*))` +
+		`|(?P<LangleLid><(?:[\p{L}_][\p{L}_0-9]*))` + // special case of Op1Lid, but also used for type variables
+		`|(?P<Op1Lid>[+\-*/%>](?:[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<Op2Lid>(?:==|<=|>=|\*\*)(?:[\p{L}_][\p{L}_0-9]*))` +
 		`|(?P<NameStr>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)"(?:\\.|[^"])*")` +
 		`|(?P<NameRegexp>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)~(?:\\.|[^/])*)~` +

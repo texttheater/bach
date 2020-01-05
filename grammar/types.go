@@ -178,12 +178,12 @@ func (g *AnyType) Ast() types.Type {
 }
 
 type TypeVariable struct {
-	Pos lexer.Position
-	Var string `@Typevar`
+	Pos       lexer.Position
+	LangleLid string `@LangleLid ">"`
 }
 
 func (g *TypeVariable) Ast() types.Type {
 	return types.TypeVariable{
-		Name: g.Var[1 : len(g.Var)-1],
+		Name: g.LangleLid[1:len(g.LangleLid)],
 	}
 }
