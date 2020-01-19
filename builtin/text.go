@@ -13,6 +13,28 @@ func initText() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
 		functions.RegularFuncer(
 			types.StrType{},
+			"bytes",
+			nil,
+			&types.ArrType{types.NumType{}},
+			func(inputState states.State, args []states.Action) *states.Thunk {
+				str := string(inputState.Value.(states.StrValue))
+				bytes := []byte(str)
+				var iter func() (states.Value, bool, error)
+				i := 0
+				iter = func() (states.Value, bool, error) {
+					if i >= len(bytes) {
+						return nil, false, nil
+					}
+					v := states.NumValue(bytes[i])
+					i++
+					return v, true, nil
+				}
+				return states.ThunkFromIter(iter)
+			},
+			nil,
+		),
+		functions.RegularFuncer(
+			types.StrType{},
 			"split",
 			nil,
 			&types.ArrType{types.StrType{}},
