@@ -26,12 +26,12 @@ func initValues() {
 			types.StrType{},
 			"parseFloat",
 			nil,
-			types.Union(types.NumType{}, types.NullType{}),
+			types.NumType{},
 			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
 				s := string(inputValue.(states.StrValue))
 				n, err := strconv.ParseFloat(s, 64)
 				if err != nil {
-					return states.NullValue{}, nil
+					return nil, err
 				}
 				return states.NumValue(n), nil
 			},
@@ -42,13 +42,13 @@ func initValues() {
 			[]types.Type{
 				types.NumType{},
 			},
-			types.Union(types.NumType{}, types.NullType{}),
+			types.NumType{},
 			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
 				s := string(inputValue.(states.StrValue))
 				b := argValues[0].(states.NumValue)
 				n, err := strconv.ParseInt(s, int(b), 64)
 				if err != nil {
-					return states.NullValue{}, nil
+					return nil, err
 				}
 				return states.NumValue(n), nil
 			},
@@ -57,13 +57,13 @@ func initValues() {
 			types.StrType{},
 			"parseInt",
 			nil,
-			types.Union(types.NumType{}, types.NullType{}),
+			types.NumType{},
 			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
 				s := string(inputValue.(states.StrValue))
 				b := 10
 				n, err := strconv.ParseInt(s, int(b), 64)
 				if err != nil {
-					return states.NullValue{}, nil
+					return nil, err
 				}
 				return states.NumValue(n), nil
 			},

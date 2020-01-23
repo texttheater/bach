@@ -24,12 +24,12 @@ func initNet() {
 			types.StrType{},
 			"urlPathUnescape",
 			nil,
-			types.Union(types.StrType{}, types.NullType{}),
+			types.StrType{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				str := string(inputValue.(states.StrValue))
 				v, err := url.PathUnescape(str)
 				if err != nil {
-					return states.NullValue{}, nil
+					return nil, err
 				}
 				return states.StrValue(v), nil
 			},
@@ -53,7 +53,7 @@ func initNet() {
 				str := string(inputValue.(states.StrValue))
 				v, err := url.QueryUnescape(str)
 				if err != nil {
-					return states.NullValue{}, nil
+					return nil, err
 				}
 				return states.StrValue(v), nil
 			},
