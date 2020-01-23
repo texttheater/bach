@@ -69,7 +69,7 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Sha
 			}
 			res := bodyAction(bodyInputState, nil).Eval()
 			if res.Error != nil {
-				return nil, false, err
+				return nil, false, res.Error
 			}
 			if res.Drop {
 				return output()
