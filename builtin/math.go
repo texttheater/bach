@@ -1,7 +1,6 @@
 package builtin
 
 import (
-	"log"
 	"math"
 	"math/bits"
 	"math/rand"
@@ -688,7 +687,6 @@ func initMath() {
 						return states.NumValue(-1), nil
 					}
 				} else {
-					log.Print("no sign bit")
 					if x == 0 {
 						return states.NumValue(0), nil
 					} else {
