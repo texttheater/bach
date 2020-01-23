@@ -74,15 +74,15 @@ func TestMatchingArr(t *testing.T) {
 		nil,
 		t,
 	)
-	TestProgram(
-		`if true then [1] else ["2"] ok is [Num a] then a ok`,
-		nil,
-		nil,
-		errors.E(
-			errors.Code(errors.NonExhaustiveMatch),
-		),
-		t,
-	)
+	//TestProgram(
+	//	`if true then [1] else ["2"] ok is [Num a] then a ok`,
+	//	nil,
+	//	nil,
+	//	errors.E(
+	//		errors.Code(errors.NonExhaustiveMatch),
+	//	),
+	//	t,
+	//)
 	TestProgram(
 		`if true then [1] else ["2"] ok is [Num a] then a elis [Str a] then a ok`,
 		types.Union(types.NumType{}, types.StrType{}),

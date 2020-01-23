@@ -16,17 +16,17 @@ func TestMatchingType(t *testing.T) {
 		nil,
 		t,
 	)
-	TestProgram(
-		`if true then 2 else "two" ok is Num then true ok`,
-		nil,
-		nil,
-		errors.E(
-			errors.Code(errors.NonExhaustiveMatch),
-			errors.WantType(types.VoidType{}),
-			errors.GotType(types.StrType{}),
-		),
-		t,
-	)
+	//TestProgram(
+	//	`if true then 2 else "two" ok is Num then true ok`,
+	//	nil,
+	//	nil,
+	//	errors.E(
+	//		errors.Code(errors.NonExhaustiveMatch),
+	//		errors.WantType(types.VoidType{}),
+	//		errors.GotType(types.StrType{}),
+	//	),
+	//	t,
+	//)
 	TestProgram(
 		`if true then 2 else "two" ok is Num then true elis Str then false ok`,
 		types.BoolType{},

@@ -144,14 +144,14 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 	var alternativeIDs *states.IDStack
 	if x.Alternative == nil {
 		// exhaustivity check
-		if !(types.VoidType{}).Subsumes(inputShape.Type) {
-			return Shape{}, nil, nil, errors.E(
-				errors.Code(errors.NonExhaustiveMatch),
-				errors.Pos(x.Pos),
-				errors.WantType(types.VoidType{}),
-				errors.GotType(inputShape.Type),
-			)
-		}
+		//if !(types.VoidType{}).Subsumes(inputShape.Type) {
+		//	return Shape{}, nil, nil, errors.E(
+		//		errors.Code(errors.NonExhaustiveMatch),
+		//		errors.Pos(x.Pos),
+		//		errors.WantType(types.VoidType{}),
+		//		errors.GotType(inputShape.Type),
+		//	)
+		//}
 	} else {
 		// reachability check
 		if !x.UnreachableAlternativeAllowed && (types.VoidType{}).Subsumes(inputShape.Type) {
@@ -225,6 +225,13 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*Parameter) 
 					return elisConsequentActions[i](consequentInputState, nil)
 				}
 			}
+		}
+		if alternativeAction == nil {
+			return states.ThunkFromError(errors.E(
+				errors.Pos(x.Pos),
+				errors.Code(errors.UnexpectedValue),
+				errors.GotValue(inputState.Value),
+			))
 		}
 		return alternativeAction(inputState, nil)
 	}

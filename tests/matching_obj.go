@@ -48,15 +48,15 @@ func TestMatchingObj(t *testing.T) {
 		),
 		t,
 	)
-	TestProgram(
-		`if true then {a: 1} elif true then {b: "s"} else {c: true} ok is {a: Num a} then a elis {b: Num b} then b ok`,
-		nil,
-		nil,
-		errors.E(
-			errors.Code(errors.NonExhaustiveMatch),
-		),
-		t,
-	)
+	//TestProgram(
+	//	`if true then {a: 1} elif true then {b: "s"} else {c: true} ok is {a: Num a} then a elis {b: Num b} then b ok`,
+	//	nil,
+	//	nil,
+	//	errors.E(
+	//		errors.Code(errors.NonExhaustiveMatch),
+	//	),
+	//	t,
+	//)
 	TestProgram(
 		`if true then {a: 1} else {b: 2} ok`,
 		types.Union(types.NewObjType(map[string]types.Type{"a": types.NumType{}}), types.NewObjType(map[string]types.Type{"b": types.NumType{}})),
