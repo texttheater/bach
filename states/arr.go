@@ -45,6 +45,9 @@ func (v *ArrValue) String() (string, error) {
 	buffer.WriteString("[")
 	if v != nil {
 		head, err := v.Head.String()
+		if err != nil {
+			return "", err
+		}
 		buffer.WriteString(head)
 		v, err = v.GetTail()
 		if err != nil {
@@ -53,8 +56,14 @@ func (v *ArrValue) String() (string, error) {
 		for v != nil {
 			buffer.WriteString(", ")
 			head, err = v.Head.String()
+			if err != nil {
+				return "", err
+			}
 			buffer.WriteString(head)
 			v, err = v.GetTail()
+			if err != nil {
+				return "", err
+			}
 		}
 	}
 	buffer.WriteString("]")
