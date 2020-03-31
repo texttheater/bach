@@ -30,6 +30,7 @@ type NonDisjunctiveType struct {
 	StrType      *StrType      `| @@`
 	ArrType      *ArrType      `| @@`
 	TupType      *TupType      `| @@`
+	MapType      *MapType      `| @@`
 	ObjType      *ObjType      `| @@`
 	AnyType      *AnyType      `| @@`
 	TypeVariable *TypeVariable `| @@`
@@ -59,6 +60,9 @@ func (g *NonDisjunctiveType) Ast() types.Type {
 	}
 	if g.TupType != nil {
 		return g.TupType.Ast()
+	}
+	if g.MapType != nil {
+		return g.MapType.Ast()
 	}
 	if g.ObjType != nil {
 		return g.ObjType.Ast()
@@ -148,6 +152,17 @@ func (g *TupType) Ast() types.Type {
 		}
 	}
 	return types.TupType(elementTypes)
+}
+
+type MapType struct {
+	Pos     lexer.Position `"Map<"`
+	ValType *Type          `@@ ">"`
+}
+
+func (g *MapType) Ast() types.Type {
+	return types.MapType{
+		ValueType: g.ValType.Ast(),
+	}
 }
 
 type ObjType struct {
