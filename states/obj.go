@@ -62,6 +62,17 @@ func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 			}
 		}
 		return true, nil
+	case types.MapType:
+		for _, thunk := range v {
+			res := thunk.Eval()
+			if res.Error != nil {
+				return false, res.Error
+			}
+			if ok, err := res.Value.Inhabits(t.ValueType, stack); !ok {
+				return false, err
+			}
+		}
+		return true, nil
 	case types.UnionType:
 		return inhabits(v, t, stack)
 	case types.AnyType:

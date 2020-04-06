@@ -88,16 +88,6 @@ func (t ObjType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
 	case VoidType:
 		return u, t
-	case MapType:
-		propTypeMap := make(map[string]Type)
-		for k, v := range t.PropTypeMap {
-			i, _ := v.Partition(u.ValueType)
-			if (VoidType{}).Subsumes(i) {
-				return VoidType{}, t
-			}
-			propTypeMap[k] = i
-		}
-		return NewObjType(propTypeMap), t
 	case ObjType:
 		propTypeMap := make(map[string]Type)
 		allSubsumed := true
@@ -123,6 +113,16 @@ func (t ObjType) Partition(u Type) (Type, Type) {
 		}
 		if allSubsumed {
 			return NewObjType(propTypeMap), VoidType{}
+		}
+		return NewObjType(propTypeMap), t
+	case MapType:
+		propTypeMap := make(map[string]Type)
+		for k, v := range t.PropTypeMap {
+			i, _ := v.Partition(u.ValueType)
+			if (VoidType{}).Subsumes(i) {
+				return VoidType{}, t
+			}
+			propTypeMap[k] = i
 		}
 		return NewObjType(propTypeMap), t
 	case UnionType:
