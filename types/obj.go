@@ -34,6 +34,9 @@ func (t ObjType) Subsumes(u Type) bool {
 	case VoidType:
 		return true
 	case ObjType:
+		if len(t.Props) != len(u.Props) {
+			return false
+		}
 		for k, v1 := range t.PropTypeMap {
 			v2, ok := u.PropTypeMap[k]
 			if !ok {
@@ -56,6 +59,9 @@ func (t ObjType) Bind(u Type, bindings map[string]Type) bool {
 	case VoidType:
 		return true
 	case ObjType:
+		if len(t.Props) != len(u.Props) {
+			return false
+		}
 		for k, v1 := range t.PropTypeMap {
 			v2, ok := u.PropTypeMap[k]
 			if !ok {
@@ -89,6 +95,9 @@ func (t ObjType) Partition(u Type) (Type, Type) {
 	case VoidType:
 		return u, t
 	case ObjType:
+		if len(t.Props) != len(u.Props) {
+			return VoidType{}, t
+		}
 		propTypeMap := make(map[string]Type)
 		allSubsumed := true
 		for k, v1 := range t.PropTypeMap {
@@ -116,15 +125,21 @@ func (t ObjType) Partition(u Type) (Type, Type) {
 		}
 		return NewObjType(propTypeMap), t
 	case MapType:
+		allSubsumed := true
 		propTypeMap := make(map[string]Type)
 		for k, v := range t.PropTypeMap {
-			i, _ := v.Partition(u.ValueType)
+			i, r := v.Partition(u.ValueType)
 			if (VoidType{}).Subsumes(i) {
 				return VoidType{}, t
 			}
+			allSubsumed = allSubsumed && (VoidType{}).Subsumes(r)
 			propTypeMap[k] = i
 		}
-		return NewObjType(propTypeMap), t
+		if allSubsumed {
+			return NewObjType(propTypeMap), VoidType{}
+		} else {
+			return NewObjType(propTypeMap), t
+		}
 	case UnionType:
 		return u.inversePartition(t)
 	case AnyType:
