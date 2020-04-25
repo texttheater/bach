@@ -135,23 +135,36 @@ func (g *ArrType) Ast() types.Type {
 }
 
 type TupType struct {
-	Pos   lexer.Position `"Tup<"`
-	Type  *Type          `( @@`
-	Types []*Type        `  ( "," @@ )* )? ">"`
+	Pos      lexer.Position `"Tup<"`
+	Type     *Type          `( @@`
+	Types    []*Type        `  ( "," @@ )*`
+	Ellipsis *string        `  @Ellipsis? )? ">"`
 }
 
 func (g *TupType) Ast() types.Type {
-	var elementTypes []types.Type
-	if g.Type != nil {
-		elementTypes = make([]types.Type, len(g.Types)+1)
-		el := g.Type.Ast()
-		elementTypes[0] = el
-		for i, elementType := range g.Types {
-			el = elementType.Ast()
-			elementTypes[i+1] = el
-		}
+	if g.Type == nil {
+		return types.VoidArrType
 	}
-	return types.TupType(elementTypes)
+	result := &types.NearrType{
+		HeadType: g.Type.Ast(),
+	}
+	current := result
+	length := len(g.Types)
+	for i, t := range g.Types {
+		if g.Ellipsis != nil && i == length-1 {
+			current.TailType = &types.ArrType{
+				ElType: t.Ast(),
+			}
+			return result
+		}
+		newTail := &types.NearrType{
+			HeadType: t.Ast(),
+		}
+		current.TailType = newTail
+		current = newTail
+	}
+	current.TailType = types.VoidArrType
+	return result
 }
 
 type MapType struct {

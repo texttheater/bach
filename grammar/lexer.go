@@ -25,8 +25,11 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Lid>[\p{L}_][\p{L}_0-9]*)` +
 		`|(?P<Op2>==|<=|>=|\*\*)` +
 		`|(?P<Op1>[+\-*/%<>=])` +
-		// starting with unique characters
+		// ellipsis
+		`|(?P<Ellipsis>\.\.\.)` +
+		// numbers
 		`|(?P<Num>\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)` +
+		// starting with unique characters
 		`|(?P<Str>"(?:\\.|[^"])*")` +
 		`|(?P<Regexp>~(?:\\.|[^/])*)~` +
 		`|(?P<Getter>@(?:[\p{L}_][\p{L}_0-9]*|[+\-*/%<>=]|==|<=|>=|\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +

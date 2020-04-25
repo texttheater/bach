@@ -109,32 +109,28 @@ func (t NearrType) ElementType() Type {
 }
 
 func (t *NearrType) String() string {
-	flat := bytes.Buffer{}
-	flat.WriteString("Tup<")
-	flat.WriteString(t.HeadType.String())
-	nested := bytes.Buffer{}
-	nested.WriteString("Nearr<")
-	nested.WriteString(t.HeadType.String())
-	nested.WriteString(", ")
-	length := 1
+	buffer := bytes.Buffer{}
+	buffer.WriteString("Tup<")
+	buffer.WriteString(t.HeadType.String())
 	tail := t.TailType
-	for !(&ArrType{VoidType{}}).Subsumes(tail) {
-		nearrTail, ok := tail.(*NearrType)
-		if !ok {
-			nested.WriteString(tail.String())
-			for i := 0; i < length; i++ {
-				nested.WriteString(">")
+Loop:
+	for {
+		switch t := tail.(type) {
+		case *NearrType:
+			buffer.WriteString(", ")
+			buffer.WriteString(t.HeadType.String())
+			tail = t.TailType
+		case *ArrType:
+			if !(VoidType{}).Subsumes(t.ElType) {
+				buffer.WriteString(", ")
+				buffer.WriteString(t.ElType.String())
+				buffer.WriteString("...")
 			}
-			return nested.String()
+			break Loop
+		default:
+			panic("non-array tail")
 		}
-		flat.WriteString(", ")
-		flat.WriteString(nearrTail.HeadType.String())
-		nested.WriteString("Nearr<")
-		nested.WriteString(nearrTail.HeadType.String())
-		nested.WriteString(", ")
-		length++
-		tail = nearrTail.TailType
 	}
-	flat.WriteString(">")
-	return flat.String()
+	buffer.WriteString(">")
+	return buffer.String()
 }
