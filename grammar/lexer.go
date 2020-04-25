@@ -7,7 +7,7 @@ import (
 var LexerDefinition = lexer.Must(lexer.Regexp(
 	`([\s]+)` +
 		// tokens starting type literals
-		`|(?P<TypeKeywordLangle>(?:Void|Null|Bool|Num|Str|Seq|Arr|Tup|Map|Obj|Any)<)` +
+		`|(?P<TypeKeywordLangle>(?:Void|Null|Bool|Num|Str|Arr|Tup|Map|Obj|Any)<)` +
 		// tokens starting calls
 		`|(?P<Op1Num>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op2Num>(?:==|<=|>=|\*\*)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
