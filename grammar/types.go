@@ -30,7 +30,6 @@ type NonDisjunctiveType struct {
 	StrType      *StrType      `| @@`
 	ArrType      *ArrType      `| @@`
 	TupType      *TupType      `| @@`
-	MapType      *MapType      `| @@`
 	ObjType      *ObjType      `| @@`
 	AnyType      *AnyType      `| @@`
 	TypeVariable *TypeVariable `| @@`
@@ -60,9 +59,6 @@ func (g *NonDisjunctiveType) Ast() types.Type {
 	}
 	if g.TupType != nil {
 		return g.TupType.Ast()
-	}
-	if g.MapType != nil {
-		return g.MapType.Ast()
 	}
 	if g.ObjType != nil {
 		return g.ObjType.Ast()
@@ -167,23 +163,14 @@ func (g *TupType) Ast() types.Type {
 	return result
 }
 
-type MapType struct {
-	Pos     lexer.Position `"Map<"`
-	ValType *Type          `@@ ">"`
-}
-
-func (g *MapType) Ast() types.Type {
-	return types.MapType{
-		ValueType: g.ValType.Ast(),
-	}
-}
-
 type ObjType struct {
-	Pos      lexer.Position `"Obj<"`
-	Prop     *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
-	ValType  *Type          `  ":" @@`
-	Props    []string       `  ( ( @Lid | @Op1 | @Op2 | @Num )`
-	ValTypes []*Type        `     ":" @@ )* )? ">"`
+	Pos       lexer.Position `"Obj<"`
+	Prop      *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
+	ValType   *Type          `  ":" @@`
+	Props     []string       `  ( ( @Lid | @Op1 | @Op2 | @Num )`
+	ValTypes  []*Type        `     ":" @@ )*`
+	RestType1 *Type          `  ( "," @@)?`
+	RestType2 *Type          `| ( @@ )? ) ">"`
 }
 
 func (g *ObjType) Ast() types.Type {
@@ -194,7 +181,18 @@ func (g *ObjType) Ast() types.Type {
 			propTypeMap[g.Props[i]] = g.ValTypes[i].Ast()
 		}
 	}
-	return types.NewObjType(propTypeMap)
+	var restType types.Type
+	if g.RestType1 != nil {
+		restType = g.RestType1.Ast()
+	} else if g.RestType2 != nil {
+		restType = g.RestType2.Ast()
+	} else {
+		restType = types.AnyType{}
+	}
+	return types.ObjType{
+		PropTypeMap: propTypeMap,
+		RestType:    restType,
+	}
 }
 
 type AnyType struct {

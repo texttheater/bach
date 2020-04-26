@@ -13,12 +13,15 @@ func TestRegexp(t *testing.T) {
 		`"abccd" ~b(?P<cs>c*)d~`,
 		types.Union(
 			types.NullType{},
-			types.NewObjType(map[string]types.Type{
-				"start": types.NumType{},
-				"0":     types.StrType{},
-				"1":     types.Union(types.NullType{}, types.StrType{}),
-				"cs":    types.Union(types.NullType{}, types.StrType{}),
-			}),
+			types.ObjType{
+				PropTypeMap: map[string]types.Type{
+					"start": types.NumType{},
+					"0":     types.StrType{},
+					"1":     types.Union(types.NullType{}, types.StrType{}),
+					"cs":    types.Union(types.NullType{}, types.StrType{}),
+				},
+				RestType: types.VoidType{},
+			},
 		),
 		states.ObjValueFromMap(map[string]states.Value{
 			"start": states.NumValue(1),
@@ -33,12 +36,15 @@ func TestRegexp(t *testing.T) {
 		`"def" ~^b(?P<cs>c*)d~`,
 		types.Union(
 			types.NullType{},
-			types.NewObjType(map[string]types.Type{
-				"start": types.NumType{},
-				"0":     types.StrType{},
-				"1":     types.Union(types.NullType{}, types.StrType{}),
-				"cs":    types.Union(types.NullType{}, types.StrType{}),
-			}),
+			types.ObjType{
+				PropTypeMap: map[string]types.Type{
+					"start": types.NumType{},
+					"0":     types.StrType{},
+					"1":     types.Union(types.NullType{}, types.StrType{}),
+					"cs":    types.Union(types.NullType{}, types.StrType{}),
+				},
+				RestType: types.VoidType{},
+			},
 		),
 		states.NullValue{},
 		nil,
@@ -48,12 +54,15 @@ func TestRegexp(t *testing.T) {
 		`"abccd" ~^b(?P<cs>*)d~`,
 		types.Union(
 			types.NullType{},
-			types.NewObjType(map[string]types.Type{
-				"start": types.NumType{},
-				"0":     types.StrType{},
-				"1":     types.Union(types.NullType{}, types.StrType{}),
-				"cs":    types.Union(types.NullType{}, types.StrType{}),
-			}),
+			types.ObjType{
+				PropTypeMap: map[string]types.Type{
+					"start": types.NumType{},
+					"0":     types.StrType{},
+					"1":     types.Union(types.NullType{}, types.StrType{}),
+					"cs":    types.Union(types.NullType{}, types.StrType{}),
+				},
+				RestType: types.AnyType{},
+			},
 		),
 		nil,
 		errors.E(

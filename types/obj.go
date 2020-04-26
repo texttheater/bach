@@ -6,27 +6,18 @@ import (
 )
 
 type ObjType struct {
-	Props       []string
 	PropTypeMap map[string]Type
+	RestType    Type
 }
 
-var AnyObjType = ObjType{
-	Props:       []string{},
+var VoidObjType Type = ObjType{
 	PropTypeMap: make(map[string]Type),
+	RestType:    VoidType{},
 }
 
-func NewObjType(propTypeMap map[string]Type) Type {
-	props := make([]string, len(propTypeMap))
-	i := 0
-	for k := range propTypeMap {
-		props[i] = k
-		i++
-	}
-	sort.Strings(props)
-	return ObjType{
-		Props:       props,
-		PropTypeMap: propTypeMap,
-	}
+var AnyObjType Type = ObjType{
+	PropTypeMap: make(map[string]Type),
+	RestType:    AnyType{},
 }
 
 func (t ObjType) Subsumes(u Type) bool {
@@ -34,17 +25,26 @@ func (t ObjType) Subsumes(u Type) bool {
 	case VoidType:
 		return true
 	case ObjType:
-		if len(t.Props) != len(u.Props) {
-			return false
-		}
-		for k, v1 := range t.PropTypeMap {
-			v2, ok := u.PropTypeMap[k]
+		for prop, wantType := range t.PropTypeMap {
+			gotType, ok := u.PropTypeMap[prop]
 			if !ok {
 				return false
 			}
-			if !v1.Subsumes(v2) {
+			if !wantType.Subsumes(gotType) {
 				return false
 			}
+		}
+		for prop, gotType := range u.PropTypeMap {
+			wantType := t.PropTypeMap[prop]
+			if wantType == nil {
+				continue
+			}
+			if !gotType.Subsumes(wantType) {
+				return false
+			}
+		}
+		if !t.RestType.Subsumes(u.RestType) {
+			return false
 		}
 		return true
 	case UnionType:
@@ -59,34 +59,33 @@ func (t ObjType) Bind(u Type, bindings map[string]Type) bool {
 	case VoidType:
 		return true
 	case ObjType:
-		if len(t.Props) != len(u.Props) {
-			return false
-		}
-		for k, v1 := range t.PropTypeMap {
-			v2, ok := u.PropTypeMap[k]
+		for prop, wantType := range t.PropTypeMap {
+			gotType, ok := u.PropTypeMap[prop]
 			if !ok {
 				return false
 			}
-			if !v1.Bind(v2, bindings) {
+			if !wantType.Bind(gotType, bindings) {
 				return false
 			}
 		}
+		for prop, gotType := range u.PropTypeMap {
+			wantType := t.PropTypeMap[prop]
+			if wantType == nil {
+				continue
+			}
+			if !gotType.Bind(wantType, bindings) {
+				return false
+			}
+		}
+		if !t.RestType.Bind(u.RestType, bindings) {
+			// TODO is that the right semantics for rest types?
+			return false
+		}
 		return true
 	case UnionType:
-		return u.inverseBind(t, bindings)
+		return u.inverseSubsumes(t)
 	default:
 		return false
-	}
-}
-
-func (t ObjType) Instantiate(bindings map[string]Type) Type {
-	propTypeMap := make(map[string]Type)
-	for p, t := range t.PropTypeMap {
-		propTypeMap[p] = t.Instantiate(bindings)
-	}
-	return ObjType{
-		Props:       t.Props,
-		PropTypeMap: propTypeMap,
 	}
 }
 
@@ -95,51 +94,49 @@ func (t ObjType) Partition(u Type) (Type, Type) {
 	case VoidType:
 		return u, t
 	case ObjType:
-		if len(t.Props) != len(u.Props) {
-			return VoidType{}, t
-		}
 		propTypeMap := make(map[string]Type)
 		allSubsumed := true
-		for k, v1 := range t.PropTypeMap {
-			if v2, ok := u.PropTypeMap[k]; ok {
-				intersection, _ := v1.Partition(v2)
-				if (VoidType{}).Subsumes(v1) {
+		for prop, tValueType := range t.PropTypeMap {
+			uValueType := u.PropTypeMap[prop]
+			if uValueType != nil {
+				i, c := tValueType.Partition(uValueType)
+				if (VoidType{}).Subsumes(i) {
 					return VoidType{}, t
 				}
-				if allSubsumed && !intersection.Subsumes(v1) {
-					allSubsumed = false
+				propTypeMap[prop] = i
+				allSubsumed = allSubsumed && (VoidType{}).Subsumes(c)
+			} else {
+				i, c := tValueType.Partition(u.RestType)
+				if (VoidType{}).Subsumes(i) {
+					return VoidType{}, t
 				}
-				v1 = intersection
+				propTypeMap[prop] = i
+				allSubsumed = allSubsumed && (VoidType{}).Subsumes(c)
 			}
-			propTypeMap[k] = v1
 		}
-		for k, v2 := range u.PropTypeMap {
-			if _, ok := propTypeMap[k]; ok {
-				continue
+		for prop, uValueType := range u.PropTypeMap {
+			if t.PropTypeMap[prop] == nil {
+				i, _ := t.RestType.Partition(uValueType)
+				if (VoidType{}).Subsumes(i) {
+					return VoidType{}, t
+				}
+				propTypeMap[prop] = i
+				allSubsumed = false
 			}
-			allSubsumed = false
-			propTypeMap[k] = v2
 		}
+		i, c := t.RestType.Partition(u.RestType)
+		allSubsumed = allSubsumed && (VoidType{}).Subsumes(c)
+		var complement Type
 		if allSubsumed {
-			return NewObjType(propTypeMap), VoidType{}
-		}
-		return NewObjType(propTypeMap), t
-	case MapType:
-		allSubsumed := true
-		propTypeMap := make(map[string]Type)
-		for k, v := range t.PropTypeMap {
-			i, r := v.Partition(u.ValueType)
-			if (VoidType{}).Subsumes(i) {
-				return VoidType{}, t
-			}
-			allSubsumed = allSubsumed && (VoidType{}).Subsumes(r)
-			propTypeMap[k] = i
-		}
-		if allSubsumed {
-			return NewObjType(propTypeMap), VoidType{}
+			complement = VoidType{}
 		} else {
-			return NewObjType(propTypeMap), t
+			complement = t // TODO give a more fine-grained type,
+			// e.g. partitioning Obj<a: Num|Str> with Obj<a: Num> should give Obj<a: Str> as complement
 		}
+		return ObjType{
+			PropTypeMap: propTypeMap,
+			RestType:    i,
+		}, complement
 	case UnionType:
 		return u.inversePartition(t)
 	case AnyType:
@@ -149,20 +146,45 @@ func (t ObjType) Partition(u Type) (Type, Type) {
 	}
 }
 
+func (t ObjType) Instantiate(bindings map[string]Type) Type {
+	propTypeMap := make(map[string]Type)
+	for prop, valueType := range t.PropTypeMap {
+		propTypeMap[prop] = valueType.Instantiate(bindings)
+	}
+	return ObjType{
+		PropTypeMap: propTypeMap,
+		RestType:    t.RestType.Instantiate(bindings),
+	}
+}
+
 func (t ObjType) String() string {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("Obj<")
-	if len(t.Props) > 0 {
-		buffer.WriteString(t.Props[0])
-		buffer.WriteString(": ")
-		buffer.WriteString(t.PropTypeMap[t.Props[0]].String())
-		for _, prop := range t.Props[1:] {
-			typ := t.PropTypeMap[prop]
-			buffer.WriteString(", ")
+	props := make([]string, len(t.PropTypeMap))
+	i := 0
+	for prop := range t.PropTypeMap {
+		props[i] = prop
+		i++
+	}
+	sort.Strings(props)
+	if len(props) != 0 {
+		first := true
+		for _, prop := range props {
+			if first {
+				first = false
+			} else {
+				buffer.WriteString(", ")
+			}
 			buffer.WriteString(prop)
 			buffer.WriteString(": ")
-			buffer.WriteString(typ.String())
+			buffer.WriteString(t.PropTypeMap[prop].String())
 		}
+	}
+	if !t.RestType.Subsumes(AnyType{}) {
+		if len(t.PropTypeMap) != 0 {
+			buffer.WriteString(", ")
+		}
+		buffer.WriteString(t.RestType.String())
 	}
 	buffer.WriteString(">")
 	return buffer.String()
@@ -170,4 +192,12 @@ func (t ObjType) String() string {
 
 func (t ObjType) ElementType() Type {
 	panic(t.String() + " is not a sequence type")
+}
+
+func (t ObjType) TypeForProp(prop string) Type {
+	typeForProp := t.PropTypeMap[prop]
+	if typeForProp == nil {
+		return t.RestType
+	}
+	return typeForProp
 }

@@ -24,9 +24,12 @@ func TestFilters(t *testing.T) {
 	)
 	TestProgram(
 		`[{n: 1}, {n: 2}, {n: 3}] each is {n: n} with n %2 >0 all`,
-		&types.ArrType{types.NewObjType(map[string]types.Type{
-			"n": types.NumType{},
-		})},
+		&types.ArrType{types.ObjType{
+			PropTypeMap: map[string]types.Type{
+				"n": types.NumType{},
+			},
+			RestType: types.VoidType{},
+		}},
 		states.NewArrValue([]states.Value{
 			states.ObjValueFromMap(map[string]states.Value{
 				"n": states.NumValue(1),

@@ -23,26 +23,29 @@ func (x ObjExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, 
 			errors.Pos(x.Pos),
 		)
 	}
-	keyTypeMap := make(map[string]types.Type)
-	keyActionMap := make(map[string]states.Action)
+	propTypeMap := make(map[string]types.Type)
+	propActionMap := make(map[string]states.Action)
 	var ids *states.IDStack
-	for key, valExpression := range x.PropValMap {
-		keyOutputShape, keyAction, keyIDs, err := valExpression.Typecheck(inputShape, nil)
+	for prop, valExpression := range x.PropValMap {
+		propOutputShape, propAction, propIDs, err := valExpression.Typecheck(inputShape, nil)
 		if err != nil {
 			return Shape{}, nil, nil, err
 		}
-		keyTypeMap[key] = keyOutputShape.Type
-		keyActionMap[key] = keyAction
-		ids = ids.AddAll(keyIDs)
+		propTypeMap[prop] = propOutputShape.Type
+		propActionMap[prop] = propAction
+		ids = ids.AddAll(propIDs)
 	}
 	outputShape := Shape{
-		Type:  types.NewObjType(keyTypeMap),
+		Type: types.ObjType{
+			PropTypeMap: propTypeMap,
+			RestType:    types.VoidType{},
+		},
 		Stack: inputShape.Stack,
 	}
 	action := func(inputState states.State, args []states.Action) *states.Thunk {
 		propThunkMap := make(map[string]*states.Thunk)
-		for key, valAction := range keyActionMap {
-			propThunkMap[key] = valAction(inputState, nil)
+		for prop, valAction := range propActionMap {
+			propThunkMap[prop] = valAction(inputState, nil)
 		}
 		return states.ThunkFromState(states.State{
 			Value:     states.ObjValue(propThunkMap),

@@ -46,7 +46,10 @@ func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 			propTypeMap[name] = submatchType
 		}
 	}
-	matchType := types.NewObjType(propTypeMap)
+	matchType := types.ObjType{
+		PropTypeMap: propTypeMap,
+		RestType:    types.VoidType{},
+	}
 	outputShape := Shape{
 		Type:  types.Union(types.NullType{}, matchType),
 		Stack: inputShape.Stack,

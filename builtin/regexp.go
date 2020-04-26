@@ -19,10 +19,13 @@ func initRegexp() {
 						Name: "A",
 						UpperBound: types.Union(
 							types.NullType{},
-							types.NewObjType(map[string]types.Type{
-								"start": types.NumType{},
-								"0":     types.StrType{},
-							}),
+							types.ObjType{
+								PropTypeMap: map[string]types.Type{
+									"start": types.NumType{},
+									"0":     types.StrType{},
+								},
+								RestType: types.AnyType{},
+							},
 						),
 					},
 				},
@@ -45,10 +48,13 @@ func initRegexp() {
 						Name: "A",
 						UpperBound: types.Union(
 							types.NullType{},
-							types.NewObjType(map[string]types.Type{
-								"start": types.NumType{},
-								"0":     types.StrType{},
-							}),
+							types.ObjType{
+								PropTypeMap: map[string]types.Type{
+									"start": types.NumType{},
+									"0":     types.StrType{},
+								},
+								RestType: types.AnyType{},
+							},
 						),
 					},
 				},

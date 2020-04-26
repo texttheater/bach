@@ -427,49 +427,6 @@ func (p ObjPattern) Position() lexer.Position {
 	return p.Pos
 }
 
-func partitionObjPattern(inputType types.Type, patternPropTypeMap map[string]types.Type) (types.Type, types.Type) {
-	switch t := inputType.(type) {
-	case types.AnyType:
-		return t, t
-	case types.MapType:
-		for _, wantValueType := range patternPropTypeMap {
-			if !t.ValueType.Subsumes(wantValueType) {
-				return types.VoidType{}, t
-			}
-		}
-		return t, t
-	case types.ObjType:
-		// output  is going to be an ObjType
-		outputPropTypeMap := make(map[string]types.Type)
-		// initialize it to the input type
-		for key, valueType := range t.PropTypeMap {
-			outputPropTypeMap[key] = valueType
-		}
-		// keep track of whether we have a non-empty complement
-		allSubsumed := len(t.PropTypeMap) == len(patternPropTypeMap)
-		// determine intersection for every value in the pattern
-		for key, wantValueType := range patternPropTypeMap {
-			gotValueType, ok := outputPropTypeMap[key]
-			if !ok || !wantValueType.Subsumes(gotValueType) {
-				return types.VoidType{}, t
-			}
-			i, c := gotValueType.Partition(wantValueType)
-			outputPropTypeMap[key] = i
-			allSubsumed = allSubsumed && types.VoidType{}.Subsumes(c)
-		}
-		// make output type
-		outputType := types.NewObjType(outputPropTypeMap)
-		// complement type: all or nothing
-		if allSubsumed {
-			return outputType, types.VoidType{}
-		} else {
-			return outputType, t
-		}
-	default:
-		return types.VoidType{}, t
-	}
-}
-
 func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, error) {
 	// compute value input types
 	propInputTypeMap := make(map[string]types.Type)
@@ -481,10 +438,6 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 				valType = types.VoidType{}
 			}
 			propInputTypeMap[prop] = valType
-		}
-	case types.MapType:
-		for prop := range p.PropPatternMap {
-			propInputTypeMap[prop] = t.ValueType
 		}
 	case types.UnionType:
 	PatternProps:
@@ -501,11 +454,6 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 					propInputTypeMap[prop] = types.Union(
 						propInputTypeMap[prop],
 						valType,
-					)
-				case types.MapType:
-					propInputTypeMap[prop] = types.Union(
-						propInputTypeMap[prop],
-						d.ValueType,
 					)
 				}
 			}
@@ -531,30 +479,24 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 		propTypeMap[prop] = valShape.Type
 		propMatcherMap[prop] = valMatcher
 	}
-	// determine output shape and complement depending on input type
-	var outputType types.Type
-	var complement types.Type
-	switch t := inputShape.Type.(type) {
-	case types.UnionType:
-		outputType = types.VoidType{}
-		complement = types.VoidType{}
-		for _, disjunct := range t {
-			i, c := partitionObjPattern(disjunct, propTypeMap)
-			outputType = types.Union(outputType, i)
-			complement = types.Union(complement, c)
-		}
-	default:
-		outputType, complement = partitionObjPattern(t, propTypeMap)
+	// determine the type of values this pattern will match
+	pType := types.ObjType{
+		PropTypeMap: propTypeMap,
+		RestType:    types.AnyType{},
 	}
-	if (types.VoidType{}).Subsumes(outputType) {
+	// partition the input type and check for impossible match
+	intersection, complement := inputShape.Type.Partition(pType)
+	if (types.VoidType{}).Subsumes(intersection) {
 		return Shape{}, nil, nil, errors.E(
 			errors.Code(errors.ImpossibleMatch),
 			errors.Pos(p.Pos),
-			errors.GotType(inputShape.Type),
+			errors.WantType(inputShape.Type),
+			errors.GotType(pType),
 		)
 	}
+	// build output shape
 	outputShape := Shape{
-		Type:  outputType,
+		Type:  intersection,
 		Stack: funcerStack,
 	}
 	if p.Name != nil {

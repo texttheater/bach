@@ -48,30 +48,17 @@ func (v ObjValue) Out() (string, error) {
 func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case types.ObjType:
-		if len(t.Props) != len(v) {
-			return false, nil
-		}
-		for prop, wantType := range t.PropTypeMap {
-			thunk, ok := v[prop]
-			if !ok {
+		for prop := range t.PropTypeMap {
+			if v[prop] == nil {
 				return false, nil
 			}
-			res := thunk.Eval()
-			if res.Error != nil {
-				return false, res.Error
-			}
-			if ok, err := res.Value.Inhabits(wantType, stack); !ok {
-				return false, err
-			}
 		}
-		return true, nil
-	case types.MapType:
-		for _, thunk := range v {
+		for gotProp, thunk := range v {
 			res := thunk.Eval()
 			if res.Error != nil {
 				return false, res.Error
 			}
-			if ok, err := res.Value.Inhabits(t.ValueType, stack); !ok {
+			if ok, err := res.Value.Inhabits(t.TypeForProp(gotProp), stack); !ok {
 				return false, err
 			}
 		}

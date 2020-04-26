@@ -7,7 +7,7 @@ import (
 var LexerDefinition = lexer.Must(lexer.Regexp(
 	`([\s]+)` +
 		// tokens starting type literals
-		`|(?P<TypeKeywordLangle>(?:Void|Null|Bool|Num|Str|Arr|Tup|Map|Obj|Any)<)` +
+		`|(?P<TypeKeywordLangle>(?:Void|Null|Bool|Num|Str|Arr|Tup|Obj|Any)<)` +
 		// tokens starting calls
 		`|(?P<Op1Num>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Op2Num>(?:==|<=|>=|\*\*)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
@@ -46,7 +46,7 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		// the following will be scanned as Name, but mapped to the
 		// appropriate token types by ToKeyword (see below)
 		`|(?P<Keyword>for|def|as|ok|if|then|elif|else|each|is|elis|with|drop)` +
-		`|(?P<TypeKeyword>Void|Null|Reader|Bool|Num|Str|Arr|Tup|Map|Obj|Any)`,
+		`|(?P<TypeKeyword>Void|Null|Reader|Bool|Num|Str|Arr|Tup|Obj|Any)`,
 ))
 
 func ToKeyword(t lexer.Token) (lexer.Token, error) {
@@ -62,8 +62,8 @@ func ToKeyword(t lexer.Token) (lexer.Token, error) {
 func isTypeKeyword(name string) bool {
 	return name == "Void" || name == "Null" || name == "Reader" ||
 		name == "Bool" || name == "Num" || name == "Str" ||
-		name == "Arr" || name == "Tup" || name == "Map" ||
-		name == "Obj" || name == "Any"
+		name == "Arr" || name == "Tup" || name == "Obj" ||
+		name == "Any"
 }
 
 func isKeyword(name string) bool {

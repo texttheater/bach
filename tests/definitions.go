@@ -108,10 +108,14 @@ func TestDefinitions(t *testing.T) {
 				Name: "A",
 				UpperBound: types.Union(
 					types.NullType{},
-					types.NewObjType(map[string]types.Type{
-						"start": types.NumType{},
-						"0":     types.StrType{},
-					})),
+					types.ObjType{
+						PropTypeMap: map[string]types.Type{
+							"start": types.NumType{},
+							"0":     types.StrType{},
+						},
+						RestType: types.AnyType{},
+					},
+				),
 			},
 			),
 			errors.GotType(types.AnyObjType),
@@ -121,23 +125,24 @@ func TestDefinitions(t *testing.T) {
 	)
 	TestProgram(
 		`for <A Obj<a: Num>> def f <A> as id ok {} f`,
-		types.NewObjType(map[string]types.Type{
-			"a": types.NumType{},
-		}),
+		nil,
 		nil,
 		errors.E(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.AnyObjType),
+			errors.InputType(types.VoidObjType),
 			errors.Name("f"),
 			errors.NumParams(0),
 		),
 		t,
 	)
 	TestProgram(
-		`for <A Obj<a: Num>> def f <A> as id ok {a: 1} f`,
-		types.NewObjType(map[string]types.Type{
-			"a": types.NumType{},
-		}),
+		`for <A Obj<a: Num, Any>> def f <A> as id ok {a: 1} f`,
+		types.ObjType{
+			PropTypeMap: map[string]types.Type{
+				"a": types.NumType{},
+			},
+			RestType: types.VoidType{},
+		},
 		states.ObjValue(map[string]*states.Thunk{
 			"a": states.ThunkFromValue(states.NumValue(1)),
 		}),

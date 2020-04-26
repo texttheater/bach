@@ -103,11 +103,13 @@ func (g *TupTypeTemplate) Ast() types.Type {
 }
 
 type ObjTypeTemplate struct {
-	Pos              lexer.Position `"Obj<"`
-	Prop             *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
-	ValTypeTemplate  *Type          `  ":" @@`
-	Props            []string       `  ( ( @Lid | @Op1 | @Op2 | @Num )`
-	ValTypeTemplates []*Type        `     ":" @@ )* )? ">"`
+	Pos               lexer.Position `"Obj<"`
+	Prop              *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
+	ValTypeTemplate   *Type          `  ":" @@`
+	Props             []string       `  ( ( @Lid | @Op1 | @Op2 | @Num )`
+	ValTypeTemplates  []*Type        `     ":" @@ )*`
+	RestTypeTemplate1 *Type          `  ( "," @@ )?`
+	RestTypeTemplate2 *Type          `| ( @@ )? ) ">"`
 }
 
 func (g *ObjTypeTemplate) Ast() types.Type {
@@ -118,7 +120,18 @@ func (g *ObjTypeTemplate) Ast() types.Type {
 			propTypeMap[g.Props[i]] = g.ValTypeTemplates[i].Ast()
 		}
 	}
-	return types.NewObjType(propTypeMap)
+	var restType types.Type
+	if g.RestTypeTemplate1 != nil {
+		restType = g.RestTypeTemplate1.Ast()
+	} else if g.RestTypeTemplate2 != nil {
+		restType = g.RestTypeTemplate2.Ast()
+	} else {
+		restType = types.AnyType{}
+	}
+	return types.ObjType{
+		PropTypeMap: propTypeMap,
+		RestType:    restType,
+	}
 }
 
 type TypeVariableTemplate struct {
