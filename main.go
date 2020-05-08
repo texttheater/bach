@@ -21,6 +21,29 @@ func repl() {
 	os.Exit(1)
 }
 
+func execute(program string, displayResult bool) (success bool) {
+	_, value, err := interpreter.InterpretString(program)
+	if err != nil {
+		errors.Explain(err, program)
+		return false
+	}
+	if displayResult {
+		str, err := value.String()
+		if err != nil {
+			errors.Explain(err, program)
+			return false
+		}
+		fmt.Println(str)
+	} else {
+		err := forceEvaluation(value)
+		if err != nil {
+			errors.Explain(err, program)
+			return false
+		}
+	}
+	return true
+}
+
 func main() {
 	// parse command line
 	var e string
@@ -42,30 +65,18 @@ func main() {
 	}
 	// execute program given on command line
 	var program string
+	var displayResult bool
 	if e != "" {
 		program = e
+		displayResult = false
 	}
 	if o != "" {
 		program = o
+		displayResult = true
 	}
-	_, value, err := interpreter.InterpretString(program)
-	if err != nil {
-		errors.Explain(err, program)
+	success := execute(program, displayResult)
+	if !success {
 		os.Exit(1)
-	}
-	if o != "" {
-		str, err := value.String()
-		if err != nil {
-			errors.Explain(err, program)
-			os.Exit(1)
-		}
-		fmt.Println(str)
-	} else {
-		err := forceEvaluation(value)
-		if err != nil {
-			errors.Explain(err, program)
-			os.Exit(1)
-		}
 	}
 }
 
