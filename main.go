@@ -15,16 +15,32 @@ func help() {
 	flag.PrintDefaults()
 }
 
+func repl() {
+	// FIXME launch REPL
+	help()
+	os.Exit(1)
+}
+
 func main() {
+	// parse command line
 	var e string
 	var o string
+	var h bool
 	flag.StringVar(&e, "e", "", "function to evaluate")
 	flag.StringVar(&o, "o", "", "function to evaluate, output result")
+	flag.BoolVar(&h, "h", false, "print help message and exit")
 	flag.Parse()
-	if (e == "") == (o == "") { // exactly one must be given
+	// help
+	if h {
 		help()
 		os.Exit(1)
 	}
+	// REPL
+	if e == "" && o == "" {
+		repl()
+		os.Exit(0)
+	}
+	// execute program given on command line
 	var program string
 	if e != "" {
 		program = e
