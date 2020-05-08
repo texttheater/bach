@@ -2,9 +2,13 @@ package states
 
 import (
 	"bytes"
+	"fmt"
+	"regexp"
 
 	"github.com/texttheater/bach/types"
 )
+
+var lid *regexp.Regexp = regexp.MustCompile(`^[\p{L}_][\p{L}_0-9]*$`)
 
 func ObjValueFromMap(m map[string]Value) ObjValue {
 	propThunkMap := make(map[string]*Thunk)
@@ -24,7 +28,11 @@ func (v ObjValue) String() (string, error) {
 		if firstWritten {
 			buffer.WriteString(", ")
 		}
-		buffer.WriteString(k)
+		if lid.MatchString(k) {
+			buffer.WriteString(k)
+		} else {
+			buffer.WriteString(fmt.Sprintf("%q", k))
+		}
 		buffer.WriteString(": ")
 		res := w.Eval()
 		if res.Error != nil {
