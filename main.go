@@ -10,6 +10,11 @@ import (
 	"github.com/texttheater/bach/states"
 )
 
+func help() {
+	fmt.Fprintln(os.Stderr, "Usage:")
+	flag.PrintDefaults()
+}
+
 func main() {
 	var e string
 	var o string
@@ -17,8 +22,7 @@ func main() {
 	flag.StringVar(&o, "o", "", "function to evaluate, output result")
 	flag.Parse()
 	if (e == "") == (o == "") { // exactly one must be given
-		fmt.Fprintln(os.Stderr, "Usage:")
-		flag.PrintDefaults()
+		help()
 		os.Exit(1)
 	}
 	var program string
