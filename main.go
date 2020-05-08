@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/c-bata/go-prompt"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/states"
@@ -16,9 +17,13 @@ func help() {
 }
 
 func repl() {
-	// FIXME launch REPL
-	help()
-	os.Exit(1)
+	p := prompt.New(func(program string) {
+		execute(program, true)
+	}, func(prompt.Document) []prompt.Suggest {
+		return nil
+	},
+		prompt.OptionPrefix("bach> "))
+	p.Run()
 }
 
 func execute(program string, displayResult bool) (success bool) {
