@@ -7,9 +7,9 @@ import (
 
 type Object struct {
 	Pos    lexer.Position `"{"`
-	Prop   *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
+	Prop   *string        `( ( @Lid | @Op1 | @Op2 | @Num | @Str )`
 	Value  *Composition   `  ":" @@`
-	Props  []string       `  ( "," ( @Lid | @Op1 | @Op2 | @Num )`
+	Props  []string       `  ( "," ( @Lid | @Op1 | @Op2 | @Num | @Str )`
 	Values []*Composition `    ":" @@ )* )? "}"`
 }
 
