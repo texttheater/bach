@@ -29,10 +29,15 @@ var LexerDefinition = lexer.Must(lexer.Regexp(
 		`|(?P<Ellipsis>\.\.\.)` +
 		// numbers
 		`|(?P<Num>\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)` +
+		// getters
+		`|(?P<LidGetter>@[\p{L}_][\p{L}_0-9]*)` +
+		`|(?P<Op1Getter>@[+\-*/%<>=])` +
+		`|(?P<Op2Getter>@(?:==|<=|>=))` +
+		`|(?P<NumGetter>@(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
+		`|(?P<StrGetter>@"(?:\\.|[^"])*")` +
 		// starting with unique characters
 		`|(?P<Str>"(?:\\.|[^"])*")` +
 		`|(?P<Regexp>~(?:\\.|[^/])*)~` +
-		`|(?P<Getter>@(?:[\p{L}_][\p{L}_0-9]*|[+\-*/%<>=]|==|<=|>=|\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
 		`|(?P<Comma>,)` +
 		`|(?P<Lpar>\()` +
 		`|(?P<Rpar>\))` +

@@ -52,6 +52,7 @@ type SComponent struct {
 	Conditional *Conditional `| @@`
 	Filter      *Filter      `| @@`
 	Regexp      *Regexp      `| @@`
+	Getter      *Getter      `| @@`
 }
 
 func (g *SComponent) Ast() (functions.Expression, error) {
@@ -93,6 +94,9 @@ func (g *SComponent) Ast() (functions.Expression, error) {
 	if g.Regexp != nil {
 		return g.Regexp.Ast()
 	}
+	if g.Getter != nil {
+		return g.Getter.Ast()
+	}
 	panic("invalid component")
 }
 
@@ -107,6 +111,7 @@ type PComponent struct {
 	Definition *Definition `| @@`
 	Filter     *Filter     `| @@`
 	Regexp     *Regexp     `| @@`
+	Getter     *Getter     `| @@`
 	Drop       *Drop       `| @@`
 }
 
@@ -145,6 +150,9 @@ func (g *PComponent) Ast() (functions.Expression, error) {
 	}
 	if g.Regexp != nil {
 		return g.Regexp.Ast()
+	}
+	if g.Getter != nil {
+		return g.Getter.Ast()
 	}
 	if g.Drop != nil {
 		return g.Drop.Ast()
@@ -186,6 +194,7 @@ type QComponent struct {
 	Conditional *Conditional `| @@`
 	Filter      *Filter      `| @@`
 	Regexp      *Regexp      `| @@`
+	Getter      *Getter      `| @@`
 	Drop        *Drop        `| @@`
 }
 
@@ -227,6 +236,9 @@ func (g *QComponent) Ast() (functions.Expression, error) {
 	}
 	if g.Regexp != nil {
 		return g.Regexp.Ast()
+	}
+	if g.Getter != nil {
+		return g.Getter.Ast()
 	}
 	if g.Drop != nil {
 		return g.Drop.Ast()
