@@ -21,6 +21,7 @@ const (
 	RegexpWantsString
 	BadRegexp
 	UnexpectedValue
+	NoSuchProperty
 )
 
 func (code ErrorCode) String() string {
@@ -61,6 +62,8 @@ func (code ErrorCode) String() string {
 		return "BadRegexp"
 	case UnexpectedValue:
 		return "UnexpectedValue"
+	case NoSuchProperty:
+		return "NoSuchProperty"
 	default:
 		return "Unknown"
 	}
@@ -104,6 +107,8 @@ func (code ErrorCode) DefaultMessage() string {
 		return "error parsing regexp"
 	case UnexpectedValue:
 		return "Component got an unexpected input value."
+	case NoSuchProperty:
+		return "Getter requires an object with the specified property."
 	default:
 		return "unknown error"
 	}
@@ -147,6 +152,8 @@ func (code ErrorCode) Kind() string {
 		return "Syntax error"
 	case UnexpectedValue:
 		return "Value error"
+	case NoSuchProperty:
+		return "NoSuchProperty"
 	default:
 		return "Unknown error"
 	}

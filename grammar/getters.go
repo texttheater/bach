@@ -39,5 +39,8 @@ func (g *Getter) Ast() (functions.Expression, error) {
 	} else {
 		panic("invalid getter")
 	}
-	panic("not implemented yet, name is " + name)
+	return &functions.GetterExpression{
+		Pos:  g.Pos,
+		Name: name,
+	}, nil
 }
