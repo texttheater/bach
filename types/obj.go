@@ -34,15 +34,6 @@ func (t ObjType) Subsumes(u Type) bool {
 				return false
 			}
 		}
-		for prop, gotType := range u.PropTypeMap {
-			wantType := t.PropTypeMap[prop]
-			if wantType == nil {
-				continue
-			}
-			if !gotType.Subsumes(wantType) {
-				return false
-			}
-		}
 		if !t.RestType.Subsumes(u.RestType) {
 			return false
 		}
@@ -65,15 +56,6 @@ func (t ObjType) Bind(u Type, bindings map[string]Type) bool {
 				return false
 			}
 			if !wantType.Bind(gotType, bindings) {
-				return false
-			}
-		}
-		for prop, gotType := range u.PropTypeMap {
-			wantType := t.PropTypeMap[prop]
-			if wantType == nil {
-				continue
-			}
-			if !gotType.Bind(wantType, bindings) {
 				return false
 			}
 		}
