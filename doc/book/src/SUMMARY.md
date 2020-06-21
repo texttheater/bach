@@ -16,6 +16,8 @@
 	- [Conditional Expressions](./conditional-expressions.md)
 	- [Filter Expressions](./filter-expressions.md)
 	- [Funcer Definition Expressions](./funcer-definition-expressions.md)
+	- [Getter Expressions](./getter-expressions.md)
+	- [Regexp Expressions](./regexp-expressions.md)
 - [Using Bach](./using-bach.md)
 	- [The REPL](./the-repl.md)
 	- [The CLI](./the-cli.md)
