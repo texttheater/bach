@@ -22,6 +22,9 @@ const (
 	BadRegexp
 	UnexpectedValue
 	NoSuchProperty
+	NoSuchIndex
+	BadIndex
+	NoGetterAllowed
 )
 
 func (code ErrorCode) String() string {
@@ -64,6 +67,12 @@ func (code ErrorCode) String() string {
 		return "UnexpectedValue"
 	case NoSuchProperty:
 		return "NoSuchProperty"
+	case NoSuchIndex:
+		return "NoSuchIndex"
+	case BadIndex:
+		return "BadIndex"
+	case NoGetterAllowed:
+		return "NoGetterAllowed"
 	default:
 		return "Unknown"
 	}
@@ -109,6 +118,12 @@ func (code ErrorCode) DefaultMessage() string {
 		return "Component got an unexpected input value."
 	case NoSuchProperty:
 		return "Getter requires an object with the specified property."
+	case NoSuchIndex:
+		return "Getter requires a tuple that is long enough."
+	case BadIndex:
+		return "Tuple indexing requires a nonnegative integer."
+	case NoGetterAllowed:
+		return "A getter expression cannot be applied to this type."
 	default:
 		return "unknown error"
 	}
@@ -153,7 +168,13 @@ func (code ErrorCode) Kind() string {
 	case UnexpectedValue:
 		return "Value error"
 	case NoSuchProperty:
-		return "NoSuchProperty"
+		return "Type error"
+	case NoSuchIndex:
+		return "Type error"
+	case BadIndex:
+		return "Value error"
+	case NoGetterAllowed:
+		return "Type error"
 	default:
 		return "Unknown error"
 	}
