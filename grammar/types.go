@@ -167,8 +167,8 @@ type ObjType struct {
 	Pos       lexer.Position `"Obj<"`
 	Prop      *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
 	ValType   *Type          `  ":" @@`
-	Props     []string       `  ( ( @Lid | @Op1 | @Op2 | @Num )`
-	ValTypes  []*Type        `     ":" @@ )*`
+	Props     []string       `  ( "," ( @Lid | @Op1 | @Op2 | @Num )`
+	ValTypes  []*Type        `    ":" @@ )*`
 	RestType1 *Type          `  ( "," @@)?`
 	RestType2 *Type          `| ( @@ )? ) ">"`
 }
