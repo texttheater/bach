@@ -28,8 +28,6 @@ func initArr() {
 				}
 			},
 		),
-	})
-	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
 		functions.RegularFuncer(
 			types.AnyType{},
 			"range",
