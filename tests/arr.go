@@ -155,4 +155,36 @@ func TestArrays(t *testing.T) {
 		),
 		t,
 	)
+	TestProgram(
+		`[] get(0)`,
+		types.Union(
+			types.ObjType{
+				PropTypeMap: map[string]types.Type{
+					"just": types.VoidType{},
+				},
+				RestType: types.AnyType{},
+			},
+			types.NullType{},
+		),
+		states.NullValue{},
+		nil,
+		t,
+	)
+	TestProgram(
+		`["a", "b", "c"] get(0)`,
+		types.Union(
+			types.ObjType{
+				PropTypeMap: map[string]types.Type{
+					"just": types.StrType{},
+				},
+				RestType: types.AnyType{},
+			},
+			types.NullType{},
+		),
+		states.ObjValue(map[string]*states.Thunk{
+			"just": states.ThunkFromValue(states.StrValue("a")),
+		}),
+		nil,
+		t,
+	)
 }

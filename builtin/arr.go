@@ -61,5 +61,59 @@ func initArr() {
 			},
 			nil,
 		),
+		functions.RegularFuncer(
+			&types.ArrType{
+				ElType: types.TypeVariable{
+					Name:       "A",
+					UpperBound: types.AnyType{},
+				},
+			},
+			"get",
+			[]*functions.Parameter{
+				functions.SimpleParam(types.NumType{}),
+			},
+			types.Union(
+				types.ObjType{
+					PropTypeMap: map[string]types.Type{
+						"just": types.TypeVariable{
+							Name:       "A",
+							UpperBound: types.AnyType{},
+						},
+					},
+					RestType: types.AnyType{},
+				},
+				types.NullType{},
+			),
+			func(inputState states.State, args []states.Action) *states.Thunk {
+				res0 := args[0](inputState, nil).Eval()
+				if res0.Error != nil {
+					return states.ThunkFromError(res0.Error)
+				}
+				index := float64(res0.Value.(states.NumValue))
+				intIndex := int(index)
+				if intIndex < 0 || index != float64(intIndex) {
+					return states.ThunkFromValue(states.NullValue{})
+				}
+				value := inputState.Value.(*states.ArrValue)
+				for i := 0; i < intIndex; i++ {
+					if value == nil {
+						return states.ThunkFromValue(states.NullValue{})
+					}
+					tail := value.Tail
+					res := tail.Eval()
+					if res.Error != nil {
+						return states.ThunkFromError(res.Error)
+					}
+					value = res.Value.(*states.ArrValue)
+				}
+				if value == nil {
+					return states.ThunkFromValue(states.NullValue{})
+				}
+				return states.ThunkFromValue(states.ObjValue(map[string]*states.Thunk{
+					"just": states.ThunkFromValue(value.Head),
+				}))
+			},
+			nil,
+		),
 	})
 }
