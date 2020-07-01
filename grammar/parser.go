@@ -2,7 +2,6 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle"
-	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
 )
@@ -15,11 +14,11 @@ func Parse(input string) (functions.Expression, error) {
 		participle.Map(ToKeyword, "Lid"),
 	)
 	if err != nil {
-		if lexerError, ok := err.(*lexer.Error); ok {
+		if parserError, ok := err.(participle.Error); ok {
 			return nil, errors.E(
 				errors.Code(errors.Syntax),
-				errors.Pos(lexerError.Pos),
-				errors.Message(lexerError.Message),
+				errors.Pos(parserError.Token().Pos),
+				errors.Message(parserError.Message()),
 			)
 		}
 		return nil, err
@@ -27,11 +26,11 @@ func Parse(input string) (functions.Expression, error) {
 	composition := &Composition{}
 	err = parser.ParseString(input, composition)
 	if err != nil {
-		if lexerError, ok := err.(*lexer.Error); ok {
+		if parserError, ok := err.(participle.Error); ok {
 			return nil, errors.E(
 				errors.Code(errors.Syntax),
-				errors.Pos(lexerError.Pos),
-				errors.Message(lexerError.Message),
+				errors.Pos(parserError.Token().Pos),
+				errors.Message(parserError.Message()),
 			)
 		}
 		return nil, err
