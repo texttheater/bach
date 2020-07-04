@@ -203,7 +203,7 @@ func Explain(err error, program string) {
 	}
 	// header and position
 	fmt.Fprint(os.Stderr, e.Code.Kind())
-	if e.Pos != nil {
+	if e.Pos != nil && e.Pos.Line > 0 {
 		fmt.Fprintln(os.Stderr, " at", e.Pos)
 		lines := strings.SplitAfter(program, "\n")
 		line := lines[e.Pos.Line-1]
