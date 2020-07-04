@@ -18,7 +18,10 @@ func initObj() {
 			},
 			"get",
 			[]*functions.Parameter{
-				functions.SimpleParam(types.StrType{}),
+				functions.SimpleParam(types.Union(
+					types.StrType{},
+					types.NumType{},
+				)),
 			},
 			types.Union(
 				types.ObjType{
@@ -38,7 +41,10 @@ func initObj() {
 				if res0.Error != nil {
 					return states.ThunkFromError(res0.Error)
 				}
-				prop := string(res0.Value.(states.StrValue))
+				prop, err := res0.Value.Out() // TODO ???
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
 				thunk, ok := inputValue[prop]
 				if !ok {
 					return states.ThunkFromValue(states.NullValue{})

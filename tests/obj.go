@@ -83,4 +83,38 @@ func TestObjects(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgram(
+		`{1: "a"} get(1)`,
+		types.Union(
+			types.ObjType{
+				PropTypeMap: map[string]types.Type{
+					"just": types.StrType{},
+				},
+				RestType: types.AnyType{},
+			},
+			types.NullType{},
+		),
+		states.ObjValue(map[string]*states.Thunk{
+			"just": states.ThunkFromValue(states.StrValue("a")),
+		}),
+		nil,
+		t,
+	)
+	TestProgram(
+		`{1.5: "a"} get(1.5)`,
+		types.Union(
+			types.ObjType{
+				PropTypeMap: map[string]types.Type{
+					"just": types.StrType{},
+				},
+				RestType: types.AnyType{},
+			},
+			types.NullType{},
+		),
+		states.ObjValue(map[string]*states.Thunk{
+			"just": states.ThunkFromValue(states.StrValue("a")),
+		}),
+		nil,
+		t,
+	)
 }
