@@ -59,8 +59,13 @@ func (t ObjType) Bind(u Type, bindings map[string]Type) bool {
 				return false
 			}
 		}
-		if !t.RestType.Bind(u.RestType, bindings) {
-			// TODO is that the right semantics for rest types?
+		restType := u.RestType
+		for prop, gotType := range u.PropTypeMap {
+			if _, ok := t.PropTypeMap[prop]; !ok {
+				restType = Union(restType, gotType)
+			}
+		}
+		if !t.RestType.Bind(restType, bindings) {
 			return false
 		}
 		return true
