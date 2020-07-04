@@ -2,7 +2,6 @@ package tests
 
 import (
 	//"log"
-	"reflect"
 	"testing"
 
 	"github.com/texttheater/bach/errors"
@@ -49,7 +48,7 @@ func TestProgram(program string, wantType types.Type, wantValue states.Value, wa
 			t.Logf("Expected value: %s", wantValueStr)
 			t.Logf("Got error:      %s", gotErr)
 			t.Fail()
-		} else if !reflect.DeepEqual(wantType, gotType) {
+		} else if !types.Equivalent(wantType, gotType) {
 			t.Log("ERROR: Program has unexpected output type.")
 			t.Logf("Program:        %s", program)
 			t.Logf("Expected type:  %s", wantType)

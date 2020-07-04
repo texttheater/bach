@@ -8,3 +8,7 @@ type Type interface {
 	String() string
 	ElementType() Type
 }
+
+func Equivalent(a Type, b Type) bool {
+	return a.Subsumes(b) && b.Subsumes(a)
+}
