@@ -14,6 +14,7 @@ func init() {
 	initMath()
 	initText()
 	initArr()
+	initObj()
 	initTypes()
 	initValues()
 	initRegexp()
