@@ -10,7 +10,7 @@ func initObj() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
 		functions.RegularFuncer(
 			types.ObjType{
-				PropTypeMap: make(map[string]types.Type),
+				PropTypeMap: map[string]types.Type{},
 				RestType: types.TypeVariable{
 					Name:       "A",
 					UpperBound: types.AnyType{},
