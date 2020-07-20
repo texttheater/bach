@@ -2,7 +2,6 @@ package functions
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 )
 
@@ -17,10 +16,10 @@ func (x AssignmentExpression) Position() lexer.Position {
 
 func (x AssignmentExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.E(
-			errors.Code(errors.ParamsNotAllowed),
-			errors.Pos(x.Pos),
-		)
+		return Shape{}, nil, nil, states.E(
+			states.Code(states.ParamsNotAllowed),
+			states.Pos(x.Pos))
+
 	}
 	variableFuncer := VariableFuncer(x, x.Name, inputShape.Type)
 	outputShape := Shape{

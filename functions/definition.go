@@ -2,7 +2,6 @@ package functions
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -24,10 +23,10 @@ func (x DefinitionExpression) Position() lexer.Position {
 func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.E(
-			errors.Code(errors.ParamsNotAllowed),
-			errors.Pos(x.Pos),
-		)
+		return Shape{}, nil, nil, states.E(
+			states.Code(states.ParamsNotAllowed),
+			states.Pos(x.Pos))
+
 	}
 	// variables for body input stack, action (will be set at runtime)
 	var bodyInputStackStub *states.VariableStack
@@ -86,12 +85,12 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (
 	ids := bodyIDs
 	// check body output type
 	if !x.OutputType.Subsumes(bodyOutputShape.Type) {
-		return Shape{}, nil, nil, errors.E(
-			errors.Code(errors.FunctionBodyHasWrongOutputType),
-			errors.Pos(x.Pos),
-			errors.WantType(x.OutputType),
-			errors.GotType(bodyOutputShape.Type),
-		)
+		return Shape{}, nil, nil, states.E(
+			states.Code(states.FunctionBodyHasWrongOutputType),
+			states.Pos(x.Pos),
+			states.WantType(x.OutputType),
+			states.GotType(bodyOutputShape.Type))
+
 	}
 	// define output context
 	outputShape := Shape{

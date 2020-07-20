@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -28,12 +27,12 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 			RestType: types.AnyType{},
 		}
 		if !wantType.Subsumes(inputShape.Type) {
-			return Shape{}, nil, nil, errors.E(
-				errors.Code(errors.NoSuchProperty),
-				errors.Pos(x.Pos),
-				errors.WantType(wantType),
-				errors.GotType(inputShape.Type),
-			)
+			return Shape{}, nil, nil, states.E(
+				states.Code(states.NoSuchProperty),
+				states.Pos(x.Pos),
+				states.WantType(wantType),
+				states.GotType(inputShape.Type))
+
 		}
 		outputType := inputShape.Type.(types.ObjType).PropTypeMap[x.Name]
 		outputShape := Shape{
@@ -56,10 +55,10 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 	case *types.NearrType:
 		index, err := strconv.Atoi(x.Name)
 		if err != nil {
-			return Shape{}, nil, nil, errors.E(
-				errors.Code(errors.BadIndex),
-				errors.Pos(x.Pos),
-			)
+			return Shape{}, nil, nil, states.E(
+				states.Code(states.BadIndex),
+				states.Pos(x.Pos))
+
 		}
 		wantType := types.AnyArrType
 		for i := 0; i <= index; i++ {
@@ -69,11 +68,11 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 			}
 		}
 		if !wantType.Subsumes(inputShape.Type) {
-			return Shape{}, nil, nil, errors.E(
-				errors.Code(errors.NoSuchIndex),
-				errors.WantType(wantType),
-				errors.GotType(inputShape.Type),
-			)
+			return Shape{}, nil, nil, states.E(
+				states.Code(states.NoSuchIndex),
+				states.WantType(wantType),
+				states.GotType(inputShape.Type))
+
 		}
 		for i := 0; i < index; i++ {
 			t = t.TailType.(*types.NearrType)
@@ -101,10 +100,10 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*Parameter) (Shap
 		}
 		return outputShape, action, nil, nil
 	default:
-		return Shape{}, nil, nil, errors.E(
-			errors.Code(errors.NoGetterAllowed),
-			errors.Pos(x.Pos),
-			errors.GotType(inputShape.Type),
-		)
+		return Shape{}, nil, nil, states.E(
+			states.Code(states.NoGetterAllowed),
+			states.Pos(x.Pos),
+			states.GotType(inputShape.Type))
+
 	}
 }

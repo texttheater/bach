@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -21,18 +20,18 @@ func (x RegexpExpression) Position() lexer.Position {
 
 func (x RegexpExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.E(
-			errors.Code(errors.ParamsNotAllowed),
-			errors.Pos(x.Pos),
-		)
+		return Shape{}, nil, nil, states.E(
+			states.Code(states.ParamsNotAllowed),
+			states.Pos(x.Pos))
+
 	}
 	if !(types.StrType{}).Subsumes(inputShape.Type) {
-		return Shape{}, nil, nil, errors.E(
-			errors.Code(errors.RegexpWantsString),
-			errors.Pos(x.Pos),
-			errors.WantType(types.StrType{}),
-			errors.GotType(inputShape.Type),
-		)
+		return Shape{}, nil, nil, states.E(
+			states.Code(states.RegexpWantsString),
+			states.Pos(x.Pos),
+			states.WantType(types.StrType{}),
+			states.GotType(inputShape.Type))
+
 	}
 	submatchType := types.Union(types.NullType{}, types.StrType{})
 	propTypeMap := make(map[string]types.Type)

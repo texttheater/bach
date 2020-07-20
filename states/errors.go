@@ -1,4 +1,4 @@
-package errors
+package states
 
 import (
 	"bytes"
@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/states"
 )
 
 type errorAttribute func(err *e)
@@ -69,7 +68,7 @@ func GotType(gotType interface{}) errorAttribute {
 	}
 }
 
-func GotValue(gotValue states.Value) errorAttribute {
+func GotValue(gotValue Value) errorAttribute {
 	return func(err *e) {
 		err.GotValue = gotValue
 	}
@@ -132,7 +131,7 @@ type e struct {
 	Message   *string
 	WantType  interface{}
 	GotType   interface{}
-	GotValue  states.Value
+	GotValue  Value
 	InputType interface{}
 	Name      *string
 	ArgNum    *int

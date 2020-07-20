@@ -3,7 +3,6 @@ package tests
 import (
 	"testing"
 
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -83,9 +82,9 @@ func TestArrays(t *testing.T) {
 		`1 each *2 all`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.MappingRequiresArrType),
-		),
+		states.E(
+			states.Code(states.MappingRequiresArrType)),
+
 		t,
 	)
 	TestProgram(
@@ -128,31 +127,31 @@ func TestArrays(t *testing.T) {
 		`[1;2]`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.RestRequiresArrType),
-			errors.WantType(types.AnyArrType),
-			errors.GotType(types.NumType{}),
-		),
+		states.E(
+			states.Code(states.RestRequiresArrType),
+			states.WantType(types.AnyArrType),
+			states.GotType(types.NumType{})),
+
 		t,
 	)
 	TestProgram(
 		`[1 if ==2 then true else fatal ok] out`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.UnexpectedValue),
-			errors.GotValue(states.NumValue(1)),
-		),
+		states.E(
+			states.Code(states.UnexpectedValue),
+			states.GotValue(states.NumValue(1))),
+
 		t,
 	)
 	TestProgram(
 		`[true, 1 if ==2 then true else fatal ok] out`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.UnexpectedValue),
-			errors.GotValue(states.NumValue(1)),
-		),
+		states.E(
+			states.Code(states.UnexpectedValue),
+			states.GotValue(states.NumValue(1))),
+
 		t,
 	)
 	TestProgram(

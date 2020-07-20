@@ -3,7 +3,6 @@ package tests
 import (
 	"testing"
 
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -65,9 +64,9 @@ func TestRegexp(t *testing.T) {
 			},
 		),
 		nil,
-		errors.E(
-			errors.Code(errors.BadRegexp),
-		),
+		states.E(
+			states.Code(states.BadRegexp)),
+
 		t,
 	)
 }

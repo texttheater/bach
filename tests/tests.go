@@ -4,7 +4,6 @@ import (
 	//"log"
 	"testing"
 
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -33,7 +32,7 @@ func TestProgram(program string, wantType types.Type, wantValue states.Value, wa
 			t.Logf("Got type:       %s", gotType)
 			t.Logf("Got value:      %s", gotValueStr)
 			t.Fail()
-		} else if !errors.Match(wantError, gotErr) {
+		} else if !states.Match(wantError, gotErr) {
 			t.Log("ERROR: Expected error does not match actual error.")
 			t.Logf("Program:        %s", program)
 			t.Logf("Expected error: %s", wantError)

@@ -1,4 +1,4 @@
-package errors
+package states
 
 type ErrorCode int
 

@@ -3,7 +3,6 @@ package tests
 import (
 	"testing"
 
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -27,9 +26,9 @@ func TestMatchingObj(t *testing.T) {
 		`if true then {a: 1} else {b: 2} ok is {a: Num} then true elis {a: Num, b: Num} then false ok`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.ImpossibleMatch),
-		),
+		states.E(
+			states.Code(states.ImpossibleMatch)),
+
 		t,
 	)
 	TestProgram(
@@ -43,9 +42,9 @@ func TestMatchingObj(t *testing.T) {
 		`if true then {a: 1} else {b: "s"} ok is {a: Num a} then a elis {b: Num b} then b ok`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.ImpossibleMatch),
-		),
+		states.E(
+			states.Code(states.ImpossibleMatch)),
+
 		t,
 	)
 	//TestProgram(

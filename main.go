@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/c-bata/go-prompt"
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/states"
 )
@@ -29,20 +28,20 @@ func repl() {
 func execute(program string, displayResult bool) (success bool) {
 	_, value, err := interpreter.InterpretString(program)
 	if err != nil {
-		errors.Explain(err, program)
+		states.Explain(err, program)
 		return false
 	}
 	if displayResult {
 		str, err := value.String()
 		if err != nil {
-			errors.Explain(err, program)
+			states.Explain(err, program)
 			return false
 		}
 		fmt.Println(str)
 	} else {
 		err := forceEvaluation(value)
 		if err != nil {
-			errors.Explain(err, program)
+			states.Explain(err, program)
 			return false
 		}
 	}

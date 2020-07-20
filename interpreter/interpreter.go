@@ -2,7 +2,6 @@ package interpreter
 
 import (
 	"github.com/texttheater/bach/builtin"
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/grammar"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -22,10 +21,10 @@ func InterpretString(program string) (types.Type, states.Value, error) {
 		return nil, nil, err
 	}
 	if (types.VoidType{}).Subsumes(outputShape.Type) {
-		return nil, nil, errors.E(
-			errors.Code(errors.VoidProgram),
-			errors.Pos(x.Position()),
-		)
+		return nil, nil, states.E(
+			states.Code(states.VoidProgram),
+			states.Pos(x.Position()))
+
 	}
 	// evaluate
 	res := action(states.InitialState, nil).Eval()

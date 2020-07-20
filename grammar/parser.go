@@ -2,8 +2,8 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle"
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 )
 
 func Parse(input string) (functions.Expression, error) {
@@ -15,11 +15,11 @@ func Parse(input string) (functions.Expression, error) {
 	)
 	if err != nil {
 		if parserError, ok := err.(participle.Error); ok {
-			return nil, errors.E(
-				errors.Code(errors.Syntax),
-				errors.Pos(parserError.Token().Pos),
-				errors.Message(parserError.Message()),
-			)
+			return nil, states.E(
+				states.Code(states.Syntax),
+				states.Pos(parserError.Token().Pos),
+				states.Message(parserError.Message()))
+
 		}
 		return nil, err
 	}
@@ -27,11 +27,11 @@ func Parse(input string) (functions.Expression, error) {
 	err = parser.ParseString(input, composition)
 	if err != nil {
 		if parserError, ok := err.(participle.Error); ok {
-			return nil, errors.E(
-				errors.Code(errors.Syntax),
-				errors.Pos(parserError.Token().Pos),
-				errors.Message(parserError.Message()),
-			)
+			return nil, states.E(
+				states.Code(states.Syntax),
+				states.Pos(parserError.Token().Pos),
+				states.Message(parserError.Message()))
+
 		}
 		return nil, err
 	}

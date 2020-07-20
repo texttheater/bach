@@ -3,7 +3,6 @@ package tests
 import (
 	"testing"
 
-	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -24,22 +23,22 @@ func TestGetters(t *testing.T) {
 	TestProgram(`{a: 1, b: 2} @c`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.NoSuchProperty),
-			errors.WantType(types.ObjType{
+		states.E(
+			states.Code(states.NoSuchProperty),
+			states.WantType(types.ObjType{
 				PropTypeMap: map[string]types.Type{
 					"c": types.AnyType{},
 				},
 				RestType: types.AnyType{},
 			}),
-			errors.GotType(types.ObjType{
+			states.GotType(types.ObjType{
 				PropTypeMap: map[string]types.Type{
 					"a": types.NumType{},
 					"b": types.NumType{},
 				},
 				RestType: types.VoidType{},
-			}),
-		),
+			})),
+
 		t,
 	)
 	TestProgram(`["a", "b", "c"] @0`,
@@ -63,59 +62,59 @@ func TestGetters(t *testing.T) {
 	TestProgram(`["a", "b", "c"] @3`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.NoSuchIndex),
-			errors.WantType(&types.NearrType{types.AnyType{}, &types.NearrType{types.AnyType{}, &types.NearrType{types.AnyType{}, &types.NearrType{types.AnyType{}, types.AnyArrType}}}}),
-			errors.GotType(types.TupType([]types.Type{types.StrType{}, types.StrType{}, types.StrType{}})),
-		),
+		states.E(
+			states.Code(states.NoSuchIndex),
+			states.WantType(&types.NearrType{types.AnyType{}, &types.NearrType{types.AnyType{}, &types.NearrType{types.AnyType{}, &types.NearrType{types.AnyType{}, types.AnyArrType}}}}),
+			states.GotType(types.TupType([]types.Type{types.StrType{}, types.StrType{}, types.StrType{}}))),
+
 		t,
 	)
 	TestProgram(`["a", "b", "c"] @-1`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.BadIndex),
-		),
+		states.E(
+			states.Code(states.BadIndex)),
+
 		t,
 	)
 	TestProgram(`["a", "b", "c"] @1.5`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.BadIndex),
-		),
+		states.E(
+			states.Code(states.BadIndex)),
+
 		t,
 	)
 	TestProgram(`"abc" @1`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.NoGetterAllowed),
-		),
+		states.E(
+			states.Code(states.NoGetterAllowed)),
+
 		t,
 	)
 	TestProgram(`24 @1`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.NoGetterAllowed),
-		),
+		states.E(
+			states.Code(states.NoGetterAllowed)),
+
 		t,
 	)
 	TestProgram(`for Any def f Arr<Any> as [] ok f @1`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.NoGetterAllowed),
-		),
+		states.E(
+			states.Code(states.NoGetterAllowed)),
+
 		t,
 	)
 	TestProgram(`for Any def f Arr<Any> as ["a", "b", "c"] ok f @1`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.NoGetterAllowed),
-		),
+		states.E(
+			states.Code(states.NoGetterAllowed)),
+
 		t,
 	)
 }
