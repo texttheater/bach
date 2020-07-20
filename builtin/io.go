@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -28,7 +29,7 @@ func initIO() {
 			"lines",
 			nil,
 			&types.ArrType{types.StrType{}},
-			func(inputState states.State, args []states.Action) *states.Thunk {
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				reader := inputState.Value.(states.ReaderValue)
 				scanner := bufio.NewScanner(reader.Reader)
 				var iter func() (states.Value, bool, error)

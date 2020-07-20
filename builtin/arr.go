@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
@@ -37,7 +38,7 @@ func initArr() {
 				parameters.SimpleParam(types.NumType{}),
 			},
 			&types.ArrType{types.NumType{}},
-			func(inputState states.State, args []states.Action) *states.Thunk {
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				res0 := args[0](inputState, nil).Eval()
 				if res0.Error != nil {
 					return states.ThunkFromError(res0.Error)
@@ -85,7 +86,7 @@ func initArr() {
 				},
 				types.NullType{},
 			),
-			func(inputState states.State, args []states.Action) *states.Thunk {
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				res0 := args[0](inputState, nil).Eval()
 				if res0.Error != nil {
 					return states.ThunkFromError(res0.Error)

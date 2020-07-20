@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"strings"
 
+	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -16,7 +17,7 @@ func initText() {
 			"bytes",
 			nil,
 			&types.ArrType{types.NumType{}},
-			func(inputState states.State, args []states.Action) *states.Thunk {
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				str := string(inputState.Value.(states.StrValue))
 				bytes := []byte(str)
 				var iter func() (states.Value, bool, error)
@@ -38,7 +39,7 @@ func initText() {
 			"split",
 			nil,
 			&types.ArrType{types.StrType{}},
-			func(inputState states.State, args []states.Action) *states.Thunk {
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				str := string(inputState.Value.(states.StrValue))
 				fields := strings.Fields(str)
 				var iter func() (states.Value, bool, error)

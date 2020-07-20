@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	//	"github.com/texttheater/bach/errors"
+	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
@@ -34,7 +34,7 @@ func initRegexp() {
 			types.TypeVariable{
 				Name: "A",
 			},
-			func(inputState states.State, args []states.Action) *states.Thunk {
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				return args[0](inputState, nil)
 			},
 			nil,
@@ -63,7 +63,7 @@ func initRegexp() {
 			&types.ArrType{types.TypeVariable{
 				Name: "A",
 			}},
-			func(inputState states.State, args []states.Action) *states.Thunk {
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				offset := 0
 				v := inputState.Value.(states.StrValue)
 				var iter func() (states.Value, bool, error)

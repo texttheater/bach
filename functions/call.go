@@ -103,7 +103,7 @@ type Funcer func(gotInputShape Shape, gotCall CallExpression, gotParams []*param
 
 type SimpleKernel func(inputValue states.Value, argValues []states.Value) (states.Value, error)
 
-func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, kernel SimpleKernel) Funcer {
+func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, simpleKernel SimpleKernel) Funcer {
 	// make parameters from argument types
 	params := make([]*parameters.Parameter, len(argTypes))
 	for i, argType := range argTypes {
@@ -113,8 +113,8 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 			OutputType: argType,
 		}
 	}
-	// make action from kernel
-	action := func(inputState states.State, args []states.Action) *states.Thunk {
+	// make regular kernel from simple kernel
+	regularKernel := func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		argValues := make([]states.Value, len(argTypes))
 		argInputState := states.State{
 			Value:     states.NullValue{},
@@ -128,7 +128,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 			}
 			argValues[i] = res.Value
 		}
-		value, err := kernel(inputState.Value, argValues)
+		value, err := simpleKernel(inputState.Value, argValues)
 		if err != nil {
 			return states.ThunkFromError(err)
 
@@ -141,11 +141,11 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 
 	}
 	// return
-	return RegularFuncer(wantInputType, wantName, params, outputType, action, nil)
+	return RegularFuncer(wantInputType, wantName, params, outputType, regularKernel, nil)
 }
 
 func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
-	varAction := func(inputState states.State, args []states.Action) *states.Thunk {
+	kernel := func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		stack := inputState.Stack
 		for stack != nil {
 			if stack.Head.ID == id {
@@ -164,12 +164,12 @@ func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
 		}
 		panic(fmt.Sprintf("variable %s not found", name))
 	}
-	return RegularFuncer(types.AnyType{}, name, nil, varType, varAction, &states.IDStack{
+	return RegularFuncer(types.AnyType{}, name, nil, varType, kernel, &states.IDStack{
 		Head: id,
 	})
 }
 
-type RegularKernel func(inputState states.State, args []states.Action) *states.Thunk
+type RegularKernel func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk
 
 func RegularFuncer(wantInputType types.Type, wantName string, params []*parameters.Parameter, outputType types.Type, kernel RegularKernel, ids *states.IDStack) Funcer {
 	return func(gotInputShape Shape, gotCall CallExpression, gotParams []*parameters.Parameter) (Shape, states.Action, *states.IDStack, bool, error) {
@@ -191,7 +191,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*paramete
 		}
 		// typecheck and set parameters filled by this call
 		funAction := func(inputState states.State, args []states.Action) *states.Thunk {
-			return kernel(inputState, args)
+			return kernel(inputState, args, bindings, gotCall.Position())
 		}
 		argActions := make([]states.Action, len(gotCall.Args))
 		argIDss := make([]*states.IDStack, len(gotCall.Args))
