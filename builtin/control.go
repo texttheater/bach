@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/parameters"
@@ -10,31 +11,22 @@ import (
 
 func initControl() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*parameters.Parameter) (functions.Shape, states.Action, *states.IDStack, bool, error) {
-			if len(gotParams) != 0 {
-				return functions.Shape{}, nil, nil, false, nil
-			}
-			if len(gotCall.Args) != 0 {
-				return functions.Shape{}, nil, nil, false, nil
-			}
-			if gotCall.Name != "fatal" {
-				return functions.Shape{}, nil, nil, false, nil
-			}
-			outputShape := functions.Shape{
-				Type:  types.VoidType{},
-				Stack: gotInputShape.Stack,
-			}
-			action := func(inputState states.State, args []states.Action) *states.Thunk {
+		functions.RegularFuncer(
+			types.AnyType{},
+			"fatal",
+			nil,
+			types.VoidType{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				return states.ThunkFromError(
 					errors.E(
 						errors.Code(errors.UnexpectedValue),
-						errors.Pos(gotCall.Pos),
-						errors.GotType(gotInputShape.Type),
-						errors.GotValue(inputState.Value)),
+						errors.Pos(pos),
+						errors.GotValue(inputState.Value),
+					),
 				)
-			}
-			return outputShape, action, nil, true, nil
-		},
+			},
+			nil,
+		),
 		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*parameters.Parameter) (functions.Shape, states.Action, *states.IDStack, bool, error) {
 			typeVar := types.TypeVariable{
 				Name:       "A",
