@@ -17,7 +17,7 @@ func (x GetterExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x GetterExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
+func (x GetterExpression) Typecheck(inputShape Shape, params []*states.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	switch t := inputShape.Type.(type) {
 	case types.ObjType:
 		wantType := types.ObjType{

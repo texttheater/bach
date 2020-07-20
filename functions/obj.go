@@ -15,7 +15,7 @@ func (x ObjExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x ObjExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
+func (x ObjExpression) Typecheck(inputShape Shape, params []*states.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	if len(params) > 0 {
 		return Shape{}, nil, nil, states.E(
 			states.Code(states.ParamsNotAllowed),

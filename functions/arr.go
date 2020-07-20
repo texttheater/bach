@@ -17,7 +17,7 @@ func (x ArrExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x ArrExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
+func (x ArrExpression) Typecheck(inputShape Shape, params []*states.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no params
 	if len(params) > 0 {
 		return Shape{}, nil, nil, states.E(

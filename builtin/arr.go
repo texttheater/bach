@@ -31,9 +31,9 @@ func initArr() {
 		functions.RegularFuncer(
 			types.AnyType{},
 			"range",
-			[]*functions.Parameter{
-				functions.SimpleParam(types.NumType{}),
-				functions.SimpleParam(types.NumType{}),
+			[]*states.Parameter{
+				states.SimpleParam(types.NumType{}),
+				states.SimpleParam(types.NumType{}),
 			},
 			&types.ArrType{types.NumType{}},
 			func(inputState states.State, args []states.Action) *states.Thunk {
@@ -69,8 +69,8 @@ func initArr() {
 				},
 			},
 			"get",
-			[]*functions.Parameter{
-				functions.SimpleParam(types.NumType{}),
+			[]*states.Parameter{
+				states.SimpleParam(types.NumType{}),
 			},
 			types.Union(
 				types.ObjType{

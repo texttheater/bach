@@ -1,7 +1,6 @@
 package functions
 
 import (
-	"bytes"
 	"fmt"
 
 	"github.com/alecthomas/participle/lexer"
@@ -19,7 +18,7 @@ func (x CallExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x CallExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
+func (x CallExpression) Typecheck(inputShape Shape, params []*states.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// go down the function stack and find the function invoked by this
 	// call
 	stack := inputShape.Stack
@@ -90,92 +89,23 @@ func (s *FuncerStack) String() string {
 	return fmt.Sprintf("%v", slice)
 }
 
-func SimpleParam(outputType types.Type) *Parameter {
-	return &Parameter{
-		InputType:  types.AnyType{},
-		Params:     nil,
-		OutputType: outputType,
-	}
-}
-
-type Parameter struct {
-	InputType  types.Type
-	Params     []*Parameter
-	OutputType types.Type
-}
-
-func (p *Parameter) Subsumes(q *Parameter) bool {
-	if len(p.Params) != len(q.Params) {
-		return false
-	}
-	if !q.InputType.Subsumes(p.InputType) {
-		return false
-	}
-	if !p.OutputType.Subsumes(q.OutputType) {
-		return false
-	}
-	for i, otherParam := range q.Params {
-		if !otherParam.Subsumes(p.Params[i]) {
-			return false
-		}
-	}
-	return true
-}
-
-func (p *Parameter) Instantiate(bindings map[string]types.Type) *Parameter {
-	inputType := p.InputType.Instantiate(bindings)
-	var params []*Parameter
-	if p.Params != nil {
-		params = make([]*Parameter, len(p.Params))
-		for i, param := range p.Params {
-			params[i] = param.Instantiate(bindings)
-		}
-	}
-	outputType := p.OutputType.Instantiate(bindings)
-	return &Parameter{
-		InputType:  inputType,
-		Params:     params,
-		OutputType: outputType,
-	}
-}
-
-func instantiate(params []*Parameter, bindings map[string]types.Type) []*Parameter {
-	result := make([]*Parameter, len(params))
+func instantiate(params []*states.Parameter, bindings map[string]types.Type) []*states.Parameter {
+	result := make([]*states.Parameter, len(params))
 	for i, param := range params {
 		result[i] = param.Instantiate(bindings)
 	}
 	return result
 }
 
-func (p Parameter) String() string {
-	buffer := bytes.Buffer{}
-	if !p.InputType.Subsumes(types.AnyType{}) || len(p.Params) > 0 {
-		buffer.WriteString("for ")
-		buffer.WriteString(p.InputType.String())
-		buffer.WriteString(" ")
-	}
-	if len(p.Params) > 0 {
-		buffer.WriteString("(")
-		buffer.WriteString(p.Params[0].String())
-		for _, param := range p.Params[1:] {
-			buffer.WriteString(", ")
-			buffer.WriteString(param.String())
-		}
-		buffer.WriteString(") ")
-	}
-	buffer.WriteString(p.OutputType.String())
-	return buffer.String()
-}
-
-type Funcer func(gotInputShape Shape, gotCall CallExpression, gotParams []*Parameter) (outputShape Shape, action states.Action, ids *states.IDStack, ok bool, err error)
+type Funcer func(gotInputShape Shape, gotCall CallExpression, gotParams []*states.Parameter) (outputShape Shape, action states.Action, ids *states.IDStack, ok bool, err error)
 
 type Kernel func(inputValue states.Value, argValues []states.Value) (states.Value, error)
 
 func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, kernel Kernel) Funcer {
 	// make parameters from argument types
-	params := make([]*Parameter, len(argTypes))
+	params := make([]*states.Parameter, len(argTypes))
 	for i, argType := range argTypes {
-		params[i] = &Parameter{
+		params[i] = &states.Parameter{
 			InputType:  types.AnyType{},
 			Params:     nil,
 			OutputType: argType,
@@ -237,8 +167,8 @@ func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
 	})
 }
 
-func RegularFuncer(wantInputType types.Type, wantName string, params []*Parameter, outputType types.Type, action states.Action, ids *states.IDStack) Funcer {
-	return func(gotInputShape Shape, gotCall CallExpression, gotParams []*Parameter) (Shape, states.Action, *states.IDStack, bool, error) {
+func RegularFuncer(wantInputType types.Type, wantName string, params []*states.Parameter, outputType types.Type, action states.Action, ids *states.IDStack) Funcer {
+	return func(gotInputShape Shape, gotCall CallExpression, gotParams []*states.Parameter) (Shape, states.Action, *states.IDStack, bool, error) {
 		// match number of parameters
 		if len(gotCall.Args)+len(gotParams) != len(params) {
 			return Shape{}, nil, nil, false, nil

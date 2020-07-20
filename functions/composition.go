@@ -16,7 +16,7 @@ func (x CompositionExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x CompositionExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
+func (x CompositionExpression) Typecheck(inputShape Shape, params []*states.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	if len(params) > 0 {
 		return Shape{}, nil, nil, states.E(
 			states.Code(states.ParamsNotAllowed),

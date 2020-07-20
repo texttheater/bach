@@ -12,8 +12,8 @@ func initRegexp() {
 		functions.RegularFuncer(
 			types.StrType{},
 			"findFirst",
-			[]*functions.Parameter{
-				&functions.Parameter{
+			[]*states.Parameter{
+				&states.Parameter{
 					InputType: types.StrType{},
 					OutputType: types.TypeVariable{
 						Name: "A",
@@ -41,8 +41,8 @@ func initRegexp() {
 		functions.RegularFuncer(
 			types.StrType{},
 			"findAll",
-			[]*functions.Parameter{
-				&functions.Parameter{
+			[]*states.Parameter{
+				&states.Parameter{
 					InputType: types.StrType{},
 					OutputType: types.TypeVariable{
 						Name: "A",

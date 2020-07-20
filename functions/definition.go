@@ -10,7 +10,7 @@ type DefinitionExpression struct {
 	Pos        lexer.Position
 	InputType  types.Type
 	Name       string
-	Params     []*Parameter
+	Params     []*states.Parameter
 	ParamNames []string
 	OutputType types.Type
 	Body       Expression
@@ -20,7 +20,7 @@ func (x DefinitionExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x DefinitionExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
+func (x DefinitionExpression) Typecheck(inputShape Shape, params []*states.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return Shape{}, nil, nil, states.E(

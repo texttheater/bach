@@ -15,7 +15,7 @@ func (x MappingExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x MappingExpression) Typecheck(inputShape Shape, params []*Parameter) (Shape, states.Action, *states.IDStack, error) {
+func (x MappingExpression) Typecheck(inputShape Shape, params []*states.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return Shape{}, nil, nil, states.E(

@@ -17,8 +17,8 @@ func initObj() {
 				},
 			},
 			"get",
-			[]*functions.Parameter{
-				functions.SimpleParam(types.Union(
+			[]*states.Parameter{
+				states.SimpleParam(types.Union(
 					types.StrType{},
 					types.NumType{},
 				)),

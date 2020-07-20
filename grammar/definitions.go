@@ -3,6 +3,7 @@ package grammar
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
@@ -20,14 +21,14 @@ type Definition struct {
 func (g *Definition) Ast() (functions.Expression, error) {
 	inputType := g.InputType.Ast()
 	var name string
-	var params []*functions.Parameter
+	var params []*states.Parameter
 	var paramNames []string
 	if g.Name != nil {
 		name = *g.Name
 	} else {
 		nameLpar := *g.NameLpar
 		name = nameLpar[:len(nameLpar)-1]
-		params = make([]*functions.Parameter, len(g.Params)+1)
+		params = make([]*states.Parameter, len(g.Params)+1)
 		paramNames = make([]string, len(g.Params)+1)
 		param, paramName, err := g.Parameter.Ast()
 		if err != nil {
@@ -64,7 +65,7 @@ type NamedParameter struct {
 	Short *NamedParameterShortForm `| @@ )`
 }
 
-func (g *NamedParameter) Ast() (*functions.Parameter, string, error) {
+func (g *NamedParameter) Ast() (*states.Parameter, string, error) {
 	if g.Long != nil {
 		return g.Long.Ast()
 	}
@@ -81,15 +82,15 @@ type NamedParameterLongForm struct {
 	OutputType *TypeTemplate `@@`
 }
 
-func (g *NamedParameterLongForm) Ast() (*functions.Parameter, string, error) {
+func (g *NamedParameterLongForm) Ast() (*states.Parameter, string, error) {
 	inputType := g.InputType.Ast()
 	var name string
-	var params []*functions.Parameter
+	var params []*states.Parameter
 	if g.Name != nil {
 		name = *g.Name
 	} else {
 		name = (*g.NameLpar)[:len(*g.NameLpar)-1]
-		params = make([]*functions.Parameter, len(g.Params)+1)
+		params = make([]*states.Parameter, len(g.Params)+1)
 		var err error
 		params[0], err = g.Parameter.Ast()
 		if err != nil {
@@ -103,7 +104,7 @@ func (g *NamedParameterLongForm) Ast() (*functions.Parameter, string, error) {
 		}
 	}
 	outputType := g.OutputType.Ast()
-	return &functions.Parameter{
+	return &states.Parameter{
 		InputType:  inputType,
 		Params:     params,
 		OutputType: outputType,
@@ -116,9 +117,9 @@ type NamedParameterShortForm struct {
 	OutputType *TypeTemplate `@@`
 }
 
-func (g *NamedParameterShortForm) Ast() (*functions.Parameter, string, error) {
+func (g *NamedParameterShortForm) Ast() (*states.Parameter, string, error) {
 	outputType := g.OutputType.Ast()
-	return &functions.Parameter{
+	return &states.Parameter{
 		InputType:  types.AnyType{},
 		OutputType: outputType,
 	}, g.Name, nil
@@ -132,16 +133,16 @@ type Parameter struct {
 	OutputType *TypeTemplate `@@`
 }
 
-func (g *Parameter) Ast() (*functions.Parameter, error) {
+func (g *Parameter) Ast() (*states.Parameter, error) {
 	var inputType types.Type
 	if g.InputType != nil {
 		inputType = g.InputType.Ast()
 	} else {
 		inputType = types.AnyType{}
 	}
-	var params []*functions.Parameter
+	var params []*states.Parameter
 	if g.Parameter != nil {
-		params = make([]*functions.Parameter, len(g.Params)+1)
+		params = make([]*states.Parameter, len(g.Params)+1)
 		var err error
 		params[0], err = g.Parameter.Ast()
 		if err != nil {
@@ -155,7 +156,7 @@ func (g *Parameter) Ast() (*functions.Parameter, error) {
 		}
 	}
 	outputType := g.OutputType.Ast()
-	return &functions.Parameter{
+	return &states.Parameter{
 		InputType:  inputType,
 		Params:     params,
 		OutputType: outputType,

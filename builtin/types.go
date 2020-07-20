@@ -8,7 +8,7 @@ import (
 
 func initTypes() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*functions.Parameter) (functions.Shape, states.Action, *states.IDStack, bool, error) {
+		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*states.Parameter) (functions.Shape, states.Action, *states.IDStack, bool, error) {
 			if len(gotCall.Args)+len(gotParams) != 0 {
 				return functions.Shape{}, nil, nil, false, nil
 			}
