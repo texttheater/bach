@@ -101,9 +101,9 @@ func instantiate(params []*parameters.Parameter, bindings map[string]types.Type)
 
 type Funcer func(gotInputShape Shape, gotCall CallExpression, gotParams []*parameters.Parameter) (outputShape Shape, action states.Action, ids *states.IDStack, ok bool, err error)
 
-type Kernel func(inputValue states.Value, argValues []states.Value) (states.Value, error)
+type SimpleKernel func(inputValue states.Value, argValues []states.Value) (states.Value, error)
 
-func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, kernel Kernel) Funcer {
+func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, kernel SimpleKernel) Funcer {
 	// make parameters from argument types
 	params := make([]*parameters.Parameter, len(argTypes))
 	for i, argType := range argTypes {
