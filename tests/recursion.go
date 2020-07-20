@@ -24,7 +24,7 @@ func TestRecursion(t *testing.T) {
 		nil,
 		t,
 	)
-	// slightly different formulation where the recursive is in the
+	// slightly different formulation where the recursive call is in the
 	// argument of *
 	TestProgram(
 		`for Num def fac Num as if ==0 then 1 else =n *(n -1 fac) ok ok 3 fac`,
