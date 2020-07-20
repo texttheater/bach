@@ -38,6 +38,10 @@ func (p *Parameter) Subsumes(q *Parameter) bool {
 	return true
 }
 
+func (p *Parameter) Equivalent(q *Parameter) bool {
+	return p.Subsumes(q) && q.Subsumes(p)
+}
+
 func (p *Parameter) Instantiate(bindings map[string]types.Type) *Parameter {
 	inputType := p.InputType.Instantiate(bindings)
 	var params []*Parameter

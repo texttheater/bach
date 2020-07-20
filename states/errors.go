@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"reflect"
 	"strings"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/types"
 )
 
 type errorAttribute func(err *e)
@@ -56,13 +56,13 @@ func Message(message string) errorAttribute {
 	}
 }
 
-func WantType(wantType interface{}) errorAttribute {
+func WantType(wantType types.Type) errorAttribute {
 	return func(err *e) {
 		err.WantType = wantType
 	}
 }
 
-func GotType(gotType interface{}) errorAttribute {
+func GotType(gotType types.Type) errorAttribute {
 	return func(err *e) {
 		err.GotType = gotType
 	}
@@ -74,7 +74,7 @@ func GotValue(gotValue Value) errorAttribute {
 	}
 }
 
-func InputType(inputType interface{}) errorAttribute {
+func InputType(inputType types.Type) errorAttribute {
 	return func(err *e) {
 		err.InputType = inputType
 	}
@@ -104,13 +104,13 @@ func ParamNum(paramNum int) errorAttribute {
 	}
 }
 
-func WantParam(wantParam interface{}) errorAttribute {
+func WantParam(wantParam *Parameter) errorAttribute {
 	return func(err *e) {
 		err.WantParam = wantParam
 	}
 }
 
-func GotParam(gotParam interface{}) errorAttribute {
+func GotParam(gotParam *Parameter) errorAttribute {
 	return func(err *e) {
 		err.GotParam = gotParam
 	}
@@ -122,23 +122,21 @@ func Hint(hint string) errorAttribute {
 	}
 }
 
-// An e represents any code of Bach error, or error template. Every field
-// may have a "none" value, which is Go's zero value except for int fields
-// where it's -1.
+// An e represents any code of Bach error, or error template.
 type e struct {
 	Code      *ErrorCode
 	Pos       *lexer.Position
 	Message   *string
-	WantType  interface{}
-	GotType   interface{}
+	WantType  types.Type
+	GotType   types.Type
 	GotValue  Value
-	InputType interface{}
+	InputType types.Type
 	Name      *string
 	ArgNum    *int
 	NumParams *int
 	ParamNum  *int
-	WantParam interface{}
-	GotParam  interface{}
+	WantParam *Parameter
+	GotParam  *Parameter
 	Hint      *string
 }
 
@@ -154,16 +152,16 @@ func (err *e) Error() string {
 		m["Message"] = *err.Message
 	}
 	if err.WantType != nil {
-		m["WantType"] = fmt.Sprintf("%s", err.WantType)
+		m["WantType"] = err.WantType.String()
 	}
 	if err.GotType != nil {
-		m["GotType"] = fmt.Sprintf("%s", err.GotType)
+		m["GotType"] = err.GotType.String()
 	}
 	if err.GotValue != nil {
 		m["GotValue"], _ = err.GotValue.String()
 	}
 	if err.InputType != nil {
-		m["InputType"] = fmt.Sprintf("%s", err.InputType)
+		m["InputType"] = err.InputType.String()
 	}
 	if err.Name != nil {
 		m["Name"] = *err.Name
@@ -178,10 +176,10 @@ func (err *e) Error() string {
 		m["ParamNum"] = *err.ParamNum
 	}
 	if err.WantParam != nil {
-		m["WantParam"] = fmt.Sprintf("%s", err.WantParam)
+		m["WantParam"] = err.WantParam.String()
 	}
 	if err.GotParam != nil {
-		m["GotParam"] = fmt.Sprintf("%s", err.GotParam)
+		m["GotParam"] = err.GotParam.String()
 	}
 	buffer := new(bytes.Buffer)
 	encoder := json.NewEncoder(buffer)
@@ -283,10 +281,10 @@ func Match(err1, err2 error) bool {
 	if e1.Message != nil && *e2.Message != *e1.Message {
 		return false
 	}
-	if e1.WantType != nil && !reflect.DeepEqual(e1.WantType, e2.WantType) {
+	if e1.WantType != nil && !types.Equivalent(e1.WantType, e2.WantType) {
 		return false
 	}
-	if e1.GotType != nil && !reflect.DeepEqual(e1.GotType, e2.GotType) {
+	if e1.GotType != nil && !types.Equivalent(e1.GotType, e2.GotType) {
 		return false
 	}
 	if e1.GotValue != nil {
@@ -294,7 +292,7 @@ func Match(err1, err2 error) bool {
 			return false
 		}
 	}
-	if e1.InputType != nil && !reflect.DeepEqual(e1.InputType, e2.InputType) {
+	if e1.InputType != nil && !types.Equivalent(e1.InputType, e2.InputType) {
 		return false
 	}
 	if e1.Name != nil && *e2.Name != *e1.Name {
@@ -309,10 +307,10 @@ func Match(err1, err2 error) bool {
 	if e1.ParamNum != nil && *e2.ParamNum != *e1.ParamNum {
 		return false
 	}
-	if e1.WantParam != nil && !reflect.DeepEqual(e1.WantParam, e2.WantParam) {
+	if e1.WantParam != nil && !e1.WantParam.Equivalent(e2.WantParam) {
 		return false
 	}
-	if e1.GotParam != nil && !reflect.DeepEqual(e1.GotParam, e2.GotParam) {
+	if e1.GotParam != nil && !e1.GotParam.Equivalent(e2.GotParam) {
 		return false
 	}
 	return true
