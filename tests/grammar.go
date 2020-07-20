@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -12,8 +13,8 @@ func TestGrammar(t *testing.T) {
 		"&",
 		nil,
 		nil,
-		states.E(
-			states.Code(states.Syntax)),
+		errors.E(
+			errors.Code(errors.Syntax)),
 
 		t,
 	)
@@ -21,8 +22,8 @@ func TestGrammar(t *testing.T) {
 		"drop",
 		nil,
 		nil,
-		states.E(
-			states.Code(states.Syntax)),
+		errors.E(
+			errors.Code(errors.Syntax)),
 
 		t,
 	)
@@ -30,8 +31,8 @@ func TestGrammar(t *testing.T) {
 		"if true then drop else true ok",
 		nil,
 		nil,
-		states.E(
-			states.Code(states.Syntax)),
+		errors.E(
+			errors.Code(errors.Syntax)),
 
 		t,
 	)

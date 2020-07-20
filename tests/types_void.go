@@ -3,7 +3,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/texttheater/bach/states"
+	"github.com/texttheater/bach/errors"
 )
 
 func TestVoidType(t *testing.T) {
@@ -11,8 +11,8 @@ func TestVoidType(t *testing.T) {
 		`[] each drop 0 all`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.ComposeWithVoid)),
+		errors.E(
+			errors.Code(errors.ComposeWithVoid)),
 
 		t,
 	)

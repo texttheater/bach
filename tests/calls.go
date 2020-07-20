@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -20,7 +21,7 @@ func TestCalls(t *testing.T) {
 		`for Num def f Num as =x x ok for Str def f Str as =x x ok f(2)`,
 		nil,
 		nil,
-		states.E(states.Code(states.NoSuchFunction), states.InputType(types.NullType{}), states.Name("f"), states.NumParams(1)), t,
+		errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NullType{}), errors.Name("f"), errors.NumParams(1)), t,
 	)
 	TestProgram(
 		`for Num def f Num as =x x ok for Str def f Str as =x x ok 2 f`,
@@ -33,7 +34,7 @@ func TestCalls(t *testing.T) {
 		`for Num def f Num as =x x ok for Str def f Str as =x x ok f`,
 		nil,
 		nil,
-		states.E(states.Code(states.NoSuchFunction), states.InputType(types.NullType{}), states.Name("f"), states.NumParams(0)), t,
+		errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NullType{}), errors.Name("f"), errors.NumParams(0)), t,
 	)
 	TestProgram(
 		`for Any def f(x Num) Num as x ok`,
@@ -60,13 +61,13 @@ func TestCalls(t *testing.T) {
 		`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok 1 f`,
 		nil,
 		nil,
-		states.E(states.Code(states.NoSuchFunction), states.InputType(types.NumType{}), states.Name("f"), states.NumParams(0)), t,
+		errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NumType{}), errors.Name("f"), errors.NumParams(0)), t,
 	)
 	TestProgram(
 		`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok f(1)`,
 		nil,
 		nil,
-		states.E(states.Code(states.ArgHasWrongOutputType), states.ArgNum(1), states.WantType(types.StrType{}), states.GotType(types.NumType{})), t,
+		errors.E(errors.Code(errors.ArgHasWrongOutputType), errors.ArgNum(1), errors.WantType(types.StrType{}), errors.GotType(types.NumType{})), t,
 	)
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok`,
@@ -79,7 +80,7 @@ func TestCalls(t *testing.T) {
 		`for Any def f(for Num g Num) Num as 1 g ok f(g)`,
 		nil,
 		nil,
-		states.E(states.Code(states.NoSuchFunction), states.InputType(types.NumType{}), states.Name("g"), states.NumParams(0)), t,
+		errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NumType{}), errors.Name("g"), errors.NumParams(0)), t,
 	)
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok f(1)`,
@@ -113,7 +114,7 @@ func TestCalls(t *testing.T) {
 		`for Any def f(for Num g(Num) Num) Num as 1 g ok`,
 		nil,
 		nil,
-		states.E(states.Code(states.NoSuchFunction), states.InputType(types.NumType{}), states.Name("g"), states.NumParams(0)), t,
+		errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NumType{}), errors.Name("g"), errors.NumParams(0)), t,
 	)
 	TestProgram(
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok`,
@@ -147,11 +148,11 @@ func TestCalls(t *testing.T) {
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok f(+1)`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.NoSuchFunction),
-			states.InputType(types.NumType{}),
-			states.Name("+"),
-			states.NumParams(2)),
+		errors.E(
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.NumType{}),
+			errors.Name("+"),
+			errors.NumParams(2)),
 
 		t,
 	)
@@ -166,15 +167,15 @@ func TestCalls(t *testing.T) {
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok f(g)`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.ParamDoesNotMatch),
-			states.ParamNum(1),
-			states.WantParam(&parameters.Parameter{
+		errors.E(
+			errors.Code(errors.ParamDoesNotMatch),
+			errors.ParamNum(1),
+			errors.WantParam(&parameters.Parameter{
 				InputType:  types.AnyType{},
 				Params:     nil,
 				OutputType: types.NumType{},
 			}),
-			states.GotParam(&parameters.Parameter{
+			errors.GotParam(&parameters.Parameter{
 				InputType:  types.AnyType{},
 				Params:     nil,
 				OutputType: types.StrType{},
@@ -186,15 +187,15 @@ func TestCalls(t *testing.T) {
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok for Any def g(for Str x Num) Num as "abc" x ok f(g)`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.ParamDoesNotMatch),
-			states.ParamNum(1),
-			states.WantParam(&parameters.Parameter{
+		errors.E(
+			errors.Code(errors.ParamDoesNotMatch),
+			errors.ParamNum(1),
+			errors.WantParam(&parameters.Parameter{
 				InputType:  types.AnyType{},
 				Params:     nil,
 				OutputType: types.NumType{},
 			}),
-			states.GotParam(&parameters.Parameter{
+			errors.GotParam(&parameters.Parameter{
 				InputType:  types.StrType{},
 				Params:     nil,
 				OutputType: types.NumType{},

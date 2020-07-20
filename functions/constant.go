@@ -2,6 +2,7 @@ package functions
 
 import (
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -19,9 +20,9 @@ func (x ConstantExpression) Position() lexer.Position {
 
 func (x ConstantExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	if len(params) > 0 {
-		return Shape{}, nil, nil, states.E(
-			states.Code(states.ParamsNotAllowed),
-			states.Pos(x.Pos))
+		return Shape{}, nil, nil, errors.E(
+			errors.Code(errors.ParamsNotAllowed),
+			errors.Pos(x.Pos))
 
 	}
 	outputShape := Shape{x.Type, inputShape.Stack}

@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -12,9 +13,9 @@ func TestValues(t *testing.T) {
 		`false if id then 1 else fatal ok`,
 		types.NumType{},
 		nil,
-		states.E(
-			states.Code(states.UnexpectedValue),
-			states.GotValue(states.BoolValue(false))),
+		errors.E(
+			errors.Code(errors.UnexpectedValue),
+			errors.GotValue(states.BoolValue(false))),
 
 		t,
 	)

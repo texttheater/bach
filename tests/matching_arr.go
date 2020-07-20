@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -19,8 +20,8 @@ func TestMatchingArr(t *testing.T) {
 		`[1, 2, 3] is [Num, Num, Num] then true else false ok`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.UnreachableElseClause)),
+		errors.E(
+			errors.Code(errors.UnreachableElseClause)),
 
 		t,
 	)
@@ -93,8 +94,8 @@ func TestMatchingArr(t *testing.T) {
 		`[] is [a] then a ok`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.ImpossibleMatch)),
+		errors.E(
+			errors.Code(errors.ImpossibleMatch)),
 
 		t,
 	)
@@ -102,8 +103,8 @@ func TestMatchingArr(t *testing.T) {
 		`[1] is [a, b] then a ok`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.ImpossibleMatch)),
+		errors.E(
+			errors.Code(errors.ImpossibleMatch)),
 
 		t,
 	)

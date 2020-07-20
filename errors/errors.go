@@ -1,4 +1,4 @@
-package states
+package errors
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
@@ -69,7 +70,7 @@ func GotType(gotType types.Type) errorAttribute {
 	}
 }
 
-func GotValue(gotValue Value) errorAttribute {
+func GotValue(gotValue states.Value) errorAttribute {
 	return func(err *e) {
 		err.GotValue = gotValue
 	}
@@ -130,7 +131,7 @@ type e struct {
 	Message   *string
 	WantType  types.Type
 	GotType   types.Type
-	GotValue  Value
+	GotValue  states.Value
 	InputType types.Type
 	Name      *string
 	ArgNum    *int

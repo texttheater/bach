@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -116,8 +117,8 @@ func TestFilters(t *testing.T) {
 		`[1, 2, 3] each if ==1 then "a" elif ==2 then "b" else "c" all`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.Syntax)),
+		errors.E(
+			errors.Code(errors.Syntax)),
 
 		t,
 	)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -26,12 +27,12 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*parameters.Paramet
 	for {
 		// reached bottom of stack without finding a matching funcer
 		if stack == nil {
-			return Shape{}, nil, nil, states.E(
-				states.Code(states.NoSuchFunction),
-				states.Pos(x.Pos),
-				states.InputType(inputShape.Type),
-				states.Name(x.Name),
-				states.NumParams(len(x.Args)+len(params)),
+			return Shape{}, nil, nil, errors.E(
+				errors.Code(errors.NoSuchFunction),
+				errors.Pos(x.Pos),
+				errors.InputType(inputShape.Type),
+				errors.Name(x.Name),
+				errors.NumParams(len(x.Args)+len(params)),
 			)
 		}
 		// try the funcer on top of the stack
@@ -200,21 +201,21 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*paramete
 				return Shape{}, nil, nil, false, err
 			}
 			if !params[i].OutputType.Bind(argOutputShape.Type, bindings) {
-				return Shape{}, nil, nil, false, states.E(
-					states.Code(states.ArgHasWrongOutputType),
-					states.Pos(gotCall.Pos),
-					states.ArgNum(i+1),
-					states.WantType(params[i].OutputType.Instantiate(bindings)),
-					states.GotType(argOutputShape.Type),
+				return Shape{}, nil, nil, false, errors.E(
+					errors.Code(errors.ArgHasWrongOutputType),
+					errors.Pos(gotCall.Pos),
+					errors.ArgNum(i+1),
+					errors.WantType(params[i].OutputType.Instantiate(bindings)),
+					errors.GotType(argOutputShape.Type),
 				)
 			}
 			if !params[i].OutputType.Instantiate(bindings).Subsumes(argOutputShape.Type) {
-				return Shape{}, nil, nil, false, states.E(
-					states.Code(states.ArgHasWrongOutputType),
-					states.Pos(gotCall.Pos),
-					states.ArgNum(i+1),
-					states.WantType(params[i].OutputType.Instantiate(bindings)),
-					states.GotType(argOutputShape.Type),
+				return Shape{}, nil, nil, false, errors.E(
+					errors.Code(errors.ArgHasWrongOutputType),
+					errors.Pos(gotCall.Pos),
+					errors.ArgNum(i+1),
+					errors.WantType(params[i].OutputType.Instantiate(bindings)),
+					errors.GotType(argOutputShape.Type),
 				)
 			}
 			argActions[i] = argAction
@@ -241,12 +242,12 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*paramete
 		for i, gotParam := range gotParams {
 			wantParam := params[len(gotCall.Args)+i].Instantiate(bindings)
 			if !gotParam.Subsumes(wantParam) {
-				return Shape{}, nil, nil, false, states.E(
-					states.Code(states.ParamDoesNotMatch),
-					states.Pos(gotCall.Pos),
-					states.ParamNum(i+1),
-					states.WantParam(gotParam),
-					states.GotParam(wantParam),
+				return Shape{}, nil, nil, false, errors.E(
+					errors.Code(errors.ParamDoesNotMatch),
+					errors.Pos(gotCall.Pos),
+					errors.ParamNum(i+1),
+					errors.WantParam(gotParam),
+					errors.GotParam(wantParam),
 				)
 			}
 		}

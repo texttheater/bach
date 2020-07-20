@@ -2,6 +2,7 @@ package functions
 
 import (
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -26,9 +27,9 @@ func (x ConditionalExpression) Position() lexer.Position {
 func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return Shape{}, nil, nil, states.E(
-			states.Code(states.ParamsNotAllowed),
-			states.Pos(x.Pos))
+		return Shape{}, nil, nil, errors.E(
+			errors.Code(errors.ParamsNotAllowed),
+			errors.Pos(x.Pos))
 
 	}
 	// typecheck pattern
@@ -49,11 +50,11 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.
 			return Shape{}, nil, nil, err
 		}
 		if !(types.BoolType{}).Subsumes(guardOutputShape.Type) {
-			return Shape{}, nil, nil, states.E(
-				states.Code(states.ConditionMustBeBool),
-				states.Pos(x.Guard.Position()),
-				states.WantType(types.BoolType{}),
-				states.GotType(guardOutputShape.Type))
+			return Shape{}, nil, nil, errors.E(
+				errors.Code(errors.ConditionMustBeBool),
+				errors.Pos(x.Guard.Position()),
+				errors.WantType(types.BoolType{}),
+				errors.GotType(guardOutputShape.Type))
 
 		}
 	}
@@ -86,9 +87,9 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.
 	for i := range x.AlternativePatterns {
 		// reachability check
 		if (types.VoidType{}).Subsumes(inputShape.Type) {
-			return Shape{}, nil, nil, states.E(
-				states.Code(states.UnreachableElisClause),
-				states.Pos(x.Pattern.Position()))
+			return Shape{}, nil, nil, errors.E(
+				errors.Code(errors.UnreachableElisClause),
+				errors.Pos(x.Pattern.Position()))
 
 		}
 		// typecheck pattern
@@ -107,11 +108,11 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.
 				return Shape{}, nil, nil, err
 			}
 			if !(types.BoolType{}).Subsumes(guardOutputShape.Type) {
-				return Shape{}, nil, nil, states.E(
-					states.Code(states.ConditionMustBeBool),
-					states.Pos(x.AlternativeGuards[i].Position()),
-					states.WantType(types.BoolType{}),
-					states.GotType(guardOutputShape.Type))
+				return Shape{}, nil, nil, errors.E(
+					errors.Code(errors.ConditionMustBeBool),
+					errors.Pos(x.AlternativeGuards[i].Position()),
+					errors.WantType(types.BoolType{}),
+					errors.GotType(guardOutputShape.Type))
 
 			}
 			ids = ids.AddAll(guardIDs)
@@ -155,9 +156,9 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.
 	} else {
 		// reachability check
 		if !x.UnreachableAlternativeAllowed && (types.VoidType{}).Subsumes(inputShape.Type) {
-			return Shape{}, nil, nil, states.E(
-				states.Code(states.UnreachableElseClause),
-				states.Pos(x.Alternative.Position()))
+			return Shape{}, nil, nil, errors.E(
+				errors.Code(errors.UnreachableElseClause),
+				errors.Pos(x.Alternative.Position()))
 
 		}
 		// alternative
@@ -227,10 +228,10 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.
 			}
 		}
 		if alternativeAction == nil {
-			return states.ThunkFromError(states.E(
-				states.Pos(x.Pos),
-				states.Code(states.UnexpectedValue),
-				states.GotValue(inputState.Value)))
+			return states.ThunkFromError(errors.E(
+				errors.Pos(x.Pos),
+				errors.Code(errors.UnexpectedValue),
+				errors.GotValue(inputState.Value)))
 		}
 		return alternativeAction(inputState, nil)
 	}
@@ -314,9 +315,9 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	elementInputTypes := make([]types.Type, len(p.ElementPatterns))
 	restInputType, ok := spreadInputType(inputShape.Type, elementInputTypes)
 	if !ok {
-		return Shape{}, nil, nil, states.E(
-			states.Code(states.ImpossibleMatch),
-			states.Pos(p.Pos))
+		return Shape{}, nil, nil, errors.E(
+			errors.Code(errors.ImpossibleMatch),
+			errors.Pos(p.Pos))
 
 	}
 	// process element patterns
@@ -349,11 +350,11 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	// partition the input type and check for impossible match
 	intersection, complement := inputShape.Type.Partition(pType)
 	if (types.VoidType{}).Subsumes(intersection) {
-		return Shape{}, nil, nil, states.E(
-			states.Code(states.ImpossibleMatch),
-			states.Pos(p.Pos),
-			states.WantType(inputShape.Type),
-			states.GotType(pType))
+		return Shape{}, nil, nil, errors.E(
+			errors.Code(errors.ImpossibleMatch),
+			errors.Pos(p.Pos),
+			errors.WantType(inputShape.Type),
+			errors.GotType(pType))
 
 	}
 	// build output shape
@@ -486,11 +487,11 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	// partition the input type and check for impossible match
 	intersection, complement := inputShape.Type.Partition(pType)
 	if (types.VoidType{}).Subsumes(intersection) {
-		return Shape{}, nil, nil, states.E(
-			states.Code(states.ImpossibleMatch),
-			states.Pos(p.Pos),
-			states.WantType(inputShape.Type),
-			states.GotType(pType))
+		return Shape{}, nil, nil, errors.E(
+			errors.Code(errors.ImpossibleMatch),
+			errors.Pos(p.Pos),
+			errors.WantType(inputShape.Type),
+			errors.GotType(pType))
 
 	}
 	// build output shape
@@ -560,11 +561,11 @@ func (p TypePattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, er
 	// partition the input type and check for impossible match
 	intersection, complement := inputShape.Type.Partition(p.Type)
 	if (types.VoidType{}).Subsumes(intersection) {
-		return Shape{}, nil, nil, states.E(
-			states.Code(states.ImpossibleMatch),
-			states.Pos(p.Pos),
-			states.WantType(inputShape.Type),
-			states.GotType(p.Type))
+		return Shape{}, nil, nil, errors.E(
+			errors.Code(errors.ImpossibleMatch),
+			errors.Pos(p.Pos),
+			errors.WantType(inputShape.Type),
+			errors.GotType(p.Type))
 
 	}
 	// build output shape

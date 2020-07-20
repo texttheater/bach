@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -37,8 +38,8 @@ func TestMatchingType(t *testing.T) {
 		`if true then 2 else "two" ok is Num then true elis Str then false else false ok`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.UnreachableElseClause)),
+		errors.E(
+			errors.Code(errors.UnreachableElseClause)),
 
 		t,
 	)

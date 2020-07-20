@@ -2,6 +2,7 @@ package functions
 
 import (
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -19,18 +20,18 @@ func (x MappingExpression) Position() lexer.Position {
 func (x MappingExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return Shape{}, nil, nil, states.E(
-			states.Code(states.ParamsNotAllowed),
-			states.Pos(x.Pos))
+		return Shape{}, nil, nil, errors.E(
+			errors.Code(errors.ParamsNotAllowed),
+			errors.Pos(x.Pos))
 
 	}
 	// make sure the input type is a sequence type
 	if !types.AnyArrType.Subsumes(inputShape.Type) {
-		return Shape{}, nil, nil, states.E(
-			states.Code(states.MappingRequiresArrType),
-			states.Pos(x.Pos),
-			states.WantType(types.AnyArrType),
-			states.GotType(inputShape.Type))
+		return Shape{}, nil, nil, errors.E(
+			errors.Code(errors.MappingRequiresArrType),
+			errors.Pos(x.Pos),
+			errors.WantType(types.AnyArrType),
+			errors.GotType(inputShape.Type))
 
 	}
 	// typecheck body

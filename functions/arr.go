@@ -2,6 +2,7 @@ package functions
 
 import (
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -21,9 +22,9 @@ func (x ArrExpression) Position() lexer.Position {
 func (x ArrExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no params
 	if len(params) > 0 {
-		return Shape{}, nil, nil, states.E(
-			states.Code(states.ParamsNotAllowed),
-			states.Pos(x.Pos))
+		return Shape{}, nil, nil, errors.E(
+			errors.Code(errors.ParamsNotAllowed),
+			errors.Pos(x.Pos))
 
 	}
 	// typecheck rest
@@ -47,11 +48,11 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*parameters.Paramete
 			return Shape{}, nil, nil, err
 		}
 		if !(types.AnyArrType).Subsumes(restShape.Type) {
-			return Shape{}, nil, nil, states.E(
-				states.Code(states.RestRequiresArrType),
-				states.Pos(x.RestPos),
-				states.WantType(types.AnyArrType),
-				states.GotType(restShape.Type))
+			return Shape{}, nil, nil, errors.E(
+				errors.Code(errors.RestRequiresArrType),
+				errors.Pos(x.RestPos),
+				errors.WantType(types.AnyArrType),
+				errors.GotType(restShape.Type))
 
 		}
 		ids = ids.AddAll(restIDs)

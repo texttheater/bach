@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -77,9 +78,9 @@ func TestDefinitions(t *testing.T) {
 			Name: "A",
 		},
 		nil,
-		states.E(
-			states.Code(states.UnexpectedValue),
-			states.GotValue(states.NullValue{})),
+		errors.E(
+			errors.Code(errors.UnexpectedValue),
+			errors.GotValue(states.NullValue{})),
 
 		t,
 	)
@@ -101,9 +102,9 @@ func TestDefinitions(t *testing.T) {
 		`for Str def f Obj<> as {} ok "abc" findFirst(f)`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.ArgHasWrongOutputType),
-			states.WantType(types.TypeVariable{
+		errors.E(
+			errors.Code(errors.ArgHasWrongOutputType),
+			errors.WantType(types.TypeVariable{
 				Name: "A",
 				UpperBound: types.Union(
 					types.NullType{},
@@ -117,8 +118,8 @@ func TestDefinitions(t *testing.T) {
 				),
 			},
 			),
-			states.GotType(types.AnyObjType),
-			states.ArgNum(1)),
+			errors.GotType(types.AnyObjType),
+			errors.ArgNum(1)),
 
 		t,
 	)
@@ -126,11 +127,11 @@ func TestDefinitions(t *testing.T) {
 		`for <A Obj<a: Num>> def f <A> as id ok {} f`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.NoSuchFunction),
-			states.InputType(types.VoidObjType),
-			states.Name("f"),
-			states.NumParams(0)),
+		errors.E(
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.VoidObjType),
+			errors.Name("f"),
+			errors.NumParams(0)),
 
 		t,
 	)
@@ -166,11 +167,11 @@ func TestDefinitions(t *testing.T) {
 		`for Any def f(for Any g <A Arr<Any>>) <A> as g ok f("a")`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.ArgHasWrongOutputType),
-			states.ArgNum(1),
-			states.WantType(types.TypeVariable{"A", types.AnyArrType}),
-			states.GotType(types.StrType{})),
+		errors.E(
+			errors.Code(errors.ArgHasWrongOutputType),
+			errors.ArgNum(1),
+			errors.WantType(types.TypeVariable{"A", types.AnyArrType}),
+			errors.GotType(types.StrType{})),
 
 		t,
 	)

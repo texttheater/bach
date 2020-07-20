@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
@@ -25,11 +26,11 @@ func initControl() {
 			}
 			action := func(inputState states.State, args []states.Action) *states.Thunk {
 				return states.ThunkFromError(
-					states.E(
-						states.Code(states.UnexpectedValue),
-						states.Pos(gotCall.Pos),
-						states.GotType(gotInputShape.Type),
-						states.GotValue(inputState.Value)),
+					errors.E(
+						errors.Code(errors.UnexpectedValue),
+						errors.Pos(gotCall.Pos),
+						errors.GotType(gotInputShape.Type),
+						errors.GotValue(inputState.Value)),
 				)
 			}
 			return outputShape, action, nil, true, nil

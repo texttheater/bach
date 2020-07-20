@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -82,8 +83,8 @@ func TestArrays(t *testing.T) {
 		`1 each *2 all`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.MappingRequiresArrType)),
+		errors.E(
+			errors.Code(errors.MappingRequiresArrType)),
 
 		t,
 	)
@@ -127,10 +128,10 @@ func TestArrays(t *testing.T) {
 		`[1;2]`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.RestRequiresArrType),
-			states.WantType(types.AnyArrType),
-			states.GotType(types.NumType{})),
+		errors.E(
+			errors.Code(errors.RestRequiresArrType),
+			errors.WantType(types.AnyArrType),
+			errors.GotType(types.NumType{})),
 
 		t,
 	)
@@ -138,9 +139,9 @@ func TestArrays(t *testing.T) {
 		`[1 if ==2 then true else fatal ok] out`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.UnexpectedValue),
-			states.GotValue(states.NumValue(1))),
+		errors.E(
+			errors.Code(errors.UnexpectedValue),
+			errors.GotValue(states.NumValue(1))),
 
 		t,
 	)
@@ -148,9 +149,9 @@ func TestArrays(t *testing.T) {
 		`[true, 1 if ==2 then true else fatal ok] out`,
 		nil,
 		nil,
-		states.E(
-			states.Code(states.UnexpectedValue),
-			states.GotValue(states.NumValue(1))),
+		errors.E(
+			errors.Code(errors.UnexpectedValue),
+			errors.GotValue(states.NumValue(1))),
 
 		t,
 	)
