@@ -169,7 +169,9 @@ func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
 	})
 }
 
-func RegularFuncer(wantInputType types.Type, wantName string, params []*parameters.Parameter, outputType types.Type, action states.Action, ids *states.IDStack) Funcer {
+type RegularKernel func(inputState states.State, args []states.Action) *states.Thunk
+
+func RegularFuncer(wantInputType types.Type, wantName string, params []*parameters.Parameter, outputType types.Type, kernel RegularKernel, ids *states.IDStack) Funcer {
 	return func(gotInputShape Shape, gotCall CallExpression, gotParams []*parameters.Parameter) (Shape, states.Action, *states.IDStack, bool, error) {
 		// match number of parameters
 		if len(gotCall.Args)+len(gotParams) != len(params) {
@@ -188,7 +190,9 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*paramete
 			return Shape{}, nil, nil, false, nil
 		}
 		// typecheck and set parameters filled by this call
-		funAction := action
+		funAction := func(inputState states.State, args []states.Action) *states.Thunk {
+			return kernel(inputState, args)
+		}
 		argActions := make([]states.Action, len(gotCall.Args))
 		argIDss := make([]*states.IDStack, len(gotCall.Args))
 		for i := range gotCall.Args {
