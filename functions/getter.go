@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -17,7 +18,7 @@ func (x GetterExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x GetterExpression) Typecheck(inputShape Shape, params []*states.Parameter) (Shape, states.Action, *states.IDStack, error) {
+func (x GetterExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	switch t := inputShape.Type.(type) {
 	case types.ObjType:
 		wantType := types.ObjType{

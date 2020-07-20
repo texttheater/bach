@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -31,9 +32,9 @@ func initArr() {
 		functions.RegularFuncer(
 			types.AnyType{},
 			"range",
-			[]*states.Parameter{
-				states.SimpleParam(types.NumType{}),
-				states.SimpleParam(types.NumType{}),
+			[]*parameters.Parameter{
+				parameters.SimpleParam(types.NumType{}),
+				parameters.SimpleParam(types.NumType{}),
 			},
 			&types.ArrType{types.NumType{}},
 			func(inputState states.State, args []states.Action) *states.Thunk {
@@ -69,8 +70,8 @@ func initArr() {
 				},
 			},
 			"get",
-			[]*states.Parameter{
-				states.SimpleParam(types.NumType{}),
+			[]*parameters.Parameter{
+				parameters.SimpleParam(types.NumType{}),
 			},
 			types.Union(
 				types.ObjType{

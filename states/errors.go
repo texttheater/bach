@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/types"
 )
 
@@ -104,13 +105,13 @@ func ParamNum(paramNum int) errorAttribute {
 	}
 }
 
-func WantParam(wantParam *Parameter) errorAttribute {
+func WantParam(wantParam *parameters.Parameter) errorAttribute {
 	return func(err *e) {
 		err.WantParam = wantParam
 	}
 }
 
-func GotParam(gotParam *Parameter) errorAttribute {
+func GotParam(gotParam *parameters.Parameter) errorAttribute {
 	return func(err *e) {
 		err.GotParam = gotParam
 	}
@@ -135,8 +136,8 @@ type e struct {
 	ArgNum    *int
 	NumParams *int
 	ParamNum  *int
-	WantParam *Parameter
-	GotParam  *Parameter
+	WantParam *parameters.Parameter
+	GotParam  *parameters.Parameter
 	Hint      *string
 }
 

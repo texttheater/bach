@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -168,12 +169,12 @@ func TestCalls(t *testing.T) {
 		states.E(
 			states.Code(states.ParamDoesNotMatch),
 			states.ParamNum(1),
-			states.WantParam(&states.Parameter{
+			states.WantParam(&parameters.Parameter{
 				InputType:  types.AnyType{},
 				Params:     nil,
 				OutputType: types.NumType{},
 			}),
-			states.GotParam(&states.Parameter{
+			states.GotParam(&parameters.Parameter{
 				InputType:  types.AnyType{},
 				Params:     nil,
 				OutputType: types.StrType{},
@@ -188,12 +189,12 @@ func TestCalls(t *testing.T) {
 		states.E(
 			states.Code(states.ParamDoesNotMatch),
 			states.ParamNum(1),
-			states.WantParam(&states.Parameter{
+			states.WantParam(&parameters.Parameter{
 				InputType:  types.AnyType{},
 				Params:     nil,
 				OutputType: types.NumType{},
 			}),
-			states.GotParam(&states.Parameter{
+			states.GotParam(&parameters.Parameter{
 				InputType:  types.StrType{},
 				Params:     nil,
 				OutputType: types.NumType{},

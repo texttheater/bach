@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -17,8 +18,8 @@ func initObj() {
 				},
 			},
 			"get",
-			[]*states.Parameter{
-				states.SimpleParam(types.Union(
+			[]*parameters.Parameter{
+				parameters.SimpleParam(types.Union(
 					types.StrType{},
 					types.NumType{},
 				)),

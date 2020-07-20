@@ -2,6 +2,7 @@ package functions
 
 import (
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -10,7 +11,7 @@ type DefinitionExpression struct {
 	Pos        lexer.Position
 	InputType  types.Type
 	Name       string
-	Params     []*states.Parameter
+	Params     []*parameters.Parameter
 	ParamNames []string
 	OutputType types.Type
 	Body       Expression
@@ -20,7 +21,7 @@ func (x DefinitionExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x DefinitionExpression) Typecheck(inputShape Shape, params []*states.Parameter) (Shape, states.Action, *states.IDStack, error) {
+func (x DefinitionExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return Shape{}, nil, nil, states.E(

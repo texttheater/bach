@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -18,7 +19,7 @@ func (x CallExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x CallExpression) Typecheck(inputShape Shape, params []*states.Parameter) (Shape, states.Action, *states.IDStack, error) {
+func (x CallExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// go down the function stack and find the function invoked by this
 	// call
 	stack := inputShape.Stack
@@ -89,23 +90,23 @@ func (s *FuncerStack) String() string {
 	return fmt.Sprintf("%v", slice)
 }
 
-func instantiate(params []*states.Parameter, bindings map[string]types.Type) []*states.Parameter {
-	result := make([]*states.Parameter, len(params))
+func instantiate(params []*parameters.Parameter, bindings map[string]types.Type) []*parameters.Parameter {
+	result := make([]*parameters.Parameter, len(params))
 	for i, param := range params {
 		result[i] = param.Instantiate(bindings)
 	}
 	return result
 }
 
-type Funcer func(gotInputShape Shape, gotCall CallExpression, gotParams []*states.Parameter) (outputShape Shape, action states.Action, ids *states.IDStack, ok bool, err error)
+type Funcer func(gotInputShape Shape, gotCall CallExpression, gotParams []*parameters.Parameter) (outputShape Shape, action states.Action, ids *states.IDStack, ok bool, err error)
 
 type Kernel func(inputValue states.Value, argValues []states.Value) (states.Value, error)
 
 func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, kernel Kernel) Funcer {
 	// make parameters from argument types
-	params := make([]*states.Parameter, len(argTypes))
+	params := make([]*parameters.Parameter, len(argTypes))
 	for i, argType := range argTypes {
-		params[i] = &states.Parameter{
+		params[i] = &parameters.Parameter{
 			InputType:  types.AnyType{},
 			Params:     nil,
 			OutputType: argType,
@@ -167,8 +168,8 @@ func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
 	})
 }
 
-func RegularFuncer(wantInputType types.Type, wantName string, params []*states.Parameter, outputType types.Type, action states.Action, ids *states.IDStack) Funcer {
-	return func(gotInputShape Shape, gotCall CallExpression, gotParams []*states.Parameter) (Shape, states.Action, *states.IDStack, bool, error) {
+func RegularFuncer(wantInputType types.Type, wantName string, params []*parameters.Parameter, outputType types.Type, action states.Action, ids *states.IDStack) Funcer {
+	return func(gotInputShape Shape, gotCall CallExpression, gotParams []*parameters.Parameter) (Shape, states.Action, *states.IDStack, bool, error) {
 		// match number of parameters
 		if len(gotCall.Args)+len(gotParams) != len(params) {
 			return Shape{}, nil, nil, false, nil

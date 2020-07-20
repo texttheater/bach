@@ -3,6 +3,7 @@ package builtin
 import (
 	//	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -12,8 +13,8 @@ func initRegexp() {
 		functions.RegularFuncer(
 			types.StrType{},
 			"findFirst",
-			[]*states.Parameter{
-				&states.Parameter{
+			[]*parameters.Parameter{
+				&parameters.Parameter{
 					InputType: types.StrType{},
 					OutputType: types.TypeVariable{
 						Name: "A",
@@ -41,8 +42,8 @@ func initRegexp() {
 		functions.RegularFuncer(
 			types.StrType{},
 			"findAll",
-			[]*states.Parameter{
-				&states.Parameter{
+			[]*parameters.Parameter{
+				&parameters.Parameter{
 					InputType: types.StrType{},
 					OutputType: types.TypeVariable{
 						Name: "A",

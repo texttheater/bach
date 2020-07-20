@@ -2,13 +2,14 @@ package builtin
 
 import (
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
 func initTypes() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*states.Parameter) (functions.Shape, states.Action, *states.IDStack, bool, error) {
+		func(gotInputShape functions.Shape, gotCall functions.CallExpression, gotParams []*parameters.Parameter) (functions.Shape, states.Action, *states.IDStack, bool, error) {
 			if len(gotCall.Args)+len(gotParams) != 0 {
 				return functions.Shape{}, nil, nil, false, nil
 			}

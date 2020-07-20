@@ -2,6 +2,7 @@ package functions
 
 import (
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -15,7 +16,7 @@ func (x MappingExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x MappingExpression) Typecheck(inputShape Shape, params []*states.Parameter) (Shape, states.Action, *states.IDStack, error) {
+func (x MappingExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
 		return Shape{}, nil, nil, states.E(
