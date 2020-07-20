@@ -14,7 +14,7 @@ type Parameter struct {
 
 func SimpleParam(outputType types.Type) *Parameter {
 	return &Parameter{
-		InputType:  types.AnyType{},
+		InputType:  types.NullType{},
 		Params:     nil,
 		OutputType: outputType,
 	}

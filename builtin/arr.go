@@ -39,12 +39,17 @@ func initArr() {
 			},
 			&types.ArrType{types.NumType{}},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				res0 := args[0](inputState, nil).Eval()
+				argInputState := states.State{
+					Value:     states.NullValue{},
+					Stack:     inputState.Stack,
+					TypeStack: inputState.TypeStack,
+				}
+				res0 := args[0](argInputState, nil).Eval()
 				if res0.Error != nil {
 					return states.ThunkFromError(res0.Error)
 				}
 				start := float64(res0.Value.(states.NumValue))
-				res1 := args[1](inputState, nil).Eval()
+				res1 := args[1](argInputState, nil).Eval()
 				if res1.Error != nil {
 					return states.ThunkFromError(res1.Error)
 				}
@@ -72,7 +77,16 @@ func initArr() {
 			},
 			"get",
 			[]*parameters.Parameter{
-				parameters.SimpleParam(types.NumType{}),
+				&parameters.Parameter{
+					InputType: &types.ArrType{
+						ElType: types.TypeVariable{
+							Name:       "A",
+							UpperBound: types.AnyType{},
+						},
+					},
+					Params:     nil,
+					OutputType: types.NumType{},
+				},
 			},
 			types.Union(
 				types.ObjType{

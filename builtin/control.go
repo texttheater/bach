@@ -81,14 +81,10 @@ func initControl() {
 			),
 			"default",
 			[]*parameters.Parameter{
-				&parameters.Parameter{
-					InputType: types.AnyType{},
-					Params:    nil,
-					OutputType: types.TypeVariable{
-						Name:       "B",
-						UpperBound: types.AnyType{},
-					},
-				},
+				parameters.SimpleParam(types.TypeVariable{
+					Name:       "B",
+					UpperBound: types.AnyType{},
+				}),
 			},
 			types.Union(
 				types.TypeVariable{
@@ -109,7 +105,12 @@ func initControl() {
 					}
 					return states.ThunkFromValue(res.Value)
 				default:
-					return args[0](inputState, nil)
+					argInputState := states.State{
+						Value:     states.NullValue{},
+						Stack:     inputState.Stack,
+						TypeStack: inputState.TypeStack,
+					}
+					return args[0](argInputState, nil)
 				}
 			},
 			nil,

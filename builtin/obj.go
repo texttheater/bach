@@ -20,10 +20,17 @@ func initObj() {
 			},
 			"get",
 			[]*parameters.Parameter{
-				parameters.SimpleParam(types.Union(
-					types.StrType{},
-					types.NumType{},
-				)),
+				&parameters.Parameter{
+					InputType: types.ObjType{
+						PropTypeMap: map[string]types.Type{},
+						RestType: types.TypeVariable{
+							Name:       "A",
+							UpperBound: types.AnyType{},
+						},
+					},
+					Params:     nil,
+					OutputType: types.Union(types.StrType{}, types.NumType{}),
+				},
 			},
 			types.Union(
 				types.ObjType{
