@@ -4,6 +4,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -61,6 +62,54 @@ func initControl() {
 							errors.GotValue(inputState.Value),
 						),
 					)
+				}
+			},
+			nil,
+		),
+		functions.RegularFuncer(
+			types.Union(
+				types.ObjType{
+					PropTypeMap: map[string]types.Type{
+						"just": types.TypeVariable{
+							Name:       "A",
+							UpperBound: types.AnyType{},
+						},
+					},
+					RestType: types.AnyType{},
+				},
+				types.NullType{},
+			),
+			"default",
+			[]*parameters.Parameter{
+				&parameters.Parameter{
+					InputType: types.AnyType{},
+					Params:    nil,
+					OutputType: types.TypeVariable{
+						Name:       "B",
+						UpperBound: types.AnyType{},
+					},
+				},
+			},
+			types.Union(
+				types.TypeVariable{
+					Name:       "A",
+					UpperBound: types.AnyType{},
+				},
+				types.TypeVariable{
+					Name:       "B",
+					UpperBound: types.AnyType{},
+				},
+			),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				switch v := inputState.Value.(type) {
+				case states.ObjValue:
+					res := v["just"].Eval()
+					if res.Error != nil {
+						return states.ThunkFromError(res.Error)
+					}
+					return states.ThunkFromValue(res.Value)
+				default:
+					return args[0](inputState, nil)
 				}
 			},
 			nil,
