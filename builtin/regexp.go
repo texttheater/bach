@@ -19,14 +19,19 @@ func initRegexp() {
 					OutputType: types.TypeVariable{
 						Name: "A",
 						UpperBound: types.Union(
-							types.NullType{},
 							types.ObjType{
 								PropTypeMap: map[string]types.Type{
-									"start": types.NumType{},
-									"0":     types.StrType{},
+									"just": types.ObjType{
+										PropTypeMap: map[string]types.Type{
+											"start": types.NumType{},
+											"0":     types.StrType{},
+										},
+										RestType: types.AnyType{},
+									},
 								},
 								RestType: types.AnyType{},
 							},
+							types.NullType{},
 						),
 					},
 				},
@@ -45,19 +50,24 @@ func initRegexp() {
 			[]*parameters.Parameter{
 				&parameters.Parameter{
 					InputType: types.StrType{},
-					OutputType: types.TypeVariable{
-						Name: "A",
-						UpperBound: types.Union(
-							types.NullType{},
-							types.ObjType{
-								PropTypeMap: map[string]types.Type{
-									"start": types.NumType{},
-									"0":     types.StrType{},
+					OutputType: types.Union(
+						types.ObjType{
+							PropTypeMap: map[string]types.Type{
+								"just": types.TypeVariable{
+									Name: "A",
+									UpperBound: types.ObjType{
+										PropTypeMap: map[string]types.Type{
+											"start": types.NumType{},
+											"0":     types.StrType{},
+										},
+										RestType: types.AnyType{},
+									},
 								},
-								RestType: types.AnyType{},
 							},
-						),
-					},
+							RestType: types.AnyType{},
+						},
+						types.NullType{},
+					),
 				},
 			},
 			&types.ArrType{types.TypeVariable{
@@ -75,18 +85,22 @@ func initRegexp() {
 					if res.Error != nil {
 						return nil, false, res.Error
 					}
-					objValue, ok := (res.Value.(states.ObjValue))
+					obj, ok := (res.Value.(states.ObjValue))
 					if !ok {
 						return nil, false, nil
 					}
-					obj := map[string]*states.Thunk(objValue)
+					res = obj["just"].Eval()
+					if res.Error != nil {
+						return nil, false, res.Error
+					}
+					obj = res.Value.(states.ObjValue)
 					start := int(obj["start"].Eval().Value.(states.NumValue))
 					obj["start"] = states.ThunkFromValue(states.NumValue(start + offset))
 					length := len(string(obj["0"].Eval().Value.(states.StrValue)))
 					end := start + length
 					offset += end
 					v = states.StrValue(string(v)[end:])
-					return objValue, true, nil
+					return obj, true, nil
 				}
 				return states.ThunkFromIter(iter)
 			},
