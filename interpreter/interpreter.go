@@ -12,7 +12,7 @@ import (
 // the result type and value.
 func InterpretString(program string) (types.Type, states.Value, error) {
 	// parse
-	x, err := grammar.Parse(program)
+	x, err := grammar.ParseComposition(program)
 	if err != nil {
 		return nil, nil, err
 	}

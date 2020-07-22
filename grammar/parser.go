@@ -4,6 +4,7 @@ import (
 	"github.com/alecthomas/participle"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/types"
 )
 
 var parser *participle.Parser
@@ -21,7 +22,7 @@ func init() {
 	}
 }
 
-func Parse(input string) (functions.Expression, error) {
+func ParseComposition(input string) (functions.Expression, error) {
 	composition := &Composition{}
 	err := parser.ParseString(input, composition)
 	if err != nil {
@@ -35,4 +36,20 @@ func Parse(input string) (functions.Expression, error) {
 		return nil, err
 	}
 	return composition.Ast()
+}
+
+func ParseType(input string) (types.Type, error) {
+	t := &Type{}
+	err := parser.ParseString(input, t)
+	if err != nil {
+		if parserError, ok := err.(participle.Error); ok {
+			return nil, errors.E(
+				errors.Code(errors.Syntax),
+				errors.Pos(parserError.Token().Pos),
+				errors.Message(parserError.Message()))
+
+		}
+		return nil, err
+	}
+	return t.Ast(), nil
 }
