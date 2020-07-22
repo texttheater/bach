@@ -5,10 +5,27 @@ import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
+	"github.com/texttheater/bach/grammar"
 	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
+
+func TestProgramStrings(program string, wantTypeString string, wantValueString string, wantError error, t *testing.T) {
+	wantType, err := grammar.ParseType(wantTypeString)
+	if err != nil {
+		t.Log("ERROR: Could not parse expected type")
+		errors.Explain(err, wantTypeString)
+		t.Fail()
+	}
+	_, wantValue, err := interpreter.InterpretString(wantValueString)
+	if err != nil {
+		t.Log("ERROR: Could not interpret expected value")
+		errors.Explain(err, wantValueString)
+		t.Fail()
+	}
+	TestProgram(program, wantType, wantValue, wantError, t)
+}
 
 func TestProgram(program string, wantType types.Type, wantValue states.Value, wantError error, t *testing.T) {
 	//log.Print(program)
