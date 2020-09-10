@@ -52,15 +52,7 @@ func (x RegexpExpression) Typecheck(inputShape Shape, params []*parameters.Param
 		RestType:    types.VoidType{},
 	}
 	outputShape := Shape{
-		Type: types.Union(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{
-					"just": matchType,
-				},
-				RestType: types.AnyType{},
-			},
-			types.NullType{},
-		),
+		Type:  types.Union(types.NullType{}, matchType),
 		Stack: inputShape.Stack,
 	}
 	action := func(inputState states.State, args []states.Action) *states.Thunk {
@@ -93,9 +85,7 @@ func (x RegexpExpression) Typecheck(inputShape Shape, params []*parameters.Param
 			}
 		}
 		return states.ThunkFromState(states.State{
-			Value: states.ObjValue(map[string]*states.Thunk{
-				"just": states.ThunkFromValue(states.ObjValue(propThunkMap)),
-			}),
+			Value:     states.ObjValue(propThunkMap),
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
 		})
