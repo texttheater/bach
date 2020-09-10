@@ -29,16 +29,11 @@ func initControl() {
 		),
 		functions.RegularFuncer(
 			types.Union(
-				types.ObjType{
-					PropTypeMap: map[string]types.Type{
-						"just": types.TypeVariable{
-							Name:       "A",
-							UpperBound: types.AnyType{},
-						},
-					},
-					RestType: types.AnyType{},
-				},
 				types.NullType{},
+				types.TypeVariable{
+					Name:       "A",
+					UpperBound: types.AnyType{},
+				},
 			),
 			"must",
 			nil,
@@ -47,14 +42,8 @@ func initControl() {
 				UpperBound: types.AnyType{},
 			},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				switch v := inputState.Value.(type) {
-				case states.ObjValue:
-					res := v["just"].Eval()
-					if res.Error != nil {
-						return states.ThunkFromError(res.Error)
-					}
-					return states.ThunkFromValue(res.Value)
-				default:
+				switch inputState.Value.(type) {
+				case states.NullValue:
 					return states.ThunkFromError(
 						errors.E(
 							errors.Code(errors.UnexpectedValue),
@@ -62,10 +51,13 @@ func initControl() {
 							errors.GotValue(inputState.Value),
 						),
 					)
+				default:
+					return states.ThunkFromValue(inputState.Value)
 				}
 			},
 			nil,
 		),
+		// TODO `must` but for option types (sth. like Null|Obj<just: A>)
 		functions.RegularFuncer(
 			types.Union(
 				types.ObjType{
