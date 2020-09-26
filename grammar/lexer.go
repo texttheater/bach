@@ -79,5 +79,5 @@ func isKeyword(name string) bool {
 		name == "ok" || name == "if" || name == "then" ||
 		name == "elif" || name == "else" || name == "each" ||
 		name == "all" || name == "is" || name == "elis" ||
-		name == "with" || name == "drop" || name == "reject"
+		name == "with" || name == "drop"
 }
