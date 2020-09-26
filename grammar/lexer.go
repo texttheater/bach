@@ -55,7 +55,6 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		{"Backtick", "`", stateful.Push("TemplateLiteral")},
 	},
 	"TemplateLiteral": {
-		{"Escaped", `\\.`, nil},
 		{"Backtick", "`", stateful.Pop()},
 		{"Lbrace", `{`, stateful.Push("Braces")},
 		{"Char", "[^{`]+", nil},
