@@ -48,10 +48,20 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		{"Rpar", `\)`, nil},
 		{"Lbrack", `\[`, nil},
 		{"Rbrack", `]`, nil},
-		{"Lbrace", `{`, nil},
-		{"Rbrace", `}`, nil},
+		{"Lbrace", `{`, stateful.Push("Braces")},
 		{"Colon", `:`, nil},
 		{"Pipe", `\|`, nil},
 		{"Semi", `\;`, nil},
+		{"Backtick", "`", stateful.Push("TemplateLiteral")},
+	},
+	"TemplateLiteral": {
+		{"Escaped", `\\.`, nil},
+		{"Backtick", "`", stateful.Pop()},
+		{"Lbrace", `{`, stateful.Push("Braces")},
+		{"Char", "[^{`]+", nil},
+	},
+	"Braces": { // generic group for placeholders and object literals
+		stateful.Include("Root"),
+		{"Rbrace", `}`, stateful.Pop()},
 	},
 }))
