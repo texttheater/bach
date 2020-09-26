@@ -39,7 +39,7 @@ func (x *TemplateLiteralExpression) Typecheck(inputShape Shape, params []*parame
 		pieceActions[i] = pieceAction
 	}
 	action := func(inputState states.State, args []states.Action) *states.Thunk {
-		var buffer bytes.Buffer
+		buffer := bytes.Buffer{}
 		for _, pieceAction := range pieceActions {
 			pieceThunk := pieceAction(inputState, nil)
 			pieceResult := pieceThunk.Eval()

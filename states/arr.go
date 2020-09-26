@@ -41,7 +41,7 @@ func (v *ArrValue) GetTail() (*ArrValue, error) {
 }
 
 func (v *ArrValue) String() (string, error) {
-	var buffer bytes.Buffer
+	buffer := bytes.Buffer{}
 	buffer.WriteString("[")
 	if v != nil {
 		head, err := v.Head.String()

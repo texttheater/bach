@@ -21,7 +21,7 @@ func ObjValueFromMap(m map[string]Value) ObjValue {
 type ObjValue map[string]*Thunk
 
 func (v ObjValue) String() (string, error) {
-	var buffer bytes.Buffer
+	buffer := bytes.Buffer{}
 	buffer.WriteString("{")
 	firstWritten := false
 	for k, w := range v {

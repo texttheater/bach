@@ -63,7 +63,7 @@ func initText() {
 			types.StrType{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				iter := states.IterFromValue(inputValue)
-				var buffer bytes.Buffer
+				buffer := bytes.Buffer{}
 				for {
 					value, ok, err := iter()
 					if err != nil {
@@ -84,7 +84,7 @@ func initText() {
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				iter := states.IterFromValue(inputValue)
 				sep := string(argumentValues[0].(states.StrValue))
-				var buffer bytes.Buffer
+				buffer := bytes.Buffer{}
 				firstWritten := false
 				for {
 					value, ok, err := iter()

@@ -69,7 +69,7 @@ func (t TypeVariable) Partition(u Type) (Type, Type) {
 }
 
 func (t TypeVariable) String() string {
-	var buffer bytes.Buffer
+	buffer := bytes.Buffer{}
 	buffer.WriteString("<")
 	buffer.WriteString(t.Name)
 	if t.UpperBound != nil {
