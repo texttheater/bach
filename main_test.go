@@ -15,6 +15,7 @@ func TestInterp(t *testing.T) {
 	tests.TestNull(t)
 	tests.TestAssignment(t)
 	tests.TestStrings(t)
+	tests.TestTemplateLiterals(t)
 	tests.TestArrays(t)
 	tests.TestObjects(t)
 	tests.TestDefinitions(t)

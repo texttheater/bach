@@ -41,18 +41,19 @@ func (g *Composition) Ast() (functions.Expression, error) {
 }
 
 type SComponent struct {
-	Pos         lexer.Position
-	Num         *float64     `  @Num`
-	Str         *string      `| @Str`
-	Array       *Array       `| @@`
-	Object      *Object      `| @@`
-	Call        *Call        `| @@`
-	Assignment  *Assignment  `| @@`
-	Definition  *Definition  `| @@`
-	Conditional *Conditional `| @@`
-	Filter      *Filter      `| @@`
-	Regexp      *Regexp      `| @@`
-	Getter      *Getter      `| @@`
+	Pos             lexer.Position
+	Num             *float64         `  @Num`
+	Str             *string          `| @Str`
+	Array           *Array           `| @@`
+	Object          *Object          `| @@`
+	Call            *Call            `| @@`
+	Assignment      *Assignment      `| @@`
+	Definition      *Definition      `| @@`
+	Conditional     *Conditional     `| @@`
+	Filter          *Filter          `| @@`
+	Regexp          *Regexp          `| @@`
+	Getter          *Getter          `| @@`
+	TemplateLiteral *TemplateLiteral `| @@`
 }
 
 func (g *SComponent) Ast() (functions.Expression, error) {
@@ -97,22 +98,26 @@ func (g *SComponent) Ast() (functions.Expression, error) {
 	if g.Getter != nil {
 		return g.Getter.Ast()
 	}
+	if g.TemplateLiteral != nil {
+		return g.TemplateLiteral.Ast()
+	}
 	panic("invalid component")
 }
 
 type PComponent struct {
-	Pos        lexer.Position
-	Num        *float64    `  @Num`
-	Str        *string     `| @Str`
-	Array      *Array      `| @@`
-	Object     *Object     `| @@`
-	Call       *Call       `| @@`
-	Assignment *Assignment `| @@`
-	Definition *Definition `| @@`
-	Filter     *Filter     `| @@`
-	Regexp     *Regexp     `| @@`
-	Getter     *Getter     `| @@`
-	Drop       *Drop       `| @@`
+	Pos             lexer.Position
+	Num             *float64         `  @Num`
+	Str             *string          `| @Str`
+	Array           *Array           `| @@`
+	Object          *Object          `| @@`
+	Call            *Call            `| @@`
+	Assignment      *Assignment      `| @@`
+	Definition      *Definition      `| @@`
+	Filter          *Filter          `| @@`
+	Regexp          *Regexp          `| @@`
+	Getter          *Getter          `| @@`
+	TemplateLiteral *TemplateLiteral `| @@`
+	Drop            *Drop            `| @@`
 }
 
 func (g *PComponent) Ast() (functions.Expression, error) {
@@ -154,6 +159,9 @@ func (g *PComponent) Ast() (functions.Expression, error) {
 	if g.Getter != nil {
 		return g.Getter.Ast()
 	}
+	if g.TemplateLiteral != nil {
+		return g.TemplateLiteral.Ast()
+	}
 	if g.Drop != nil {
 		return g.Drop.Ast()
 	}
@@ -183,19 +191,20 @@ func (g *QComposition) Ast() (functions.Expression, error) {
 }
 
 type QComponent struct {
-	Pos         lexer.Position
-	Num         *float64     `  @Num`
-	Str         *string      `| @Str`
-	Array       *Array       `| @@`
-	Object      *Object      `| @@`
-	Call        *Call        `| @@`
-	Assignment  *Assignment  `| @@`
-	Definition  *Definition  `| @@`
-	Conditional *Conditional `| @@`
-	Filter      *Filter      `| @@`
-	Regexp      *Regexp      `| @@`
-	Getter      *Getter      `| @@`
-	Drop        *Drop        `| @@`
+	Pos             lexer.Position
+	Num             *float64         `  @Num`
+	Str             *string          `| @Str`
+	Array           *Array           `| @@`
+	Object          *Object          `| @@`
+	Call            *Call            `| @@`
+	Assignment      *Assignment      `| @@`
+	Definition      *Definition      `| @@`
+	Conditional     *Conditional     `| @@`
+	Filter          *Filter          `| @@`
+	Regexp          *Regexp          `| @@`
+	Getter          *Getter          `| @@`
+	TemplateLiteral *TemplateLiteral `| @@`
+	Drop            *Drop            `| @@`
 }
 
 func (g *QComponent) Ast() (functions.Expression, error) {
@@ -239,6 +248,9 @@ func (g *QComponent) Ast() (functions.Expression, error) {
 	}
 	if g.Getter != nil {
 		return g.Getter.Ast()
+	}
+	if g.TemplateLiteral != nil {
+		return g.TemplateLiteral.Ast()
 	}
 	if g.Drop != nil {
 		return g.Drop.Ast()
