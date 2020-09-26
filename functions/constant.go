@@ -22,10 +22,13 @@ func (x ConstantExpression) Typecheck(inputShape Shape, params []*parameters.Par
 	if len(params) > 0 {
 		return Shape{}, nil, nil, errors.E(
 			errors.Code(errors.ParamsNotAllowed),
-			errors.Pos(x.Pos))
-
+			errors.Pos(x.Pos),
+		)
 	}
-	outputShape := Shape{x.Type, inputShape.Stack}
+	outputShape := Shape{
+		Type:  x.Type,
+		Stack: inputShape.Stack,
+	}
 	action := func(inputState states.State, args []states.Action) *states.Thunk {
 		return states.ThunkFromState(states.State{
 			Value:     x.Value,
