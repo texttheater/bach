@@ -24,3 +24,10 @@ func TestFilter(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestTypes(t *testing.T) {
+	_, err := grammar.ParseType("Obj<>")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
