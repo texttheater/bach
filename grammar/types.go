@@ -164,34 +164,44 @@ func (g *TupType) Ast() types.Type {
 }
 
 type ObjType struct {
-	Pos       lexer.Position `"Obj<"`
-	Prop      *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
-	ValType   *Type          `  ":" @@`
-	Props     []string       `  ( "," ( @Lid | @Op1 | @Op2 | @Num )`
-	ValTypes  []*Type        `    ":" @@ )*`
-	RestType1 *Type          `  ( "," @@)?`
-	RestType2 *Type          `| ( @@ )? ) ">"`
+	Pos       lexer.Position    `"Obj<"`
+	Prop      *string           `( ( @Lid | @Op1 | @Op2 | @Num )`
+	ValType   *Type             `  ":" @@`
+	AfterProp *ObjTypeAfterProp `   @@`
+	RestType  *Type             `| @@? ">" )`
+}
+
+type ObjTypeAfterProp struct {
+	Pos       lexer.Position    `( ">"`
+	Prop      *string           `| "," ( ( @Lid | @Op1 | @Op2 | @Num )`
+	ValType   *Type             `        ":" @@`
+	AfterProp *ObjTypeAfterProp `        @@`
+	RestType  *Type             `      | @@ ">" ) )`
 }
 
 func (g *ObjType) Ast() types.Type {
 	propTypeMap := make(map[string]types.Type)
+	restType := g.RestType
 	if g.Prop != nil {
 		propTypeMap[*g.Prop] = g.ValType.Ast()
-		for i := range g.Props {
-			propTypeMap[g.Props[i]] = g.ValTypes[i].Ast()
+		afterProp := g.AfterProp
+		for afterProp != nil {
+			if afterProp.Prop != nil {
+				propTypeMap[*afterProp.Prop] = afterProp.ValType.Ast()
+			}
+			restType = afterProp.RestType
+			afterProp = afterProp.AfterProp
 		}
 	}
-	var restType types.Type
-	if g.RestType1 != nil {
-		restType = g.RestType1.Ast()
-	} else if g.RestType2 != nil {
-		restType = g.RestType2.Ast()
+	var restTypeAst types.Type
+	if restType == nil {
+		restTypeAst = types.AnyType{}
 	} else {
-		restType = types.AnyType{}
+		restTypeAst = restType.Ast()
 	}
 	return types.ObjType{
 		PropTypeMap: propTypeMap,
-		RestType:    restType,
+		RestType:    restTypeAst,
 	}
 }
 
