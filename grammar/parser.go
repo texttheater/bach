@@ -9,10 +9,21 @@ import (
 
 var parser *participle.Parser
 
+var typeParser *participle.Parser
+
 func init() {
 	var err error
 	parser, err = participle.Build(
 		&Composition{},
+		participle.Lexer(LexerDefinition),
+		participle.Unquote("Str"),
+		participle.Map(ToKeyword, "Lid"),
+	)
+	if err != nil {
+		panic(err)
+	}
+	typeParser, err = participle.Build(
+		&Type{},
 		participle.Lexer(LexerDefinition),
 		participle.Unquote("Str"),
 		participle.Map(ToKeyword, "Lid"),
@@ -40,7 +51,7 @@ func ParseComposition(input string) (functions.Expression, error) {
 
 func ParseType(input string) (types.Type, error) {
 	t := &Type{}
-	err := parser.ParseString(input, t)
+	err := typeParser.ParseString(input, t)
 	if err != nil {
 		if parserError, ok := err.(participle.Error); ok {
 			return nil, errors.E(
