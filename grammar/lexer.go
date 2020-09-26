@@ -2,57 +2,60 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
+	"github.com/alecthomas/participle/lexer/stateful"
 )
 
-var LexerDefinition = lexer.Must(lexer.Regexp(
-	`([\s]+)` +
+var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
+	"Root": {
+		{"whitespace", `\s+`, nil},
 		// tokens starting type literals
-		`|(?P<TypeKeywordLangle>(?:Void|Null|Bool|Num|Str|Arr|Tup|Obj|Any)<)` +
+		{"TypeKeywordLangle", `Arr<|Tup<|Obj<`, nil},
 		// tokens starting calls
-		`|(?P<Op1Num>[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-		`|(?P<Op2Num>(?:==|<=|>=|\*\*)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-		`|(?P<LangleLid><(?:[\p{L}_][\p{L}_0-9]*))` + // special case of Op1Lid, but also used for type variables
-		`|(?P<Op1Lid>[+\-*/%>](?:[\p{L}_][\p{L}_0-9]*))` +
-		`|(?P<Op2Lid>(?:==|<=|>=|\*\*)(?:[\p{L}_][\p{L}_0-9]*))` +
-		`|(?P<NameStr>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)"(?:\\.|[^"])*")` +
-		`|(?P<NameRegexp>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)~(?:\\.|[^/])*)~` +
-		`|(?P<NameLpar>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\()` +
-		`|(?P<NameLbrack>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\[)` +
-		`|(?P<NameLbrace>(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*){)` +
+		{"Op1Num", `[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
+		{"Op2Num", `(?:==|<=|>=|\*\*)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
+		{"LangleLid", `<(?:[\p{L}_][\p{L}_0-9]*)`, nil}, // special case of Op1Lid, but also used for type variables
+		{"Op1Lid", `[+\-*/%>](?:[\p{L}_][\p{L}_0-9]*)`, nil},
+		{"Op2Lid", `(?:==|<=|>=|\*\*)(?:[\p{L}_][\p{L}_0-9]*)`, nil},
+		{"NameStr", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)"(?:\\.|[^"])*"`, nil},
+		{"NameRegexp", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)~(?:\\.|[^/])*~`, nil},
+		{"NameLpar", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\(`, nil},
+		{"NameLbrack", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\[`, nil},
+		{"NameLbrace", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*){`, nil},
 		// assignment
-		`|(?P<Assignment>=(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*))` +
+		{"Assignment", `=(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)`, nil},
 		// names
-		`|(?P<Lid>[\p{L}_][\p{L}_0-9]*)` +
-		`|(?P<Op2>==|<=|>=|\*\*)` +
-		`|(?P<Op1>[+\-*/%<>=])` +
+		{"Lid", `[\p{L}_][\p{L}_0-9]*`, nil},
+		{"Op2", `==|<=|>=|\*\*`, nil},
+		{"Op1", `[+\-*/%<>=]`, nil},
 		// ellipsis
-		`|(?P<Ellipsis>\.\.\.)` +
+		{"Ellipsis", `\.\.\.`, nil},
 		// numbers
-		`|(?P<Num>\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)` +
+		{"Num", `\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+`, nil},
 		// getters
-		`|(?P<LidGetter>@[\p{L}_][\p{L}_0-9]*)` +
-		`|(?P<Op1Getter>@[+\-*/%<>=])` +
-		`|(?P<Op2Getter>@(?:==|<=|>=))` +
-		`|(?P<NumGetter>@(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+))` +
-		`|(?P<StrGetter>@"(?:\\.|[^"])*")` +
+		{"LidGetter", `@[\p{L}_][\p{L}_0-9]*`, nil},
+		{"Op1Getter", `@[+\-*/%<>=]`, nil},
+		{"Op2Getter", `@(?:==|<=|>=)`, nil},
+		{"NumGetter", `@(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
+		{"StrGetter", `@"(?:\\.|[^"])*"`, nil},
 		// starting with unique characters
-		`|(?P<Str>"(?:\\.|[^"])*")` +
-		`|(?P<Regexp>~(?:\\.|[^/])*)~` +
-		`|(?P<Comma>,)` +
-		`|(?P<Lpar>\()` +
-		`|(?P<Rpar>\))` +
-		`|(?P<Lbrack>\[)` +
-		`|(?P<Rbrack>])` +
-		`|(?P<Lbrace>{)` +
-		`|(?P<Rbrace>})` +
-		`|(?P<Colon>:)` +
-		`|(?P<Pipe>\|)` +
-		`|(?P<Semi>\;)` +
+		{"Str", `"(?:\\.|[^"])*"`, nil},
+		{"Regexp", `~(?:\\.|[^/])*~`, nil},
+		{"Comma", `,`, nil},
+		{"Lpar", `\(`, nil},
+		{"Rpar", `\)`, nil},
+		{"Lbrack", `\[`, nil},
+		{"Rbrack", `]`, nil},
+		{"Lbrace", `{`, nil},
+		{"Rbrace", `}`, nil},
+		{"Colon", `:`, nil},
+		{"Pipe", `\|`, nil},
+		{"Semi", `\;`, nil},
 		// the following will be scanned as Name, but mapped to the
 		// appropriate token types by ToKeyword (see below)
-		`|(?P<Keyword>for|def|as|ok|if|then|elif|else|each|is|elis|with|drop)` +
-		`|(?P<TypeKeyword>Void|Null|Reader|Bool|Num|Str|Arr|Tup|Obj|Any)`,
-))
+		{"Keyword", `for|def|as|ok|if|then|elif|else|each|is|elis|with|drop`, nil},
+		{"TypeKeyword", `Void|Null|Reader|Bool|Num|Str|Arr|Tup|Obj|Any`, nil},
+	},
+}))
 
 func ToKeyword(t lexer.Token) (lexer.Token, error) {
 	if isTypeKeyword(t.Value) {
