@@ -17,7 +17,6 @@ func init() {
 		&Composition{},
 		participle.Lexer(LexerDefinition),
 		participle.Unquote("Str"),
-		participle.Map(ToKeyword, "Lid"),
 	)
 	if err != nil {
 		panic(err)
@@ -26,7 +25,6 @@ func init() {
 		&Type{},
 		participle.Lexer(LexerDefinition),
 		participle.Unquote("Str"),
-		participle.Map(ToKeyword, "Lid"),
 	)
 	if err != nil {
 		panic(err)

@@ -7,9 +7,12 @@ import (
 
 var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 	"Root": {
+		// whitespace
 		{"whitespace", `\s+`, nil},
 		// tokens starting type literals
-		{"TypeKeywordLangle", `Arr<|Tup<|Obj<`, nil},
+		{"Keyword", `(?:for|def|as|ok|if|then|elif|else|each|all|is|elis|with|drop)\b`, nil},
+		{"TypeKeywordLangle", `(?:Arr|Tup|Obj)<`, nil},
+		{"TypeKeyword", `(?:Void|Null|Reader|Bool|Num|Str|Arr|Tup|Obj|Any)\b`, nil},
 		// tokens starting calls
 		{"Op1Num", `[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
 		{"Op2Num", `(?:==|<=|>=|\*\*)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
@@ -50,34 +53,5 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		{"Colon", `:`, nil},
 		{"Pipe", `\|`, nil},
 		{"Semi", `\;`, nil},
-		// the following will be scanned as Name, but mapped to the
-		// appropriate token types by ToKeyword (see below)
-		{"Keyword", `for|def|as|ok|if|then|elif|else|each|is|elis|with|drop`, nil},
-		{"TypeKeyword", `Void|Null|Reader|Bool|Num|Str|Arr|Tup|Obj|Any`, nil},
 	},
 }))
-
-func ToKeyword(t lexer.Token) (lexer.Token, error) {
-	if isTypeKeyword(t.Value) {
-		t.Type = LexerDefinition.Symbols()["Type"]
-	}
-	if isKeyword(t.Value) {
-		t.Type = LexerDefinition.Symbols()["Keyword"]
-	}
-	return t, nil
-}
-
-func isTypeKeyword(name string) bool {
-	return name == "Void" || name == "Null" || name == "Reader" ||
-		name == "Bool" || name == "Num" || name == "Str" ||
-		name == "Arr" || name == "Tup" || name == "Obj" ||
-		name == "Any"
-}
-
-func isKeyword(name string) bool {
-	return name == "for" || name == "def" || name == "as" ||
-		name == "ok" || name == "if" || name == "then" ||
-		name == "elif" || name == "else" || name == "each" ||
-		name == "all" || name == "is" || name == "elis" ||
-		name == "with" || name == "drop"
-}
