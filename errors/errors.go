@@ -183,8 +183,8 @@ func (err *e) Error() string {
 	if err.GotParam != nil {
 		m["GotParam"] = err.GotParam.String()
 	}
-	buffer := new(bytes.Buffer)
-	encoder := json.NewEncoder(buffer)
+	buffer := bytes.Buffer{}
+	encoder := json.NewEncoder(&buffer)
 	encoder.SetEscapeHTML(false)
 	err2 := encoder.Encode(m)
 	if err2 != nil {
