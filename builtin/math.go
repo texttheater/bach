@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/golang-variadic-hypot/varhypot"
@@ -14,8 +14,8 @@ import (
 
 func initMath() {
 	rand.Seed(time.Now().UnixNano())
-	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		functions.SimpleFuncer(
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"+",
 			[]types.Type{types.NumType{}},
@@ -26,7 +26,7 @@ func initMath() {
 				return states.NumValue(inputNum + argumentNum), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"-",
 			[]types.Type{types.NumType{}},
@@ -37,7 +37,7 @@ func initMath() {
 				return states.NumValue(inputNum - argumentNum), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"-",
 			[]types.Type{types.NumType{}},
@@ -51,7 +51,7 @@ func initMath() {
 				}
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"*",
 			[]types.Type{types.NumType{}},
@@ -62,7 +62,7 @@ func initMath() {
 				return states.NumValue(inputNum * argumentNum), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"/",
 			[]types.Type{types.NumType{}},
@@ -73,7 +73,7 @@ func initMath() {
 				return states.NumValue(inputNum / argumentNum), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"%",
 			[]types.Type{types.NumType{}},
@@ -84,7 +84,7 @@ func initMath() {
 				return states.NumValue(math.Mod(float64(inputNum), float64(argumentNum))), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"<",
 			[]types.Type{types.NumType{}},
@@ -95,7 +95,7 @@ func initMath() {
 				return states.BoolValue(inputNum < argumentNum), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			">",
 			[]types.Type{types.NumType{}},
@@ -106,7 +106,7 @@ func initMath() {
 				return states.BoolValue(inputNum > argumentNum), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"==",
 			[]types.Type{types.NumType{}},
@@ -117,7 +117,7 @@ func initMath() {
 				return states.BoolValue(inputNum == argumentNum), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"<=",
 			[]types.Type{types.NumType{}},
@@ -128,7 +128,7 @@ func initMath() {
 				return states.BoolValue(inputNum <= argumentNum), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			">=",
 			[]types.Type{types.NumType{}},
@@ -139,7 +139,7 @@ func initMath() {
 				return states.BoolValue(inputNum >= argumentNum), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			&types.ArrType{types.NumType{}},
 			"sum",
 			nil,
@@ -159,7 +159,7 @@ func initMath() {
 				}
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			&types.ArrType{types.NumType{}},
 			"avg",
 			nil,
@@ -181,7 +181,7 @@ func initMath() {
 				}
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"inf",
 			nil,
@@ -190,7 +190,7 @@ func initMath() {
 				return states.NumValue(math.Inf(1)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"nan",
 			nil,
@@ -199,7 +199,7 @@ func initMath() {
 				return states.NumValue(math.NaN()), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"isFinite",
 			nil,
@@ -209,7 +209,7 @@ func initMath() {
 				return states.BoolValue(!math.IsInf(x, 0)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"isNaN",
 			nil,
@@ -219,7 +219,7 @@ func initMath() {
 				return states.BoolValue(math.IsNaN(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"epsilon",
 			nil,
@@ -228,7 +228,7 @@ func initMath() {
 				return states.NumValue(math.Nextafter(1, 2) - 1), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"largestSafeInteger",
 			nil,
@@ -237,7 +237,7 @@ func initMath() {
 				return states.NumValue(9007199254740991), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"largestNum",
 			nil,
@@ -246,7 +246,7 @@ func initMath() {
 				return states.NumValue(math.MaxFloat64), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"smallestSafeInteger",
 			nil,
@@ -255,7 +255,7 @@ func initMath() {
 				return states.NumValue(-9007199254740991), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"smallestPositiveNum",
 			nil,
@@ -264,7 +264,7 @@ func initMath() {
 				return states.NumValue(math.SmallestNonzeroFloat64), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"isInteger",
 			nil,
@@ -274,7 +274,7 @@ func initMath() {
 				return states.BoolValue(x == float64(int(x))), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"isSafeInteger",
 			nil,
@@ -284,7 +284,7 @@ func initMath() {
 				return states.BoolValue(x >= -9007199254740991 && x <= 9007199254740991), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"e",
 			nil,
@@ -293,7 +293,7 @@ func initMath() {
 				return states.NumValue(math.E), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"ln2",
 			nil,
@@ -302,7 +302,7 @@ func initMath() {
 				return states.NumValue(math.Ln2), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"ln10",
 			nil,
@@ -311,7 +311,7 @@ func initMath() {
 				return states.NumValue(math.Ln10), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"log2e",
 			nil,
@@ -320,7 +320,7 @@ func initMath() {
 				return states.NumValue(math.Log2E), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"log10e",
 			nil,
@@ -329,7 +329,7 @@ func initMath() {
 				return states.NumValue(math.Log10E), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"pi",
 			nil,
@@ -338,7 +338,7 @@ func initMath() {
 				return states.NumValue(math.Pi), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"sqrt1_2",
 			nil,
@@ -347,7 +347,7 @@ func initMath() {
 				return states.NumValue(0.7071067811865476), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"sqrt2",
 			nil,
@@ -356,7 +356,7 @@ func initMath() {
 				return states.NumValue(math.Sqrt2), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"abs",
 			nil,
@@ -366,7 +366,7 @@ func initMath() {
 				return states.NumValue(math.Abs(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"acos",
 			nil,
@@ -376,7 +376,7 @@ func initMath() {
 				return states.NumValue(math.Acos(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"acosh",
 			nil,
@@ -386,7 +386,7 @@ func initMath() {
 				return states.NumValue(math.Acosh(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"asin",
 			nil,
@@ -396,7 +396,7 @@ func initMath() {
 				return states.NumValue(math.Asin(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"asinh",
 			nil,
@@ -406,7 +406,7 @@ func initMath() {
 				return states.NumValue(math.Asinh(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"atan",
 			nil,
@@ -416,7 +416,7 @@ func initMath() {
 				return states.NumValue(math.Atan(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"atanh",
 			nil,
@@ -426,7 +426,7 @@ func initMath() {
 				return states.NumValue(math.Atanh(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"atan2",
 			[]types.Type{
@@ -439,7 +439,7 @@ func initMath() {
 				return states.NumValue(math.Atan2(y, x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"cbrt",
 			nil,
@@ -449,7 +449,7 @@ func initMath() {
 				return states.NumValue(math.Cbrt(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"ceil",
 			nil,
@@ -459,7 +459,7 @@ func initMath() {
 				return states.NumValue(math.Ceil(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"clz32",
 			nil,
@@ -469,7 +469,7 @@ func initMath() {
 				return states.NumValue(bits.LeadingZeros32(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"cos",
 			nil,
@@ -479,7 +479,7 @@ func initMath() {
 				return states.NumValue(math.Cos(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"cosh",
 			nil,
@@ -489,7 +489,7 @@ func initMath() {
 				return states.NumValue(math.Cos(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"exp",
 			nil,
@@ -499,7 +499,7 @@ func initMath() {
 				return states.NumValue(math.Exp(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"expm1",
 			nil,
@@ -509,7 +509,7 @@ func initMath() {
 				return states.NumValue(math.Expm1(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"floor",
 			nil,
@@ -519,7 +519,7 @@ func initMath() {
 				return states.NumValue(math.Floor(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"fround",
 			nil,
@@ -529,7 +529,7 @@ func initMath() {
 				return states.NumValue(float32(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			&types.ArrType{types.NumType{}},
 			"hypot",
 			nil,
@@ -549,7 +549,7 @@ func initMath() {
 				return states.NumValue(float64(hypot)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"imul",
 			[]types.Type{
@@ -562,7 +562,7 @@ func initMath() {
 				return states.NumValue(x * y), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"log",
 			nil,
@@ -572,7 +572,7 @@ func initMath() {
 				return states.NumValue(math.Log(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"log1p",
 			nil,
@@ -582,7 +582,7 @@ func initMath() {
 				return states.NumValue(math.Log1p(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"log10",
 			nil,
@@ -592,7 +592,7 @@ func initMath() {
 				return states.NumValue(math.Log10(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"log2",
 			nil,
@@ -603,7 +603,7 @@ func initMath() {
 			},
 		),
 		// TODO max, min with key function
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			&types.ArrType{types.NumType{}},
 			"max",
 			nil,
@@ -622,7 +622,7 @@ func initMath() {
 				return states.NumValue(max), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			&types.ArrType{types.NumType{}},
 			"min",
 			nil,
@@ -641,7 +641,7 @@ func initMath() {
 				return states.NumValue(min), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"**",
 			[]types.Type{
@@ -654,7 +654,7 @@ func initMath() {
 				return states.NumValue(math.Pow(x, y)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"random", // TODO integer, choice
 			nil,
@@ -663,7 +663,7 @@ func initMath() {
 				return states.NumValue(rand.Float64()), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"round",
 			nil,
@@ -673,7 +673,7 @@ func initMath() {
 				return states.NumValue(math.Round(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"sign",
 			nil,
@@ -695,7 +695,7 @@ func initMath() {
 				}
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"sin",
 			nil,
@@ -705,7 +705,7 @@ func initMath() {
 				return states.NumValue(math.Sin(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"sinh",
 			nil,
@@ -715,7 +715,7 @@ func initMath() {
 				return states.NumValue(math.Sinh(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"sqrt",
 			nil,
@@ -725,7 +725,7 @@ func initMath() {
 				return states.NumValue(math.Sqrt(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"tan",
 			nil,
@@ -735,7 +735,7 @@ func initMath() {
 				return states.NumValue(math.Tan(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"tanh",
 			nil,
@@ -745,7 +745,7 @@ func initMath() {
 				return states.NumValue(math.Tanh(x)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.NumType{},
 			"trunc",
 			nil,

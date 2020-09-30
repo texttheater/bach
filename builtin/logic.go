@@ -1,14 +1,14 @@
 package builtin
 
 import (
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
 func initLogic() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		functions.SimpleFuncer(
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"true",
 			nil,
@@ -17,7 +17,7 @@ func initLogic() {
 				return states.BoolValue(true), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"false",
 			nil,
@@ -26,7 +26,7 @@ func initLogic() {
 				return states.BoolValue(false), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.BoolType{},
 			"and",
 			[]types.Type{types.BoolType{}},
@@ -37,7 +37,7 @@ func initLogic() {
 				return states.BoolValue(inputBool && argumentBool), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.BoolType{},
 			"or",
 			[]types.Type{types.BoolType{}},
@@ -48,7 +48,7 @@ func initLogic() {
 				return states.BoolValue(inputBool || argumentBool), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.BoolType{},
 			"not",
 			nil,
@@ -58,7 +58,7 @@ func initLogic() {
 				return states.BoolValue(!inputBool), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.BoolType{},
 			"==",
 			[]types.Type{types.BoolType{}},

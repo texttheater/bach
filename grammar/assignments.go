@@ -2,7 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 )
 
 type Assignment struct {
@@ -10,9 +10,9 @@ type Assignment struct {
 	Assignment string `@Assignment`
 }
 
-func (g *Assignment) Ast() (functions.Expression, error) {
+func (g *Assignment) Ast() (expressions.Expression, error) {
 	name := g.Assignment[1:]
-	return &functions.AssignmentExpression{
+	return &expressions.AssignmentExpression{
 		Pos:  g.Pos,
 		Name: name,
 	}, nil

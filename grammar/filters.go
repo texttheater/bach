@@ -2,7 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/types"
 )
 
@@ -11,12 +11,12 @@ type Filter struct {
 	FromComponent *FilterFromComponent `"each" @@`
 }
 
-func (g *Filter) Ast() (functions.Expression, error) {
+func (g *Filter) Ast() (expressions.Expression, error) {
 	body, err := g.FromComponent.Ast(g.Pos, nil)
 	if err != nil {
 		return nil, err
 	}
-	return &functions.MappingExpression{g.Pos, body}, nil
+	return &expressions.MappingExpression{g.Pos, body}, nil
 }
 
 type FilterFromComponent struct {
@@ -25,7 +25,7 @@ type FilterFromComponent struct {
 	FromConditional *FilterFromConditional `| @@ )`
 }
 
-func (g *FilterFromComponent) Ast(pos lexer.Position, body functions.Expression) (functions.Expression, error) {
+func (g *FilterFromComponent) Ast(pos lexer.Position, body expressions.Expression) (expressions.Expression, error) {
 	if g.FromPComponent != nil {
 		return g.FromPComponent.Ast(pos, body)
 	}
@@ -41,12 +41,12 @@ type FilterFromPComponent struct {
 	FromComponent *FilterFromComponent `( @@ | "all" )`
 }
 
-func (g *FilterFromPComponent) Ast(pos lexer.Position, body functions.Expression) (functions.Expression, error) {
+func (g *FilterFromPComponent) Ast(pos lexer.Position, body expressions.Expression) (expressions.Expression, error) {
 	component, err := g.PComponent.Ast()
 	if err != nil {
 		return nil, err
 	}
-	body = functions.Compose(pos, body, component)
+	body = expressions.Compose(pos, body, component)
 	if g.FromComponent != nil {
 		body, err = g.FromComponent.Ast(pos, body)
 		if err != nil {
@@ -85,8 +85,8 @@ type FilterFromConsequentShort struct {
 	FromComponent  *FilterFromComponent       `| ( "ok" @@ | "all" ) )`
 }
 
-func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expression) (functions.Expression, error) {
-	x := &functions.ConditionalExpression{}
+func (g *FilterFromConditional) Ast(pos lexer.Position, body expressions.Expression) (expressions.Expression, error) {
+	x := &expressions.ConditionalExpression{}
 	x.Pos = g.Pos
 	if g.Pattern != nil {
 		pattern, err := g.Pattern.Ast()
@@ -106,7 +106,7 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 		if err != nil {
 			return nil, err
 		}
-		x.Pattern = functions.TypePattern{
+		x.Pattern = expressions.TypePattern{
 			Pos:  g.Pos,
 			Type: types.AnyType{},
 		}
@@ -140,7 +140,7 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 				if err != nil {
 					return nil, err
 				}
-				x.AlternativePatterns = append(x.AlternativePatterns, functions.TypePattern{
+				x.AlternativePatterns = append(x.AlternativePatterns, expressions.TypePattern{
 					Pos:  c.Pos,
 					Type: types.AnyType{},
 				})
@@ -160,7 +160,7 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 			}
 			x.Alternative = alternative
 		}
-		body = functions.Compose(pos, body, x)
+		body = expressions.Compose(pos, body, x)
 		if c.FromComponent != nil {
 			body, err = c.FromComponent.Ast(pos, body)
 			if err != nil {
@@ -169,7 +169,7 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 		}
 		return body, nil
 	} else { // short form
-		x.Consequent = &functions.IdentityExpression{}
+		x.Consequent = &expressions.IdentityExpression{}
 		c := g.FromConsequentShort
 		for c.FromConsequent != nil { // further elis/elif clauses
 			if c.Pattern != nil {
@@ -192,18 +192,18 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body functions.Expressio
 				if err != nil {
 					return nil, err
 				}
-				x.AlternativePatterns = append(x.AlternativePatterns, functions.TypePattern{
+				x.AlternativePatterns = append(x.AlternativePatterns, expressions.TypePattern{
 					Pos:  c.Pos,
 					Type: types.AnyType{},
 				})
 				x.AlternativeGuards = append(x.AlternativeGuards, condition)
 			}
-			x.AlternativeConsequents = append(x.AlternativeConsequents, &functions.IdentityExpression{pos})
+			x.AlternativeConsequents = append(x.AlternativeConsequents, &expressions.IdentityExpression{pos})
 			c = c.FromConsequent
 		}
-		x.Alternative = &functions.DropExpression{}
+		x.Alternative = &expressions.DropExpression{}
 		x.UnreachableAlternativeAllowed = true
-		body = functions.Compose(pos, body, x)
+		body = expressions.Compose(pos, body, x)
 		if c.FromComponent != nil {
 			var err error
 			body, err = c.FromComponent.Ast(pos, body)

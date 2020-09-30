@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 )
 
 type Getter struct {
@@ -16,7 +16,7 @@ type Getter struct {
 	StrGetter *string `| @StrGetter`
 }
 
-func (g *Getter) Ast() (functions.Expression, error) {
+func (g *Getter) Ast() (expressions.Expression, error) {
 	var name string
 	var err error
 	if g.LidGetter != nil {
@@ -39,7 +39,7 @@ func (g *Getter) Ast() (functions.Expression, error) {
 	} else {
 		panic("invalid getter")
 	}
-	return &functions.GetterExpression{
+	return &expressions.GetterExpression{
 		Pos:  g.Pos,
 		Name: name,
 	}, nil

@@ -1,14 +1,14 @@
 package builtin
 
 import (
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
 func initNull() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		functions.SimpleFuncer(
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"null",
 			nil,

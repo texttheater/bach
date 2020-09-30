@@ -6,14 +6,14 @@ import (
 	"os"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
 func initIO() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		functions.SimpleFuncer(
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		expressions.SimpleFuncer(
 			types.AnyType{},
 			"in",
 			nil,
@@ -24,7 +24,7 @@ func initIO() {
 				}, nil
 			},
 		),
-		functions.RegularFuncer(
+		expressions.RegularFuncer(
 			types.ReaderType{},
 			"lines",
 			nil,
@@ -44,7 +44,7 @@ func initIO() {
 			},
 			nil,
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.TypeVariable{
 				Name: "A",
 			},
@@ -62,7 +62,7 @@ func initIO() {
 				return inputValue, nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.TypeVariable{
 				Name: "A",
 			},
@@ -84,7 +84,7 @@ func initIO() {
 				return inputValue, nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.TypeVariable{
 				Name: "A",
 			},
@@ -102,7 +102,7 @@ func initIO() {
 				return inputValue, nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.TypeVariable{
 				Name: "A",
 			},

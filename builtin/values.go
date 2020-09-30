@@ -3,14 +3,14 @@ package builtin
 import (
 	"strconv"
 
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
 func initValues() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		functions.SimpleFuncer(
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		expressions.SimpleFuncer(
 			types.TypeVariable{
 				Name:       "A",
 				UpperBound: types.AnyType{},
@@ -25,7 +25,7 @@ func initValues() {
 				return inputValue, nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.StrType{},
 			"parseFloat",
 			nil,
@@ -39,7 +39,7 @@ func initValues() {
 				return states.NumValue(n), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.StrType{},
 			"parseInt",
 			[]types.Type{
@@ -56,7 +56,7 @@ func initValues() {
 				return states.NumValue(n), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.StrType{},
 			"parseInt",
 			nil,

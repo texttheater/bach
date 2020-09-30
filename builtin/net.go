@@ -3,14 +3,14 @@ package builtin
 import (
 	"net/url"
 
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
 func initNet() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		functions.SimpleFuncer(
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		expressions.SimpleFuncer(
 			types.StrType{},
 			"urlPathEscape",
 			nil,
@@ -20,7 +20,7 @@ func initNet() {
 				return states.StrValue(url.PathEscape(str)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.StrType{},
 			"urlPathUnescape",
 			nil,
@@ -34,7 +34,7 @@ func initNet() {
 				return states.StrValue(v), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.StrType{},
 			"urlQueryEscape",
 			nil,
@@ -44,7 +44,7 @@ func initNet() {
 				return states.StrValue(url.QueryEscape(str)), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.StrType{},
 			"urlQueryUnescape",
 			nil,

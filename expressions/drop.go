@@ -1,4 +1,4 @@
-package functions
+package expressions
 
 import (
 	"github.com/alecthomas/participle/lexer"

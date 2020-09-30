@@ -5,14 +5,14 @@ import (
 	"strings"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
 func initText() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		functions.RegularFuncer(
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		expressions.RegularFuncer(
 			types.StrType{},
 			"bytes",
 			nil,
@@ -34,7 +34,7 @@ func initText() {
 			},
 			nil,
 		),
-		functions.RegularFuncer(
+		expressions.RegularFuncer(
 			types.StrType{},
 			"split",
 			nil,
@@ -56,7 +56,7 @@ func initText() {
 			},
 			nil,
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			&types.ArrType{types.StrType{}},
 			"join",
 			nil,
@@ -76,7 +76,7 @@ func initText() {
 				}
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			&types.ArrType{types.StrType{}},
 			"join",
 			[]types.Type{types.StrType{}},
@@ -102,7 +102,7 @@ func initText() {
 				}
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.StrType{},
 			"==",
 			[]types.Type{types.StrType{}},
@@ -113,7 +113,7 @@ func initText() {
 				return states.BoolValue(str1 == str2), nil
 			},
 		),
-		functions.SimpleFuncer(
+		expressions.SimpleFuncer(
 			types.StrType{},
 			"+",
 			[]types.Type{types.StrType{}},

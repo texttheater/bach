@@ -2,7 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/types"
 )
@@ -18,7 +18,7 @@ type Definition struct {
 	Body       *Composition      `"as" @@ "ok"`
 }
 
-func (g *Definition) Ast() (functions.Expression, error) {
+func (g *Definition) Ast() (expressions.Expression, error) {
 	inputType := g.InputType.Ast()
 	var name string
 	var params []*parameters.Parameter
@@ -48,7 +48,7 @@ func (g *Definition) Ast() (functions.Expression, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &functions.DefinitionExpression{
+	return &expressions.DefinitionExpression{
 		Pos:        g.Pos,
 		InputType:  inputType,
 		Name:       name,

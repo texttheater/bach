@@ -2,15 +2,15 @@ package builtin
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
 func initRegexp() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		functions.RegularFuncer(
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		expressions.RegularFuncer(
 			types.StrType{},
 			"findFirst",
 			[]*parameters.Parameter{
@@ -39,7 +39,7 @@ func initRegexp() {
 			},
 			nil,
 		),
-		functions.RegularFuncer(
+		expressions.RegularFuncer(
 			types.StrType{},
 			"findAll",
 			[]*parameters.Parameter{

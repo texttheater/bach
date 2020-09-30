@@ -5,7 +5,7 @@ import (
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 )
 
 type Regexp struct {
@@ -13,7 +13,7 @@ type Regexp struct {
 	Regexp string `@Regexp`
 }
 
-func (g *Regexp) Ast() (functions.Expression, error) {
+func (g *Regexp) Ast() (expressions.Expression, error) {
 	regexpString := g.Regexp[1 : len(g.Regexp)-1]
 	regexp, err := regexp.Compile(regexpString)
 	if err != nil {
@@ -23,7 +23,7 @@ func (g *Regexp) Ast() (functions.Expression, error) {
 			errors.Message(err.Error()))
 
 	}
-	regexpExpression := &functions.RegexpExpression{
+	regexpExpression := &expressions.RegexpExpression{
 		Pos:    g.Pos,
 		Regexp: regexp,
 	}

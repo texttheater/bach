@@ -3,7 +3,7 @@ package grammar
 import (
 	"github.com/alecthomas/participle"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/types"
 )
 
@@ -31,7 +31,7 @@ func init() {
 	}
 }
 
-func ParseComposition(input string) (functions.Expression, error) {
+func ParseComposition(input string) (expressions.Expression, error) {
 	composition := &Composition{}
 	err := parser.ParseString(input, composition)
 	if err != nil {

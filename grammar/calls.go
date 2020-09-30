@@ -7,7 +7,7 @@ import (
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -24,7 +24,7 @@ type Call struct {
 	Name        *string      `| ( @Lid | @Op1 | @Op2 )`
 }
 
-func (g *Call) Ast() (functions.Expression, error) {
+func (g *Call) Ast() (expressions.Expression, error) {
 	if g.Op1Num != nil {
 		return g.Op1Num.Ast()
 	}
@@ -47,7 +47,7 @@ func (g *Call) Ast() (functions.Expression, error) {
 		return g.NameArglist.Ast()
 	}
 	if g.Name != nil {
-		return &functions.CallExpression{
+		return &expressions.CallExpression{
 			Pos:  g.Pos,
 			Name: *g.Name,
 			Args: nil,
@@ -61,7 +61,7 @@ type Op1Num struct {
 	Op1Num string `@Op1Num`
 }
 
-func (g *Op1Num) Ast() (functions.Expression, error) {
+func (g *Op1Num) Ast() (expressions.Expression, error) {
 	op := g.Op1Num[:1]
 	num, err := strconv.ParseFloat(g.Op1Num[1:], 64)
 	if err != nil {
@@ -69,11 +69,11 @@ func (g *Op1Num) Ast() (functions.Expression, error) {
 	}
 	numPos := g.Pos
 	numPos.Column += 1
-	return &functions.CallExpression{
+	return &expressions.CallExpression{
 		Pos:  g.Pos,
 		Name: op,
-		Args: []functions.Expression{
-			&functions.ConstantExpression{
+		Args: []expressions.Expression{
+			&expressions.ConstantExpression{
 				Pos:   numPos,
 				Type:  types.NumType{},
 				Value: states.NumValue(num),
@@ -87,7 +87,7 @@ type Op2Num struct {
 	Op2Num string `@Op2Num`
 }
 
-func (g *Op2Num) Ast() (functions.Expression, error) {
+func (g *Op2Num) Ast() (expressions.Expression, error) {
 	op := g.Op2Num[:2]
 	num, err := strconv.ParseFloat(g.Op2Num[2:], 64)
 	if err != nil {
@@ -95,11 +95,11 @@ func (g *Op2Num) Ast() (functions.Expression, error) {
 	}
 	numPos := g.Pos
 	numPos.Column += 2
-	return &functions.CallExpression{
+	return &expressions.CallExpression{
 		Pos:  g.Pos,
 		Name: op,
-		Args: []functions.Expression{
-			&functions.ConstantExpression{
+		Args: []expressions.Expression{
+			&expressions.ConstantExpression{
 				Pos:   numPos,
 				Type:  types.NumType{},
 				Value: states.NumValue(num),
@@ -113,16 +113,16 @@ type Op1Lid struct {
 	Op1Lid string `@LangleLid | @Op1Lid`
 }
 
-func (g *Op1Lid) Ast() (functions.Expression, error) {
+func (g *Op1Lid) Ast() (expressions.Expression, error) {
 	op := g.Op1Lid[:1]
 	name := g.Op1Lid[1:]
 	namePos := g.Pos
 	namePos.Column += 1
-	return &functions.CallExpression{
+	return &expressions.CallExpression{
 		Pos:  g.Pos,
 		Name: op,
-		Args: []functions.Expression{
-			&functions.CallExpression{
+		Args: []expressions.Expression{
+			&expressions.CallExpression{
 				Pos:  namePos,
 				Name: name,
 				Args: nil,
@@ -136,16 +136,16 @@ type Op2Lid struct {
 	Op2Lid string `@Op2Lid`
 }
 
-func (g *Op2Lid) Ast() (functions.Expression, error) {
+func (g *Op2Lid) Ast() (expressions.Expression, error) {
 	op := g.Op2Lid[:2]
 	name := g.Op2Lid[2:]
 	namePos := g.Pos
 	namePos.Column += 2
-	return &functions.CallExpression{
+	return &expressions.CallExpression{
 		Pos:  g.Pos,
 		Name: op,
-		Args: []functions.Expression{
-			&functions.CallExpression{
+		Args: []expressions.Expression{
+			&expressions.CallExpression{
 				Pos:  namePos,
 				Name: name,
 				Args: nil,
@@ -159,7 +159,7 @@ type NameRegexp struct {
 	NameRegexp string `@NameRegexp`
 }
 
-func (g *NameRegexp) Ast() (functions.Expression, error) {
+func (g *NameRegexp) Ast() (expressions.Expression, error) {
 	i := strings.Index(g.NameRegexp, "~")
 	name := g.NameRegexp[:i]
 	regexpString := g.NameRegexp[i+1 : len(g.NameRegexp)-1]
@@ -173,11 +173,11 @@ func (g *NameRegexp) Ast() (functions.Expression, error) {
 			errors.Message(err.Error()))
 
 	}
-	return &functions.CallExpression{
+	return &expressions.CallExpression{
 		Pos:  g.Pos,
 		Name: name,
-		Args: []functions.Expression{
-			&functions.RegexpExpression{
+		Args: []expressions.Expression{
+			&expressions.RegexpExpression{
 				Pos:    regexpPos,
 				Regexp: regexp,
 			},
@@ -192,9 +192,9 @@ type NameArglist struct {
 	Args     []*Composition `( "," @@ )* ")"`
 }
 
-func (g *NameArglist) Ast() (functions.Expression, error) {
+func (g *NameArglist) Ast() (expressions.Expression, error) {
 	name := g.NameLpar[:len(g.NameLpar)-1]
-	args := make([]functions.Expression, len(g.Args)+1)
+	args := make([]expressions.Expression, len(g.Args)+1)
 	var err error
 	args[0], err = g.Arg.Ast()
 	if err != nil {
@@ -206,7 +206,7 @@ func (g *NameArglist) Ast() (functions.Expression, error) {
 			return nil, err
 		}
 	}
-	return &functions.CallExpression{
+	return &expressions.CallExpression{
 		Pos:  g.Pos,
 		Name: name,
 		Args: args,
@@ -220,13 +220,13 @@ type NameArray struct {
 	Elements   []*Composition `  ( "," @@ )* )? "]"`
 }
 
-func (g *NameArray) Ast() (functions.Expression, error) {
+func (g *NameArray) Ast() (expressions.Expression, error) {
 	name := g.NameLbrack[:len(g.NameLbrack)-1]
 	arrPos := g.Pos
 	arrPos.Column += len(name)
-	var elements []functions.Expression
+	var elements []expressions.Expression
 	if g.Element != nil {
-		elements = make([]functions.Expression, 1+len(g.Elements))
+		elements = make([]expressions.Expression, 1+len(g.Elements))
 		var err error
 		elements[0], err = g.Element.Ast()
 		if err != nil {
@@ -239,11 +239,11 @@ func (g *NameArray) Ast() (functions.Expression, error) {
 			}
 		}
 	}
-	return &functions.CallExpression{
+	return &expressions.CallExpression{
 		Pos:  g.Pos,
 		Name: name,
-		Args: []functions.Expression{
-			&functions.ArrExpression{
+		Args: []expressions.Expression{
+			&expressions.ArrExpression{
 				Pos:      arrPos,
 				Elements: elements,
 			},
@@ -260,11 +260,11 @@ type NameObject struct {
 	Values     []*Composition `    ":" @@ )* )? "}"`
 }
 
-func (g *NameObject) Ast() (functions.Expression, error) {
+func (g *NameObject) Ast() (expressions.Expression, error) {
 	name := g.NameLbrace[:len(g.NameLbrace)-1]
 	objPos := g.Pos
 	objPos.Column += len(name)
-	propValMap := make(map[string]functions.Expression)
+	propValMap := make(map[string]expressions.Expression)
 	if g.Prop != nil {
 		var err error
 		propValMap[*g.Prop], err = g.Value.Ast()
@@ -278,10 +278,10 @@ func (g *NameObject) Ast() (functions.Expression, error) {
 			}
 		}
 	}
-	return &functions.CallExpression{
+	return &expressions.CallExpression{
 		Name: name,
-		Args: []functions.Expression{
-			&functions.ObjExpression{
+		Args: []expressions.Expression{
+			&expressions.ObjExpression{
 				objPos,
 				propValMap,
 			},
@@ -294,7 +294,7 @@ type NameString struct {
 	NameStr string `@NameStr`
 }
 
-func (g *NameString) Ast() (functions.Expression, error) {
+func (g *NameString) Ast() (expressions.Expression, error) {
 	i := strings.Index(g.NameStr, "\"")
 	name := g.NameStr[:i]
 	str, err := strconv.Unquote(g.NameStr[i:len(g.NameStr)])
@@ -303,11 +303,11 @@ func (g *NameString) Ast() (functions.Expression, error) {
 	}
 	strPos := g.Pos
 	strPos.Column += len(name)
-	return &functions.CallExpression{
+	return &expressions.CallExpression{
 		Pos:  g.Pos,
 		Name: name,
-		Args: []functions.Expression{
-			&functions.ConstantExpression{
+		Args: []expressions.Expression{
+			&expressions.ConstantExpression{
 				Pos:   strPos,
 				Type:  types.StrType{},
 				Value: states.StrValue(str),

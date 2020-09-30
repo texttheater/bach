@@ -2,7 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/types"
 )
 
@@ -14,7 +14,7 @@ type Pattern struct {
 	ObjPattern  *ObjPattern  `| @@`
 }
 
-func (g *Pattern) Ast() (functions.Pattern, error) {
+func (g *Pattern) Ast() (expressions.Pattern, error) {
 	if g.NamePattern != nil {
 		p, err := g.NamePattern.Ast()
 		if err != nil {
@@ -49,8 +49,8 @@ type NamePattern struct {
 	Name string `@Lid | @Op1 | @Op2`
 }
 
-func (g *NamePattern) Ast() (functions.Pattern, error) {
-	return functions.TypePattern{g.Pos, types.AnyType{}, &g.Name}, nil
+func (g *NamePattern) Ast() (expressions.Pattern, error) {
+	return expressions.TypePattern{g.Pos, types.AnyType{}, &g.Name}, nil
 }
 
 type TypePattern struct {
@@ -59,8 +59,8 @@ type TypePattern struct {
 	Name *string `( @Lid | @Op1 | @Op2 )?`
 }
 
-func (g *TypePattern) Ast() (functions.Pattern, error) {
-	return functions.TypePattern{g.Pos, g.Type.Ast(), g.Name}, nil
+func (g *TypePattern) Ast() (expressions.Pattern, error) {
+	return expressions.TypePattern{g.Pos, g.Type.Ast(), g.Name}, nil
 }
 
 type ArrPattern struct {
@@ -71,10 +71,10 @@ type ArrPattern struct {
 	Name     *string        `( @Lid | @Op1 | @Op2 )?`
 }
 
-func (g *ArrPattern) Ast() (functions.Pattern, error) {
-	var elPatterns []functions.Pattern
+func (g *ArrPattern) Ast() (expressions.Pattern, error) {
+	var elPatterns []expressions.Pattern
 	if g.Element != nil {
-		elPatterns = make([]functions.Pattern, len(g.Elements)+1)
+		elPatterns = make([]expressions.Pattern, len(g.Elements)+1)
 		p, err := g.Element.Ast()
 		if err != nil {
 			return nil, err
@@ -88,9 +88,9 @@ func (g *ArrPattern) Ast() (functions.Pattern, error) {
 			elPatterns[i+1] = p
 		}
 	}
-	var restPattern functions.Pattern
+	var restPattern expressions.Pattern
 	if g.Rest == nil {
-		restPattern = functions.TypePattern{
+		restPattern = expressions.TypePattern{
 			Pos:  g.Pos,
 			Type: &types.ArrType{types.VoidType{}},
 		}
@@ -101,7 +101,7 @@ func (g *ArrPattern) Ast() (functions.Pattern, error) {
 			return nil, err
 		}
 	}
-	return &functions.ArrPattern{
+	return &expressions.ArrPattern{
 		Pos:             g.Pos,
 		ElementPatterns: elPatterns,
 		RestPattern:     restPattern,
@@ -118,8 +118,8 @@ type ObjPattern struct {
 	Name   *string        `( @Lid | @Op1 | @Op2 )?`
 }
 
-func (g *ObjPattern) Ast() (functions.Pattern, error) {
-	propPatternMap := make(map[string]functions.Pattern)
+func (g *ObjPattern) Ast() (expressions.Pattern, error) {
+	propPatternMap := make(map[string]expressions.Pattern)
 	if g.Prop != nil {
 		p, err := g.Value.Ast()
 		if err != nil {
@@ -134,5 +134,5 @@ func (g *ObjPattern) Ast() (functions.Pattern, error) {
 			propPatternMap[prop] = p
 		}
 	}
-	return &functions.ObjPattern{g.Pos, propPatternMap, g.Name}, nil
+	return &expressions.ObjPattern{g.Pos, propPatternMap, g.Name}, nil
 }

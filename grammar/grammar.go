@@ -2,7 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -24,7 +24,7 @@ type Composition struct {
 	Components []*SComponent `( @@ )*`
 }
 
-func (g *Composition) Ast() (functions.Expression, error) {
+func (g *Composition) Ast() (expressions.Expression, error) {
 	pos := g.Component.Pos
 	e, err := g.Component.Ast()
 	if err != nil {
@@ -35,7 +35,7 @@ func (g *Composition) Ast() (functions.Expression, error) {
 		if err != nil {
 			return nil, err
 		}
-		e = &functions.CompositionExpression{pos, e, compAst}
+		e = &expressions.CompositionExpression{pos, e, compAst}
 	}
 	return e, nil
 }
@@ -56,16 +56,16 @@ type SComponent struct {
 	TemplateLiteral *TemplateLiteral `| @@`
 }
 
-func (g *SComponent) Ast() (functions.Expression, error) {
+func (g *SComponent) Ast() (expressions.Expression, error) {
 	if g.Num != nil {
-		return &functions.ConstantExpression{
+		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.NumType{},
 			Value: states.NumValue(*g.Num),
 		}, nil
 	}
 	if g.Str != nil {
-		return &functions.ConstantExpression{
+		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.StrType{},
 			Value: states.StrValue(*g.Str),
@@ -120,16 +120,16 @@ type PComponent struct {
 	Drop            *Drop            `| @@`
 }
 
-func (g *PComponent) Ast() (functions.Expression, error) {
+func (g *PComponent) Ast() (expressions.Expression, error) {
 	if g.Num != nil {
-		return &functions.ConstantExpression{
+		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.NumType{},
 			Value: states.NumValue(*g.Num),
 		}, nil
 	}
 	if g.Str != nil {
-		return &functions.ConstantExpression{
+		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.StrType{},
 			Value: states.StrValue(*g.Str),
@@ -174,7 +174,7 @@ type QComposition struct {
 	Components []*QComponent `( @@ )*`
 }
 
-func (g *QComposition) Ast() (functions.Expression, error) {
+func (g *QComposition) Ast() (expressions.Expression, error) {
 	pos := g.Component.Pos
 	e, err := g.Component.Ast()
 	if err != nil {
@@ -185,7 +185,7 @@ func (g *QComposition) Ast() (functions.Expression, error) {
 		if err != nil {
 			return nil, err
 		}
-		e = &functions.CompositionExpression{pos, e, compAst}
+		e = &expressions.CompositionExpression{pos, e, compAst}
 	}
 	return e, nil
 }
@@ -207,16 +207,16 @@ type QComponent struct {
 	Drop            *Drop            `| @@`
 }
 
-func (g *QComponent) Ast() (functions.Expression, error) {
+func (g *QComponent) Ast() (expressions.Expression, error) {
 	if g.Num != nil {
-		return &functions.ConstantExpression{
+		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.NumType{},
 			Value: states.NumValue(*g.Num),
 		}, nil
 	}
 	if g.Str != nil {
-		return &functions.ConstantExpression{
+		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.StrType{},
 			Value: states.StrValue(*g.Str),

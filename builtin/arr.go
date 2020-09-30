@@ -2,15 +2,15 @@ package builtin
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
 func initArr() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]functions.Funcer{
-		functions.SimpleFuncer(
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		expressions.SimpleFuncer(
 			types.AnyArrType,
 			"len",
 			nil,
@@ -30,7 +30,7 @@ func initArr() {
 				}
 			},
 		),
-		functions.RegularFuncer(
+		expressions.RegularFuncer(
 			types.AnyType{},
 			"range",
 			[]*parameters.Parameter{
@@ -68,7 +68,7 @@ func initArr() {
 			},
 			nil,
 		),
-		functions.RegularFuncer(
+		expressions.RegularFuncer(
 			&types.ArrType{
 				ElType: types.TypeVariable{
 					Name:       "A",

@@ -2,7 +2,7 @@ package grammar
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/functions"
+	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/types"
 )
 
@@ -24,12 +24,12 @@ type Alternative struct {
 	Consequent *Composition `"then" @@`
 }
 
-func (g *Conditional) Ast() (functions.Expression, error) {
-	var pattern functions.Pattern
-	var guard functions.Expression
+func (g *Conditional) Ast() (expressions.Expression, error) {
+	var pattern expressions.Pattern
+	var guard expressions.Expression
 	var err error
 	if g.Pattern == nil {
-		pattern = functions.TypePattern{
+		pattern = expressions.TypePattern{
 			Pos:  g.Pos,
 			Type: types.AnyType{},
 		}
@@ -49,17 +49,17 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 			}
 		}
 	}
-	var consequent functions.Expression
+	var consequent expressions.Expression
 	consequent, err = g.Consequent.Ast()
 	if err != nil {
 		return nil, err
 	}
-	alternativePatterns := make([]functions.Pattern, len(g.Alternatives))
-	alternativeGuards := make([]functions.Expression, len(g.Alternatives))
-	alternativeConsequents := make([]functions.Expression, len(g.Alternatives))
+	alternativePatterns := make([]expressions.Pattern, len(g.Alternatives))
+	alternativeGuards := make([]expressions.Expression, len(g.Alternatives))
+	alternativeConsequents := make([]expressions.Expression, len(g.Alternatives))
 	for i, alternative := range g.Alternatives {
 		if alternative.Pattern == nil {
-			alternativePatterns[i] = functions.TypePattern{
+			alternativePatterns[i] = expressions.TypePattern{
 				Pos:  alternative.Pos,
 				Type: types.AnyType{},
 				Name: nil,
@@ -85,14 +85,14 @@ func (g *Conditional) Ast() (functions.Expression, error) {
 			return nil, err
 		}
 	}
-	var alternative functions.Expression
+	var alternative expressions.Expression
 	if g.Alternative != nil {
 		alternative, err = g.Alternative.Ast()
 	}
 	if err != nil {
 		return nil, err
 	}
-	return &functions.ConditionalExpression{
+	return &expressions.ConditionalExpression{
 		Pos:                    g.Pos,
 		Pattern:                pattern,
 		Guard:                  guard,
