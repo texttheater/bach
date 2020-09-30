@@ -12,7 +12,7 @@ func (v StrValue) Repr() (string, error) {
 	return fmt.Sprintf("%q", string(v)), nil
 }
 
-func (v StrValue) Out() (string, error) {
+func (v StrValue) Str() (string, error) {
 	return string(v), nil
 }
 

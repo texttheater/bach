@@ -49,7 +49,7 @@ func (v ObjValue) Repr() (string, error) {
 	return buffer.String(), nil
 }
 
-func (v ObjValue) Out() (string, error) {
+func (v ObjValue) Str() (string, error) {
 	return v.Repr()
 }
 

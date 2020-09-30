@@ -11,7 +11,7 @@ func (v NullValue) Repr() (string, error) {
 	return "null", nil
 }
 
-func (v NullValue) Out() (string, error) {
+func (v NullValue) Str() (string, error) {
 	return v.Repr()
 }
 

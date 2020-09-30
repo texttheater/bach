@@ -54,7 +54,7 @@ func initIO() {
 				Name: "A",
 			},
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
-				str, err := inputValue.Out()
+				str, err := inputValue.Str()
 				if err != nil {
 					return nil, err
 				}
@@ -74,7 +74,7 @@ func initIO() {
 				Name: "A",
 			},
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
-				str, err := inputValue.Out()
+				str, err := inputValue.Str()
 				if err != nil {
 					return nil, err
 				}
@@ -94,7 +94,7 @@ func initIO() {
 				Name: "A",
 			},
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
-				str, err := inputValue.Out()
+				str, err := inputValue.Str()
 				if err != nil {
 					return nil, err
 				}
@@ -114,7 +114,7 @@ func initIO() {
 				Name: "A",
 			},
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
-				str, err := inputValue.Out()
+				str, err := inputValue.Str()
 				if err != nil {
 					return nil, err
 				}

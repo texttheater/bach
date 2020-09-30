@@ -12,7 +12,7 @@ func (v NumValue) Repr() (string, error) {
 	return strconv.FormatFloat(float64(v), 'g', -1, 64), nil
 }
 
-func (v NumValue) Out() (string, error) {
+func (v NumValue) Str() (string, error) {
 	return v.Repr()
 }
 

@@ -46,7 +46,7 @@ func (x *TemplateLiteralExpression) Typecheck(inputShape Shape, params []*parame
 			if pieceResult.Error != nil {
 				return states.ThunkFromError(pieceResult.Error)
 			}
-			out, err := pieceResult.Value.Out()
+			out, err := pieceResult.Value.Str()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}

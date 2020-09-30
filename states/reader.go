@@ -14,7 +14,7 @@ func (v ReaderValue) Repr() (string, error) {
 	return "<reader>", nil
 }
 
-func (v ReaderValue) Out() (string, error) {
+func (v ReaderValue) Str() (string, error) {
 	return v.Repr()
 }
 

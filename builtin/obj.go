@@ -50,7 +50,7 @@ func initObj() {
 				if res0.Error != nil {
 					return states.ThunkFromError(res0.Error)
 				}
-				prop, err := res0.Value.Out() // TODO ???
+				prop, err := res0.Value.Str() // TODO ???
 				if err != nil {
 					return states.ThunkFromError(err)
 				}

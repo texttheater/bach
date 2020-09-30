@@ -70,7 +70,7 @@ func (v *ArrValue) Repr() (string, error) {
 	return buffer.String(), nil
 }
 
-func (v *ArrValue) Out() (string, error) {
+func (v *ArrValue) Str() (string, error) {
 	return v.Repr()
 }
 

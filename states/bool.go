@@ -12,7 +12,7 @@ func (v BoolValue) Repr() (string, error) {
 	return strconv.FormatBool(bool(v)), nil
 }
 
-func (v BoolValue) Out() (string, error) {
+func (v BoolValue) Str() (string, error) {
 	return v.Repr()
 }
 
