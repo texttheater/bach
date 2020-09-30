@@ -33,7 +33,7 @@ func execute(program string, displayResult bool) (success bool) {
 		return false
 	}
 	if displayResult {
-		str, err := value.String()
+		str, err := value.Repr()
 		if err != nil {
 			errors.Explain(err, program)
 			return false

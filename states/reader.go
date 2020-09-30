@@ -10,12 +10,12 @@ type ReaderValue struct {
 	Reader io.Reader
 }
 
-func (v ReaderValue) String() (string, error) {
+func (v ReaderValue) Repr() (string, error) {
 	return "<reader>", nil
 }
 
 func (v ReaderValue) Out() (string, error) {
-	return v.String()
+	return v.Repr()
 }
 
 func (v ReaderValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {

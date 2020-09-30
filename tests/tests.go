@@ -31,13 +31,13 @@ func TestProgram(program string, wantType types.Type, wantValue states.Value, wa
 	//log.Print(program)
 	var wantValueStr string
 	if wantValue != nil {
-		wantValueStr, _ = wantValue.String()
+		wantValueStr, _ = wantValue.Repr()
 	}
 	gotType, gotValue, gotErr := interpreter.InterpretString(program)
 	var gotValueStr string
 	if gotValue != nil {
 		var err error
-		gotValueStr, err = gotValue.String()
+		gotValueStr, err = gotValue.Repr()
 		if gotErr == nil {
 			gotErr = err
 		}

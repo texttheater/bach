@@ -20,7 +20,7 @@ func ObjValueFromMap(m map[string]Value) ObjValue {
 
 type ObjValue map[string]*Thunk
 
-func (v ObjValue) String() (string, error) {
+func (v ObjValue) Repr() (string, error) {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("{")
 	firstWritten := false
@@ -38,7 +38,7 @@ func (v ObjValue) String() (string, error) {
 		if res.Error != nil {
 			return "", res.Error
 		}
-		wString, err := res.Value.String()
+		wString, err := res.Value.Repr()
 		if err != nil {
 			return "", err
 		}
@@ -50,7 +50,7 @@ func (v ObjValue) String() (string, error) {
 }
 
 func (v ObjValue) Out() (string, error) {
-	return v.String()
+	return v.Repr()
 }
 
 func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {

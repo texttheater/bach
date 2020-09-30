@@ -40,11 +40,11 @@ func (v *ArrValue) GetTail() (*ArrValue, error) {
 	return res.Value.(*ArrValue), nil
 }
 
-func (v *ArrValue) String() (string, error) {
+func (v *ArrValue) Repr() (string, error) {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("[")
 	if v != nil {
-		head, err := v.Head.String()
+		head, err := v.Head.Repr()
 		if err != nil {
 			return "", err
 		}
@@ -55,7 +55,7 @@ func (v *ArrValue) String() (string, error) {
 		}
 		for v != nil {
 			buffer.WriteString(", ")
-			head, err = v.Head.String()
+			head, err = v.Head.Repr()
 			if err != nil {
 				return "", err
 			}
@@ -71,7 +71,7 @@ func (v *ArrValue) String() (string, error) {
 }
 
 func (v *ArrValue) Out() (string, error) {
-	return v.String()
+	return v.Repr()
 }
 
 func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {

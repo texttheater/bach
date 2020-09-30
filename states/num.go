@@ -8,12 +8,12 @@ import (
 
 type NumValue float64
 
-func (v NumValue) String() (string, error) {
+func (v NumValue) Repr() (string, error) {
 	return strconv.FormatFloat(float64(v), 'g', -1, 64), nil
 }
 
 func (v NumValue) Out() (string, error) {
-	return v.String()
+	return v.Repr()
 }
 
 func (v NumValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {

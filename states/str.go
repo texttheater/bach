@@ -8,7 +8,7 @@ import (
 
 type StrValue string
 
-func (v StrValue) String() (string, error) {
+func (v StrValue) Repr() (string, error) {
 	return fmt.Sprintf("%q", string(v)), nil
 }
 

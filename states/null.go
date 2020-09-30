@@ -7,12 +7,12 @@ import (
 type NullValue struct {
 }
 
-func (v NullValue) String() (string, error) {
+func (v NullValue) Repr() (string, error) {
 	return "null", nil
 }
 
 func (v NullValue) Out() (string, error) {
-	return v.String()
+	return v.Repr()
 }
 
 func (v NullValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {

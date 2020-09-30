@@ -160,7 +160,7 @@ func (err *e) Error() string {
 		m["GotType"] = err.GotType.String()
 	}
 	if err.GotValue != nil {
-		m["GotValue"], _ = err.GotValue.String()
+		m["GotValue"], _ = err.GotValue.Repr()
 	}
 	if err.InputType != nil {
 		m["InputType"] = err.InputType.String()
@@ -231,7 +231,7 @@ func Explain(err error, program string) {
 		fmt.Fprintln(os.Stderr, "Got type:  ", e.GotType)
 	}
 	if e.GotValue != nil {
-		gotValueStr, _ := e.GotValue.String()
+		gotValueStr, _ := e.GotValue.Repr()
 		fmt.Fprintln(os.Stderr, "Got value: ", gotValueStr)
 	}
 	if e.InputType != nil {
