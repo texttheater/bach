@@ -111,9 +111,9 @@ func (g *ArrPattern) Ast() (expressions.Pattern, error) {
 
 type ObjPattern struct {
 	Pos    lexer.Position `"{"`
-	Prop   *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
+	Prop   *string        `( ( @Lid | @Op1 | @Op2 | @NumLiteral )`
 	Value  *Pattern       `  ":" @@`
-	Props  []string       `   ( "," ( @Lid | @Op1 | @Op2 | @Num )`
+	Props  []string       `   ( "," ( @Lid | @Op1 | @Op2 | @NumLiteral )`
 	Values []*Pattern     `     ":" @@ )* )? "}"`
 	Name   *string        `( @Lid | @Op1 | @Op2 )?`
 }

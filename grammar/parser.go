@@ -16,7 +16,7 @@ func init() {
 	parser, err = participle.Build(
 		&Composition{},
 		participle.Lexer(LexerDefinition),
-		participle.Unquote("Str"),
+		participle.Unquote("StrLiteral"),
 	)
 	if err != nil {
 		panic(err)
@@ -24,7 +24,7 @@ func init() {
 	typeParser, err = participle.Build(
 		&Type{},
 		participle.Lexer(LexerDefinition),
-		participle.Unquote("Str"),
+		participle.Unquote("StrLiteral"),
 	)
 	if err != nil {
 		panic(err)

@@ -165,7 +165,7 @@ func (g *TupType) Ast() types.Type {
 
 type ObjType struct {
 	Pos       lexer.Position    `"Obj<"`
-	Prop      *string           `( ( @Lid | @Op1 | @Op2 | @Num )`
+	Prop      *string           `( ( @Lid | @Op1 | @Op2 | @NumLiteral )`
 	ValType   *Type             `  ":" @@`
 	AfterProp *ObjTypeAfterProp `   @@`
 	RestType  *Type             `| @@? ">" )`
@@ -173,7 +173,7 @@ type ObjType struct {
 
 type ObjTypeAfterProp struct {
 	Pos       lexer.Position    `( ">"`
-	Prop      *string           `| "," ( ( @Lid | @Op1 | @Op2 | @Num )`
+	Prop      *string           `| "," ( ( @Lid | @Op1 | @Op2 | @NumLiteral )`
 	ValType   *Type             `        ":" @@`
 	AfterProp *ObjTypeAfterProp `        @@`
 	RestType  *Type             `      | @@ ">" ) )`

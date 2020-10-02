@@ -254,9 +254,9 @@ func (g *NameArray) Ast() (expressions.Expression, error) {
 type NameObject struct {
 	Pos        lexer.Position
 	NameLbrace string         `@NameLbarace`
-	Prop       *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
+	Prop       *string        `( ( @Lid | @Op1 | @Op2 | @NumLiteral )`
 	Value      *Composition   `  ":" @@`
-	Props      []string       `  ( "," ( @Lid | @Op1 | @Op2 | @Num )`
+	Props      []string       `  ( "," ( @Lid | @Op1 | @Op2 | @NumLiteral )`
 	Values     []*Composition `    ":" @@ )* )? "}"`
 }
 

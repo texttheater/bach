@@ -33,7 +33,7 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		// ellipsis
 		{"Ellipsis", `\.\.\.`, nil},
 		// numbers
-		{"Num", `\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+`, nil},
+		{"NumLiteral", `\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+`, nil},
 		// getters
 		{"LidGetter", `@[\p{L}_][\p{L}_0-9]*`, nil},
 		{"Op1Getter", `@[+\-*/%<>=]`, nil},
@@ -41,7 +41,7 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		{"NumGetter", `@(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
 		{"StrGetter", `@"(?:\\.|[^"])*"`, nil},
 		// starting with unique characters
-		{"Str", `"(?:\\.|[^"])*"`, nil},
+		{"StrLiteral", `"(?:\\.|[^"])*"`, nil},
 		{"Regexp", `~(?:\\.|[^/])*~`, nil},
 		{"Comma", `,`, nil},
 		{"Lpar", `\(`, nil},

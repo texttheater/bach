@@ -5,14 +5,14 @@ import (
 	"github.com/texttheater/bach/expressions"
 )
 
-type Array struct {
+type ArrLiteral struct {
 	Pos      lexer.Position `"["`
 	Element  *Composition   `( @@`
 	Elements []*Composition `  ( "," @@ )*`
 	Rest     *Composition   `  ( ";" @@ )? )? "]"`
 }
 
-func (g *Array) Ast() (expressions.Expression, error) {
+func (g *ArrLiteral) Ast() (expressions.Expression, error) {
 	var elements []expressions.Expression
 	var rest expressions.Expression
 	if g.Element != nil {

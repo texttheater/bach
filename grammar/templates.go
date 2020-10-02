@@ -104,9 +104,9 @@ func (g *TupTypeTemplate) Ast() types.Type {
 
 type ObjTypeTemplate struct {
 	Pos               lexer.Position `"Obj<"`
-	Prop              *string        `( ( @Lid | @Op1 | @Op2 | @Num )`
+	Prop              *string        `( ( @Lid | @Op1 | @Op2 | @NumLiteral )`
 	ValTypeTemplate   *Type          `  ":" @@`
-	Props             []string       `  ( ( @Lid | @Op1 | @Op2 | @Num )`
+	Props             []string       `  ( ( @Lid | @Op1 | @Op2 | @NumLiteral )`
 	ValTypeTemplates  []*Type        `     ":" @@ )*`
 	RestTypeTemplate1 *Type          `  ( "," @@ )?`
 	RestTypeTemplate2 *Type          `| ( @@ )? ) ">"`

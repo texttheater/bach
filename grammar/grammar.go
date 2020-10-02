@@ -42,10 +42,10 @@ func (g *Composition) Ast() (expressions.Expression, error) {
 
 type SComponent struct {
 	Pos             lexer.Position
-	Num             *float64         `  @Num`
-	Str             *string          `| @Str`
-	Array           *Array           `| @@`
-	Object          *Object          `| @@`
+	NumLiteral      *float64         `  @NumLiteral`
+	StrLiteral      *string          `| @StrLiteral`
+	ArrLiteral      *ArrLiteral      `| @@`
+	ObjLiteral      *ObjLiteral      `| @@`
 	Call            *Call            `| @@`
 	Assignment      *Assignment      `| @@`
 	Definition      *Definition      `| @@`
@@ -57,25 +57,25 @@ type SComponent struct {
 }
 
 func (g *SComponent) Ast() (expressions.Expression, error) {
-	if g.Num != nil {
+	if g.NumLiteral != nil {
 		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.NumType{},
-			Value: states.NumValue(*g.Num),
+			Value: states.NumValue(*g.NumLiteral),
 		}, nil
 	}
-	if g.Str != nil {
+	if g.StrLiteral != nil {
 		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.StrType{},
-			Value: states.StrValue(*g.Str),
+			Value: states.StrValue(*g.StrLiteral),
 		}, nil
 	}
-	if g.Array != nil {
-		return g.Array.Ast()
+	if g.ArrLiteral != nil {
+		return g.ArrLiteral.Ast()
 	}
-	if g.Object != nil {
-		return g.Object.Ast()
+	if g.ObjLiteral != nil {
+		return g.ObjLiteral.Ast()
 	}
 	if g.Call != nil {
 		return g.Call.Ast()
@@ -106,10 +106,10 @@ func (g *SComponent) Ast() (expressions.Expression, error) {
 
 type PComponent struct {
 	Pos             lexer.Position
-	Num             *float64         `  @Num`
-	Str             *string          `| @Str`
-	Array           *Array           `| @@`
-	Object          *Object          `| @@`
+	NumLiteral      *float64         `  @NumLiteral`
+	StrLiteral      *string          `| @StrLiteral`
+	ArrLiteral      *ArrLiteral      `| @@`
+	ObjLiteral      *ObjLiteral      `| @@`
 	Call            *Call            `| @@`
 	Assignment      *Assignment      `| @@`
 	Definition      *Definition      `| @@`
@@ -121,25 +121,25 @@ type PComponent struct {
 }
 
 func (g *PComponent) Ast() (expressions.Expression, error) {
-	if g.Num != nil {
+	if g.NumLiteral != nil {
 		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.NumType{},
-			Value: states.NumValue(*g.Num),
+			Value: states.NumValue(*g.NumLiteral),
 		}, nil
 	}
-	if g.Str != nil {
+	if g.StrLiteral != nil {
 		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.StrType{},
-			Value: states.StrValue(*g.Str),
+			Value: states.StrValue(*g.StrLiteral),
 		}, nil
 	}
-	if g.Array != nil {
-		return g.Array.Ast()
+	if g.ArrLiteral != nil {
+		return g.ArrLiteral.Ast()
 	}
-	if g.Object != nil {
-		return g.Object.Ast()
+	if g.ObjLiteral != nil {
+		return g.ObjLiteral.Ast()
 	}
 	if g.Call != nil {
 		return g.Call.Ast()
@@ -192,10 +192,10 @@ func (g *QComposition) Ast() (expressions.Expression, error) {
 
 type QComponent struct {
 	Pos             lexer.Position
-	Num             *float64         `  @Num`
-	Str             *string          `| @Str`
-	Array           *Array           `| @@`
-	Object          *Object          `| @@`
+	NumLiteral      *float64         `  @NumLiteral`
+	StrLiteral      *string          `| @StrLiteral`
+	ArrLiteral      *ArrLiteral      `| @@`
+	ObjLiteral      *ObjLiteral      `| @@`
 	Call            *Call            `| @@`
 	Assignment      *Assignment      `| @@`
 	Definition      *Definition      `| @@`
@@ -208,25 +208,25 @@ type QComponent struct {
 }
 
 func (g *QComponent) Ast() (expressions.Expression, error) {
-	if g.Num != nil {
+	if g.NumLiteral != nil {
 		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.NumType{},
-			Value: states.NumValue(*g.Num),
+			Value: states.NumValue(*g.NumLiteral),
 		}, nil
 	}
-	if g.Str != nil {
+	if g.StrLiteral != nil {
 		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
 			Type:  types.StrType{},
-			Value: states.StrValue(*g.Str),
+			Value: states.StrValue(*g.StrLiteral),
 		}, nil
 	}
-	if g.Array != nil {
-		return g.Array.Ast()
+	if g.ArrLiteral != nil {
+		return g.ArrLiteral.Ast()
 	}
-	if g.Object != nil {
-		return g.Object.Ast()
+	if g.ObjLiteral != nil {
+		return g.ObjLiteral.Ast()
 	}
 	if g.Call != nil {
 		return g.Call.Ast()

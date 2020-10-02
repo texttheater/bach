@@ -5,15 +5,15 @@ import (
 	"github.com/texttheater/bach/expressions"
 )
 
-type Object struct {
+type ObjLiteral struct {
 	Pos    lexer.Position `"{"`
-	Prop   *string        `( ( @Lid | @Op1 | @Op2 | @Num | @Str )`
+	Prop   *string        `( ( @Lid | @Op1 | @Op2 | @NumLiteral | @StrLiteral )`
 	Value  *Composition   `  ":" @@`
-	Props  []string       `  ( "," ( @Lid | @Op1 | @Op2 | @Num | @Str )`
+	Props  []string       `  ( "," ( @Lid | @Op1 | @Op2 | @NumLiteral | @StrLiteral )`
 	Values []*Composition `    ":" @@ )* )? "}"`
 }
 
-func (g *Object) Ast() (expressions.Expression, error) {
+func (g *ObjLiteral) Ast() (expressions.Expression, error) {
 	propValMap := make(map[string]expressions.Expression)
 	if g.Prop != nil {
 		var err error
