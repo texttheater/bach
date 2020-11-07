@@ -39,8 +39,8 @@ func ParseComposition(input string) (expressions.Expression, error) {
 			return nil, errors.E(
 				errors.Code(errors.Syntax),
 				errors.Pos(parserError.Token().Pos),
-				errors.Message(parserError.Message()))
-
+				errors.Message(parserError.Message()),
+			)
 		}
 		return nil, err
 	}

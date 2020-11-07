@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -43,11 +44,22 @@ func (g *Fragment) Ast() (expressions.Expression, error) {
 	var str string
 	var err error
 	if g.Dbrace != nil {
+		if len(*g.Dbrace) == 1 {
+			return nil, errors.E(
+				errors.Code(errors.Syntax),
+				errors.Pos(g.Pos),
+				errors.Message("Use a double brace }} for a literal brace }"),
+			)
+		}
 		str = (*g.Dbrace)[:1]
 	} else {
 		str, err = strconv.Unquote("\"" + *g.Text + "\"")
 		if err != nil {
-			return nil, err // TODO wrap error
+			return nil, errors.E(
+				errors.Code(errors.Syntax),
+				errors.Pos(g.Pos),
+				errors.Message(err.Error()),
+			)
 		}
 	}
 	return &expressions.ConstantExpression{
