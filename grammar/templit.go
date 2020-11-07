@@ -1,6 +1,8 @@
 package grammar
 
 import (
+	"strconv"
+
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
@@ -30,16 +32,27 @@ func (g *TemplateLiteral) Ast() (expressions.Expression, error) {
 type Fragment struct {
 	Pos         lexer.Position
 	Composition *Composition `( "{" @@ "}"`
-	Text        string       `| @Char )`
+	Dbrace      *string      `| @Dbrace`
+	Text        *string      `| @Char )`
 }
 
 func (g *Fragment) Ast() (expressions.Expression, error) {
 	if g.Composition != nil {
 		return g.Composition.Ast()
 	}
+	var str string
+	var err error
+	if g.Dbrace != nil {
+		str = (*g.Dbrace)[:1]
+	} else {
+		str, err = strconv.Unquote("\"" + *g.Text + "\"")
+		if err != nil {
+			return nil, err // TODO wrap error
+		}
+	}
 	return &expressions.ConstantExpression{
 		Pos:   g.Pos,
 		Type:  types.StrType{},
-		Value: states.StrValue(g.Text), // TODO allow escapes?
+		Value: states.StrValue(str),
 	}, nil
 }

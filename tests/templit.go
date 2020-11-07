@@ -15,4 +15,11 @@ func TestTemplateLiterals(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgram(
+		"`{{}}`",
+		types.StrType{},
+		states.StrValue("{}"),
+		nil,
+		t,
+	)
 }
