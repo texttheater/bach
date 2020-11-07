@@ -19,7 +19,7 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		{"LangleLid", `<(?:[\p{L}_][\p{L}_0-9]*)`, nil}, // special case of Op1Lid, but also used for type variables
 		{"Op1Lid", `[+\-*/%>](?:[\p{L}_][\p{L}_0-9]*)`, nil},
 		{"Op2Lid", `(?:==|<=|>=|\*\*)(?:[\p{L}_][\p{L}_0-9]*)`, nil},
-		{"NameStr", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)"(?:\\.|[^"])*"`, nil},
+		{"NameQuot", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)"`, stateful.Push("StrLiteral")},
 		{"NameRegexp", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)~(?:\\.|[^/])*~`, nil},
 		{"NameLpar", `(?:[+\-*/%<>=]|==|<=|>=|\*\*|[\p{L}_][\p{L}_0-9]*)\(`, nil},
 		{"NameLbrack", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\[`, nil},
@@ -41,7 +41,6 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		{"NumGetter", `@(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
 		{"StrGetter", `@"(?:\\.|[^"])*"`, nil},
 		// starting with unique characters
-		{"StrLiteral", `"(?:\\.|[^"])*"`, nil},
 		{"Regexp", `~(?:\\.|[^/])*~`, nil},
 		{"Comma", `,`, nil},
 		{"Lpar", `\(`, nil},
@@ -52,13 +51,13 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		{"Colon", `:`, nil},
 		{"Pipe", `\|`, nil},
 		{"Semi", `\;`, nil},
-		{"Backtick", "`", stateful.Push("TemplateLiteral")},
+		{"Quot", `"`, stateful.Push("StrLiteral")},
 	},
-	"TemplateLiteral": {
-		{"Backtick", "`", stateful.Pop()},
+	"StrLiteral": {
+		{"Quot", `"`, stateful.Pop()},
 		{"Dbrace", `{\{|}}?`, nil},
 		{"Lbrace", `{`, stateful.Push("Braces")},
-		{"Char", "[^{}`]+", nil},
+		{"Char", `(?:\\.|[^{}"])+`, nil},
 	},
 	"Braces": { // generic group for placeholders and object literals
 		stateful.Include("Root"),

@@ -11,7 +11,6 @@ func TestFilter(t *testing.T) {
 	parser, err := participle.Build(
 		&grammar.Filter{},
 		participle.Lexer(grammar.LexerDefinition),
-		participle.Unquote("StrLiteral"),
 		participle.UseLookahead(0),
 	)
 	if err != nil {

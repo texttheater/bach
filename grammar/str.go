@@ -10,12 +10,12 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-type TemplateLiteral struct {
+type StrLiteral struct {
 	Pos       lexer.Position
-	Fragments []*Fragment "\"`\" @@* \"`\""
+	Fragments []*Fragment `"\"" @@* "\""`
 }
 
-func (g *TemplateLiteral) Ast() (expressions.Expression, error) {
+func (g *StrLiteral) Ast() (expressions.Expression, error) {
 	pieces := make([]expressions.Expression, len(g.Fragments))
 	for i, fragment := range g.Fragments {
 		piece, err := fragment.Ast()
@@ -28,6 +28,35 @@ func (g *TemplateLiteral) Ast() (expressions.Expression, error) {
 		Pos:    g.Pos,
 		Pieces: pieces,
 	}, nil
+}
+
+func (g *StrLiteral) StaticStr() (string, bool, error) {
+	if len(g.Fragments) != 1 {
+		return "", false, nil
+	}
+	fragment := g.Fragments[0]
+	if fragment.Dbrace != nil {
+		if len(*fragment.Dbrace) == 1 {
+			return "", false, errors.E(
+				errors.Code(errors.Syntax),
+				errors.Pos(g.Pos),
+				errors.Message("Use a double brace }} for a literal brace }"),
+			)
+		}
+		return (*fragment.Dbrace)[:1], true, nil
+	}
+	if fragment.Text != nil {
+		str, err := strconv.Unquote("\"" + *fragment.Text + "\"")
+		if err != nil {
+			return "", false, errors.E(
+				errors.Code(errors.Syntax),
+				errors.Pos(g.Pos),
+				errors.Message(err.Error()),
+			)
+		}
+		return str, true, nil
+	}
+	return "", false, nil
 }
 
 type Fragment struct {

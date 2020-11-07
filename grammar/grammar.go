@@ -41,19 +41,18 @@ func (g *Composition) Ast() (expressions.Expression, error) {
 }
 
 type SComponent struct {
-	Pos             lexer.Position
-	NumLiteral      *float64         `  @NumLiteral`
-	StrLiteral      *string          `| @StrLiteral`
-	ArrLiteral      *ArrLiteral      `| @@`
-	ObjLiteral      *ObjLiteral      `| @@`
-	Call            *Call            `| @@`
-	Assignment      *Assignment      `| @@`
-	Definition      *Definition      `| @@`
-	Conditional     *Conditional     `| @@`
-	Filter          *Filter          `| @@`
-	Regexp          *Regexp          `| @@`
-	Getter          *Getter          `| @@`
-	TemplateLiteral *TemplateLiteral `| @@`
+	Pos         lexer.Position
+	NumLiteral  *float64     `  @NumLiteral`
+	StrLiteral  *StrLiteral  `| @@`
+	ArrLiteral  *ArrLiteral  `| @@`
+	ObjLiteral  *ObjLiteral  `| @@`
+	Call        *Call        `| @@`
+	Assignment  *Assignment  `| @@`
+	Definition  *Definition  `| @@`
+	Conditional *Conditional `| @@`
+	Filter      *Filter      `| @@`
+	Regexp      *Regexp      `| @@`
+	Getter      *Getter      `| @@`
 }
 
 func (g *SComponent) Ast() (expressions.Expression, error) {
@@ -65,11 +64,7 @@ func (g *SComponent) Ast() (expressions.Expression, error) {
 		}, nil
 	}
 	if g.StrLiteral != nil {
-		return &expressions.ConstantExpression{
-			Pos:   g.Pos,
-			Type:  types.StrType{},
-			Value: states.StrValue(*g.StrLiteral),
-		}, nil
+		return g.StrLiteral.Ast()
 	}
 	if g.ArrLiteral != nil {
 		return g.ArrLiteral.Ast()
@@ -98,26 +93,22 @@ func (g *SComponent) Ast() (expressions.Expression, error) {
 	if g.Getter != nil {
 		return g.Getter.Ast()
 	}
-	if g.TemplateLiteral != nil {
-		return g.TemplateLiteral.Ast()
-	}
 	panic("invalid component")
 }
 
 type PComponent struct {
-	Pos             lexer.Position
-	NumLiteral      *float64         `  @NumLiteral`
-	StrLiteral      *string          `| @StrLiteral`
-	ArrLiteral      *ArrLiteral      `| @@`
-	ObjLiteral      *ObjLiteral      `| @@`
-	Call            *Call            `| @@`
-	Assignment      *Assignment      `| @@`
-	Definition      *Definition      `| @@`
-	Filter          *Filter          `| @@`
-	Regexp          *Regexp          `| @@`
-	Getter          *Getter          `| @@`
-	TemplateLiteral *TemplateLiteral `| @@`
-	Drop            *Drop            `| @@`
+	Pos        lexer.Position
+	NumLiteral *float64    `  @NumLiteral`
+	StrLiteral *StrLiteral `| @@`
+	ArrLiteral *ArrLiteral `| @@`
+	ObjLiteral *ObjLiteral `| @@`
+	Call       *Call       `| @@`
+	Assignment *Assignment `| @@`
+	Definition *Definition `| @@`
+	Filter     *Filter     `| @@`
+	Regexp     *Regexp     `| @@`
+	Getter     *Getter     `| @@`
+	Drop       *Drop       `| @@`
 }
 
 func (g *PComponent) Ast() (expressions.Expression, error) {
@@ -129,11 +120,7 @@ func (g *PComponent) Ast() (expressions.Expression, error) {
 		}, nil
 	}
 	if g.StrLiteral != nil {
-		return &expressions.ConstantExpression{
-			Pos:   g.Pos,
-			Type:  types.StrType{},
-			Value: states.StrValue(*g.StrLiteral),
-		}, nil
+		return g.StrLiteral.Ast()
 	}
 	if g.ArrLiteral != nil {
 		return g.ArrLiteral.Ast()
@@ -158,9 +145,6 @@ func (g *PComponent) Ast() (expressions.Expression, error) {
 	}
 	if g.Getter != nil {
 		return g.Getter.Ast()
-	}
-	if g.TemplateLiteral != nil {
-		return g.TemplateLiteral.Ast()
 	}
 	if g.Drop != nil {
 		return g.Drop.Ast()
@@ -191,20 +175,19 @@ func (g *QComposition) Ast() (expressions.Expression, error) {
 }
 
 type QComponent struct {
-	Pos             lexer.Position
-	NumLiteral      *float64         `  @NumLiteral`
-	StrLiteral      *string          `| @StrLiteral`
-	ArrLiteral      *ArrLiteral      `| @@`
-	ObjLiteral      *ObjLiteral      `| @@`
-	Call            *Call            `| @@`
-	Assignment      *Assignment      `| @@`
-	Definition      *Definition      `| @@`
-	Conditional     *Conditional     `| @@`
-	Filter          *Filter          `| @@`
-	Regexp          *Regexp          `| @@`
-	Getter          *Getter          `| @@`
-	TemplateLiteral *TemplateLiteral `| @@`
-	Drop            *Drop            `| @@`
+	Pos         lexer.Position
+	NumLiteral  *float64     `  @NumLiteral`
+	StrLiteral  *StrLiteral  `| @@`
+	ArrLiteral  *ArrLiteral  `| @@`
+	ObjLiteral  *ObjLiteral  `| @@`
+	Call        *Call        `| @@`
+	Assignment  *Assignment  `| @@`
+	Definition  *Definition  `| @@`
+	Conditional *Conditional `| @@`
+	Filter      *Filter      `| @@`
+	Regexp      *Regexp      `| @@`
+	Getter      *Getter      `| @@`
+	Drop        *Drop        `| @@`
 }
 
 func (g *QComponent) Ast() (expressions.Expression, error) {
@@ -216,11 +199,7 @@ func (g *QComponent) Ast() (expressions.Expression, error) {
 		}, nil
 	}
 	if g.StrLiteral != nil {
-		return &expressions.ConstantExpression{
-			Pos:   g.Pos,
-			Type:  types.StrType{},
-			Value: states.StrValue(*g.StrLiteral),
-		}, nil
+		return g.StrLiteral.Ast()
 	}
 	if g.ArrLiteral != nil {
 		return g.ArrLiteral.Ast()
@@ -248,9 +227,6 @@ func (g *QComponent) Ast() (expressions.Expression, error) {
 	}
 	if g.Getter != nil {
 		return g.Getter.Ast()
-	}
-	if g.TemplateLiteral != nil {
-		return g.TemplateLiteral.Ast()
 	}
 	if g.Drop != nil {
 		return g.Drop.Ast()

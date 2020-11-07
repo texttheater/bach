@@ -213,6 +213,36 @@ func (g *NameArglist) Ast() (expressions.Expression, error) {
 	}, nil
 }
 
+type NameString struct {
+	Pos       lexer.Position
+	NameQuot  string      `@NameQuot`
+	Fragments []*Fragment `@@* "\""`
+}
+
+func (g *NameString) Ast() (expressions.Expression, error) {
+	name := g.NameQuot[:len(g.NameQuot)-1]
+	pieces := make([]expressions.Expression, len(g.Fragments))
+	for i, fragment := range g.Fragments {
+		piece, err := fragment.Ast()
+		if err != nil {
+			return nil, err
+		}
+		pieces[i] = piece
+	}
+	strPos := g.Pos
+	strPos.Column += len(name)
+	return &expressions.CallExpression{
+		Pos:  g.Pos,
+		Name: name,
+		Args: []expressions.Expression{
+			&expressions.TemplateLiteralExpression{
+				Pos:    strPos,
+				Pieces: pieces,
+			},
+		},
+	}, nil
+}
+
 type NameArray struct {
 	Pos        lexer.Position
 	NameLbrack string         `@NameLbrack`
@@ -284,33 +314,6 @@ func (g *NameObject) Ast() (expressions.Expression, error) {
 			&expressions.ObjExpression{
 				objPos,
 				propValMap,
-			},
-		},
-	}, nil
-}
-
-type NameString struct {
-	Pos     lexer.Position
-	NameStr string `@NameStr`
-}
-
-func (g *NameString) Ast() (expressions.Expression, error) {
-	i := strings.Index(g.NameStr, "\"")
-	name := g.NameStr[:i]
-	str, err := strconv.Unquote(g.NameStr[i:len(g.NameStr)])
-	if err != nil {
-		return nil, err
-	}
-	strPos := g.Pos
-	strPos.Column += len(name)
-	return &expressions.CallExpression{
-		Pos:  g.Pos,
-		Name: name,
-		Args: []expressions.Expression{
-			&expressions.ConstantExpression{
-				Pos:   strPos,
-				Type:  types.StrType{},
-				Value: states.StrValue(str),
 			},
 		},
 	}, nil
