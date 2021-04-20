@@ -44,6 +44,53 @@ func initIO() {
 			},
 			nil,
 		),
+		expressions.RegularFuncer(
+			&types.ArrType{types.StrType{}},
+			"blocks",
+			nil,
+			&types.ArrType{&types.ArrType{types.StrType{}}},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				var nextBlock func(lines *states.ArrValue) (*states.ArrValue, *states.ArrValue, error)
+				nextBlock = func(lines *states.ArrValue) (*states.ArrValue, *states.ArrValue, error) {
+					if lines == nil {
+						return nil, nil, nil
+					}
+					head := lines.Head.(states.StrValue)
+					res := lines.Tail.Eval()
+					if res.Error != nil {
+						return nil, nil, res.Error
+					}
+					tail := res.Value.(*states.ArrValue)
+					if head == "" {
+						return nil, tail, nil
+					}
+					next, rest, err := nextBlock(tail)
+					if err != nil {
+						return nil, nil, err
+					}
+					return &states.ArrValue{
+						Head: head,
+						Tail: states.ThunkFromValue(next),
+					}, rest, nil
+				}
+				lines := inputState.Value.(*states.ArrValue)
+				var iter func() (states.Value, bool, error)
+				iter = func() (states.Value, bool, error) {
+					if lines == nil {
+						return nil, false, nil
+					}
+					var next *states.ArrValue
+					var err error
+					next, lines, err = nextBlock(lines)
+					if err != nil {
+						return nil, false, err
+					}
+					return next, true, nil
+				}
+				return states.ThunkFromIter(iter)
+			},
+			nil,
+		),
 		expressions.SimpleFuncer(
 			types.TypeVariable{
 				Name: "A",
