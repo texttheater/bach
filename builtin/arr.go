@@ -107,10 +107,34 @@ func initArr() {
 				}
 				index := float64(res0.Value.(states.NumValue))
 				intIndex := int(index)
-				if intIndex < 0 || index != float64(intIndex) {
+				if index != float64(intIndex) {
 					return states.ThunkFromValue(states.NullValue{})
 				}
 				value := inputState.Value.(*states.ArrValue)
+				if index < 0 {
+					revIndex := -intIndex
+					buf := make([]states.Value, revIndex)
+					bufIndex := 0
+					for true {
+						if value == nil {
+							if buf[bufIndex] == nil {
+								return states.ThunkFromValue(states.NullValue{})
+							}
+							return states.ThunkFromValue(states.ObjValue(map[string]*states.Thunk{
+								"just": states.ThunkFromValue(buf[bufIndex]),
+							}))
+						}
+						buf[bufIndex] = value.Head
+						bufIndex = (bufIndex + 1) % revIndex
+						tail := value.Tail
+						res := tail.Eval()
+						if res.Error != nil {
+							return states.ThunkFromError(res.Error)
+						}
+						value = res.Value.(*states.ArrValue)
+					}
+				}
+				// nonnegative index
 				for i := 0; i < intIndex; i++ {
 					if value == nil {
 						return states.ThunkFromValue(states.NullValue{})

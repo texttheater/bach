@@ -187,4 +187,70 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgram(
+		`["a", "b", "c"] get(-1)`,
+		types.Union(
+			types.ObjType{
+				PropTypeMap: map[string]types.Type{
+					"just": types.StrType{},
+				},
+				RestType: types.AnyType{},
+			},
+			types.NullType{},
+		),
+		states.ObjValue(map[string]*states.Thunk{
+			"just": states.ThunkFromValue(states.StrValue("c")),
+		}),
+		nil,
+		t,
+	)
+	TestProgram(
+		`["a", "b", "c"] get(-2)`,
+		types.Union(
+			types.ObjType{
+				PropTypeMap: map[string]types.Type{
+					"just": types.StrType{},
+				},
+				RestType: types.AnyType{},
+			},
+			types.NullType{},
+		),
+		states.ObjValue(map[string]*states.Thunk{
+			"just": states.ThunkFromValue(states.StrValue("b")),
+		}),
+		nil,
+		t,
+	)
+	TestProgram(
+		`["a", "b", "c"] get(-3)`,
+		types.Union(
+			types.ObjType{
+				PropTypeMap: map[string]types.Type{
+					"just": types.StrType{},
+				},
+				RestType: types.AnyType{},
+			},
+			types.NullType{},
+		),
+		states.ObjValue(map[string]*states.Thunk{
+			"just": states.ThunkFromValue(states.StrValue("a")),
+		}),
+		nil,
+		t,
+	)
+	TestProgram(
+		`["a", "b", "c"] get(-4)`,
+		types.Union(
+			types.ObjType{
+				PropTypeMap: map[string]types.Type{
+					"just": types.StrType{},
+				},
+				RestType: types.AnyType{},
+			},
+			types.NullType{},
+		),
+		states.NullValue{},
+		nil,
+		t,
+	)
 }
