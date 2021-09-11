@@ -13,7 +13,7 @@ import (
 // P-components appear within mappings. Compared to S-components, they
 // exclude conditionals (these are tied in with mapping syntax) and add
 // Drop (within a mapping, you can drop elements).
-// Q-componnts appear within branches within mappings. Compared to
+// Q-components appear within branches within mappings. Compared to
 // P-components, they add conditionals (we are now one level deeper and
 // therefore conditionals are fine again) but retain Drop (we are still in
 // a mapping).
