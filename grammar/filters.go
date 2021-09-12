@@ -169,7 +169,9 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body expressions.Express
 		}
 		return body, nil
 	} else { // short form
-		x.Consequent = &expressions.IdentityExpression{}
+		x.Consequent = &expressions.IdentityExpression{
+			Pos: x.Pos,
+		}
 		c := g.FromConsequentShort
 		for c.FromConsequent != nil { // further elis/elif clauses
 			if c.Pattern != nil {
@@ -198,7 +200,9 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body expressions.Express
 				})
 				x.AlternativeGuards = append(x.AlternativeGuards, condition)
 			}
-			x.AlternativeConsequents = append(x.AlternativeConsequents, &expressions.IdentityExpression{pos})
+			x.AlternativeConsequents = append(x.AlternativeConsequents, &expressions.IdentityExpression{
+				Pos: pos,
+			})
 			c = c.FromConsequent
 		}
 		x.Alternative = &expressions.DropExpression{}
