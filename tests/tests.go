@@ -12,17 +12,24 @@ import (
 )
 
 func TestProgramStr(program string, wantTypeString string, wantValueString string, wantError error, t *testing.T) {
-	wantType, err := grammar.ParseType(wantTypeString)
-	if err != nil {
-		t.Log("ERROR: Could not parse expected type")
-		errors.Explain(err, wantTypeString)
-		t.Fail()
+	var wantType types.Type
+	var err error
+	if wantTypeString != "" {
+		wantType, err = grammar.ParseType(wantTypeString)
+		if err != nil {
+			t.Log("ERROR: Could not parse expected type")
+			errors.Explain(err, wantTypeString)
+			t.Fail()
+		}
 	}
-	_, wantValue, err := interpreter.InterpretString(wantValueString)
-	if err != nil {
-		t.Log("ERROR: Could not interpret expected value")
-		errors.Explain(err, wantValueString)
-		t.Fail()
+	var wantValue states.Value
+	if wantValueString != "" {
+		_, wantValue, err = interpreter.InterpretString(wantValueString)
+		if err != nil {
+			t.Log("ERROR: Could not interpret expected value")
+			errors.Explain(err, wantValueString)
+			t.Fail()
+		}
 	}
 	TestProgram(program, wantType, wantValue, wantError, t)
 }
