@@ -81,4 +81,11 @@ func TestConditionals(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`for Any def f Num|Str as 2 ok f is Num _`,
+		`Obj<yes: Num>|Obj<no: Str>`,
+		`{yes: 2}`,
+		nil,
+		t,
+	)
 }
