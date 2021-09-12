@@ -11,7 +11,7 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-func TestProgramStrings(program string, wantTypeString string, wantValueString string, wantError error, t *testing.T) {
+func TestProgramStr(program string, wantTypeString string, wantValueString string, wantError error, t *testing.T) {
 	wantType, err := grammar.ParseType(wantTypeString)
 	if err != nil {
 		t.Log("ERROR: Could not parse expected type")
