@@ -275,7 +275,7 @@ func spreadInputType(inputType types.Type, elementTypes []types.Type) (restType 
 		return spreadInputType(t.TailType, elementTypes[1:])
 	case *types.ArrType:
 		// Optional: fail if the pattern wants to match more elements
-		// then the value can contain, as per its type. For now, it is
+		// than the value can contain, as per its type. For now, it is
 		// is commented out and will instead lead to an error message
 		// about a surplus element not having type Void. That's a bit
 		// opaque but has the advantage of indicating the place where
