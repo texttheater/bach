@@ -1,8 +1,6 @@
 package expressions
 
 import (
-	"log"
-
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/parameters"
@@ -26,7 +24,6 @@ func (x WrapExpression) Typecheck(inputShape Shape, params []*parameters.Paramet
 			errors.Pos(x.Pos),
 		)
 	}
-	log.Printf("input shape for wrap expression: %v", inputShape.Type)
 	shape := Shape{
 		Type: types.ObjType{
 			PropTypeMap: map[string]types.Type{
