@@ -43,4 +43,42 @@ func TestConditionals(t *testing.T) {
 		nil,
 		t,
 	)
+	// predicates
+	TestProgramStr(
+		`is Null`,
+		``,
+		``,
+		errors.E(
+			errors.Code(errors.UnreachableElseClause),
+		),
+		t,
+	)
+	TestProgramStr(
+		`2 is Num with >3`,
+		`Obj<yes: Num>|Obj<no: Num>`,
+		`{no: 2}`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`4 is Num with >3`,
+		`Obj<yes: Num>|Obj<no: Num>`,
+		`{yes: 4}`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`2 if >3`,
+		`Obj<yes: Num>|Obj<no: Num>`,
+		`{no: 2}`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`4 if >3`,
+		`Obj<yes: Num>|Obj<no: Num>`,
+		`{yes: 4}`,
+		nil,
+		t,
+	)
 }
