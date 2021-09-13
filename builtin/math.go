@@ -6,10 +6,10 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/texttheater/bach/builtin/varhypot"
 	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
+	"github.com/texttheater/golang-variadic-hypot/varhypot"
 )
 
 func initMath() {
