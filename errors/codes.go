@@ -119,7 +119,7 @@ func (code ErrorCode) DefaultMessage() string {
 	case NoSuchProperty:
 		return "Getter requires an object with the specified property."
 	case NoSuchIndex:
-		return "Getter requires a tuple that is long enough."
+		return "Array is not long enough."
 	case BadIndex:
 		return "Tuple indexing requires a nonnegative integer."
 	case NoGetterAllowed:
