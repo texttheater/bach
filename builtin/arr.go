@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
@@ -88,18 +89,10 @@ func initArr() {
 					OutputType: types.NumType{},
 				},
 			},
-			types.Union(
-				types.ObjType{
-					PropTypeMap: map[string]types.Type{
-						"just": types.TypeVariable{
-							Name:       "A",
-							UpperBound: types.AnyType{},
-						},
-					},
-					RestType: types.AnyType{},
-				},
-				types.NullType{},
-			),
+			types.TypeVariable{
+				Name:       "A",
+				UpperBound: types.AnyType{},
+			},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				res0 := args[0](inputState, nil).Eval()
 				if res0.Error != nil {
@@ -108,21 +101,24 @@ func initArr() {
 				index := float64(res0.Value.(states.NumValue))
 				intIndex := int(index)
 				if index != float64(intIndex) {
-					return states.ThunkFromValue(states.NullValue{})
+					return states.ThunkFromError(errors.E(
+						errors.Code(errors.BadIndex),
+					))
 				}
 				value := inputState.Value.(*states.ArrValue)
-				if index < 0 {
+				// negative index
+				if intIndex < 0 {
 					revIndex := -intIndex
 					buf := make([]states.Value, revIndex)
 					bufIndex := 0
 					for true {
 						if value == nil {
 							if buf[bufIndex] == nil {
-								return states.ThunkFromValue(states.NullValue{})
+								return states.ThunkFromError(errors.E(
+									errors.Code(errors.NoSuchIndex),
+								))
 							}
-							return states.ThunkFromValue(states.ObjValue(map[string]*states.Thunk{
-								"just": states.ThunkFromValue(buf[bufIndex]),
-							}))
+							return states.ThunkFromValue(buf[bufIndex])
 						}
 						buf[bufIndex] = value.Head
 						bufIndex = (bufIndex + 1) % revIndex
@@ -137,7 +133,9 @@ func initArr() {
 				// nonnegative index
 				for i := 0; i < intIndex; i++ {
 					if value == nil {
-						return states.ThunkFromValue(states.NullValue{})
+						return states.ThunkFromError(errors.E(
+							errors.Code(errors.NoSuchIndex),
+						))
 					}
 					tail := value.Tail
 					res := tail.Eval()
@@ -147,11 +145,12 @@ func initArr() {
 					value = res.Value.(*states.ArrValue)
 				}
 				if value == nil {
+					return states.ThunkFromError(errors.E(
+						errors.Code(errors.NoSuchIndex),
+					))
 					return states.ThunkFromValue(states.NullValue{})
 				}
-				return states.ThunkFromValue(states.ObjValue(map[string]*states.Thunk{
-					"just": states.ThunkFromValue(value.Head),
-				}))
+				return states.ThunkFromValue(value.Head)
 			},
 			nil,
 		),

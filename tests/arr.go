@@ -155,102 +155,50 @@ func TestArrays(t *testing.T) {
 
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`[] get(0)`,
-		types.Union(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{
-					"just": types.VoidType{},
-				},
-				RestType: types.AnyType{},
-			},
-			types.NullType{},
+		`Void`,
+		``,
+		errors.E(
+			errors.Code(errors.VoidProgram),
 		),
-		states.NullValue{},
-		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`["a", "b", "c"] get(0)`,
-		types.Union(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{
-					"just": types.StrType{},
-				},
-				RestType: types.AnyType{},
-			},
-			types.NullType{},
-		),
-		states.ObjValue(map[string]*states.Thunk{
-			"just": states.ThunkFromValue(states.StrValue("a")),
-		}),
+		`Str`,
+		`"a"`,
 		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`["a", "b", "c"] get(-1)`,
-		types.Union(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{
-					"just": types.StrType{},
-				},
-				RestType: types.AnyType{},
-			},
-			types.NullType{},
-		),
-		states.ObjValue(map[string]*states.Thunk{
-			"just": states.ThunkFromValue(states.StrValue("c")),
-		}),
+		`Str`,
+		`"c"`,
 		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`["a", "b", "c"] get(-2)`,
-		types.Union(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{
-					"just": types.StrType{},
-				},
-				RestType: types.AnyType{},
-			},
-			types.NullType{},
-		),
-		states.ObjValue(map[string]*states.Thunk{
-			"just": states.ThunkFromValue(states.StrValue("b")),
-		}),
+		`Str`,
+		`"b"`,
 		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`["a", "b", "c"] get(-3)`,
-		types.Union(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{
-					"just": types.StrType{},
-				},
-				RestType: types.AnyType{},
-			},
-			types.NullType{},
-		),
-		states.ObjValue(map[string]*states.Thunk{
-			"just": states.ThunkFromValue(states.StrValue("a")),
-		}),
+		`Str`,
+		`"a"`,
 		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`["a", "b", "c"] get(-4)`,
-		types.Union(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{
-					"just": types.StrType{},
-				},
-				RestType: types.AnyType{},
-			},
-			types.NullType{},
+		`Str`,
+		``,
+		errors.E(
+			errors.Code(errors.NoSuchIndex),
 		),
-		states.NullValue{},
-		nil,
 		t,
 	)
 }

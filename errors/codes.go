@@ -170,7 +170,7 @@ func (code ErrorCode) Kind() string {
 	case NoSuchProperty:
 		return "Type error"
 	case NoSuchIndex:
-		return "Type error"
+		return "Type error" // FIXME this can be a runtime error
 	case BadIndex:
 		return "Value error"
 	case NoGetterAllowed:
