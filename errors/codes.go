@@ -121,7 +121,7 @@ func (code ErrorCode) DefaultMessage() string {
 	case NoSuchIndex:
 		return "Array is not long enough."
 	case BadIndex:
-		return "Tuple indexing requires a nonnegative integer."
+		return "Index must be an integer."
 	case NoGetterAllowed:
 		return "A getter expression cannot be applied to this type."
 	default:

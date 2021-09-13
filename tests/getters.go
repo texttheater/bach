@@ -65,17 +65,28 @@ func TestGetters(t *testing.T) {
 		nil,
 		errors.E(
 			errors.Code(errors.NoSuchIndex),
-			errors.WantType(&types.NearrType{types.AnyType{}, &types.NearrType{types.AnyType{}, &types.NearrType{types.AnyType{}, &types.NearrType{types.AnyType{}, types.AnyArrType}}}}),
-			errors.GotType(types.TupType([]types.Type{types.StrType{}, types.StrType{}, types.StrType{}}))),
-
+		),
 		t,
 	)
-	TestProgram(`["a", "b", "c"] @-1`,
+	TestProgramStr(
+		`["a", "b", "c"] @-1`,
+		`Str`,
+		`"c"`,
 		nil,
+		t,
+	)
+	TestProgramStr(
+		`["a", "b", "c"] @-2`,
+		`Str`,
+		`"b"`,
 		nil,
-		errors.E(
-			errors.Code(errors.BadIndex)),
-
+		t,
+	)
+	TestProgramStr(
+		`["a", "b", "c"] @-3`,
+		`Str`,
+		`"a"`,
+		nil,
 		t,
 	)
 	TestProgram(`["a", "b", "c"] @1.5`,

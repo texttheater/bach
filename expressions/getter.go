@@ -59,27 +59,45 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*parameters.Param
 		if err != nil {
 			return Shape{}, nil, nil, errors.E(
 				errors.Code(errors.BadIndex),
-				errors.Pos(x.Pos))
-
+				errors.Pos(x.Pos),
+			)
 		}
-		wantType := types.AnyArrType
-		for i := 0; i <= index; i++ {
-			wantType = &types.NearrType{
-				HeadType: types.AnyType{},
-				TailType: wantType,
+		var outputType types.Type
+		restType := t
+		if index < 0 {
+			posIndex := index + 1
+			revIndex := -index
+			buf := make([]types.Type, revIndex)
+			bufIndex := 0
+			for true {
+				buf[bufIndex] = restType.HeadType
+				bufIndex = (bufIndex + 1) % revIndex
+				if types.VoidArrType.Subsumes(restType.TailType) {
+					if buf[bufIndex] == nil {
+						return Shape{}, nil, nil, errors.E(
+							errors.Pos(x.Pos),
+							errors.Code(errors.NoSuchIndex),
+						)
+					}
+					outputType = buf[bufIndex]
+					break
+				}
+				restType = restType.TailType.(*types.NearrType)
+				posIndex += 1
 			}
+			index = posIndex
+		} else {
+			for i := 0; i < index; i++ {
+				if types.VoidArrType.Subsumes(restType.TailType) {
+					return Shape{}, nil, nil, errors.E(
+						errors.Pos(x.Pos),
+						errors.Code(errors.NoSuchIndex),
+					)
+				}
+				restType = restType.TailType.(*types.NearrType)
+			}
+			outputType = restType.HeadType
 		}
-		if !wantType.Subsumes(inputShape.Type) {
-			return Shape{}, nil, nil, errors.E(
-				errors.Code(errors.NoSuchIndex),
-				errors.WantType(wantType),
-				errors.GotType(inputShape.Type))
-
-		}
-		for i := 0; i < index; i++ {
-			t = t.TailType.(*types.NearrType)
-		}
-		outputType := t.HeadType
 		outputShape := Shape{
 			Type:  outputType,
 			Stack: inputShape.Stack,

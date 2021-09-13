@@ -26,10 +26,17 @@ func (g *Getter) Ast() (expressions.Expression, error) {
 	} else if g.Op2Getter != nil {
 		name = (*g.Op2Getter)[1:]
 	} else if g.NumGetter != nil {
-		num, err := strconv.ParseFloat((*g.NumGetter)[1:], 64)
+		numString := (*g.NumGetter)[1:]
+		sign := 1.0
+		if numString[0] == '-' {
+			numString = numString[1:]
+			sign = -1.0
+		}
+		num, err := strconv.ParseFloat(numString, 64)
 		if err != nil {
 			return nil, err
 		}
+		num = num * sign
 		name = strconv.FormatFloat(float64(num), 'g', -1, 64)
 	} else if g.StrGetter != nil {
 		name, err = strconv.Unquote((*g.StrGetter)[1:])

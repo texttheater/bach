@@ -35,10 +35,10 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		// numbers
 		{"NumLiteral", `\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+`, nil},
 		// getters
+		{"NumGetter", `@-?(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
 		{"LidGetter", `@[\p{L}_][\p{L}_0-9]*`, nil},
 		{"Op2Getter", `@(?:==|<=|>=|\*\*)`, nil},
 		{"Op1Getter", `@[+\-*/%<>=]`, nil},
-		{"NumGetter", `@(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
 		{"StrGetter", `@"(?:\\.|[^"])*"`, nil},
 		// starting with unique characters
 		{"Regexp", `~(?:\\.|[^/])*~`, nil},
