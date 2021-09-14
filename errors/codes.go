@@ -117,7 +117,7 @@ func (code ErrorCode) DefaultMessage() string {
 	case UnexpectedValue:
 		return "Component got an unexpected input value."
 	case NoSuchProperty:
-		return "Getter requires an object with the specified property."
+		return "The object does not have this property."
 	case NoSuchIndex:
 		return "Array is not long enough."
 	case BadIndex:
@@ -168,7 +168,7 @@ func (code ErrorCode) Kind() string {
 	case UnexpectedValue:
 		return "Value error"
 	case NoSuchProperty:
-		return "Type error"
+		return "Type error" // FIXME this can be a runtime error
 	case NoSuchIndex:
 		return "Type error" // FIXME this can be a runtime error
 	case BadIndex:

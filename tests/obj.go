@@ -3,117 +3,51 @@ package tests
 import (
 	"testing"
 
-	"github.com/texttheater/bach/states"
-	"github.com/texttheater/bach/types"
+	"github.com/texttheater/bach/errors"
 )
 
 func TestObjects(t *testing.T) {
-	TestProgram(
+	TestProgramStr(
 		`{} get"a"`,
-		types.Union(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{
-					"just": types.VoidType{},
-				},
-				RestType: types.AnyType{},
-			},
-			types.NullType{},
+		`Void`,
+		``,
+		errors.E(
+			errors.Code(errors.VoidProgram),
 		),
-		states.NullValue{},
-		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`{a: 1} get"a"`,
-		types.Union(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{
-					"just": types.NumType{},
-				},
-				RestType: types.AnyType{},
-			},
-			types.NullType{},
-		),
-		states.ObjValue(map[string]*states.Thunk{
-			"just": states.ThunkFromValue(states.NumValue(1)),
-		}),
+		`Num`,
+		`1`,
 		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`{a: 1, b: "hey"} get"a"`,
-		types.Union(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{
-					"just": types.Union(
-						types.NumType{},
-						types.StrType{},
-					),
-				},
-				RestType: types.AnyType{},
-			},
-			types.NullType{},
-		),
-		states.ObjValue(map[string]*states.Thunk{
-			"just": states.ThunkFromValue(states.NumValue(1)),
-		}),
+		`Num|Str`,
+		`1`,
 		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`{a: 1, b: "hey", c: false} get"a"`,
-		types.Union(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{
-					"just": types.Union(
-						types.NumType{},
-						types.Union(
-							types.StrType{},
-							types.BoolType{},
-						),
-					),
-				},
-				RestType: types.AnyType{},
-			},
-			types.NullType{},
-		),
-		states.ObjValue(map[string]*states.Thunk{
-			"just": states.ThunkFromValue(states.NumValue(1)),
-		}),
+		`Num|Str|Bool`,
+		`1`,
 		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`{1: "a"} get(1)`,
-		types.Union(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{
-					"just": types.StrType{},
-				},
-				RestType: types.AnyType{},
-			},
-			types.NullType{},
-		),
-		states.ObjValue(map[string]*states.Thunk{
-			"just": states.ThunkFromValue(states.StrValue("a")),
-		}),
+		`Str`,
+		`"a"`,
 		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`{1.5: "a"} get(1.5)`,
-		types.Union(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{
-					"just": types.StrType{},
-				},
-				RestType: types.AnyType{},
-			},
-			types.NullType{},
-		),
-		states.ObjValue(map[string]*states.Thunk{
-			"just": states.ThunkFromValue(states.StrValue("a")),
-		}),
+		`Str`,
+		`"a"`,
 		nil,
 		t,
 	)

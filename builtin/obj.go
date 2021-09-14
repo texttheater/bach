@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/parameters"
 	"github.com/texttheater/bach/states"
@@ -32,18 +33,10 @@ func initObj() {
 					OutputType: types.Union(types.StrType{}, types.NumType{}),
 				},
 			},
-			types.Union(
-				types.ObjType{
-					PropTypeMap: map[string]types.Type{
-						"just": types.TypeVariable{
-							Name:       "A",
-							UpperBound: types.AnyType{},
-						},
-					},
-					RestType: types.AnyType{},
-				},
-				types.NullType{},
-			),
+			types.TypeVariable{
+				Name:       "A",
+				UpperBound: types.AnyType{},
+			},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				inputValue := inputState.Value.(states.ObjValue)
 				res0 := args[0](inputState, nil).Eval()
@@ -56,17 +49,15 @@ func initObj() {
 				}
 				thunk, ok := inputValue[prop]
 				if !ok {
-					return states.ThunkFromValue(states.NullValue{})
+					return states.ThunkFromError(errors.E(
+						errors.Code(errors.NoSuchProperty),
+					))
 				}
 				res := thunk.Eval()
 				if res.Error != nil {
 					return states.ThunkFromError(res.Error)
 				}
-				return states.ThunkFromValue(states.ObjValue(
-					map[string]*states.Thunk{
-						"just": states.ThunkFromValue(res.Value),
-					},
-				))
+				return states.ThunkFromValue(res.Value)
 			},
 			nil,
 		),
