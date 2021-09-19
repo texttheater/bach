@@ -11,6 +11,47 @@ import (
 
 func initArr() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		expressions.RegularFuncer(
+			&types.ArrType{
+				ElType: types.TypeVariable{
+					Name:       "A",
+					UpperBound: types.AnyType{},
+				},
+			},
+			"take",
+			[]*parameters.Parameter{
+				parameters.SimpleParam(types.NumType{}), // FIXME simple params are bullshit
+			},
+			&types.ArrType{
+				ElType: types.TypeVariable{
+					Name:       "A",
+					UpperBound: types.AnyType{},
+				},
+			},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				arr := inputState.Value.(*states.ArrValue)
+				res := args[0](inputState, nil).Eval()
+				if res.Error != nil {
+					return states.ThunkFromError(res.Error)
+				}
+				n := int(res.Value.(states.NumValue))
+				iter := func() (states.Value, bool, error) {
+					if arr == nil || n <= 0 {
+						return nil, false, nil
+					}
+					head := arr.Head
+					res := arr.Tail.Eval()
+					if res.Error != nil {
+						return nil, false, res.Error
+					}
+					arr = res.Value.(*states.ArrValue)
+					n--
+					return head, true, nil
+				}
+				return states.ThunkFromIter(iter)
+			},
+			nil,
+		),
 		expressions.SimpleFuncer(
 			types.AnyArrType,
 			"len",
