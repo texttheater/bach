@@ -243,4 +243,46 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`[1, 2, 3] drop(2)`,
+		`Arr<Num>`,
+		`[3]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[1, 2, 3] drop(1)`,
+		`Arr<Num>`,
+		`[2, 3]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[1, 2, 3] drop(0)`,
+		`Arr<Num>`,
+		`[1, 2, 3]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[1, 2, 3] drop(-1)`,
+		`Arr<Num>`,
+		`[1, 2, 3]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[1, 2, 3] drop(4)`,
+		`Arr<Num>`,
+		`[]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[1, 2, 3] drop(3)`,
+		`Arr<Num>`,
+		`[]`,
+		nil,
+		t,
+	)
 }
