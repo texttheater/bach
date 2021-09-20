@@ -10,7 +10,6 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		// whitespace
 		{"whitespace", `\s+`, nil},
 		// tokens starting type literals
-		{"Keyword", `(?:for|def|as|ok|if|then|elif|else|each|all|is|elis|with|drop)\b`, nil},
 		{"TypeKeywordLangle", `(?:Arr|Tup|Obj)<`, nil},
 		{"TypeKeyword", `(?:Void|Null|Reader|Bool|Num|Str|Arr|Tup|Obj|Any)\b`, nil},
 		// tokens starting calls
@@ -26,6 +25,8 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		{"NameLbrace", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*){`, nil},
 		// assignment
 		{"Assignment", `=(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)`, nil},
+		// keywords
+		{"Keyword", `(?:for|def|as|ok|if|then|elif|else|each|all|is|elis|with|drop)\b`, nil},
 		// names
 		{"Lid", `[\p{L}_][\p{L}_0-9]*`, nil},
 		{"Op2", `==|<=|>=|\*\*`, nil},
