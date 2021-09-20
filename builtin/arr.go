@@ -18,6 +18,38 @@ func initArr() {
 					UpperBound: types.AnyType{},
 				},
 			},
+			"rev",
+			nil,
+			&types.ArrType{
+				ElType: types.TypeVariable{
+					Name:       "A",
+					UpperBound: types.AnyType{},
+				},
+			},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				inputArr := inputValue.(*states.ArrValue)
+				var outputArr *states.ArrValue
+				for inputArr != nil {
+					outputArr = &states.ArrValue{
+						Head: inputArr.Head,
+						Tail: states.ThunkFromValue(outputArr),
+					}
+					res := inputArr.Tail.Eval()
+					if res.Error != nil {
+						return nil, res.Error
+					}
+					inputArr = res.Value.(*states.ArrValue)
+				}
+				return outputArr, nil
+			},
+		),
+		expressions.SimpleFuncer(
+			&types.ArrType{
+				ElType: types.TypeVariable{
+					Name:       "A",
+					UpperBound: types.AnyType{},
+				},
+			},
 			"drop",
 			[]types.Type{
 				types.NumType{},

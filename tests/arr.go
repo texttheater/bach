@@ -285,4 +285,18 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`[1, 2, 3] rev`,
+		`Arr<Num>`,
+		`[3, 2, 1]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[] rev`,
+		`Tup<>`,
+		`[]`,
+		nil,
+		t,
+	)
 }
