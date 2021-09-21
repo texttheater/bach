@@ -173,31 +173,10 @@ func TestArrays(t *testing.T) {
 	)
 	TestProgramStr(
 		`["a", "b", "c"] get(-1)`,
-		`Str`,
-		`"c"`,
-		nil,
-		t,
-	)
-	TestProgramStr(
-		`["a", "b", "c"] get(-2)`,
-		`Str`,
-		`"b"`,
-		nil,
-		t,
-	)
-	TestProgramStr(
-		`["a", "b", "c"] get(-3)`,
-		`Str`,
-		`"a"`,
-		nil,
-		t,
-	)
-	TestProgramStr(
-		`["a", "b", "c"] get(-4)`,
-		`Str`,
+		``,
 		``,
 		errors.ValueError(
-			errors.Code(errors.NoSuchIndex),
+			errors.Code(errors.BadIndex),
 		),
 		t,
 	)

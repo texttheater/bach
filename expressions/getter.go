@@ -56,7 +56,7 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*parameters.Param
 		return outputShape, action, nil, nil
 	case *types.NearrType:
 		index, err := strconv.Atoi(x.Name)
-		if err != nil {
+		if err != nil || index < 0 {
 			return Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.BadIndex),
 				errors.Pos(x.Pos),
@@ -64,40 +64,16 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*parameters.Param
 		}
 		var outputType types.Type
 		restType := t
-		if index < 0 {
-			posIndex := index + 1
-			revIndex := -index
-			buf := make([]types.Type, revIndex)
-			bufIndex := 0
-			for true {
-				buf[bufIndex] = restType.HeadType
-				bufIndex = (bufIndex + 1) % revIndex
-				if types.VoidArrType.Subsumes(restType.TailType) {
-					if buf[bufIndex] == nil {
-						return Shape{}, nil, nil, errors.TypeError(
-							errors.Pos(x.Pos),
-							errors.Code(errors.NoSuchIndex),
-						)
-					}
-					outputType = buf[bufIndex]
-					break
-				}
-				restType = restType.TailType.(*types.NearrType)
-				posIndex += 1
+		for i := 0; i < index; i++ {
+			if types.VoidArrType.Subsumes(restType.TailType) {
+				return Shape{}, nil, nil, errors.TypeError(
+					errors.Pos(x.Pos),
+					errors.Code(errors.NoSuchIndex),
+				)
 			}
-			index = posIndex
-		} else {
-			for i := 0; i < index; i++ {
-				if types.VoidArrType.Subsumes(restType.TailType) {
-					return Shape{}, nil, nil, errors.TypeError(
-						errors.Pos(x.Pos),
-						errors.Code(errors.NoSuchIndex),
-					)
-				}
-				restType = restType.TailType.(*types.NearrType)
-			}
-			outputType = restType.HeadType
+			restType = restType.TailType.(*types.NearrType)
 		}
+		outputType = restType.HeadType
 		outputShape := Shape{
 			Type:  outputType,
 			Stack: inputShape.Stack,

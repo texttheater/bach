@@ -70,23 +70,11 @@ func TestGetters(t *testing.T) {
 	)
 	TestProgramStr(
 		`["a", "b", "c"] @-1`,
-		`Str`,
-		`"c"`,
-		nil,
-		t,
-	)
-	TestProgramStr(
-		`["a", "b", "c"] @-2`,
-		`Str`,
-		`"b"`,
-		nil,
-		t,
-	)
-	TestProgramStr(
-		`["a", "b", "c"] @-3`,
-		`Str`,
-		`"a"`,
-		nil,
+		``,
+		``,
+		errors.TypeError(
+			errors.Code(errors.BadIndex),
+		),
 		t,
 	)
 	TestProgram(`["a", "b", "c"] @1.5`,
