@@ -115,6 +115,81 @@ func initArr() {
 			},
 			nil,
 		),
+		expressions.RegularFuncer(
+			&types.ArrType{
+				ElType: types.TypeVariable{
+					Name:       "A",
+					UpperBound: types.AnyType{},
+				},
+			},
+			"slice",
+			[]*parameters.Parameter{
+				parameters.SimpleParam(types.NumType{}),
+				parameters.SimpleParam(types.NumType{}),
+			},
+			&types.ArrType{
+				ElType: types.TypeVariable{
+					Name:       "A",
+					UpperBound: types.AnyType{},
+				},
+			},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				// validate first argument
+				argInputState := inputState.Clear()
+				res0 := args[0](argInputState, nil).Eval()
+				if res0.Error != nil {
+					return states.ThunkFromError(res0.Error)
+				}
+				from := float64(res0.Value.(states.NumValue))
+				intFrom := int(from)
+				if from != float64(intFrom) || intFrom < 0 {
+					return states.ThunkFromError(errors.ValueError(
+						errors.Code(errors.BadIndex),
+						errors.Pos(pos),
+					))
+				}
+				// validate second argument
+				res1 := args[1](argInputState, nil).Eval()
+				if res1.Error != nil {
+					return states.ThunkFromError(res1.Error)
+				}
+				to := float64(res1.Value.(states.NumValue))
+				intTo := int(to)
+				if to != float64(intTo) || intTo < 0 {
+					return states.ThunkFromError(errors.ValueError(
+						errors.Code(errors.BadIndex),
+						errors.Pos(pos),
+					))
+				}
+				// drop
+				arr := inputState.Value.(*states.ArrValue)
+				for arr != nil && intFrom > 0 {
+					res := arr.Tail.Eval()
+					if res.Error != nil {
+						return states.ThunkFromError(res.Error)
+					}
+					arr = res.Value.(*states.ArrValue)
+					intFrom--
+					intTo--
+				}
+				// take
+				iter := func() (states.Value, bool, error) {
+					if arr == nil || intTo <= 0 {
+						return nil, false, nil
+					}
+					head := arr.Head
+					res := arr.Tail.Eval()
+					if res.Error != nil {
+						return nil, false, res.Error
+					}
+					arr = res.Value.(*states.ArrValue)
+					intTo--
+					return head, true, nil
+				}
+				return states.ThunkFromIter(iter)
+			},
+			nil,
+		),
 		expressions.SimpleFuncer(
 			types.AnyArrType,
 			"len",
