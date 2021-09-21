@@ -15,8 +15,17 @@ import (
 
 type errorAttribute func(err *e)
 
-// E builds an error value from a number of error attributes. The following
-// functions can be used to create error attributes:
+func E(atts ...errorAttribute) error {
+	err := e{}
+	e := &err
+	for _, att := range atts {
+		att(e)
+	}
+	return e
+}
+
+// SyntaxError builds a syntax error value from a number of error attributes.
+// The following functions can be used to create error attributes:
 //
 //    Code
 //    Pos
@@ -31,8 +40,74 @@ type errorAttribute func(err *e)
 //    ParamNum
 //    WantParam
 //    GotParam
-func E(atts ...errorAttribute) error {
-	err := e{}
+func SyntaxError(atts ...errorAttribute) error {
+	return makeError(SyntaxKind, atts...)
+}
+
+// TypeError builds a syntax error value from a number of error attributes.
+// The following functions can be used to create error attributes:
+//
+//    Code
+//    Pos
+//    Message
+//    WantType
+//    GotType
+//    GotValue
+//    InputType
+//    Name
+//    ArgNum
+//    NumParams
+//    ParamNum
+//    WantParam
+//    GotParam
+func TypeError(atts ...errorAttribute) error {
+	return makeError(TypeKind, atts...)
+}
+
+// ValueError builds a syntax error value from a number of error attributes.
+// The following functions can be used to create error attributes:
+//
+//    Code
+//    Pos
+//    Message
+//    WantType
+//    GotType
+//    GotValue
+//    InputType
+//    Name
+//    ArgNum
+//    NumParams
+//    ParamNum
+//    WantParam
+//    GotParam
+func ValueError(atts ...errorAttribute) error {
+	return makeError(ValueKind, atts...)
+}
+
+// UnknownError builds a syntax error value from a number of error attributes.
+// The following functions can be used to create error attributes:
+//
+//    Code
+//    Pos
+//    Message
+//    WantType
+//    GotType
+//    GotValue
+//    InputType
+//    Name
+//    ArgNum
+//    NumParams
+//    ParamNum
+//    WantParam
+//    GotParam
+func UnknownError(atts ...errorAttribute) error {
+	return makeError(UnknownKind, atts...)
+}
+
+func makeError(kind ErrorKind, atts ...errorAttribute) error {
+	err := e{
+		Kind: &kind,
+	}
 	e := &err
 	for _, att := range atts {
 		att(e)
@@ -126,6 +201,7 @@ func Hint(hint string) errorAttribute {
 
 // An e represents any code of Bach error, or error template.
 type e struct {
+	Kind      *ErrorKind
 	Code      *ErrorCode
 	Pos       *lexer.Position
 	Message   *string
@@ -144,6 +220,9 @@ type e struct {
 
 func (err *e) Error() string {
 	m := make(map[string]interface{})
+	if err.Kind != nil {
+		m["kind"] = err.Kind.String()
+	}
 	if err.Code != nil {
 		m["Code"] = err.Code.String()
 	}
@@ -201,7 +280,7 @@ func Explain(err error, program string) {
 		return
 	}
 	// header and position
-	fmt.Fprint(os.Stderr, e.Code.Kind())
+	fmt.Fprint(os.Stderr, e.Kind)
 	if e.Pos != nil && e.Pos.Line > 0 {
 		fmt.Fprintln(os.Stderr, " at", e.Pos)
 		lines := strings.SplitAfter(program, "\n")
@@ -272,6 +351,9 @@ func Match(err1, err2 error) bool {
 	}
 	e2, ok := err2.(*e)
 	if !ok {
+		return false
+	}
+	if e1.Kind != nil && *e2.Kind != *e1.Kind {
 		return false
 	}
 	if e1.Code != nil && *e2.Code != *e1.Code {

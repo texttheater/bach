@@ -1,5 +1,27 @@
 package errors
 
+type ErrorKind int
+
+const (
+	SyntaxKind ErrorKind = iota
+	TypeKind
+	ValueKind
+	UnknownKind
+)
+
+func (kind ErrorKind) String() string {
+	switch kind {
+	case SyntaxKind:
+		return "Syntax error"
+	case TypeKind:
+		return "Type error"
+	case ValueKind:
+		return "Value error"
+	default:
+		return "Unknown error"
+	}
+}
+
 type ErrorCode int
 
 const (
@@ -126,56 +148,5 @@ func (code ErrorCode) DefaultMessage() string {
 		return "A getter expression cannot be applied to this type."
 	default:
 		return "unknown error"
-	}
-}
-
-func (code ErrorCode) Kind() string {
-	switch code {
-	case Syntax:
-		return "Syntax error"
-	case ParamsNotAllowed:
-		return "Type error"
-	case NoSuchFunction:
-		return "Type error"
-	case ArgHasWrongOutputType:
-		return "Type error"
-	case ParamDoesNotMatch:
-		return "Type error"
-	case FunctionBodyHasWrongOutputType:
-		return "Type error"
-	case ConditionMustBeBool:
-		return "Type error"
-	case MappingRequiresArrType:
-		return "Type error"
-	case RestRequiresArrType:
-		return "Type error"
-	case ComposeWithVoid:
-		return "Type error"
-	case VoidProgram:
-		return "Type error"
-	case NonExhaustiveMatch:
-		return "Type error"
-	case ImpossibleMatch:
-		return "Type error"
-	case UnreachableElisClause:
-		return "Type error"
-	case UnreachableElseClause:
-		return "Type error"
-	case RegexpWantsString:
-		return "Type error"
-	case BadRegexp:
-		return "Syntax error"
-	case UnexpectedValue:
-		return "Value error"
-	case NoSuchProperty:
-		return "Type error" // FIXME this can be a runtime error
-	case NoSuchIndex:
-		return "Type error" // FIXME this can be a runtime error
-	case BadIndex:
-		return "Value error"
-	case NoGetterAllowed:
-		return "Type error"
-	default:
-		return "Unknown error"
 	}
 }
