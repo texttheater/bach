@@ -48,7 +48,7 @@ func TestConditionals(t *testing.T) {
 		`is Null`,
 		``,
 		``,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.UnreachableElseClause),
 		),
 		t,

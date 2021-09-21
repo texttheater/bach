@@ -20,9 +20,9 @@ func TestMatchingArr(t *testing.T) {
 		`[1, 2, 3] is [Num, Num, Num] then true else false ok`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.UnreachableElseClause)),
-
+		errors.TypeError(
+			errors.Code(errors.UnreachableElseClause),
+		),
 		t,
 	)
 	TestProgram(
@@ -78,7 +78,7 @@ func TestMatchingArr(t *testing.T) {
 	//	`if true then [1] else ["2"] ok is [Num a] then a ok`,
 	//	nil,
 	//	nil,
-	//	errors.E(
+	//	errors.TypeError(
 	//		errors.Code(errors.NonExhaustiveMatch),
 	//	),
 	//	t,
@@ -94,18 +94,18 @@ func TestMatchingArr(t *testing.T) {
 		`[] is [a] then a ok`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.ImpossibleMatch)),
-
+		errors.TypeError(
+			errors.Code(errors.ImpossibleMatch),
+		),
 		t,
 	)
 	TestProgram(
 		`[1] is [a, b] then a ok`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.ImpossibleMatch)),
-
+		errors.TypeError(
+			errors.Code(errors.ImpossibleMatch),
+		),
 		t,
 	)
 	TestProgram(

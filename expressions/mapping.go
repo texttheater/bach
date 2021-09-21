@@ -20,19 +20,19 @@ func (x MappingExpression) Position() lexer.Position {
 func (x MappingExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ParamsNotAllowed),
-			errors.Pos(x.Pos))
-
+			errors.Pos(x.Pos),
+		)
 	}
 	// make sure the input type is a sequence type
 	if !types.AnyArrType.Subsumes(inputShape.Type) {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.MappingRequiresArrType),
 			errors.Pos(x.Pos),
 			errors.WantType(types.AnyArrType),
-			errors.GotType(inputShape.Type))
-
+			errors.GotType(inputShape.Type),
+		)
 	}
 	// typecheck body
 	bodyInputShape := Shape{

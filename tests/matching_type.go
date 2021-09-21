@@ -20,7 +20,7 @@ func TestMatchingType(t *testing.T) {
 	//	`if true then 2 else "two" ok is Num then true ok`,
 	//	nil,
 	//	nil,
-	//	errors.E(
+	//	errors.TypeError(
 	//		errors.Code(errors.NonExhaustiveMatch),
 	//		errors.WantType(types.VoidType{}),
 	//		errors.GotType(types.StrType{}),
@@ -38,9 +38,9 @@ func TestMatchingType(t *testing.T) {
 		`if true then 2 else "two" ok is Num then true elis Str then false else false ok`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.UnreachableElseClause)),
-
+		errors.TypeError(
+			errors.Code(errors.UnreachableElseClause),
+		),
 		t,
 	)
 	TestProgram(

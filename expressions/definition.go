@@ -25,10 +25,10 @@ func (x DefinitionExpression) Position() lexer.Position {
 func (x DefinitionExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ParamsNotAllowed),
-			errors.Pos(x.Pos))
-
+			errors.Pos(x.Pos),
+		)
 	}
 	// variables for body input stack, action (will be set at runtime)
 	var bodyInputStackStub *states.VariableStack
@@ -87,12 +87,12 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*parameters.P
 	ids := bodyIDs
 	// check body output type
 	if !x.OutputType.Subsumes(bodyOutputShape.Type) {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.FunctionBodyHasWrongOutputType),
 			errors.Pos(x.Pos),
 			errors.WantType(x.OutputType),
-			errors.GotType(bodyOutputShape.Type))
-
+			errors.GotType(bodyOutputShape.Type),
+		)
 	}
 	// define output context
 	outputShape := Shape{

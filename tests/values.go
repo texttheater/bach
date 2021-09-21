@@ -13,10 +13,10 @@ func TestValues(t *testing.T) {
 		`false if id then 1 else fatal ok`,
 		types.NumType{},
 		nil,
-		errors.E(
+		errors.ValueError(
 			errors.Code(errors.UnexpectedValue),
-			errors.GotValue(states.BoolValue(false))),
-
+			errors.GotValue(states.BoolValue(false)),
+		),
 		t,
 	)
 }

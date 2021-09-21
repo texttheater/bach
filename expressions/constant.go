@@ -20,7 +20,7 @@ func (x ConstantExpression) Position() lexer.Position {
 
 func (x ConstantExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
@@ -35,7 +35,6 @@ func (x ConstantExpression) Typecheck(inputShape Shape, params []*parameters.Par
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
 		})
-
 	}
 	return outputShape, action, nil, nil
 }

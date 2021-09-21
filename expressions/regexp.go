@@ -22,18 +22,18 @@ func (x RegexpExpression) Position() lexer.Position {
 
 func (x RegexpExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ParamsNotAllowed),
-			errors.Pos(x.Pos))
-
+			errors.Pos(x.Pos),
+		)
 	}
 	if !(types.StrType{}).Subsumes(inputShape.Type) {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.RegexpWantsString),
 			errors.Pos(x.Pos),
 			errors.WantType(types.StrType{}),
-			errors.GotType(inputShape.Type))
-
+			errors.GotType(inputShape.Type),
+		)
 	}
 	submatchType := types.Union(types.NullType{}, types.StrType{})
 	propTypeMap := make(map[string]types.Type)

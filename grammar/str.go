@@ -37,7 +37,7 @@ func (g *StrLiteral) StaticStr() (string, bool, error) {
 	fragment := g.Fragments[0]
 	if fragment.Dbrace != nil {
 		if len(*fragment.Dbrace) == 1 {
-			return "", false, errors.E(
+			return "", false, errors.SyntaxError(
 				errors.Code(errors.Syntax),
 				errors.Pos(g.Pos),
 				errors.Message("Use a double brace }} for a literal brace }"),
@@ -48,7 +48,7 @@ func (g *StrLiteral) StaticStr() (string, bool, error) {
 	if fragment.Text != nil {
 		str, err := strconv.Unquote("\"" + *fragment.Text + "\"")
 		if err != nil {
-			return "", false, errors.E(
+			return "", false, errors.SyntaxError(
 				errors.Code(errors.Syntax),
 				errors.Pos(g.Pos),
 				errors.Message(err.Error()),
@@ -74,7 +74,7 @@ func (g *Fragment) Ast() (expressions.Expression, error) {
 	var err error
 	if g.Dbrace != nil {
 		if len(*g.Dbrace) == 1 {
-			return nil, errors.E(
+			return nil, errors.SyntaxError(
 				errors.Code(errors.Syntax),
 				errors.Pos(g.Pos),
 				errors.Message("Use a double brace }} for a literal brace }"),
@@ -84,7 +84,7 @@ func (g *Fragment) Ast() (expressions.Expression, error) {
 	} else {
 		str, err = strconv.Unquote("\"" + *g.Text + "\"")
 		if err != nil {
-			return nil, errors.E(
+			return nil, errors.SyntaxError(
 				errors.Code(errors.Syntax),
 				errors.Pos(g.Pos),
 				errors.Message(err.Error()),

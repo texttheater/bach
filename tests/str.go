@@ -62,7 +62,7 @@ func TestStrings(t *testing.T) {
 		`"{{}"`,
 		nil,
 		nil,
-		errors.E(
+		errors.SyntaxError(
 			errors.Code(errors.Syntax),
 		),
 		t,

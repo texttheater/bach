@@ -53,7 +53,7 @@ func (g *Prop) StaticStr() (string, error) {
 			return "", err
 		}
 		if !ok {
-			return "", errors.E(
+			return "", errors.SyntaxError(
 				errors.Code(errors.Syntax),
 				errors.Pos(g.Pos),
 				errors.Message("Can't use a dynamic string literal for object property."),

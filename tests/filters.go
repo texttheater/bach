@@ -117,9 +117,9 @@ func TestFilters(t *testing.T) {
 		`[1, 2, 3] each if ==1 then "a" elif ==2 then "b" else "c" all`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.Syntax)),
-
+		errors.SyntaxError(
+			errors.Code(errors.Syntax),
+		),
 		t,
 	)
 	TestProgram(

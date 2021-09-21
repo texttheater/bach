@@ -78,10 +78,10 @@ func TestDefinitions(t *testing.T) {
 			Name: "A",
 		},
 		nil,
-		errors.E(
+		errors.ValueError(
 			errors.Code(errors.UnexpectedValue),
-			errors.GotValue(states.NullValue{})),
-
+			errors.GotValue(states.NullValue{}),
+		),
 		t,
 	)
 	TestProgram(
@@ -102,7 +102,7 @@ func TestDefinitions(t *testing.T) {
 		`for Str def f Obj<> as {} ok "abc" findFirst(f)`,
 		nil,
 		nil,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.ArgHasWrongOutputType),
 			errors.WantType(types.TypeVariable{
 				Name: "A",
@@ -119,20 +119,20 @@ func TestDefinitions(t *testing.T) {
 			},
 			),
 			errors.GotType(types.AnyObjType),
-			errors.ArgNum(1)),
-
+			errors.ArgNum(1),
+		),
 		t,
 	)
 	TestProgram(
 		`for <A Obj<a: Num>> def f <A> as id ok {} f`,
 		nil,
 		nil,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
 			errors.InputType(types.VoidObjType),
 			errors.Name("f"),
-			errors.NumParams(0)),
-
+			errors.NumParams(0),
+		),
 		t,
 	)
 	TestProgram(
@@ -167,12 +167,12 @@ func TestDefinitions(t *testing.T) {
 		`for Any def f(for Any g <A Arr<Any>>) <A> as g ok f("a")`,
 		nil,
 		nil,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.ArgHasWrongOutputType),
 			errors.ArgNum(1),
 			errors.WantType(types.TypeVariable{"A", types.AnyArrType}),
-			errors.GotType(types.StrType{})),
-
+			errors.GotType(types.StrType{}),
+		),
 		t,
 	)
 }

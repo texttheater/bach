@@ -24,7 +24,7 @@ func TestGetters(t *testing.T) {
 	TestProgram(`{a: 1, b: 2} @c`,
 		nil,
 		nil,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.NoSuchProperty),
 			errors.WantType(types.ObjType{
 				PropTypeMap: map[string]types.Type{
@@ -38,8 +38,8 @@ func TestGetters(t *testing.T) {
 					"b": types.NumType{},
 				},
 				RestType: types.VoidType{},
-			})),
-
+			}),
+		),
 		t,
 	)
 	TestProgram(`["a", "b", "c"] @0`,
@@ -63,7 +63,7 @@ func TestGetters(t *testing.T) {
 	TestProgram(`["a", "b", "c"] @3`,
 		nil,
 		nil,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.NoSuchIndex),
 		),
 		t,
@@ -92,41 +92,41 @@ func TestGetters(t *testing.T) {
 	TestProgram(`["a", "b", "c"] @1.5`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.BadIndex)),
-
+		errors.TypeError(
+			errors.Code(errors.BadIndex),
+		),
 		t,
 	)
 	TestProgram(`"abc" @1`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.NoGetterAllowed)),
-
+		errors.TypeError(
+			errors.Code(errors.NoGetterAllowed),
+		),
 		t,
 	)
 	TestProgram(`24 @1`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.NoGetterAllowed)),
-
+		errors.TypeError(
+			errors.Code(errors.NoGetterAllowed),
+		),
 		t,
 	)
 	TestProgram(`for Any def f Arr<Any> as [] ok f @1`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.NoGetterAllowed)),
-
+		errors.TypeError(
+			errors.Code(errors.NoGetterAllowed),
+		),
 		t,
 	)
 	TestProgram(`for Any def f Arr<Any> as ["a", "b", "c"] ok f @1`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.NoGetterAllowed)),
-
+		errors.TypeError(
+			errors.Code(errors.NoGetterAllowed),
+		),
 		t,
 	)
 }

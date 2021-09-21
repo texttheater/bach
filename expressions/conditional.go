@@ -27,10 +27,10 @@ func (x ConditionalExpression) Position() lexer.Position {
 func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ParamsNotAllowed),
-			errors.Pos(x.Pos))
-
+			errors.Pos(x.Pos),
+		)
 	}
 	// typecheck pattern
 	patternOutputShape, restType, matcher, err := x.Pattern.Typecheck(inputShape)
@@ -50,12 +50,12 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.
 			return Shape{}, nil, nil, err
 		}
 		if !(types.BoolType{}).Subsumes(guardOutputShape.Type) {
-			return Shape{}, nil, nil, errors.E(
+			return Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.ConditionMustBeBool),
 				errors.Pos(x.Guard.Position()),
 				errors.WantType(types.BoolType{}),
-				errors.GotType(guardOutputShape.Type))
-
+				errors.GotType(guardOutputShape.Type),
+			)
 		}
 	}
 	ids := guardIDs
@@ -87,10 +87,10 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.
 	for i := range x.AlternativePatterns {
 		// reachability check
 		if (types.VoidType{}).Subsumes(inputShape.Type) {
-			return Shape{}, nil, nil, errors.E(
+			return Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.UnreachableElisClause),
-				errors.Pos(x.Pattern.Position()))
-
+				errors.Pos(x.Pattern.Position()),
+			)
 		}
 		// typecheck pattern
 		patternOutputShape, restType, elisMatchers[i], err = x.AlternativePatterns[i].Typecheck(inputShape)
@@ -108,12 +108,12 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.
 				return Shape{}, nil, nil, err
 			}
 			if !(types.BoolType{}).Subsumes(guardOutputShape.Type) {
-				return Shape{}, nil, nil, errors.E(
+				return Shape{}, nil, nil, errors.TypeError(
 					errors.Code(errors.ConditionMustBeBool),
 					errors.Pos(x.AlternativeGuards[i].Position()),
 					errors.WantType(types.BoolType{}),
-					errors.GotType(guardOutputShape.Type))
-
+					errors.GotType(guardOutputShape.Type),
+				)
 			}
 			ids = ids.AddAll(guardIDs)
 		}
@@ -146,7 +146,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.
 	if x.Alternative == nil {
 		// exhaustivity check
 		//if !(types.VoidType{}).Subsumes(inputShape.Type) {
-		//	return Shape{}, nil, nil, errors.E(
+		//	return Shape{}, nil, nil, errors.TypeError(
 		//		errors.Code(errors.NonExhaustiveMatch),
 		//		errors.Pos(x.Pos),
 		//		errors.WantType(types.VoidType{}),
@@ -156,10 +156,10 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.
 	} else {
 		// reachability check
 		if !x.UnreachableAlternativeAllowed && (types.VoidType{}).Subsumes(inputShape.Type) {
-			return Shape{}, nil, nil, errors.E(
+			return Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.UnreachableElseClause),
-				errors.Pos(x.Alternative.Position()))
-
+				errors.Pos(x.Alternative.Position()),
+			)
 		}
 		// alternative
 		var alternativeOutputShape Shape
@@ -176,7 +176,6 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.
 		matcherVarStack, ok, err := matcher(inputState)
 		if err != nil {
 			return states.ThunkFromError(err)
-
 		}
 		if ok {
 			guardInputState := states.State{
@@ -203,7 +202,6 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.
 			matcherVarStack, ok, err := elisMatchers[i](inputState)
 			if err != nil {
 				return states.ThunkFromError(err)
-
 			}
 			if ok {
 				guardInputState := states.State{
@@ -228,7 +226,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*parameters.
 			}
 		}
 		if alternativeAction == nil {
-			return states.ThunkFromError(errors.E(
+			return states.ThunkFromError(errors.TypeError(
 				errors.Pos(x.Pos),
 				errors.Code(errors.UnexpectedValue),
 				errors.GotValue(inputState.Value)))
@@ -315,10 +313,10 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	elementInputTypes := make([]types.Type, len(p.ElementPatterns))
 	restInputType, ok := spreadInputType(inputShape.Type, elementInputTypes)
 	if !ok {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ImpossibleMatch),
-			errors.Pos(p.Pos))
-
+			errors.Pos(p.Pos),
+		)
 	}
 	// process element patterns
 	funcerStack := inputShape.Stack
@@ -350,12 +348,12 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	// partition the input type and check for impossible match
 	intersection, complement := inputShape.Type.Partition(pType)
 	if (types.VoidType{}).Subsumes(intersection) {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ImpossibleMatch),
 			errors.Pos(p.Pos),
 			errors.WantType(inputShape.Type),
-			errors.GotType(pType))
-
+			errors.GotType(pType),
+		)
 	}
 	// build output shape
 	outputShape := Shape{
@@ -487,12 +485,12 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	// partition the input type and check for impossible match
 	intersection, complement := inputShape.Type.Partition(pType)
 	if (types.VoidType{}).Subsumes(intersection) {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ImpossibleMatch),
 			errors.Pos(p.Pos),
 			errors.WantType(inputShape.Type),
-			errors.GotType(pType))
-
+			errors.GotType(pType),
+		)
 	}
 	// build output shape
 	outputShape := Shape{
@@ -561,12 +559,12 @@ func (p TypePattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, er
 	// partition the input type and check for impossible match
 	intersection, complement := inputShape.Type.Partition(p.Type)
 	if (types.VoidType{}).Subsumes(intersection) {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ImpossibleMatch),
 			errors.Pos(p.Pos),
 			errors.WantType(inputShape.Type),
-			errors.GotType(p.Type))
-
+			errors.GotType(p.Type),
+		)
 	}
 	// build output shape
 	outputShape := Shape{

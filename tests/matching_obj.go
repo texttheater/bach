@@ -27,9 +27,9 @@ func TestMatchingObj(t *testing.T) {
 		`if true then {a: 1} else {b: 2} ok is {a: Num} then true elis {a: Num, b: Num} then false ok`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.ImpossibleMatch)),
-
+		errors.TypeError(
+			errors.Code(errors.ImpossibleMatch),
+		),
 		t,
 	)
 	TestProgram(
@@ -43,16 +43,16 @@ func TestMatchingObj(t *testing.T) {
 		`if true then {a: 1} else {b: "s"} ok is {a: Num a} then a elis {b: Num b} then b ok`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.ImpossibleMatch)),
-
+		errors.TypeError(
+			errors.Code(errors.ImpossibleMatch),
+		),
 		t,
 	)
 	//TestProgram(
 	//	`if true then {a: 1} elif true then {b: "s"} else {c: true} ok is {a: Num a} then a elis {b: Num b} then b ok`,
 	//	nil,
 	//	nil,
-	//	errors.E(
+	//	errors.TypeError(
 	//		errors.Code(errors.NonExhaustiveMatch),
 	//	),
 	//	t,

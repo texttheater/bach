@@ -83,9 +83,9 @@ func TestArrays(t *testing.T) {
 		`1 each *2 all`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.MappingRequiresArrType)),
-
+		errors.TypeError(
+			errors.Code(errors.MappingRequiresArrType),
+		),
 		t,
 	)
 	TestProgram(
@@ -128,38 +128,38 @@ func TestArrays(t *testing.T) {
 		`[1;2]`,
 		nil,
 		nil,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.RestRequiresArrType),
 			errors.WantType(types.AnyArrType),
-			errors.GotType(types.NumType{})),
-
+			errors.GotType(types.NumType{}),
+		),
 		t,
 	)
 	TestProgram(
 		`[1 if ==2 then true else fatal ok] out`,
 		nil,
 		nil,
-		errors.E(
+		errors.ValueError(
 			errors.Code(errors.UnexpectedValue),
-			errors.GotValue(states.NumValue(1))),
-
+			errors.GotValue(states.NumValue(1)),
+		),
 		t,
 	)
 	TestProgram(
 		`[true, 1 if ==2 then true else fatal ok] out`,
 		nil,
 		nil,
-		errors.E(
+		errors.ValueError(
 			errors.Code(errors.UnexpectedValue),
-			errors.GotValue(states.NumValue(1))),
-
+			errors.GotValue(states.NumValue(1)),
+		),
 		t,
 	)
 	TestProgramStr(
 		`[] get(0)`,
 		`Void`,
 		``,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.VoidProgram),
 		),
 		t,
@@ -196,7 +196,7 @@ func TestArrays(t *testing.T) {
 		`["a", "b", "c"] get(-4)`,
 		`Str`,
 		``,
-		errors.E(
+		errors.ValueError(
 			errors.Code(errors.NoSuchIndex),
 		),
 		t,

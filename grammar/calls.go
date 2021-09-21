@@ -167,11 +167,11 @@ func (g *NameRegexp) Ast() (expressions.Expression, error) {
 	regexpPos.Column += len(name)
 	regexp, err := regexp.Compile(regexpString)
 	if err != nil {
-		return nil, errors.E(
+		return nil, errors.SyntaxError(
 			errors.Code(errors.BadRegexp),
 			errors.Pos(regexpPos),
-			errors.Message(err.Error()))
-
+			errors.Message(err.Error()),
+		)
 	}
 	return &expressions.CallExpression{
 		Pos:  g.Pos,

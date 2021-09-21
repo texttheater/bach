@@ -27,7 +27,7 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*parameters.Paramet
 	for {
 		// reached bottom of stack without finding a matching funcer
 		if stack == nil {
-			return Shape{}, nil, nil, errors.E(
+			return Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.NoSuchFunction),
 				errors.Pos(x.Pos),
 				errors.InputType(inputShape.Type),
@@ -200,7 +200,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*paramete
 				return Shape{}, nil, nil, false, err
 			}
 			if !params[i].OutputType.Bind(argOutputShape.Type, bindings) {
-				return Shape{}, nil, nil, false, errors.E(
+				return Shape{}, nil, nil, false, errors.TypeError(
 					errors.Code(errors.ArgHasWrongOutputType),
 					errors.Pos(gotCall.Pos),
 					errors.ArgNum(i+1),
@@ -209,7 +209,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*paramete
 				)
 			}
 			if !params[i].OutputType.Instantiate(bindings).Subsumes(argOutputShape.Type) {
-				return Shape{}, nil, nil, false, errors.E(
+				return Shape{}, nil, nil, false, errors.TypeError(
 					errors.Code(errors.ArgHasWrongOutputType),
 					errors.Pos(gotCall.Pos),
 					errors.ArgNum(i+1),
@@ -241,7 +241,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*paramete
 		for i, gotParam := range gotParams {
 			wantParam := params[len(gotCall.Args)+i].Instantiate(bindings)
 			if !gotParam.Subsumes(wantParam) {
-				return Shape{}, nil, nil, false, errors.E(
+				return Shape{}, nil, nil, false, errors.TypeError(
 					errors.Code(errors.ParamDoesNotMatch),
 					errors.Pos(gotCall.Pos),
 					errors.ParamNum(i+1),

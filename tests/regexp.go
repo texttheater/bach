@@ -65,9 +65,9 @@ func TestRegexp(t *testing.T) {
 			},
 		),
 		nil,
-		errors.E(
-			errors.Code(errors.BadRegexp)),
-
+		errors.SyntaxError(
+			errors.Code(errors.BadRegexp),
+		),
 		t,
 	)
 }

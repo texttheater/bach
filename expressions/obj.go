@@ -19,10 +19,10 @@ func (x ObjExpression) Position() lexer.Position {
 
 func (x ObjExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ParamsNotAllowed),
-			errors.Pos(x.Pos))
-
+			errors.Pos(x.Pos),
+		)
 	}
 	propTypeMap := make(map[string]types.Type)
 	propActionMap := make(map[string]states.Action)

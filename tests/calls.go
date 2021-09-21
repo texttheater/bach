@@ -21,7 +21,13 @@ func TestCalls(t *testing.T) {
 		`for Num def f Num as =x x ok for Str def f Str as =x x ok f(2)`,
 		nil,
 		nil,
-		errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NullType{}), errors.Name("f"), errors.NumParams(1)), t,
+		errors.TypeError(
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.NullType{}),
+			errors.Name("f"),
+			errors.NumParams(1),
+		),
+		t,
 	)
 	TestProgram(
 		`for Num def f Num as =x x ok for Str def f Str as =x x ok 2 f`,
@@ -34,7 +40,13 @@ func TestCalls(t *testing.T) {
 		`for Num def f Num as =x x ok for Str def f Str as =x x ok f`,
 		nil,
 		nil,
-		errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NullType{}), errors.Name("f"), errors.NumParams(0)), t,
+		errors.TypeError(
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.NullType{}),
+			errors.Name("f"),
+			errors.NumParams(0),
+		),
+		t,
 	)
 	TestProgram(
 		`for Any def f(x Num) Num as x ok`,
@@ -61,13 +73,25 @@ func TestCalls(t *testing.T) {
 		`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok 1 f`,
 		nil,
 		nil,
-		errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NumType{}), errors.Name("f"), errors.NumParams(0)), t,
+		errors.TypeError(
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.NumType{}),
+			errors.Name("f"),
+			errors.NumParams(0),
+		),
+		t,
 	)
 	TestProgram(
 		`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok f(1)`,
 		nil,
 		nil,
-		errors.E(errors.Code(errors.ArgHasWrongOutputType), errors.ArgNum(1), errors.WantType(types.StrType{}), errors.GotType(types.NumType{})), t,
+		errors.TypeError(
+			errors.Code(errors.ArgHasWrongOutputType),
+			errors.ArgNum(1),
+			errors.WantType(types.StrType{}),
+			errors.GotType(types.NumType{}),
+		),
+		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok`,
@@ -80,7 +104,13 @@ func TestCalls(t *testing.T) {
 		`for Any def f(for Num g Num) Num as 1 g ok f(g)`,
 		nil,
 		nil,
-		errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NumType{}), errors.Name("g"), errors.NumParams(0)), t,
+		errors.TypeError(
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.NumType{}),
+			errors.Name("g"),
+			errors.NumParams(0),
+		),
+		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok f(1)`,
@@ -114,7 +144,13 @@ func TestCalls(t *testing.T) {
 		`for Any def f(for Num g(Num) Num) Num as 1 g ok`,
 		nil,
 		nil,
-		errors.E(errors.Code(errors.NoSuchFunction), errors.InputType(types.NumType{}), errors.Name("g"), errors.NumParams(0)), t,
+		errors.TypeError(
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.NumType{}),
+			errors.Name("g"),
+			errors.NumParams(0),
+		),
+		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok`,
@@ -148,12 +184,12 @@ func TestCalls(t *testing.T) {
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok f(+1)`,
 		nil,
 		nil,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
 			errors.InputType(types.NumType{}),
 			errors.Name("+"),
-			errors.NumParams(2)),
-
+			errors.NumParams(2),
+		),
 		t,
 	)
 	TestProgram(
@@ -167,7 +203,7 @@ func TestCalls(t *testing.T) {
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok f(g)`,
 		nil,
 		nil,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.ParamDoesNotMatch),
 			errors.ParamNum(1),
 			errors.WantParam(&parameters.Parameter{
@@ -179,15 +215,15 @@ func TestCalls(t *testing.T) {
 				InputType:  types.AnyType{},
 				Params:     nil,
 				OutputType: types.StrType{},
-			})),
-
+			}),
+		),
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok for Any def g(for Str x Num) Num as "abc" x ok f(g)`,
 		nil,
 		nil,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.ParamDoesNotMatch),
 			errors.ParamNum(1),
 			errors.WantParam(&parameters.Parameter{
@@ -199,8 +235,8 @@ func TestCalls(t *testing.T) {
 				InputType:  types.StrType{},
 				Params:     nil,
 				OutputType: types.NumType{},
-			})),
-
+			}),
+		),
 		t,
 	)
 }

@@ -11,9 +11,9 @@ func TestVoidType(t *testing.T) {
 		`[] each drop 0 all`,
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.ComposeWithVoid)),
-
+		errors.TypeError(
+			errors.Code(errors.ComposeWithVoid),
+		),
 		t,
 	)
 }

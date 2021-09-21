@@ -13,27 +13,27 @@ func TestGrammar(t *testing.T) {
 		"&",
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.Syntax)),
-
+		errors.SyntaxError(
+			errors.Code(errors.Syntax),
+		),
 		t,
 	)
 	TestProgram(
 		"drop",
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.Syntax)),
-
+		errors.SyntaxError(
+			errors.Code(errors.Syntax),
+		),
 		t,
 	)
 	TestProgram(
 		"if true then drop else true ok",
 		nil,
 		nil,
-		errors.E(
-			errors.Code(errors.Syntax)),
-
+		errors.SyntaxError(
+			errors.Code(errors.Syntax),
+		),
 		t,
 	)
 	// The following program requires a lookahead of 1 (participle's

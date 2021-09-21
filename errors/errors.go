@@ -15,15 +15,6 @@ import (
 
 type errorAttribute func(err *e)
 
-func E(atts ...errorAttribute) error {
-	err := e{}
-	e := &err
-	for _, att := range atts {
-		att(e)
-	}
-	return e
-}
-
 // SyntaxError builds a syntax error value from a number of error attributes.
 // The following functions can be used to create error attributes:
 //

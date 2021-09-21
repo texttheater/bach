@@ -11,7 +11,7 @@ func TestObjects(t *testing.T) {
 		`{} get"a"`,
 		`Void`,
 		``,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.VoidProgram),
 		),
 		t,

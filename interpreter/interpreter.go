@@ -22,10 +22,10 @@ func InterpretString(program string) (types.Type, states.Value, error) {
 		return nil, nil, err
 	}
 	if (types.VoidType{}).Subsumes(outputShape.Type) {
-		return nil, nil, errors.E(
+		return nil, nil, errors.TypeError(
 			errors.Code(errors.VoidProgram),
-			errors.Pos(x.Position()))
-
+			errors.Pos(x.Position()),
+		)
 	}
 	// evaluate
 	res := action(states.InitialState, nil).Eval()

@@ -22,7 +22,7 @@ func (x ArrExpression) Position() lexer.Position {
 func (x ArrExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no params
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos))
 
@@ -48,12 +48,11 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*parameters.Paramete
 			return Shape{}, nil, nil, err
 		}
 		if !(types.AnyArrType).Subsumes(restShape.Type) {
-			return Shape{}, nil, nil, errors.E(
+			return Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.RestRequiresArrType),
 				errors.Pos(x.RestPos),
 				errors.WantType(types.AnyArrType),
 				errors.GotType(restShape.Type))
-
 		}
 		ids = ids.AddAll(restIDs)
 		outputType = restShape.Type

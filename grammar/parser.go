@@ -34,7 +34,7 @@ func ParseComposition(input string) (expressions.Expression, error) {
 	err := parser.ParseString(input, composition)
 	if err != nil {
 		if parserError, ok := err.(participle.Error); ok {
-			return nil, errors.E(
+			return nil, errors.SyntaxError(
 				errors.Code(errors.Syntax),
 				errors.Pos(parserError.Token().Pos),
 				errors.Message(parserError.Message()),
@@ -50,11 +50,11 @@ func ParseType(input string) (types.Type, error) {
 	err := typeParser.ParseString(input, t)
 	if err != nil {
 		if parserError, ok := err.(participle.Error); ok {
-			return nil, errors.E(
+			return nil, errors.SyntaxError(
 				errors.Code(errors.Syntax),
 				errors.Pos(parserError.Token().Pos),
-				errors.Message(parserError.Message()))
-
+				errors.Message(parserError.Message()),
+			)
 		}
 		return nil, err
 	}

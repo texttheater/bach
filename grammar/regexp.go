@@ -17,11 +17,11 @@ func (g *Regexp) Ast() (expressions.Expression, error) {
 	regexpString := g.Regexp[1 : len(g.Regexp)-1]
 	regexp, err := regexp.Compile(regexpString)
 	if err != nil {
-		return nil, errors.E(
+		return nil, errors.SyntaxError(
 			errors.Code(errors.BadRegexp),
 			errors.Pos(g.Pos),
-			errors.Message(err.Error()))
-
+			errors.Message(err.Error()),
+		)
 	}
 	regexpExpression := &expressions.RegexpExpression{
 		Pos:    g.Pos,

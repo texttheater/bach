@@ -29,12 +29,12 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*parameters.Param
 			RestType: types.AnyType{},
 		}
 		if !wantType.Subsumes(inputShape.Type) {
-			return Shape{}, nil, nil, errors.E(
+			return Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.NoSuchProperty),
 				errors.Pos(x.Pos),
 				errors.WantType(wantType),
-				errors.GotType(inputShape.Type))
-
+				errors.GotType(inputShape.Type),
+			)
 		}
 		outputType := inputShape.Type.(types.ObjType).PropTypeMap[x.Name]
 		outputShape := Shape{
@@ -57,7 +57,7 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*parameters.Param
 	case *types.NearrType:
 		index, err := strconv.Atoi(x.Name)
 		if err != nil {
-			return Shape{}, nil, nil, errors.E(
+			return Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.BadIndex),
 				errors.Pos(x.Pos),
 			)
@@ -74,7 +74,7 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*parameters.Param
 				bufIndex = (bufIndex + 1) % revIndex
 				if types.VoidArrType.Subsumes(restType.TailType) {
 					if buf[bufIndex] == nil {
-						return Shape{}, nil, nil, errors.E(
+						return Shape{}, nil, nil, errors.TypeError(
 							errors.Pos(x.Pos),
 							errors.Code(errors.NoSuchIndex),
 						)
@@ -89,7 +89,7 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*parameters.Param
 		} else {
 			for i := 0; i < index; i++ {
 				if types.VoidArrType.Subsumes(restType.TailType) {
-					return Shape{}, nil, nil, errors.E(
+					return Shape{}, nil, nil, errors.TypeError(
 						errors.Pos(x.Pos),
 						errors.Code(errors.NoSuchIndex),
 					)
@@ -120,10 +120,10 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*parameters.Param
 		}
 		return outputShape, action, nil, nil
 	default:
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.NoGetterAllowed),
 			errors.Pos(x.Pos),
-			errors.GotType(inputShape.Type))
-
+			errors.GotType(inputShape.Type),
+		)
 	}
 }

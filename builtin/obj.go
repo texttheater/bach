@@ -39,7 +39,7 @@ func initObj() {
 				}
 				thunk, ok := inputValue[prop]
 				if !ok {
-					return states.ThunkFromError(errors.E(
+					return states.ThunkFromError(errors.ValueError(
 						errors.Code(errors.NoSuchProperty),
 						errors.Pos(pos),
 					))

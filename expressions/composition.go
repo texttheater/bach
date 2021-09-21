@@ -20,7 +20,7 @@ func (x CompositionExpression) Position() lexer.Position {
 
 func (x CompositionExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos))
 
@@ -30,7 +30,7 @@ func (x CompositionExpression) Typecheck(inputShape Shape, params []*parameters.
 		return Shape{}, nil, nil, err
 	}
 	if (types.VoidType{}).Subsumes(middleShape.Type) {
-		return Shape{}, nil, nil, errors.E(
+		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ComposeWithVoid),
 			errors.Pos(x.Right.Position()))
 

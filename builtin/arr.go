@@ -192,7 +192,7 @@ func initArr() {
 				index := float64(res0.Value.(states.NumValue))
 				intIndex := int(index)
 				if index != float64(intIndex) {
-					return states.ThunkFromError(errors.E(
+					return states.ThunkFromError(errors.ValueError(
 						errors.Code(errors.BadIndex),
 						errors.Pos(pos),
 					))
@@ -206,7 +206,7 @@ func initArr() {
 					for true {
 						if value == nil {
 							if buf[bufIndex] == nil {
-								return states.ThunkFromError(errors.E(
+								return states.ThunkFromError(errors.ValueError(
 									errors.Code(errors.NoSuchIndex),
 									errors.Pos(pos),
 								))
@@ -226,7 +226,7 @@ func initArr() {
 				// nonnegative index
 				for i := 0; i < intIndex; i++ {
 					if value == nil {
-						return states.ThunkFromError(errors.E(
+						return states.ThunkFromError(errors.ValueError(
 							errors.Code(errors.NoSuchIndex),
 							errors.Pos(pos),
 						))
@@ -239,7 +239,7 @@ func initArr() {
 					value = res.Value.(*states.ArrValue)
 				}
 				if value == nil {
-					return states.ThunkFromError(errors.E(
+					return states.ThunkFromError(errors.ValueError(
 						errors.Code(errors.NoSuchIndex),
 						errors.Pos(pos),
 					))

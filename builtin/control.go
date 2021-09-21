@@ -17,7 +17,7 @@ func initControl() {
 			types.VoidType{},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				return states.ThunkFromError(
-					errors.E(
+					errors.ValueError(
 						errors.Code(errors.UnexpectedValue),
 						errors.Pos(pos),
 						errors.GotValue(inputState.Value),
@@ -44,7 +44,7 @@ func initControl() {
 				switch inputState.Value.(type) {
 				case states.NullValue:
 					return states.ThunkFromError(
-						errors.E(
+						errors.ValueError(
 							errors.Code(errors.UnexpectedValue),
 							errors.Pos(pos),
 							errors.GotValue(inputState.Value),
