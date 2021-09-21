@@ -18,8 +18,8 @@ func (g *Regexp) Ast() (expressions.Expression, error) {
 	regexp, err := regexp.Compile(regexpString)
 	if err != nil {
 		return nil, errors.E(
-			errors.Pos(g.Pos),
 			errors.Code(errors.BadRegexp),
+			errors.Pos(g.Pos),
 			errors.Message(err.Error()))
 
 	}

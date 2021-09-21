@@ -194,6 +194,7 @@ func initArr() {
 				if index != float64(intIndex) {
 					return states.ThunkFromError(errors.E(
 						errors.Code(errors.BadIndex),
+						errors.Pos(pos),
 					))
 				}
 				value := inputState.Value.(*states.ArrValue)
@@ -207,6 +208,7 @@ func initArr() {
 							if buf[bufIndex] == nil {
 								return states.ThunkFromError(errors.E(
 									errors.Code(errors.NoSuchIndex),
+									errors.Pos(pos),
 								))
 							}
 							return states.ThunkFromValue(buf[bufIndex])
@@ -226,6 +228,7 @@ func initArr() {
 					if value == nil {
 						return states.ThunkFromError(errors.E(
 							errors.Code(errors.NoSuchIndex),
+							errors.Pos(pos),
 						))
 					}
 					tail := value.Tail
@@ -238,6 +241,7 @@ func initArr() {
 				if value == nil {
 					return states.ThunkFromError(errors.E(
 						errors.Code(errors.NoSuchIndex),
+						errors.Pos(pos),
 					))
 					return states.ThunkFromValue(states.NullValue{})
 				}

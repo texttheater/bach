@@ -168,8 +168,8 @@ func (g *NameRegexp) Ast() (expressions.Expression, error) {
 	regexp, err := regexp.Compile(regexpString)
 	if err != nil {
 		return nil, errors.E(
-			errors.Pos(regexpPos),
 			errors.Code(errors.BadRegexp),
+			errors.Pos(regexpPos),
 			errors.Message(err.Error()))
 
 	}

@@ -41,6 +41,7 @@ func initObj() {
 				if !ok {
 					return states.ThunkFromError(errors.E(
 						errors.Code(errors.NoSuchProperty),
+						errors.Pos(pos),
 					))
 				}
 				res := thunk.Eval()
