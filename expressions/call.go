@@ -116,13 +116,8 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 	// make regular kernel from simple kernel
 	regularKernel := func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		argValues := make([]states.Value, len(argTypes))
-		argInputState := states.State{
-			Value:     states.NullValue{},
-			Stack:     inputState.Stack,
-			TypeStack: inputState.TypeStack,
-		}
 		for i, arg := range args {
-			res := arg(argInputState, nil).Eval()
+			res := arg(inputState.Clear(), nil).Eval()
 			if res.Error != nil {
 				return states.ThunkFromError(res.Error)
 			}

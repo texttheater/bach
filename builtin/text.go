@@ -66,7 +66,7 @@ func initText() {
 			&types.ArrType{types.StrType{}},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				str := string(inputState.Value.(states.StrValue))
-				res0 := args[0](inputState, nil).Eval()
+				res0 := args[0](inputState.Clear(), nil).Eval()
 				if res0.Error != nil {
 					return states.ThunkFromError(res0.Error)
 				}

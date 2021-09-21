@@ -21,17 +21,7 @@ func initObj() {
 			},
 			"get",
 			[]*parameters.Parameter{
-				&parameters.Parameter{
-					InputType: types.ObjType{
-						PropTypeMap: map[string]types.Type{},
-						RestType: types.TypeVariable{
-							Name:       "A",
-							UpperBound: types.AnyType{},
-						},
-					},
-					Params:     nil,
-					OutputType: types.Union(types.StrType{}, types.NumType{}),
-				},
+				parameters.SimpleParam(types.Union(types.StrType{}, types.NumType{})),
 			},
 			types.TypeVariable{
 				Name:       "A",
@@ -39,7 +29,7 @@ func initObj() {
 			},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				inputValue := inputState.Value.(states.ObjValue)
-				res0 := args[0](inputState, nil).Eval()
+				res0 := args[0](inputState.Clear(), nil).Eval()
 				if res0.Error != nil {
 					return states.ThunkFromError(res0.Error)
 				}

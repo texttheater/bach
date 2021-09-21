@@ -10,6 +10,15 @@ type State struct {
 	TypeStack *BindingStack
 }
 
+// Clear returns an identical state except that the Value is replaced with null
+func (s State) Clear() State {
+	return State{
+		Value:     NullValue{},
+		Stack:     s.Stack,
+		TypeStack: s.TypeStack,
+	}
+}
+
 type VariableStack struct {
 	Head Variable
 	Tail *VariableStack

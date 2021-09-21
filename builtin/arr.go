@@ -83,7 +83,7 @@ func initArr() {
 			},
 			"take",
 			[]*parameters.Parameter{
-				parameters.SimpleParam(types.NumType{}), // FIXME simple params are bullshit
+				parameters.SimpleParam(types.NumType{}),
 			},
 			&types.ArrType{
 				ElType: types.TypeVariable{
@@ -93,7 +93,7 @@ func initArr() {
 			},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				arr := inputState.Value.(*states.ArrValue)
-				res := args[0](inputState, nil).Eval()
+				res := args[0](inputState.Clear(), nil).Eval()
 				if res.Error != nil {
 					return states.ThunkFromError(res.Error)
 				}
@@ -144,11 +144,7 @@ func initArr() {
 			},
 			&types.ArrType{types.NumType{}},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				argInputState := states.State{
-					Value:     states.NullValue{},
-					Stack:     inputState.Stack,
-					TypeStack: inputState.TypeStack,
-				}
+				argInputState := inputState.Clear()
 				res0 := args[0](argInputState, nil).Eval()
 				if res0.Error != nil {
 					return states.ThunkFromError(res0.Error)
@@ -182,23 +178,14 @@ func initArr() {
 			},
 			"get",
 			[]*parameters.Parameter{
-				&parameters.Parameter{
-					InputType: &types.ArrType{
-						ElType: types.TypeVariable{
-							Name:       "A",
-							UpperBound: types.AnyType{},
-						},
-					},
-					Params:     nil,
-					OutputType: types.NumType{},
-				},
+				parameters.SimpleParam(types.NumType{}),
 			},
 			types.TypeVariable{
 				Name:       "A",
 				UpperBound: types.AnyType{},
 			},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				res0 := args[0](inputState, nil).Eval()
+				res0 := args[0](inputState.Clear(), nil).Eval()
 				if res0.Error != nil {
 					return states.ThunkFromError(res0.Error)
 				}
