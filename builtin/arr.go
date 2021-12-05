@@ -11,6 +11,50 @@ import (
 
 func initArr() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		expressions.RegularFuncer(
+			&types.ArrType{types.TypeVariable{"A", types.AnyType{}}},
+			"+",
+			[]*parameters.Parameter{
+				parameters.SimpleParam(&types.ArrType{
+					types.TypeVariable{"B", types.AnyType{}},
+				}),
+			},
+			&types.ArrType{types.Union(
+				types.TypeVariable{"A", types.AnyType{}},
+				types.TypeVariable{"B", types.AnyType{}},
+			)},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				arr1 := inputState.Value.(*states.ArrValue)
+				res := args[0](inputState.Clear(), nil).Eval()
+				if res.Error != nil {
+					return states.ThunkFromError(res.Error)
+				}
+				arr2 := res.Value.(*states.ArrValue)
+				iter := func() (states.Value, bool, error) {
+					if arr1 != nil {
+						head := arr1.Head
+						res := arr1.Tail.Eval()
+						if res.Error != nil {
+							return nil, false, res.Error
+						}
+						arr1 = res.Value.(*states.ArrValue)
+						return head, true, nil
+					}
+					if arr2 != nil {
+						head := arr2.Head
+						res := arr2.Tail.Eval()
+						if res.Error != nil {
+							return nil, false, res.Error
+						}
+						arr2 = res.Value.(*states.ArrValue)
+						return head, true, nil
+					}
+					return nil, false, nil
+				}
+				return states.ThunkFromIter(iter)
+			},
+			nil,
+		),
 		expressions.SimpleFuncer(
 			&types.ArrType{
 				ElType: types.TypeVariable{
