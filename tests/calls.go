@@ -239,4 +239,28 @@ func TestCalls(t *testing.T) {
 		),
 		t,
 	)
+	TestProgramStr(
+		`a[2]`,
+		``,
+		``,
+		errors.E(
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.NullType{}),
+			errors.Name(`a`),
+			errors.NumParams(1),
+		),
+		t,
+	)
+	TestProgramStr(
+		`a{b: 2}`,
+		``,
+		``,
+		errors.E(
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.NullType{}),
+			errors.Name(`a`),
+			errors.NumParams(1),
+		),
+		t,
+	)
 }

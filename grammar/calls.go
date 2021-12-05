@@ -20,6 +20,8 @@ type Call struct {
 	Op2Lid      *Op2Lid      `| @@`
 	NameString  *NameString  `| @@`
 	NameRegexp  *NameRegexp  `| @@`
+	NameArr     *NameArr     `| @@`
+	NameObj     *NameObj     `| @@`
 	NameArglist *NameArglist `| @@`
 	Name        *string      `| ( @Lid | @Op1 | @Op2 )`
 }
@@ -42,6 +44,12 @@ func (g *Call) Ast() (expressions.Expression, error) {
 	}
 	if g.NameRegexp != nil {
 		return g.NameRegexp.Ast()
+	}
+	if g.NameArr != nil {
+		return g.NameArr.Ast()
+	}
+	if g.NameObj != nil {
+		return g.NameObj.Ast()
 	}
 	if g.NameArglist != nil {
 		return g.NameArglist.Ast()
@@ -182,6 +190,46 @@ func (g *NameRegexp) Ast() (expressions.Expression, error) {
 				Regexp: regexp,
 			},
 		},
+	}, nil
+}
+
+type NameArr struct {
+	Pos        lexer.Position
+	NameLbrack string          `@NameLbrack`
+	Rest       *ArrLiteralRest `@@`
+}
+
+func (g *NameArr) Ast() (expressions.Expression, error) {
+	name := g.NameLbrack[:len(g.NameLbrack)-1]
+	argAst, err := g.Rest.Ast()
+	if err != nil {
+		return nil, err
+	}
+	argAst.Pos = g.Pos // FIXME increase column by 1
+	return &expressions.CallExpression{
+		Pos:  g.Pos,
+		Name: name,
+		Args: []expressions.Expression{argAst},
+	}, nil
+}
+
+type NameObj struct {
+	Pos        lexer.Position
+	NameLbrace string          `@NameLbrace`
+	Rest       *ObjLiteralRest `@@`
+}
+
+func (g *NameObj) Ast() (expressions.Expression, error) {
+	name := g.NameLbrace[:len(g.NameLbrace)-1]
+	argAst, err := g.Rest.Ast()
+	if err != nil {
+		return nil, err
+	}
+	argAst.Pos = g.Pos // FIXME increase column by 1
+	return &expressions.CallExpression{
+		Pos:  g.Pos,
+		Name: name,
+		Args: []expressions.Expression{argAst},
 	}, nil
 }
 
