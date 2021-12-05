@@ -6,13 +6,25 @@ import (
 )
 
 type ArrLiteral struct {
-	Pos      lexer.Position `"["`
+	Pos  lexer.Position  `"["`
+	Rest *ArrLiteralRest "@@"
+}
+
+func (g *ArrLiteral) Ast() (expressions.Expression, error) {
+	ast, err := g.Rest.Ast()
+	if ast != nil {
+		ast.Pos = g.Pos
+	}
+	return ast, err
+}
+
+type ArrLiteralRest struct {
 	Element  *Composition   `( @@`
 	Elements []*Composition `  ( "," @@ )*`
 	Rest     *Composition   `  ( ";" @@ )? )? "]"`
 }
 
-func (g *ArrLiteral) Ast() (expressions.Expression, error) {
+func (g *ArrLiteralRest) Ast() (*expressions.ArrExpression, error) {
 	var elements []expressions.Expression
 	var rest expressions.Expression
 	if g.Element != nil {
@@ -36,7 +48,6 @@ func (g *ArrLiteral) Ast() (expressions.Expression, error) {
 		}
 	}
 	x := &expressions.ArrExpression{
-		Pos:      g.Pos,
 		Elements: elements,
 		Rest:     rest,
 	}

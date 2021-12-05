@@ -7,14 +7,26 @@ import (
 )
 
 type ObjLiteral struct {
-	Pos    lexer.Position `"{"`
+	Pos  lexer.Position  `"{"`
+	Rest *ObjLiteralRest "@@"
+}
+
+func (g *ObjLiteral) Ast() (expressions.Expression, error) {
+	ast, rest := g.Rest.Ast()
+	if ast != nil {
+		ast.Pos = g.Pos
+	}
+	return ast, rest
+}
+
+type ObjLiteralRest struct {
 	Prop   *Prop          `( @@`
 	Value  *Composition   `  ":" @@`
 	Props  []*Prop        `  ( "," @@`
 	Values []*Composition `    ":" @@ )* )? "}"`
 }
 
-func (g *ObjLiteral) Ast() (expressions.Expression, error) {
+func (g *ObjLiteralRest) Ast() (*expressions.ObjExpression, error) {
 	propValMap := make(map[string]expressions.Expression)
 	if g.Prop != nil {
 		var err error
@@ -37,7 +49,9 @@ func (g *ObjLiteral) Ast() (expressions.Expression, error) {
 			}
 		}
 	}
-	return &expressions.ObjExpression{g.Pos, propValMap}, nil
+	return &expressions.ObjExpression{
+		PropValMap: propValMap,
+	}, nil
 }
 
 type Prop struct {
