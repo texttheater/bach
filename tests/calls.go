@@ -243,7 +243,7 @@ func TestCalls(t *testing.T) {
 		`a[2]`,
 		``,
 		``,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
 			errors.InputType(types.NullType{}),
 			errors.Name(`a`),
@@ -255,7 +255,7 @@ func TestCalls(t *testing.T) {
 		`a{b: 2}`,
 		``,
 		``,
-		errors.E(
+		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
 			errors.InputType(types.NullType{}),
 			errors.Name(`a`),
