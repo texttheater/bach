@@ -40,10 +40,10 @@ func (v NumValue) Equal(w Value) (bool, error) {
 	}
 }
 
-func IntFromAction(state State, action Action) (int, error) {
+func NumFromAction(state State, action Action) (float64, error) {
 	res := action(state, nil).Eval()
 	if res.Error != nil {
-		return 0, res.Error
+		return 0.0, res.Error
 	}
-	return int(res.Value.(NumValue)), nil
+	return float64(res.Value.(NumValue)), nil
 }

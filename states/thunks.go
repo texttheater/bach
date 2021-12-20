@@ -61,6 +61,20 @@ func IterFromValue(v Value) func() (Value, bool, error) {
 	}
 }
 
+func IterFromError(err error) func() (Value, bool, error) {
+	return func() (Value, bool, error) {
+		return nil, false, err
+	}
+}
+
+func IterFromAction(state State, action Action) func() (Value, bool, error) {
+	res := action(state, nil).Eval()
+	if res.Error != nil {
+		return IterFromError(res.Error)
+	}
+	return IterFromValue(res.Value)
+}
+
 func ThunkFromIter(iter func() (Value, bool, error)) *Thunk {
 	value, ok, err := iter()
 	if err != nil {
