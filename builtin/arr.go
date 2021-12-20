@@ -136,26 +136,27 @@ func initArr() {
 				},
 			},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				arr := inputState.Value.(*states.ArrValue)
 				res := args[0](inputState.Clear(), nil).Eval()
 				if res.Error != nil {
 					return states.ThunkFromError(res.Error)
 				}
 				n := int(res.Value.(states.NumValue))
-				iter := func() (states.Value, bool, error) {
-					if arr == nil || n <= 0 {
+				input := states.IterFromValue(inputState.Value)
+				output := func() (states.Value, bool, error) {
+					if n <= 0 {
 						return nil, false, nil
 					}
-					head := arr.Head
-					res := arr.Tail.Eval()
-					if res.Error != nil {
-						return nil, false, res.Error
+					el, ok, err := input()
+					if err != nil {
+						return nil, false, err
 					}
-					arr = res.Value.(*states.ArrValue)
+					if !ok {
+						return nil, false, nil
+					}
 					n--
-					return head, true, nil
+					return el, true, nil
 				}
-				return states.ThunkFromIter(iter)
+				return states.ThunkFromIter(output)
 			},
 			nil,
 		),
