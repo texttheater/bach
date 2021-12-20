@@ -87,7 +87,7 @@ func initArr() {
 				return outputArr, nil
 			},
 		),
-		expressions.SimpleFuncer(
+		expressions.RegularFuncer(
 			&types.ArrType{
 				ElType: types.TypeVariable{
 					Name:       "A",
@@ -95,8 +95,8 @@ func initArr() {
 				},
 			},
 			"drop",
-			[]types.Type{
-				types.NumType{},
+			[]*parameters.Parameter{
+				parameters.SimpleParam(types.NumType{}),
 			},
 			&types.ArrType{
 				ElType: types.TypeVariable{
@@ -104,19 +104,24 @@ func initArr() {
 					UpperBound: types.AnyType{},
 				},
 			},
-			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				arr := inputValue.(*states.ArrValue)
-				n := argumentValues[0].(states.NumValue)
-				for n > 0 && arr != nil {
-					res := arr.Tail.Eval()
-					if res.Error != nil {
-						return nil, res.Error
-					}
-					arr = res.Value.(*states.ArrValue)
-					n--
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				n, err := states.IntFromAction(inputState.Clear(), args[0])
+				if err != nil {
+					return states.ThunkFromError(err)
 				}
-				return arr, nil
+				input := states.IterFromValue(inputState.Value)
+				for i := 0; i < n; i++ {
+					_, ok, err := input()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					if !ok {
+						break
+					}
+				}
+				return states.ThunkFromIter(input)
 			},
+			nil,
 		),
 		expressions.RegularFuncer(
 			&types.ArrType{

@@ -39,3 +39,11 @@ func (v NumValue) Equal(w Value) (bool, error) {
 		return false, nil
 	}
 }
+
+func IntFromAction(state State, action Action) (int, error) {
+	res := action(state, nil).Eval()
+	if res.Error != nil {
+		return 0, res.Error
+	}
+	return int(res.Value.(NumValue)), nil
+}
