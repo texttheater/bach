@@ -1,6 +1,8 @@
 package builtin
 
 import (
+	"sort"
+
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/expressions"
@@ -11,6 +13,46 @@ import (
 
 func initArr() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		expressions.RegularFuncer(
+			&types.ArrType{types.StrType{}},
+			"sort",
+			nil,
+			&types.ArrType{types.StrType{}},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				slice, err := states.SliceFromValue(inputState.Value)
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				less := func(i, j int) bool {
+					a := slice[i].(states.StrValue)
+					b := slice[j].(states.StrValue)
+					return a < b
+				}
+				sort.Slice(slice, less)
+				return states.ThunkFromSlice(slice)
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
+			&types.ArrType{types.NumType{}},
+			"sort",
+			nil,
+			&types.ArrType{types.NumType{}},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				slice, err := states.SliceFromValue(inputState.Value)
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				less := func(i, j int) bool {
+					a := slice[i].(states.NumValue)
+					b := slice[j].(states.NumValue)
+					return a < b
+				}
+				sort.Slice(slice, less)
+				return states.ThunkFromSlice(slice)
+			},
+			nil,
+		),
 		expressions.RegularFuncer(
 			&types.ArrType{types.TypeVariable{"A", types.AnyType{}}},
 			"+",

@@ -383,4 +383,18 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`[7, 3, 2, 5, 2] sort`,
+		`Arr<Num>`,
+		`[2, 2, 3, 5, 7]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"Zwölf Boxkämpfer jagen Victor quer über den großen Sylter Deich . Voilà !" split sort`,
+		`Arr<Str>`,
+		`["!", ".", "Boxkämpfer", "Deich", "Sylter", "Victor", "Voilà", "Zwölf", "den", "großen", "jagen", "quer", "über"]`,
+		nil,
+		t,
+	)
 }

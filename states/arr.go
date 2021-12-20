@@ -150,3 +150,65 @@ func (v *ArrValue) Equal(w Value) (bool, error) {
 		return false, nil
 	}
 }
+
+func IterFromValue(v Value) func() (Value, bool, error) {
+	return func() (Value, bool, error) {
+		arr := v.(*ArrValue)
+		if arr == nil {
+			return nil, false, nil
+		}
+		var err error
+		v, err = arr.GetTail()
+		if err != nil {
+			return nil, false, err
+		}
+		return arr.Head, true, nil
+	}
+}
+
+func ThunkFromIter(iter func() (Value, bool, error)) *Thunk {
+	value, ok, err := iter()
+	if err != nil {
+		return ThunkFromError(err)
+	}
+	if !ok {
+		return ThunkFromValue((*ArrValue)(nil))
+	}
+	return ThunkFromValue(&ArrValue{
+		Head: value,
+		Tail: &Thunk{
+			Func: func() *Thunk {
+				return ThunkFromIter(iter)
+			},
+		},
+	})
+}
+
+func SliceFromValue(v Value) ([]Value, error) {
+	var slice []Value
+	iter := IterFromValue(v)
+	for {
+		el, ok, err := iter()
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			break
+		}
+		slice = append(slice, el)
+	}
+	return slice, nil
+}
+
+func ThunkFromSlice(slice []Value) *Thunk {
+	i := 0
+	iter := func() (Value, bool, error) {
+		if i < len(slice) {
+			el := slice[i]
+			i++
+			return el, true, nil
+		}
+		return nil, false, nil
+	}
+	return ThunkFromIter(iter)
+}
