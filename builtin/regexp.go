@@ -14,7 +14,7 @@ func initRegexp() {
 			types.StrType{},
 			"findFirst",
 			[]*parameters.Parameter{
-				&parameters.Parameter{
+				{
 					InputType: types.StrType{},
 					OutputType: types.TypeVariable{
 						Name: "A",
