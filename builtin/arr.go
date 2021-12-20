@@ -205,32 +205,34 @@ func initArr() {
 						errors.Pos(pos),
 					))
 				}
+				// make iter
+				input := states.IterFromValue(inputState.Value)
 				// drop
-				arr := inputState.Value.(*states.ArrValue)
-				for arr != nil && intFrom > 0 {
-					res := arr.Tail.Eval()
-					if res.Error != nil {
-						return states.ThunkFromError(res.Error)
+				for i := 0; i < intFrom; i++ {
+					_, ok, err := input()
+					if err != nil {
+						return states.ThunkFromError(err)
 					}
-					arr = res.Value.(*states.ArrValue)
-					intFrom--
-					intTo--
+					if !ok {
+						break
+					}
 				}
 				// take
-				iter := func() (states.Value, bool, error) {
-					if arr == nil || intTo <= 0 {
+				output := func() (states.Value, bool, error) {
+					if intTo <= 0 {
 						return nil, false, nil
 					}
-					head := arr.Head
-					res := arr.Tail.Eval()
-					if res.Error != nil {
-						return nil, false, res.Error
+					el, ok, err := input()
+					if err != nil {
+						return nil, false, err
 					}
-					arr = res.Value.(*states.ArrValue)
+					if !ok {
+						return nil, false, nil
+					}
 					intTo--
-					return head, true, nil
+					return el, true, nil
 				}
-				return states.ThunkFromIter(iter)
+				return states.ThunkFromIter(output)
 			},
 			nil,
 		),
