@@ -93,7 +93,7 @@ func (g *Fragment) Ast() (expressions.Expression, error) {
 	}
 	return &expressions.ConstantExpression{
 		Pos:   g.Pos,
-		Type:  types.StrType{},
+		Type:  types.Str{},
 		Value: states.StrValue(str),
 	}, nil
 }

@@ -14,7 +14,7 @@ type Parameter struct {
 
 func SimpleParam(outputType types.Type) *Parameter {
 	return &Parameter{
-		InputType:  types.AnyType{},
+		InputType:  types.Any{},
 		Params:     nil,
 		OutputType: outputType,
 	}
@@ -61,7 +61,7 @@ func (p *Parameter) Instantiate(bindings map[string]types.Type) *Parameter {
 
 func (p Parameter) String() string {
 	buffer := bytes.Buffer{}
-	if !p.InputType.Subsumes(types.AnyType{}) || len(p.Params) > 0 {
+	if !p.InputType.Subsumes(types.Any{}) || len(p.Params) > 0 {
 		buffer.WriteString("for ")
 		buffer.WriteString(p.InputType.String())
 		buffer.WriteString(" ")

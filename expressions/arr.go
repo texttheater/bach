@@ -32,7 +32,7 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*parameters.Paramete
 	var action states.Action
 	var ids *states.IDStack
 	if x.Rest == nil {
-		outputType = types.VoidArrType
+		outputType = types.VoidArr
 		action = func(inputState states.State, args []states.Action) *states.Thunk {
 			return states.ThunkFromState(states.State{
 				Value: (*states.ArrValue)(nil),
@@ -47,11 +47,11 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*parameters.Paramete
 		if err != nil {
 			return Shape{}, nil, nil, err
 		}
-		if !(types.AnyArrType).Subsumes(restShape.Type) {
+		if !(types.AnyArr).Subsumes(restShape.Type) {
 			return Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.RestRequiresArrType),
 				errors.Pos(x.RestPos),
-				errors.WantType(types.AnyArrType),
+				errors.WantType(types.AnyArr),
 				errors.GotType(restShape.Type))
 		}
 		ids = ids.AddAll(restIDs)
@@ -63,9 +63,9 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*parameters.Paramete
 		if err != nil {
 			return Shape{}, nil, nil, err
 		}
-		outputType = &types.NearrType{
-			HeadType: elementShape.Type,
-			TailType: outputType,
+		outputType = &types.Nearr{
+			Head: elementShape.Type,
+			Tail: outputType,
 		}
 		tailAction := action
 		action = func(inputState states.State, args []states.Action) *states.Thunk {

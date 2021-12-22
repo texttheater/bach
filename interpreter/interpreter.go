@@ -21,7 +21,7 @@ func InterpretString(program string) (types.Type, states.Value, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	if (types.VoidType{}).Subsumes(outputShape.Type) {
+	if (types.Void{}).Subsumes(outputShape.Type) {
 		return nil, nil, errors.TypeError(
 			errors.Code(errors.VoidProgram),
 			errors.Pos(x.Position()),

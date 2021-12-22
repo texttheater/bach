@@ -12,7 +12,7 @@ import (
 func TestCalls(t *testing.T) {
 	TestProgram(
 		`for Num def f Num as =x x ok for Str def f Str as =x x ok`,
-		types.NullType{},
+		types.Null{},
 		states.NullValue{},
 		nil,
 		t,
@@ -23,7 +23,7 @@ func TestCalls(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.NullType{}),
+			errors.InputType(types.Null{}),
 			errors.Name("f"),
 			errors.NumParams(1),
 		),
@@ -31,7 +31,7 @@ func TestCalls(t *testing.T) {
 	)
 	TestProgram(
 		`for Num def f Num as =x x ok for Str def f Str as =x x ok 2 f`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(2),
 		nil,
 		t,
@@ -42,7 +42,7 @@ func TestCalls(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.NullType{}),
+			errors.InputType(types.Null{}),
 			errors.Name("f"),
 			errors.NumParams(0),
 		),
@@ -50,21 +50,21 @@ func TestCalls(t *testing.T) {
 	)
 	TestProgram(
 		`for Any def f(x Num) Num as x ok`,
-		types.NullType{},
+		types.Null{},
 		states.NullValue{},
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(x Num) Num as x ok f(1)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok`,
-		types.NullType{},
+		types.Null{},
 		states.NullValue{},
 		nil,
 		t,
@@ -75,7 +75,7 @@ func TestCalls(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.NumType{}),
+			errors.InputType(types.Num{}),
 			errors.Name("f"),
 			errors.NumParams(0),
 		),
@@ -88,14 +88,14 @@ func TestCalls(t *testing.T) {
 		errors.TypeError(
 			errors.Code(errors.ArgHasWrongOutputType),
 			errors.ArgNum(1),
-			errors.WantType(types.StrType{}),
-			errors.GotType(types.NumType{}),
+			errors.WantType(types.Str{}),
+			errors.GotType(types.Num{}),
 		),
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok`,
-		types.NullType{},
+		types.Null{},
 		states.NullValue{},
 		nil,
 		t,
@@ -106,7 +106,7 @@ func TestCalls(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.NumType{}),
+			errors.InputType(types.Num{}),
 			errors.Name("g"),
 			errors.NumParams(0),
 		),
@@ -114,28 +114,28 @@ func TestCalls(t *testing.T) {
 	)
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok f(1)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok f(+1)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(2),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok f(+2)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(3),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g Num) Num as 1 g ok f(*10)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(10),
 		nil,
 		t,
@@ -146,7 +146,7 @@ func TestCalls(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.NumType{}),
+			errors.InputType(types.Num{}),
 			errors.Name("g"),
 			errors.NumParams(0),
 		),
@@ -154,28 +154,28 @@ func TestCalls(t *testing.T) {
 	)
 	TestProgram(
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok`,
-		types.NullType{},
+		types.Null{},
 		states.NullValue{},
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok f(+)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(3),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok f(*)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(2),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok f(/)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(0.5),
 		nil,
 		t,
@@ -186,7 +186,7 @@ func TestCalls(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.NumType{}),
+			errors.InputType(types.Num{}),
 			errors.Name("+"),
 			errors.NumParams(2),
 		),
@@ -194,7 +194,7 @@ func TestCalls(t *testing.T) {
 	)
 	TestProgram(
 		`for Any def f(for Num g(Num) Num) Num as 1 g(2) ok for Any def g(x Str) Str as x ok`,
-		types.NullType{},
+		types.Null{},
 		states.NullValue{},
 		nil,
 		t,
@@ -207,14 +207,14 @@ func TestCalls(t *testing.T) {
 			errors.Code(errors.ParamDoesNotMatch),
 			errors.ParamNum(1),
 			errors.WantParam(&parameters.Parameter{
-				InputType:  types.AnyType{},
+				InputType:  types.Any{},
 				Params:     nil,
-				OutputType: types.NumType{},
+				OutputType: types.Num{},
 			}),
 			errors.GotParam(&parameters.Parameter{
-				InputType:  types.AnyType{},
+				InputType:  types.Any{},
 				Params:     nil,
-				OutputType: types.StrType{},
+				OutputType: types.Str{},
 			}),
 		),
 		t,
@@ -227,14 +227,14 @@ func TestCalls(t *testing.T) {
 			errors.Code(errors.ParamDoesNotMatch),
 			errors.ParamNum(1),
 			errors.WantParam(&parameters.Parameter{
-				InputType:  types.AnyType{},
+				InputType:  types.Any{},
 				Params:     nil,
-				OutputType: types.NumType{},
+				OutputType: types.Num{},
 			}),
 			errors.GotParam(&parameters.Parameter{
-				InputType:  types.StrType{},
+				InputType:  types.Str{},
 				Params:     nil,
-				OutputType: types.NumType{},
+				OutputType: types.Num{},
 			}),
 		),
 		t,
@@ -245,7 +245,7 @@ func TestCalls(t *testing.T) {
 		``,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.NullType{}),
+			errors.InputType(types.Null{}),
 			errors.Name(`a`),
 			errors.NumParams(1),
 		),
@@ -257,7 +257,7 @@ func TestCalls(t *testing.T) {
 		``,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.NullType{}),
+			errors.InputType(types.Null{}),
 			errors.Name(`a`),
 			errors.NumParams(1),
 		),

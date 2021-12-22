@@ -11,25 +11,25 @@ import (
 func initValues() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.SimpleFuncer(
-			types.TypeVariable{
-				Name:       "A",
-				UpperBound: types.AnyType{},
+			types.Var{
+				Name:  "A",
+				Bound: types.Any{},
 			},
 			"id",
 			nil,
-			types.TypeVariable{
-				Name:       "A",
-				UpperBound: types.AnyType{},
+			types.Var{
+				Name:  "A",
+				Bound: types.Any{},
 			},
 			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
 				return inputValue, nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.StrType{},
+			types.Str{},
 			"parseFloat",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
 				s := string(inputValue.(states.StrValue))
 				n, err := strconv.ParseFloat(s, 64)
@@ -40,12 +40,12 @@ func initValues() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.StrType{},
+			types.Str{},
 			"parseInt",
 			[]types.Type{
-				types.NumType{},
+				types.Num{},
 			},
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
 				s := string(inputValue.(states.StrValue))
 				b := argValues[0].(states.NumValue)
@@ -57,10 +57,10 @@ func initValues() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.StrType{},
+			types.Str{},
 			"parseInt",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
 				s := string(inputValue.(states.StrValue))
 				b := 10

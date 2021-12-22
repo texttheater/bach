@@ -5,9 +5,9 @@ import (
 	"fmt"
 )
 
-func Union(a Type, b Type) Type {
-	if aUnion, ok := a.(UnionType); ok {
-		if bUnion, ok := b.(UnionType); ok {
+func NewUnion(a Type, b Type) Type {
+	if aUnion, ok := a.(Union); ok {
+		if bUnion, ok := b.(Union); ok {
 			for _, bDisjunct := range bUnion {
 				aUnion = typeAppend(aUnion, bDisjunct)
 			}
@@ -15,7 +15,7 @@ func Union(a Type, b Type) Type {
 		}
 		return typeAppend(aUnion, b)
 	}
-	if bUnion, ok := b.(UnionType); ok {
+	if bUnion, ok := b.(Union); ok {
 		return typeAppend(bUnion, a)
 	}
 	if a.Subsumes(b) {
@@ -24,16 +24,16 @@ func Union(a Type, b Type) Type {
 	if b.Subsumes(a) {
 		return b
 	}
-	return UnionType([]Type{a, b})
+	return Union([]Type{a, b})
 }
 
-// A UnionType is a slice of types, representing their union. The elements are
+// A Union is a slice of types, representing their union. The elements are
 // called "disjuncts". The following invariants must be maintained: for every
-// UnionType, 1) no disjunct subsumes another, 2) no disjunct is itself a union
+// Union, 1) no disjunct subsumes another, 2) no disjunct is itself a union
 // type.
-type UnionType []Type
+type Union []Type
 
-func typeAppend(t UnionType, u Type) UnionType {
+func typeAppend(t Union, u Type) Union {
 	for i, disjunct := range t {
 		// case 1: a disjunct subsumes u already, no change needed
 		if disjunct.Subsumes(u) {
@@ -56,7 +56,7 @@ func typeAppend(t UnionType, u Type) UnionType {
 	return append(t, u)
 }
 
-func (t UnionType) inverseSubsumes(u Type) bool {
+func (t Union) inverseSubsumes(u Type) bool {
 	// precondition: u is not a UnionType
 	for _, disjunct := range t {
 		if !u.Subsumes(disjunct) {
@@ -66,7 +66,7 @@ func (t UnionType) inverseSubsumes(u Type) bool {
 	return true
 }
 
-func (t UnionType) inverseBind(u Type, bindings map[string]Type) bool {
+func (t Union) inverseBind(u Type, bindings map[string]Type) bool {
 	// precondition: u is not a UnionType
 	for _, disjunct := range t {
 		if !u.Bind(disjunct, bindings) {
@@ -76,9 +76,9 @@ func (t UnionType) inverseBind(u Type, bindings map[string]Type) bool {
 	return true
 }
 
-func (t UnionType) Subsumes(u Type) bool {
+func (t Union) Subsumes(u Type) bool {
 	switch u := u.(type) {
-	case UnionType:
+	case Union:
 		// check that for every disjunct of u, at least one disjunct of
 		// t subsumes it
 	uDisjuncts:
@@ -102,9 +102,9 @@ func (t UnionType) Subsumes(u Type) bool {
 	}
 }
 
-func (t UnionType) Bind(u Type, bindings map[string]Type) bool {
+func (t Union) Bind(u Type, bindings map[string]Type) bool {
 	switch u := u.(type) {
-	case UnionType:
+	case Union:
 		// check that for every disjunct of u, at least one disjunct of
 		// t subsumes it
 	uDisjuncts:
@@ -128,54 +128,54 @@ func (t UnionType) Bind(u Type, bindings map[string]Type) bool {
 	}
 }
 
-func (t UnionType) Instantiate(bindings map[string]Type) Type {
-	var result Type = VoidType{}
+func (t Union) Instantiate(bindings map[string]Type) Type {
+	var result Type = Void{}
 	for _, disjunct := range t {
-		result = Union(result, disjunct.Instantiate(bindings))
+		result = NewUnion(result, disjunct.Instantiate(bindings))
 	}
 	return result
 }
 
-func (t UnionType) inversePartition(u Type) (Type, Type) {
+func (t Union) inversePartition(u Type) (Type, Type) {
 	// precondition: u is not a UnionType
-	var intersection Type = VoidType{}
+	var intersection Type = Void{}
 	complement := u
 	for _, disjunct := range t {
 		var i Type
 		i, complement = complement.Partition(disjunct)
-		intersection = Union(intersection, i)
+		intersection = NewUnion(intersection, i)
 	}
 	return intersection, complement
 }
 
-func (t UnionType) Partition(u Type) (Type, Type) {
+func (t Union) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
-	case VoidType:
+	case Void:
 		return u, t
-	case UnionType:
-		var intersectionsUnion Type = VoidType{}
-		var complementsUnion Type = VoidType{}
+	case Union:
+		var intersectionsUnion Type = Void{}
+		var complementsUnion Type = Void{}
 		for _, tDisjunct := range t {
 			intersection, complement := u.inversePartition(tDisjunct)
-			intersectionsUnion = Union(intersectionsUnion, intersection)
-			complementsUnion = Union(complementsUnion, complement)
+			intersectionsUnion = NewUnion(intersectionsUnion, intersection)
+			complementsUnion = NewUnion(complementsUnion, complement)
 		}
 		return intersectionsUnion, complementsUnion
-	case AnyType:
-		return t, VoidType{}
+	case Any:
+		return t, Void{}
 	default:
-		var intersectionsUnion Type = VoidType{}
-		var complementsUnion Type = VoidType{}
+		var intersectionsUnion Type = Void{}
+		var complementsUnion Type = Void{}
 		for _, tDisjunct := range t {
 			intersection, complement := tDisjunct.Partition(u)
-			intersectionsUnion = Union(intersectionsUnion, intersection)
-			complementsUnion = Union(complementsUnion, complement)
+			intersectionsUnion = NewUnion(intersectionsUnion, intersection)
+			complementsUnion = NewUnion(complementsUnion, complement)
 		}
 		return intersectionsUnion, complementsUnion
 	}
 }
 
-func (t UnionType) String() string {
+func (t Union) String() string {
 	buffer := bytes.Buffer{}
 	buffer.WriteString(fmt.Sprintf("%s", t[0]))
 	for _, disjunct := range t[1:] {
@@ -185,10 +185,10 @@ func (t UnionType) String() string {
 	return buffer.String()
 }
 
-func (t UnionType) ElementType() Type {
-	var elType Type = VoidType{}
+func (t Union) ElementType() Type {
+	var elType Type = Void{}
 	for _, disjunct := range t {
-		elType = Union(elType, disjunct.ElementType())
+		elType = NewUnion(elType, disjunct.ElementType())
 	}
 	return elType
 }

@@ -59,7 +59,7 @@ func (g *SComponent) Ast() (expressions.Expression, error) {
 	if g.NumLiteral != nil {
 		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
-			Type:  types.NumType{},
+			Type:  types.Num{},
 			Value: states.NumValue(*g.NumLiteral),
 		}, nil
 	}
@@ -115,7 +115,7 @@ func (g *PComponent) Ast() (expressions.Expression, error) {
 	if g.NumLiteral != nil {
 		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
-			Type:  types.NumType{},
+			Type:  types.Num{},
 			Value: states.NumValue(*g.NumLiteral),
 		}, nil
 	}
@@ -194,7 +194,7 @@ func (g *QComponent) Ast() (expressions.Expression, error) {
 	if g.NumLiteral != nil {
 		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
-			Type:  types.NumType{},
+			Type:  types.Num{},
 			Value: states.NumValue(*g.NumLiteral),
 		}, nil
 	}

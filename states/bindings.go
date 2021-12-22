@@ -33,7 +33,7 @@ func (s *BindingStack) Update(name string, t types.Type) *BindingStack {
 	}
 }
 
-func (s *BindingStack) Inhabits(v Value, t types.TypeVariable) (bool, error) {
+func (s *BindingStack) Inhabits(v Value, t types.Var) (bool, error) {
 	if s == nil {
 		return false, nil
 	}

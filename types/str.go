@@ -1,53 +1,53 @@
 package types
 
-type StrType struct {
+type Str struct {
 }
 
-func (t StrType) Subsumes(u Type) bool {
+func (t Str) Subsumes(u Type) bool {
 	switch u.(type) {
-	case VoidType:
+	case Void:
 		return true
-	case StrType:
+	case Str:
 		return true
 	default:
 		return false
 	}
 }
 
-func (t StrType) Bind(u Type, bindings map[string]Type) bool {
+func (t Str) Bind(u Type, bindings map[string]Type) bool {
 	switch u.(type) {
-	case VoidType:
+	case Void:
 		return true
-	case StrType:
+	case Str:
 		return true
 	default:
 		return false
 	}
 }
 
-func (t StrType) Instantiate(bindings map[string]Type) Type {
+func (t Str) Instantiate(bindings map[string]Type) Type {
 	return t
 }
 
-func (t StrType) Partition(u Type) (Type, Type) {
+func (t Str) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
-	case VoidType:
+	case Void:
 		return u, t
-	case StrType:
-		return u, VoidType{}
-	case UnionType:
+	case Str:
+		return u, Void{}
+	case Union:
 		return u.inversePartition(t)
-	case AnyType:
-		return t, VoidType{}
+	case Any:
+		return t, Void{}
 	default:
-		return VoidType{}, t
+		return Void{}, t
 	}
 }
 
-func (t StrType) String() string {
+func (t Str) String() string {
 	return "Str"
 }
 
-func (t StrType) ElementType() Type {
+func (t Str) ElementType() Type {
 	panic("Str is not a sequence type")
 }

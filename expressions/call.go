@@ -108,7 +108,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 	params := make([]*parameters.Parameter, len(argTypes))
 	for i, argType := range argTypes {
 		params[i] = &parameters.Parameter{
-			InputType:  types.AnyType{},
+			InputType:  types.Any{},
 			Params:     nil,
 			OutputType: argType,
 		}
@@ -159,7 +159,7 @@ func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
 		}
 		panic(fmt.Sprintf("variable %s not found", name))
 	}
-	return RegularFuncer(types.AnyType{}, name, nil, varType, kernel, &states.IDStack{
+	return RegularFuncer(types.Any{}, name, nil, varType, kernel, &states.IDStack{
 		Head: id,
 	})
 }

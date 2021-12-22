@@ -11,7 +11,7 @@ import (
 func TestMatchingArr(t *testing.T) {
 	TestProgram(
 		`[1, 2, 3] is [Num, Num, Num] then true ok`,
-		types.BoolType{},
+		types.Bool{},
 		states.BoolValue(true),
 		nil,
 		t,
@@ -27,49 +27,49 @@ func TestMatchingArr(t *testing.T) {
 	)
 	TestProgram(
 		`[1, 2, 3] each id all is [Num, Num, Num] then true else false ok`,
-		types.BoolType{},
+		types.Bool{},
 		states.BoolValue(true),
 		nil,
 		t,
 	)
 	TestProgram(
 		`[1, "a"] is [Num, Str] then true ok`,
-		types.BoolType{},
+		types.Bool{},
 		states.BoolValue(true),
 		nil,
 		t,
 	)
 	TestProgram(
 		`[1, "a"] is [Num a, Str b] then a ok`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
 	TestProgram(
 		`[1, "a"] is [Num a, Str b] then b ok`,
-		types.StrType{},
+		types.Str{},
 		states.StrValue("a"),
 		nil,
 		t,
 	)
 	TestProgram(
 		`[[1]] is [[Any x]] then x ok`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
 	TestProgram(
 		`[[1]] is [[x]] then x ok`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
 	TestProgram(
 		`if true then [1] else [2] ok is [Num a] then a ok`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(1),
 		nil,
 		t,
@@ -85,7 +85,7 @@ func TestMatchingArr(t *testing.T) {
 	//)
 	TestProgram(
 		`if true then [1] else ["2"] ok is [Num a] then a elis [Str a] then a ok`,
-		types.Union(types.NumType{}, types.StrType{}),
+		types.NewUnion(types.Num{}, types.Str{}),
 		states.NumValue(1),
 		nil,
 		t,
@@ -110,11 +110,11 @@ func TestMatchingArr(t *testing.T) {
 	)
 	TestProgram(
 		`[1, 2, 3] is [head;tail] then tail ok`,
-		&types.NearrType{
-			HeadType: types.NumType{},
-			TailType: &types.NearrType{
-				HeadType: types.NumType{},
-				TailType: types.VoidArrType,
+		&types.Nearr{
+			Head: types.Num{},
+			Tail: &types.Nearr{
+				Head: types.Num{},
+				Tail: types.VoidArr,
 			},
 		},
 		states.NewArrValue(
@@ -128,9 +128,9 @@ func TestMatchingArr(t *testing.T) {
 	)
 	TestProgram(
 		`[1, 2, 3] is [a, b;rest] then rest ok`,
-		&types.NearrType{
-			HeadType: types.NumType{},
-			TailType: types.VoidArrType,
+		&types.Nearr{
+			Head: types.Num{},
+			Tail: types.VoidArr,
 		},
 		states.NewArrValue(
 			[]states.Value{
@@ -142,7 +142,7 @@ func TestMatchingArr(t *testing.T) {
 	)
 	TestProgram(
 		`[1, 2, 3] is [a, b, c;rest] then rest ok`,
-		types.VoidArrType,
+		types.VoidArr,
 		states.NewArrValue(
 			[]states.Value{},
 		),
@@ -151,8 +151,8 @@ func TestMatchingArr(t *testing.T) {
 	)
 	TestProgram(
 		`for Arr<Num> def plusOne Arr<Num> as is [head;tail] then [head +1;tail plusOne] else [] ok ok [1, 2] plusOne`,
-		&types.ArrType{
-			ElType: types.NumType{},
+		&types.Arr{
+			El: types.Num{},
 		},
 		states.NewArrValue([]states.Value{
 			states.NumValue(2),

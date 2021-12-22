@@ -7,26 +7,26 @@ import (
 )
 
 func TestSubsumption(t *testing.T) {
-	var t1 types.Type = &types.ArrType{types.NumType{}}
-	var t2 types.Type = types.TupType([]types.Type{
-		types.NumType{},
-		types.NumType{},
-		types.NumType{},
+	var t1 types.Type = &types.Arr{types.Num{}}
+	var t2 types.Type = types.NewTup([]types.Type{
+		types.Num{},
+		types.Num{},
+		types.Num{},
 	})
 	if !t1.Subsumes(t2) {
 		t.Logf("%s should subsume %s", t1, t2)
 		t.Fail()
 	}
 	// ---
-	t1 = &types.ArrType{types.VoidType{}}
-	t2 = &types.ArrType{types.VoidType{}}
+	t1 = &types.Arr{types.Void{}}
+	t2 = &types.Arr{types.Void{}}
 	if !t1.Subsumes(t2) {
 		t.Logf("%s should subsume %s", t1, t2)
 		t.Fail()
 	}
 	// ---
-	t1 = &types.NearrType{types.AnyType{}, &types.NearrType{types.AnyType{}, &types.NearrType{types.AnyType{}, types.AnyArrType}}}
-	t2 = types.TupType([]types.Type{types.NumType{}, types.NumType{}})
+	t1 = &types.Nearr{types.Any{}, &types.Nearr{types.Any{}, &types.Nearr{types.Any{}, types.AnyArr}}}
+	t2 = types.NewTup([]types.Type{types.Num{}, types.Num{}})
 	if t1.Subsumes(t2) {
 		t.Logf("%s should not subsume %s", t1, t2)
 		t.Fail()

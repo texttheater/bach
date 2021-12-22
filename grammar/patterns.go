@@ -50,7 +50,7 @@ type NamePattern struct {
 }
 
 func (g *NamePattern) Ast() (expressions.Pattern, error) {
-	return expressions.TypePattern{g.Pos, types.AnyType{}, &g.Name}, nil
+	return expressions.TypePattern{g.Pos, types.Any{}, &g.Name}, nil
 }
 
 type TypePattern struct {
@@ -92,7 +92,7 @@ func (g *ArrPattern) Ast() (expressions.Pattern, error) {
 	if g.Rest == nil {
 		restPattern = expressions.TypePattern{
 			Pos:  g.Pos,
-			Type: &types.ArrType{types.VoidType{}},
+			Type: &types.Arr{types.Void{}},
 		}
 	} else {
 		var err error

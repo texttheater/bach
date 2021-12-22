@@ -14,10 +14,10 @@ import (
 func initText() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
-			types.StrType{},
+			types.Str{},
 			"bytes",
 			nil,
-			&types.ArrType{types.NumType{}},
+			&types.Arr{types.Num{}},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				str := string(inputState.Value.(states.StrValue))
 				bytes := []byte(str)
@@ -36,10 +36,10 @@ func initText() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			types.StrType{},
+			types.Str{},
 			"split",
 			nil,
-			&types.ArrType{types.StrType{}},
+			&types.Arr{types.Str{}},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				str := string(inputState.Value.(states.StrValue))
 				fields := strings.Fields(str)
@@ -58,12 +58,12 @@ func initText() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			types.StrType{},
+			types.Str{},
 			"split",
 			[]*parameters.Parameter{
-				parameters.SimpleParam(types.StrType{}),
+				parameters.SimpleParam(types.Str{}),
 			},
-			&types.ArrType{types.StrType{}},
+			&types.Arr{types.Str{}},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				str := string(inputState.Value.(states.StrValue))
 				res0 := args[0](inputState.Clear(), nil).Eval()
@@ -87,10 +87,10 @@ func initText() {
 			nil,
 		),
 		expressions.SimpleFuncer(
-			&types.ArrType{types.StrType{}},
+			&types.Arr{types.Str{}},
 			"join",
 			nil,
-			types.StrType{},
+			types.Str{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				iter := states.IterFromValue(inputValue)
 				buffer := bytes.Buffer{}
@@ -107,10 +107,10 @@ func initText() {
 			},
 		),
 		expressions.SimpleFuncer(
-			&types.ArrType{types.StrType{}},
+			&types.Arr{types.Str{}},
 			"join",
-			[]types.Type{types.StrType{}},
-			types.StrType{},
+			[]types.Type{types.Str{}},
+			types.Str{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				iter := states.IterFromValue(inputValue)
 				sep := string(argumentValues[0].(states.StrValue))
@@ -133,10 +133,10 @@ func initText() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.StrType{},
+			types.Str{},
 			"==",
-			[]types.Type{types.StrType{}},
-			types.BoolType{},
+			[]types.Type{types.Str{}},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				str1 := string(inputValue.(states.StrValue))
 				str2 := string(argumentValues[0].(states.StrValue))
@@ -144,10 +144,10 @@ func initText() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.StrType{},
+			types.Str{},
 			"+",
-			[]types.Type{types.StrType{}},
-			types.StrType{},
+			[]types.Type{types.Str{}},
+			types.Str{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				str1 := string(inputValue.(states.StrValue))
 				str2 := string(argumentValues[0].(states.StrValue))

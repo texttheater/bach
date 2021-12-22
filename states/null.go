@@ -17,13 +17,13 @@ func (v NullValue) Str() (string, error) {
 
 func (v NullValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
-	case types.NullType:
+	case types.Null:
 		return true, nil
-	case types.UnionType:
+	case types.Union:
 		return inhabits(v, t, stack)
-	case types.AnyType:
+	case types.Any:
 		return true, nil
-	case types.TypeVariable:
+	case types.Var:
 		return stack.Inhabits(v, t)
 	default:
 		return false, nil

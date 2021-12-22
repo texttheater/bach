@@ -14,7 +14,7 @@ func TestTypeErrors(t *testing.T) {
 		``,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.BoolType{}),
+			errors.InputType(types.Bool{}),
 			errors.Name("+"),
 			errors.NumParams(1),
 		),
@@ -26,7 +26,7 @@ func TestTypeErrors(t *testing.T) {
 		``,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.NullType{}),
+			errors.InputType(types.Null{}),
 			errors.Name("+"),
 			errors.NumParams(0),
 		),

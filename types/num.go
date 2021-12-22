@@ -1,53 +1,53 @@
 package types
 
-type NumType struct {
+type Num struct {
 }
 
-func (t NumType) Subsumes(u Type) bool {
+func (t Num) Subsumes(u Type) bool {
 	switch u.(type) {
-	case VoidType:
+	case Void:
 		return true
-	case NumType:
+	case Num:
 		return true
 	default:
 		return false
 	}
 }
 
-func (t NumType) Bind(u Type, bindings map[string]Type) bool {
+func (t Num) Bind(u Type, bindings map[string]Type) bool {
 	switch u.(type) {
-	case VoidType:
+	case Void:
 		return true
-	case NumType:
+	case Num:
 		return true
 	default:
 		return false
 	}
 }
 
-func (t NumType) Instantiate(bindings map[string]Type) Type {
+func (t Num) Instantiate(bindings map[string]Type) Type {
 	return t
 }
 
-func (t NumType) Partition(u Type) (Type, Type) {
+func (t Num) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
-	case VoidType:
+	case Void:
 		return u, t
-	case NumType:
-		return u, VoidType{}
-	case UnionType:
+	case Num:
+		return u, Void{}
+	case Union:
 		return u.inversePartition(t)
-	case AnyType:
-		return t, VoidType{}
+	case Any:
+		return t, Void{}
 	default:
-		return VoidType{}, t
+		return Void{}, t
 	}
 }
 
-func (t NumType) String() string {
+func (t Num) String() string {
 	return "Num"
 }
 
-func (t NumType) ElementType() Type {
+func (t Num) ElementType() Type {
 	panic("Num is not a sequence type")
 }

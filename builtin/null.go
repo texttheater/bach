@@ -9,10 +9,10 @@ import (
 func initNull() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"null",
 			nil,
-			types.NullType{},
+			types.Null{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NullValue{}, nil
 			},

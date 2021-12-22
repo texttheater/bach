@@ -29,7 +29,7 @@ func (x CompositionExpression) Typecheck(inputShape Shape, params []*parameters.
 	if err != nil {
 		return Shape{}, nil, nil, err
 	}
-	if (types.VoidType{}).Subsumes(middleShape.Type) {
+	if (types.Void{}).Subsumes(middleShape.Type) {
 		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ComposeWithVoid),
 			errors.Pos(x.Right.Position()))

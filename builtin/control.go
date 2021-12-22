@@ -11,10 +11,10 @@ import (
 func initControl() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
-			types.AnyType{},
+			types.Any{},
 			"fatal",
 			nil,
-			types.VoidType{},
+			types.Void{},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				return states.ThunkFromError(
 					errors.ValueError(
@@ -27,18 +27,18 @@ func initControl() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			types.Union(
-				types.NullType{},
-				types.TypeVariable{
-					Name:       "A",
-					UpperBound: types.AnyType{},
+			types.NewUnion(
+				types.Null{},
+				types.Var{
+					Name:  "A",
+					Bound: types.Any{},
 				},
 			),
 			"must",
 			nil,
-			types.TypeVariable{
-				Name:       "A",
-				UpperBound: types.AnyType{},
+			types.Var{
+				Name:  "A",
+				Bound: types.Any{},
 			},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				switch inputState.Value.(type) {

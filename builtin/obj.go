@@ -12,20 +12,20 @@ import (
 func initObj() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
-			types.ObjType{
-				PropTypeMap: map[string]types.Type{},
-				RestType: types.TypeVariable{
-					Name:       "A",
-					UpperBound: types.AnyType{},
+			types.Obj{
+				Props: map[string]types.Type{},
+				Rest: types.Var{
+					Name:  "A",
+					Bound: types.Any{},
 				},
 			},
 			"get",
 			[]*parameters.Parameter{
-				parameters.SimpleParam(types.Union(types.StrType{}, types.NumType{})),
+				parameters.SimpleParam(types.NewUnion(types.Str{}, types.Num{})),
 			},
-			types.TypeVariable{
-				Name:       "A",
-				UpperBound: types.AnyType{},
+			types.Var{
+				Name:  "A",
+				Bound: types.Any{},
 			},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				inputValue := inputState.Value.(states.ObjValue)

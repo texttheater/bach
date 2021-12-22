@@ -11,20 +11,20 @@ import (
 func initNet() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.SimpleFuncer(
-			types.StrType{},
+			types.Str{},
 			"urlPathEscape",
 			nil,
-			types.StrType{},
+			types.Str{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				str := string(inputValue.(states.StrValue))
 				return states.StrValue(url.PathEscape(str)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.StrType{},
+			types.Str{},
 			"urlPathUnescape",
 			nil,
-			types.StrType{},
+			types.Str{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				str := string(inputValue.(states.StrValue))
 				v, err := url.PathUnescape(str)
@@ -35,20 +35,20 @@ func initNet() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.StrType{},
+			types.Str{},
 			"urlQueryEscape",
 			nil,
-			types.StrType{},
+			types.Str{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				str := string(inputValue.(states.StrValue))
 				return states.StrValue(url.QueryEscape(str)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.StrType{},
+			types.Str{},
 			"urlQueryUnescape",
 			nil,
-			types.StrType{},
+			types.Str{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				str := string(inputValue.(states.StrValue))
 				v, err := url.QueryUnescape(str)

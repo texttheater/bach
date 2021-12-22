@@ -11,27 +11,27 @@ import (
 func initRegexp() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
-			types.StrType{},
+			types.Str{},
 			"findFirst",
 			[]*parameters.Parameter{
 				{
-					InputType: types.StrType{},
-					OutputType: types.TypeVariable{
+					InputType: types.Str{},
+					OutputType: types.Var{
 						Name: "A",
-						UpperBound: types.Union(
-							types.NullType{},
-							types.ObjType{
-								PropTypeMap: map[string]types.Type{
-									"start": types.NumType{},
-									"0":     types.StrType{},
+						Bound: types.NewUnion(
+							types.Null{},
+							types.Obj{
+								Props: map[string]types.Type{
+									"start": types.Num{},
+									"0":     types.Str{},
 								},
-								RestType: types.AnyType{},
+								Rest: types.Any{},
 							},
 						),
 					},
 				},
 			},
-			types.TypeVariable{
+			types.Var{
 				Name: "A",
 			},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -40,27 +40,27 @@ func initRegexp() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			types.StrType{},
+			types.Str{},
 			"findAll",
 			[]*parameters.Parameter{
 				&parameters.Parameter{
-					InputType: types.StrType{},
-					OutputType: types.TypeVariable{
+					InputType: types.Str{},
+					OutputType: types.Var{
 						Name: "A",
-						UpperBound: types.Union(
-							types.NullType{},
-							types.ObjType{
-								PropTypeMap: map[string]types.Type{
-									"start": types.NumType{},
-									"0":     types.StrType{},
+						Bound: types.NewUnion(
+							types.Null{},
+							types.Obj{
+								Props: map[string]types.Type{
+									"start": types.Num{},
+									"0":     types.Str{},
 								},
-								RestType: types.AnyType{},
+								Rest: types.Any{},
 							},
 						),
 					},
 				},
 			},
-			&types.ArrType{types.TypeVariable{
+			&types.Arr{types.Var{
 				Name: "A",
 			}},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {

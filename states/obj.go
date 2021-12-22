@@ -55,8 +55,8 @@ func (v ObjValue) Str() (string, error) {
 
 func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
-	case types.ObjType:
-		for prop := range t.PropTypeMap {
+	case types.Obj:
+		for prop := range t.Props {
 			if v[prop] == nil {
 				return false, nil
 			}
@@ -71,11 +71,11 @@ func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 			}
 		}
 		return true, nil
-	case types.UnionType:
+	case types.Union:
 		return inhabits(v, t, stack)
-	case types.AnyType:
+	case types.Any:
 		return true, nil
-	case types.TypeVariable:
+	case types.Var:
 		return stack.Inhabits(v, t)
 	default:
 		return false, nil

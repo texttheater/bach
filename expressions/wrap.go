@@ -25,11 +25,11 @@ func (x WrapExpression) Typecheck(inputShape Shape, params []*parameters.Paramet
 		)
 	}
 	shape := Shape{
-		Type: types.ObjType{
-			PropTypeMap: map[string]types.Type{
+		Type: types.Obj{
+			Props: map[string]types.Type{
 				x.Prop: inputShape.Type,
 			},
-			RestType: types.AnyType{},
+			Rest: types.Any{},
 		},
 		Stack: inputShape.Stack,
 	}

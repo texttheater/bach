@@ -108,7 +108,7 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body expressions.Express
 		}
 		x.Pattern = expressions.TypePattern{
 			Pos:  g.Pos,
-			Type: types.AnyType{},
+			Type: types.Any{},
 		}
 		x.Guard = condition
 	}
@@ -142,7 +142,7 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body expressions.Express
 				}
 				x.AlternativePatterns = append(x.AlternativePatterns, expressions.TypePattern{
 					Pos:  c.Pos,
-					Type: types.AnyType{},
+					Type: types.Any{},
 				})
 				x.AlternativeGuards = append(x.AlternativeGuards, condition)
 			}
@@ -196,7 +196,7 @@ func (g *FilterFromConditional) Ast(pos lexer.Position, body expressions.Express
 				}
 				x.AlternativePatterns = append(x.AlternativePatterns, expressions.TypePattern{
 					Pos:  c.Pos,
-					Type: types.AnyType{},
+					Type: types.Any{},
 				})
 				x.AlternativeGuards = append(x.AlternativeGuards, condition)
 			}

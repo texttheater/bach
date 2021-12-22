@@ -4,29 +4,29 @@ import (
 	"bytes"
 )
 
-type TypeVariable struct {
-	Name       string
-	UpperBound Type
+type Var struct {
+	Name  string
+	Bound Type
 }
 
-func (t TypeVariable) Subsumes(u Type) bool {
+func (t Var) Subsumes(u Type) bool {
 	switch u := u.(type) {
-	case VoidType:
+	case Void:
 		return true
-	case TypeVariable:
+	case Var:
 		return t.Name == u.Name
 	default:
 		return false
 	}
 }
 
-func (t TypeVariable) Bind(u Type, bindings map[string]Type) bool {
+func (t Var) Bind(u Type, bindings map[string]Type) bool {
 	instType, ok := bindings[t.Name]
 	if !ok {
-		if t.UpperBound == nil {
-			instType = AnyType{}
+		if t.Bound == nil {
+			instType = Any{}
 		} else {
-			instType = t.UpperBound
+			instType = t.Bound
 		}
 	}
 	var newInstType Type
@@ -42,7 +42,7 @@ func (t TypeVariable) Bind(u Type, bindings map[string]Type) bool {
 	return true
 }
 
-func (t TypeVariable) Instantiate(bindings map[string]Type) Type {
+func (t Var) Instantiate(bindings map[string]Type) Type {
 	instType, ok := bindings[t.Name]
 	if !ok {
 		return t
@@ -50,36 +50,36 @@ func (t TypeVariable) Instantiate(bindings map[string]Type) Type {
 	return instType
 }
 
-func (t TypeVariable) Partition(u Type) (Type, Type) {
+func (t Var) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
-	case VoidType:
+	case Void:
 		return u, t
-	case TypeVariable:
+	case Var:
 		if t.Name == u.Name {
-			return u, VoidType{}
+			return u, Void{}
 		}
-		return VoidType{}, t
-	case UnionType:
+		return Void{}, t
+	case Union:
 		return u.inversePartition(t)
-	case AnyType:
-		return t, VoidType{}
+	case Any:
+		return t, Void{}
 	default:
-		return VoidType{}, t
+		return Void{}, t
 	}
 }
 
-func (t TypeVariable) String() string {
+func (t Var) String() string {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("<")
 	buffer.WriteString(t.Name)
-	if t.UpperBound != nil {
+	if t.Bound != nil {
 		buffer.WriteString(" ")
-		buffer.WriteString(t.UpperBound.String())
+		buffer.WriteString(t.Bound.String())
 	}
 	buffer.WriteString(">")
 	return buffer.String()
 }
 
-func (t TypeVariable) ElementType() Type {
+func (t Var) ElementType() Type {
 	panic("type variable " + t.Name + " is not a sequence type")
 }

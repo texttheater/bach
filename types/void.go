@@ -1,38 +1,38 @@
 package types
 
-type VoidType struct {
+type Void struct {
 }
 
-func (t VoidType) Subsumes(u Type) bool {
+func (t Void) Subsumes(u Type) bool {
 	switch u.(type) {
-	case VoidType:
+	case Void:
 		return true
 	default:
 		return false
 	}
 }
 
-func (t VoidType) Bind(u Type, bindings map[string]Type) bool {
+func (t Void) Bind(u Type, bindings map[string]Type) bool {
 	switch u.(type) {
-	case VoidType:
+	case Void:
 		return true
 	default:
 		return false
 	}
 }
 
-func (t VoidType) Instantiate(bindings map[string]Type) Type {
+func (t Void) Instantiate(bindings map[string]Type) Type {
 	return t
 }
 
-func (t VoidType) Partition(u Type) (Type, Type) {
+func (t Void) Partition(u Type) (Type, Type) {
 	return t, t
 }
 
-func (t VoidType) String() string {
+func (t Void) String() string {
 	return "Void"
 }
 
-func (t VoidType) ElementType() Type {
+func (t Void) ElementType() Type {
 	panic("Void is not a sequence type")
 }

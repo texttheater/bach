@@ -10,13 +10,13 @@ import (
 func initTypes() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
-			types.TypeVariable{
-				Name:       "A",
-				UpperBound: types.AnyType{},
+			types.Var{
+				Name:  "A",
+				Bound: types.Any{},
 			},
 			"type",
 			nil,
-			types.StrType{},
+			types.Str{},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				return states.ThunkFromValue(states.StrValue(bindings["A"].String()))
 			},

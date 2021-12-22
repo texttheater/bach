@@ -11,70 +11,70 @@ import (
 func TestDefinitions(t *testing.T) {
 	TestProgram(
 		`for Num def plusOne Num as +1 ok 1 plusOne`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(2),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Num def plusOne Num as +1 ok 1 plusOne plusOne`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(3),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Num def apply(for Num f Num) Num as f ok 1 apply(+1)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(2),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Num def connectSelf(for Num f(for Any Num) Num) Num as =x f(x) ok 1 connectSelf(+)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(2),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Num def connectSelf(for Num f(for Any Num) Num) Num as =x f(x) ok 1 connectSelf(+) 3 connectSelf(*)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(9),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Num def connectSelf(for Num f(Num) Num) Num as =x f(x) ok 1 connectSelf(+)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(2),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Num def apply(for Num f Num) Num as f ok 2 =n apply(+n)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(4),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for Any def f(a Num, b Num) Tup<Num, Num> as [a, b] ok f(2, 3)`,
-		types.TupType([]types.Type{types.NumType{}, types.NumType{}}),
+		types.NewTup([]types.Type{types.Num{}, types.Num{}}),
 		states.NewArrValue([]states.Value{states.NumValue(2), states.NumValue(3)}),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for <A> def apply(for <A> f <B>) <B> as f ok 1 apply(+1)`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(2),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for <A>|Null def myMust <A> as is Null then fatal else id ok ok null myMust`,
-		types.TypeVariable{
+		types.Var{
 			Name: "A",
 		},
 		nil,
@@ -86,14 +86,14 @@ func TestDefinitions(t *testing.T) {
 	)
 	TestProgram(
 		`for <A>|Null def myMust <A> as is Null then fatal else id ok ok 1 myMust`,
-		types.NumType{},
+		types.Num{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
 	TestProgram(
 		`for <A>|Null def myMust <A> as is <A> then id else fatal ok ok null myMust`,
-		types.NullType{},
+		types.Null{},
 		states.NullValue{},
 		nil,
 		t,
@@ -104,16 +104,16 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.ArgHasWrongOutputType),
-			errors.WantType(types.TypeVariable{
+			errors.WantType(types.Var{
 				Name: "A",
-				UpperBound: types.Union(
-					types.NullType{},
-					types.ObjType{
-						PropTypeMap: map[string]types.Type{
-							"start": types.NumType{},
-							"0":     types.StrType{},
+				Bound: types.NewUnion(
+					types.Null{},
+					types.Obj{
+						Props: map[string]types.Type{
+							"start": types.Num{},
+							"0":     types.Str{},
 						},
-						RestType: types.AnyType{},
+						Rest: types.Any{},
 					},
 				),
 			},
@@ -137,11 +137,11 @@ func TestDefinitions(t *testing.T) {
 	)
 	TestProgram(
 		`for <A Obj<a: Num, Any>> def f <A> as id ok {a: 1} f`,
-		types.ObjType{
-			PropTypeMap: map[string]types.Type{
-				"a": types.NumType{},
+		types.Obj{
+			Props: map[string]types.Type{
+				"a": types.Num{},
 			},
-			RestType: types.VoidType{},
+			Rest: types.Void{},
 		},
 		states.ObjValue(map[string]*states.Thunk{
 			"a": states.ThunkFromValue(states.NumValue(1)),
@@ -152,9 +152,9 @@ func TestDefinitions(t *testing.T) {
 	// generics with bounds
 	TestProgram(
 		`for Any def f(for Any g <A Arr<Any>>) <A> as g ok f([1, "a"])`,
-		types.TupType([]types.Type{
-			types.NumType{},
-			types.StrType{},
+		types.NewTup([]types.Type{
+			types.Num{},
+			types.Str{},
 		}),
 		states.NewArrValue([]states.Value{
 			states.NumValue(1),
@@ -170,8 +170,8 @@ func TestDefinitions(t *testing.T) {
 		errors.TypeError(
 			errors.Code(errors.ArgHasWrongOutputType),
 			errors.ArgNum(1),
-			errors.WantType(types.TypeVariable{"A", types.AnyArrType}),
-			errors.GotType(types.StrType{}),
+			errors.WantType(types.Var{"A", types.AnyArr}),
+			errors.GotType(types.Str{}),
 		),
 		t,
 	)

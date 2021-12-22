@@ -26,11 +26,11 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*parameters.Para
 		)
 	}
 	// make sure the input type is a sequence type
-	if !types.AnyArrType.Subsumes(inputShape.Type) {
+	if !types.AnyArr.Subsumes(inputShape.Type) {
 		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.MappingRequiresArrType),
 			errors.Pos(x.Pos),
-			errors.WantType(types.AnyArrType),
+			errors.WantType(types.AnyArr),
 			errors.GotType(inputShape.Type),
 		)
 	}
@@ -46,8 +46,8 @@ func (x MappingExpression) Typecheck(inputShape Shape, params []*parameters.Para
 	ids := bodyIDs
 	// create output shape
 	outputShape := Shape{
-		Type: &types.ArrType{
-			ElType: bodyOutputShape.Type,
+		Type: &types.Arr{
+			El: bodyOutputShape.Type,
 		},
 		Stack: inputShape.Stack,
 	}

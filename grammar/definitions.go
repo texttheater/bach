@@ -120,7 +120,7 @@ type NamedParameterShortForm struct {
 func (g *NamedParameterShortForm) Ast() (*parameters.Parameter, string, error) {
 	outputType := g.OutputType.Ast()
 	return &parameters.Parameter{
-		InputType:  types.AnyType{},
+		InputType:  types.Any{},
 		OutputType: outputType,
 	}, g.Name, nil
 }
@@ -138,7 +138,7 @@ func (g *Parameter) Ast() (*parameters.Parameter, error) {
 	if g.InputType != nil {
 		inputType = g.InputType.Ast()
 	} else {
-		inputType = types.AnyType{}
+		inputType = types.Any{}
 	}
 	var params []*parameters.Parameter
 	if g.Parameter != nil {

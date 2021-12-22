@@ -5,7 +5,7 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-var InitialShape expressions.Shape = expressions.Shape{types.NullType{}, nil}
+var InitialShape expressions.Shape = expressions.Shape{types.Null{}, nil}
 
 func init() {
 	initNull()

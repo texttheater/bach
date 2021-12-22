@@ -27,7 +27,7 @@ func (x *TemplateLiteralExpression) Typecheck(inputShape Shape, params []*parame
 		)
 	}
 	outputShape := Shape{
-		Type:  types.StrType{},
+		Type:  types.Str{},
 		Stack: inputShape.Stack,
 	}
 	pieceActions := make([]states.Action, len(x.Pieces))

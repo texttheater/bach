@@ -16,10 +16,10 @@ func initMath() {
 	rand.Seed(time.Now().UnixNano())
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"+",
-			[]types.Type{types.NumType{}},
-			types.NumType{},
+			[]types.Type{types.Num{}},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputNum := inputValue.(states.NumValue)
 				argumentNum := argumentValues[0].(states.NumValue)
@@ -27,10 +27,10 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"-",
-			[]types.Type{types.NumType{}},
-			types.NumType{},
+			[]types.Type{types.Num{}},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputNum := inputValue.(states.NumValue)
 				argumentNum := argumentValues[0].(states.NumValue)
@@ -38,10 +38,10 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"-",
-			[]types.Type{types.NumType{}},
-			types.NumType{},
+			[]types.Type{types.Num{}},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(argumentValues[0].(states.NumValue))
 				if math.Signbit(x) {
@@ -52,10 +52,10 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"*",
-			[]types.Type{types.NumType{}},
-			types.NumType{},
+			[]types.Type{types.Num{}},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputNum := inputValue.(states.NumValue)
 				argumentNum := argumentValues[0].(states.NumValue)
@@ -63,10 +63,10 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"/",
-			[]types.Type{types.NumType{}},
-			types.NumType{},
+			[]types.Type{types.Num{}},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputNum := inputValue.(states.NumValue)
 				argumentNum := argumentValues[0].(states.NumValue)
@@ -74,10 +74,10 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"%",
-			[]types.Type{types.NumType{}},
-			types.NumType{},
+			[]types.Type{types.Num{}},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputNum := inputValue.(states.NumValue)
 				argumentNum := argumentValues[0].(states.NumValue)
@@ -85,10 +85,10 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"<",
-			[]types.Type{types.NumType{}},
-			types.BoolType{},
+			[]types.Type{types.Num{}},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputNum := inputValue.(states.NumValue)
 				argumentNum := argumentValues[0].(states.NumValue)
@@ -96,10 +96,10 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			">",
-			[]types.Type{types.NumType{}},
-			types.BoolType{},
+			[]types.Type{types.Num{}},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputNum := inputValue.(states.NumValue)
 				argumentNum := argumentValues[0].(states.NumValue)
@@ -107,10 +107,10 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"==",
-			[]types.Type{types.NumType{}},
-			types.BoolType{},
+			[]types.Type{types.Num{}},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputNum := inputValue.(states.NumValue)
 				argumentNum := argumentValues[0].(states.NumValue)
@@ -118,10 +118,10 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"<=",
-			[]types.Type{types.NumType{}},
-			types.BoolType{},
+			[]types.Type{types.Num{}},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputNum := inputValue.(states.NumValue)
 				argumentNum := argumentValues[0].(states.NumValue)
@@ -129,10 +129,10 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			">=",
-			[]types.Type{types.NumType{}},
-			types.BoolType{},
+			[]types.Type{types.Num{}},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputNum := inputValue.(states.NumValue)
 				argumentNum := argumentValues[0].(states.NumValue)
@@ -140,10 +140,10 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			&types.ArrType{types.NumType{}},
+			&types.Arr{types.Num{}},
 			"sum",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				iter := states.IterFromValue(inputValue)
 				sum := 0.0
@@ -160,10 +160,10 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			&types.ArrType{types.NumType{}},
+			&types.Arr{types.Num{}},
 			"avg",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				iter := states.IterFromValue(inputValue)
 				sum := 0.0
@@ -182,257 +182,257 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"inf",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(math.Inf(1)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"nan",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(math.NaN()), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"isFinite",
 			nil,
-			types.BoolType{},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.BoolValue(!math.IsInf(x, 0)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"isNaN",
 			nil,
-			types.BoolType{},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.BoolValue(math.IsNaN(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"epsilon",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(math.Nextafter(1, 2) - 1), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"largestSafeInteger",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(9007199254740991), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"largestNum",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(math.MaxFloat64), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"smallestSafeInteger",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(-9007199254740991), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"smallestPositiveNum",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(math.SmallestNonzeroFloat64), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"isInteger",
 			nil,
-			types.BoolType{},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.BoolValue(x == float64(int(x))), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"isSafeInteger",
 			nil,
-			types.BoolType{},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.BoolValue(x >= -9007199254740991 && x <= 9007199254740991), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"e",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(math.E), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"ln2",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(math.Ln2), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"ln10",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(math.Ln10), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"log2e",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(math.Log2E), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"log10e",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(math.Log10E), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"pi",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(math.Pi), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"sqrt1_2",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(0.7071067811865476), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"sqrt2",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(math.Sqrt2), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"abs",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Abs(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"acos",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Acos(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"acosh",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Acosh(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"asin",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Asin(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"asinh",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Asinh(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"atan",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Atan(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"atanh",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Atanh(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"atan2",
 			[]types.Type{
-				types.NumType{},
+				types.Num{},
 			},
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				y := float64(inputValue.(states.NumValue))
 				x := float64(argumentValues[0].(states.NumValue))
@@ -440,100 +440,100 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"cbrt",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Cbrt(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"ceil",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Ceil(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"clz32",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := uint32(inputValue.(states.NumValue))
 				return states.NumValue(bits.LeadingZeros32(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"cos",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Cos(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"cosh",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Cos(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"exp",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Exp(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"expm1",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Expm1(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"floor",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Floor(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"fround",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(float32(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			&types.ArrType{types.NumType{}},
+			&types.Arr{types.Num{}},
 			"hypot",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				v := inputValue.(*states.ArrValue)
 				x := make([]float64, 0)
@@ -550,12 +550,12 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"imul",
 			[]types.Type{
-				types.NumType{},
+				types.Num{},
 			},
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := int32(int64(inputValue.(states.NumValue)))
 				y := int32(int64(argumentValues[0].(states.NumValue)))
@@ -563,40 +563,40 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"log",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Log(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"log1p",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Log1p(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"log10",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Log10(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"log2",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Log2(x)), nil
@@ -604,10 +604,10 @@ func initMath() {
 		),
 		// TODO max, min with key function
 		expressions.SimpleFuncer(
-			&types.ArrType{types.NumType{}},
+			&types.Arr{types.Num{}},
 			"max",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				v := inputValue.(*states.ArrValue)
 				max := math.Inf(-1)
@@ -623,10 +623,10 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			&types.ArrType{types.NumType{}},
+			&types.Arr{types.Num{}},
 			"min",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				v := inputValue.(*states.ArrValue)
 				min := math.Inf(1)
@@ -642,12 +642,12 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"**",
 			[]types.Type{
-				types.NumType{},
+				types.Num{},
 			},
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				y := float64(argumentValues[0].(states.NumValue))
@@ -655,29 +655,29 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"random", // TODO integer, choice
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.NumValue(rand.Float64()), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"round",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Round(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"sign",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				if math.Signbit(x) {
@@ -696,60 +696,60 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"sin",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Sin(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"sinh",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Sinh(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"sqrt",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Sqrt(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"tan",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Tan(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"tanh",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Tanh(x)), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.NumType{},
+			types.Num{},
 			"trunc",
 			nil,
-			types.NumType{},
+			types.Num{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.NumValue(math.Trunc(x)), nil

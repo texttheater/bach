@@ -76,11 +76,11 @@ func (v *ArrValue) Str() (string, error) {
 
 func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
-	case *types.NearrType:
+	case *types.Nearr:
 		if v == nil {
 			return false, nil
 		}
-		ok, err := v.Head.Inhabits(t.HeadType, stack)
+		ok, err := v.Head.Inhabits(t.Head, stack)
 		if err != nil {
 			return false, err
 		}
@@ -91,13 +91,13 @@ func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		return tail.Inhabits(t.TailType, stack)
-	case *types.ArrType:
-		if (types.AnyType{}).Subsumes(t.ElType) {
+		return tail.Inhabits(t.Tail, stack)
+	case *types.Arr:
+		if (types.Any{}).Subsumes(t.El) {
 			return true, nil
 		}
 		for v != nil {
-			ok, err := v.Head.Inhabits(t.ElType, stack)
+			ok, err := v.Head.Inhabits(t.El, stack)
 			if err != nil {
 				return false, err
 			}
@@ -110,11 +110,11 @@ func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 			}
 		}
 		return true, nil
-	case types.UnionType:
+	case types.Union:
 		return inhabits(v, t, stack)
-	case types.AnyType:
+	case types.Any:
 		return true, nil
-	case types.TypeVariable:
+	case types.Var:
 		return stack.Inhabits(v, t)
 	default:
 		return false, nil

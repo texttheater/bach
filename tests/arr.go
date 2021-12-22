@@ -11,21 +11,21 @@ import (
 func TestArrays(t *testing.T) {
 	TestProgram(
 		`[]`,
-		types.TupType([]types.Type{}),
+		types.NewTup([]types.Type{}),
 		states.NewArrValue([]states.Value{}),
 		nil,
 		t,
 	)
 	TestProgram(
 		`[1]`,
-		types.TupType([]types.Type{types.NumType{}}),
+		types.NewTup([]types.Type{types.Num{}}),
 		states.NewArrValue([]states.Value{states.NumValue(1)}),
 		nil,
 		t,
 	)
 	TestProgram(
 		`[1, 2, 3]`,
-		types.TupType([]types.Type{types.NumType{}, types.NumType{}, types.NumType{}}),
+		types.NewTup([]types.Type{types.Num{}, types.Num{}, types.Num{}}),
 		states.NewArrValue([]states.Value{states.NumValue(1),
 			states.NumValue(2),
 			states.NumValue(3)}),
@@ -34,7 +34,7 @@ func TestArrays(t *testing.T) {
 	)
 	TestProgram(
 		`[1, "a"]`,
-		types.TupType([]types.Type{types.NumType{}, types.StrType{}}),
+		types.NewTup([]types.Type{types.Num{}, types.Str{}}),
 		states.NewArrValue([]states.Value{states.NumValue(1),
 			states.StrValue("a")}),
 		nil,
@@ -42,7 +42,7 @@ func TestArrays(t *testing.T) {
 	)
 	TestProgram(
 		`[[1, 2], ["a", "b"]]`,
-		types.TupType([]types.Type{types.TupType([]types.Type{types.NumType{}, types.NumType{}}), types.TupType([]types.Type{types.StrType{}, types.StrType{}})}),
+		types.NewTup([]types.Type{types.NewTup([]types.Type{types.Num{}, types.Num{}}), types.NewTup([]types.Type{types.Str{}, types.Str{}})}),
 		states.NewArrValue([]states.Value{states.NewArrValue([]states.Value{states.NumValue(1),
 			states.NumValue(2)}),
 			states.NewArrValue([]states.Value{states.StrValue("a"), states.StrValue("b")})}),
@@ -51,8 +51,8 @@ func TestArrays(t *testing.T) {
 	)
 	TestProgram(
 		`for Arr<Num> def f Arr<Num> as =x x ok [1, 2, 3] f`,
-		&types.ArrType{
-			types.NumType{},
+		&types.Arr{
+			types.Num{},
 		},
 		states.NewArrValue(
 			[]states.Value{
@@ -66,8 +66,8 @@ func TestArrays(t *testing.T) {
 	)
 	TestProgram(
 		`[1, 2, 3] each *2 all`,
-		&types.ArrType{
-			types.NumType{},
+		&types.Arr{
+			types.Num{},
 		},
 		states.NewArrValue(
 			[]states.Value{
@@ -90,9 +90,9 @@ func TestArrays(t *testing.T) {
 	)
 	TestProgram(
 		`[1;[]]`,
-		types.TupType(
+		types.NewTup(
 			[]types.Type{
-				types.NumType{},
+				types.Num{},
 			},
 		),
 		states.NewArrValue(
@@ -105,12 +105,12 @@ func TestArrays(t *testing.T) {
 	)
 	TestProgram(
 		`[3, 4] =rest [1, 2;rest]`,
-		types.TupType(
+		types.NewTup(
 			[]types.Type{
-				types.NumType{},
-				types.NumType{},
-				types.NumType{},
-				types.NumType{},
+				types.Num{},
+				types.Num{},
+				types.Num{},
+				types.Num{},
 			},
 		),
 		states.NewArrValue(
@@ -130,8 +130,8 @@ func TestArrays(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.RestRequiresArrType),
-			errors.WantType(types.AnyArrType),
-			errors.GotType(types.NumType{}),
+			errors.WantType(types.AnyArr),
+			errors.GotType(types.Num{}),
 		),
 		t,
 	)

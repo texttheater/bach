@@ -8,5 +8,5 @@ import (
 )
 
 func TestNull(t *testing.T) {
-	TestProgram("1 null", types.NullType{}, states.NullValue{}, nil, t)
+	TestProgram("1 null", types.Null{}, states.NullValue{}, nil, t)
 }

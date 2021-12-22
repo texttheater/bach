@@ -14,10 +14,10 @@ import (
 func initIO() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"in",
 			nil,
-			types.ReaderType{},
+			types.Reader{},
 			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
 				return states.ReaderValue{
 					os.Stdin,
@@ -25,10 +25,10 @@ func initIO() {
 			},
 		),
 		expressions.RegularFuncer(
-			types.ReaderType{},
+			types.Reader{},
 			"lines",
 			nil,
-			&types.ArrType{types.StrType{}},
+			&types.Arr{types.Str{}},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				reader := inputState.Value.(states.ReaderValue)
 				scanner := bufio.NewScanner(reader.Reader)
@@ -45,10 +45,10 @@ func initIO() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			&types.ArrType{types.StrType{}},
+			&types.Arr{types.Str{}},
 			"blocks",
 			nil,
-			&types.ArrType{&types.ArrType{types.StrType{}}},
+			&types.Arr{&types.Arr{types.Str{}}},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				var nextBlock func(lines *states.ArrValue) (*states.ArrValue, *states.ArrValue, error)
 				nextBlock = func(lines *states.ArrValue) (*states.ArrValue, *states.ArrValue, error) {
@@ -92,12 +92,12 @@ func initIO() {
 			nil,
 		),
 		expressions.SimpleFuncer(
-			types.TypeVariable{
+			types.Var{
 				Name: "A",
 			},
 			"out",
 			nil,
-			types.TypeVariable{
+			types.Var{
 				Name: "A",
 			},
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
@@ -110,14 +110,14 @@ func initIO() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.TypeVariable{
+			types.Var{
 				Name: "A",
 			},
 			"out",
 			[]types.Type{
-				types.StrType{},
+				types.Str{},
 			},
-			types.TypeVariable{
+			types.Var{
 				Name: "A",
 			},
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
@@ -132,12 +132,12 @@ func initIO() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.TypeVariable{
+			types.Var{
 				Name: "A",
 			},
 			"err",
 			nil,
-			types.TypeVariable{
+			types.Var{
 				Name: "A",
 			},
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
@@ -150,14 +150,14 @@ func initIO() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.TypeVariable{
+			types.Var{
 				Name: "A",
 			},
 			"err",
 			[]types.Type{
-				types.StrType{},
+				types.Str{},
 			},
-			types.TypeVariable{
+			types.Var{
 				Name: "A",
 			},
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {

@@ -1,53 +1,53 @@
 package types
 
-type BoolType struct {
+type Bool struct {
 }
 
-func (t BoolType) Subsumes(u Type) bool {
+func (t Bool) Subsumes(u Type) bool {
 	switch u.(type) {
-	case VoidType:
+	case Void:
 		return true
-	case BoolType:
+	case Bool:
 		return true
 	default:
 		return false
 	}
 }
 
-func (t BoolType) Bind(u Type, bindings map[string]Type) bool {
+func (t Bool) Bind(u Type, bindings map[string]Type) bool {
 	switch u.(type) {
-	case VoidType:
+	case Void:
 		return true
-	case BoolType:
+	case Bool:
 		return true
 	default:
 		return false
 	}
 }
 
-func (t BoolType) Instantiate(bindings map[string]Type) Type {
+func (t Bool) Instantiate(bindings map[string]Type) Type {
 	return t
 }
 
-func (t BoolType) Partition(u Type) (Type, Type) {
+func (t Bool) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
-	case VoidType:
+	case Void:
 		return u, t
-	case BoolType:
-		return u, VoidType{}
-	case UnionType:
+	case Bool:
+		return u, Void{}
+	case Union:
 		return u.inversePartition(t)
-	case AnyType:
-		return t, VoidType{}
+	case Any:
+		return t, Void{}
 	default:
-		return VoidType{}, t
+		return Void{}, t
 	}
 }
 
-func (t BoolType) String() string {
+func (t Bool) String() string {
 	return "Bool"
 }
 
-func (t BoolType) ElementType() Type {
+func (t Bool) ElementType() Type {
 	panic("Bool is not a sequence type")
 }

@@ -9,28 +9,28 @@ import (
 func initLogic() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"true",
 			nil,
-			types.BoolType{},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.BoolValue(true), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.AnyType{},
+			types.Any{},
 			"false",
 			nil,
-			types.BoolType{},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				return states.BoolValue(false), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.BoolType{},
+			types.Bool{},
 			"and",
-			[]types.Type{types.BoolType{}},
-			types.BoolType{},
+			[]types.Type{types.Bool{}},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputBool := inputValue.(states.BoolValue)
 				argumentBool := argumentValues[0].(states.BoolValue)
@@ -38,10 +38,10 @@ func initLogic() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.BoolType{},
+			types.Bool{},
 			"or",
-			[]types.Type{types.BoolType{}},
-			types.BoolType{},
+			[]types.Type{types.Bool{}},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputBool := inputValue.(states.BoolValue)
 				argumentBool := argumentValues[0].(states.BoolValue)
@@ -49,20 +49,20 @@ func initLogic() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.BoolType{},
+			types.Bool{},
 			"not",
 			nil,
-			types.BoolType{},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputBool := inputValue.(states.BoolValue)
 				return states.BoolValue(!inputBool), nil
 			},
 		),
 		expressions.SimpleFuncer(
-			types.BoolType{},
+			types.Bool{},
 			"==",
-			[]types.Type{types.BoolType{}},
-			types.BoolType{},
+			[]types.Type{types.Bool{}},
+			types.Bool{},
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				inputBool := inputValue.(states.BoolValue)
 				argumentBool := argumentValues[0].(states.BoolValue)

@@ -21,12 +21,12 @@ func (x GetterExpression) Position() lexer.Position {
 
 func (x GetterExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
 	switch t := inputShape.Type.(type) {
-	case types.ObjType:
-		wantType := types.ObjType{
-			PropTypeMap: map[string]types.Type{
-				x.Name: types.AnyType{},
+	case types.Obj:
+		wantType := types.Obj{
+			Props: map[string]types.Type{
+				x.Name: types.Any{},
 			},
-			RestType: types.AnyType{},
+			Rest: types.Any{},
 		}
 		if !wantType.Subsumes(inputShape.Type) {
 			return Shape{}, nil, nil, errors.TypeError(
@@ -36,7 +36,7 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*parameters.Param
 				errors.GotType(inputShape.Type),
 			)
 		}
-		outputType := inputShape.Type.(types.ObjType).PropTypeMap[x.Name]
+		outputType := inputShape.Type.(types.Obj).Props[x.Name]
 		outputShape := Shape{
 			Type:  outputType,
 			Stack: inputShape.Stack,
@@ -54,7 +54,7 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*parameters.Param
 			return states.ThunkFromState(outputState)
 		}
 		return outputShape, action, nil, nil
-	case *types.NearrType:
+	case *types.Nearr:
 		index, err := strconv.Atoi(x.Name)
 		if err != nil || index < 0 {
 			return Shape{}, nil, nil, errors.TypeError(
@@ -65,15 +65,15 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*parameters.Param
 		var outputType types.Type
 		restType := t
 		for i := 0; i < index; i++ {
-			if types.VoidArrType.Subsumes(restType.TailType) {
+			if types.VoidArr.Subsumes(restType.Tail) {
 				return Shape{}, nil, nil, errors.TypeError(
 					errors.Pos(x.Pos),
 					errors.Code(errors.NoSuchIndex),
 				)
 			}
-			restType = restType.TailType.(*types.NearrType)
+			restType = restType.Tail.(*types.Nearr)
 		}
-		outputType = restType.HeadType
+		outputType = restType.Head
 		outputShape := Shape{
 			Type:  outputType,
 			Stack: inputShape.Stack,

@@ -11,7 +11,7 @@ import (
 func TestValues(t *testing.T) {
 	TestProgram(
 		`false if id then 1 else fatal ok`,
-		types.NumType{},
+		types.Num{},
 		nil,
 		errors.ValueError(
 			errors.Code(errors.UnexpectedValue),

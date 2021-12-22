@@ -40,7 +40,7 @@ func (g *Conditional) Ast() (expressions.Expression, error) {
 	if g.Pattern == nil {
 		pattern = expressions.TypePattern{
 			Pos:  g.Pos,
-			Type: types.AnyType{},
+			Type: types.Any{},
 		}
 		guard, err = g.Condition.Ast()
 		if err != nil {
@@ -74,7 +74,7 @@ func (g *Conditional) Ast() (expressions.Expression, error) {
 			if alternative.Pattern == nil {
 				alternativePatterns[i] = expressions.TypePattern{
 					Pos:  alternative.Pos,
-					Type: types.AnyType{},
+					Type: types.Any{},
 					Name: nil,
 				}
 				alternativeGuards[i], err = alternative.Condition.Ast()
@@ -105,7 +105,7 @@ func (g *Conditional) Ast() (expressions.Expression, error) {
 			if alternative.Pattern == nil {
 				alternativePatterns[i] = expressions.TypePattern{
 					Pos:  alternative.Pos,
-					Type: types.AnyType{},
+					Type: types.Any{},
 					Name: nil,
 				}
 				alternativeGuards[i], err = alternative.Condition.Ast()
