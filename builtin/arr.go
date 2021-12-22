@@ -14,6 +14,46 @@ import (
 func initArr() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
+			"sort",
+			[]*params.Param{
+				{
+					InputType: types.NewVar("A", types.Any{}),
+					Params: []*params.Param{
+						params.SimpleParam(types.NewVar("A", types.Any{})),
+					},
+					OutputType: types.Bool{},
+				},
+			},
+			types.NewArr(types.NewVar("A", types.Any{})),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				slice, err := states.SliceFromValue(inputState.Value)
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				less := func(i, j int) bool {
+					arg0 := states.State{
+						Value: slice[i],
+						Stack: inputState.Stack,
+					}
+					arg1 := states.SimpleAction(slice[j])
+					thunk := args[0](arg0, []states.Action{arg1})
+					res := thunk.Eval()
+					if res.Error != nil {
+						err = res.Error
+						return true
+					}
+					return bool(res.Value.(states.BoolValue))
+				}
+				sort.SliceStable(slice, less)
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				return states.ThunkFromSlice(slice)
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
 			types.NewArr(
 				types.Str{},
 			),

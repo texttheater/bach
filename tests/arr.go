@@ -397,4 +397,25 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`[7, 3, 2, 5] sort(>)`,
+		`Arr<Num>`,
+		`[7, 5, 3, 2]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[{a: 7}, {a: 3}, {a: 2}, {a: 5}] for Obj<a: Num, Void> def <(other Obj<a: Num, Void>) Bool as @a <(other @a) ok sort(<)`,
+		`Arr<Obj<a: Num, Void>>`,
+		`[{a: 2}, {a: 3}, {a: 5}, {a: 7}]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[{a: 7, b: 2}, {a: 3, b: 1}, {a: 2, b: 2}, {a: 5, b: 2}] for Obj<a: Num, b: Num, Void> def <(other Obj<a: Num, b: Num, Void>) Bool as @b <(other @b) ok sort(<)`,
+		`Arr<Obj<a: Num, b: Num, Void>>`,
+		`[{a: 3, b: 1}, {a: 7, b: 2}, {a: 2, b: 2}, {a: 5, b: 2}]`,
+		nil,
+		t,
+	)
 }
