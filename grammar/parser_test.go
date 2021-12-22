@@ -45,4 +45,16 @@ func TestTypes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	_, err = grammar.ParseType("Obj<a: Bool>")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = grammar.ParseType("Obj<a: Bool, b: Bool, Bool>")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = grammar.ParseType("Obj<a: Num, b: Num>")
+	if err != nil {
+		t.Fatal(err)
+	}
 }
