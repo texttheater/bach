@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -206,12 +206,12 @@ func TestCalls(t *testing.T) {
 		errors.TypeError(
 			errors.Code(errors.ParamDoesNotMatch),
 			errors.ParamNum(1),
-			errors.WantParam(&parameters.Parameter{
+			errors.WantParam(&params.Param{
 				InputType:  types.Any{},
 				Params:     nil,
 				OutputType: types.Num{},
 			}),
-			errors.GotParam(&parameters.Parameter{
+			errors.GotParam(&params.Param{
 				InputType:  types.Any{},
 				Params:     nil,
 				OutputType: types.Str{},
@@ -226,12 +226,12 @@ func TestCalls(t *testing.T) {
 		errors.TypeError(
 			errors.Code(errors.ParamDoesNotMatch),
 			errors.ParamNum(1),
-			errors.WantParam(&parameters.Parameter{
+			errors.WantParam(&params.Param{
 				InputType:  types.Any{},
 				Params:     nil,
 				OutputType: types.Num{},
 			}),
-			errors.GotParam(&parameters.Parameter{
+			errors.GotParam(&params.Param{
 				InputType:  types.Str{},
 				Params:     nil,
 				OutputType: types.Num{},

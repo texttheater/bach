@@ -6,7 +6,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/expressions"
-	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -66,8 +66,8 @@ func initArr() {
 				types.NewVar("A", types.Any{}),
 			),
 			"+",
-			[]*parameters.Parameter{
-				parameters.SimpleParam(types.NewArr(
+			[]*params.Param{
+				params.SimpleParam(types.NewArr(
 					types.NewVar("B", types.Any{}),
 				)),
 			},
@@ -134,8 +134,8 @@ func initArr() {
 				types.NewVar("A", types.Any{}),
 			),
 			"drop",
-			[]*parameters.Parameter{
-				parameters.SimpleParam(types.Num{}),
+			[]*params.Param{
+				params.SimpleParam(types.Num{}),
 			},
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
@@ -171,8 +171,8 @@ func initArr() {
 				types.NewVar("A", types.Any{}),
 			),
 			"take",
-			[]*parameters.Parameter{
-				parameters.SimpleParam(types.Num{}),
+			[]*params.Param{
+				params.SimpleParam(types.Num{}),
 			},
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
@@ -213,9 +213,9 @@ func initArr() {
 				types.NewVar("A", types.Any{}),
 			),
 			"slice",
-			[]*parameters.Parameter{
-				parameters.SimpleParam(types.Num{}),
-				parameters.SimpleParam(types.Num{}),
+			[]*params.Param{
+				params.SimpleParam(types.Num{}),
+				params.SimpleParam(types.Num{}),
 			},
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
@@ -298,9 +298,9 @@ func initArr() {
 		expressions.RegularFuncer(
 			types.Any{},
 			"range",
-			[]*parameters.Parameter{
-				parameters.SimpleParam(types.Num{}),
-				parameters.SimpleParam(types.Num{}),
+			[]*params.Param{
+				params.SimpleParam(types.Num{}),
+				params.SimpleParam(types.Num{}),
 			},
 			types.NewArr(
 				types.Num{},
@@ -334,8 +334,8 @@ func initArr() {
 				types.NewVar("A", types.Any{}),
 			),
 			"get",
-			[]*parameters.Parameter{
-				parameters.SimpleParam(types.Num{}),
+			[]*params.Param{
+				params.SimpleParam(types.Num{}),
 			},
 			types.NewVar("A", types.Any{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {

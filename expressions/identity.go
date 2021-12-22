@@ -3,7 +3,7 @@ package expressions
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 )
 
@@ -15,7 +15,7 @@ func (x IdentityExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x IdentityExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
+func (x IdentityExpression) Typecheck(inputShape Shape, params []*params.Param) (Shape, states.Action, *states.IDStack, error) {
 	if len(params) > 0 {
 		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ParamsNotAllowed),

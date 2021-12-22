@@ -6,7 +6,7 @@ import (
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/expressions"
-	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -60,8 +60,8 @@ func initText() {
 		expressions.RegularFuncer(
 			types.Str{},
 			"split",
-			[]*parameters.Parameter{
-				parameters.SimpleParam(types.Str{}),
+			[]*params.Param{
+				params.SimpleParam(types.Str{}),
 			},
 			types.NewArr(types.Str{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {

@@ -3,7 +3,7 @@ package builtin
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/expressions"
-	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -13,7 +13,7 @@ func initRegexp() {
 		expressions.RegularFuncer(
 			types.Str{},
 			"findFirst",
-			[]*parameters.Parameter{
+			[]*params.Param{
 				{
 					InputType: types.Str{},
 					OutputType: types.NewVar("A", types.NewUnion(
@@ -39,7 +39,7 @@ func initRegexp() {
 		expressions.RegularFuncer(
 			types.Str{},
 			"findAll",
-			[]*parameters.Parameter{
+			[]*params.Param{
 				{
 					InputType: types.Str{},
 					OutputType: types.NewVar("A", types.NewUnion(

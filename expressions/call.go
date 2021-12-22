@@ -5,7 +5,7 @@ import (
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -20,7 +20,7 @@ func (x CallExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x CallExpression) Typecheck(inputShape Shape, params []*parameters.Parameter) (Shape, states.Action, *states.IDStack, error) {
+func (x CallExpression) Typecheck(inputShape Shape, params []*params.Param) (Shape, states.Action, *states.IDStack, error) {
 	// go down the function stack and find the function invoked by this
 	// call
 	stack := inputShape.Stack
@@ -91,23 +91,23 @@ func (s *FuncerStack) String() string {
 	return fmt.Sprintf("%v", slice)
 }
 
-func instantiate(params []*parameters.Parameter, bindings map[string]types.Type) []*parameters.Parameter {
-	result := make([]*parameters.Parameter, len(params))
-	for i, param := range params {
-		result[i] = param.Instantiate(bindings)
+func instantiate(pars []*params.Param, bindings map[string]types.Type) []*params.Param {
+	result := make([]*(params.Param), len(pars))
+	for i, par := range pars {
+		result[i] = par.Instantiate(bindings)
 	}
 	return result
 }
 
-type Funcer func(gotInputShape Shape, gotCall CallExpression, gotParams []*parameters.Parameter) (outputShape Shape, action states.Action, ids *states.IDStack, ok bool, err error)
+type Funcer func(gotInputShape Shape, gotCall CallExpression, gotParams []*params.Param) (outputShape Shape, action states.Action, ids *states.IDStack, ok bool, err error)
 
 type SimpleKernel func(inputValue states.Value, argValues []states.Value) (states.Value, error)
 
 func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, simpleKernel SimpleKernel) Funcer {
 	// make parameters from argument types
-	params := make([]*parameters.Parameter, len(argTypes))
+	pars := make([]*params.Param, len(argTypes))
 	for i, argType := range argTypes {
-		params[i] = &parameters.Parameter{
+		pars[i] = &params.Param{
 			InputType:  types.Any{},
 			Params:     nil,
 			OutputType: argType,
@@ -136,7 +136,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 
 	}
 	// return
-	return RegularFuncer(wantInputType, wantName, params, outputType, regularKernel, nil)
+	return RegularFuncer(wantInputType, wantName, pars, outputType, regularKernel, nil)
 }
 
 func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
@@ -166,10 +166,10 @@ func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
 
 type RegularKernel func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk
 
-func RegularFuncer(wantInputType types.Type, wantName string, params []*parameters.Parameter, outputType types.Type, kernel RegularKernel, ids *states.IDStack) Funcer {
-	return func(gotInputShape Shape, gotCall CallExpression, gotParams []*parameters.Parameter) (Shape, states.Action, *states.IDStack, bool, error) {
+func RegularFuncer(wantInputType types.Type, wantName string, pars []*params.Param, outputType types.Type, kernel RegularKernel, ids *states.IDStack) Funcer {
+	return func(gotInputShape Shape, gotCall CallExpression, gotParams []*params.Param) (Shape, states.Action, *states.IDStack, bool, error) {
 		// match number of parameters
-		if len(gotCall.Args)+len(gotParams) != len(params) {
+		if len(gotCall.Args)+len(gotParams) != len(pars) {
 			return Shape{}, nil, nil, false, nil
 		}
 		// match name
@@ -192,28 +192,28 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*paramete
 		argIDss := make([]*states.IDStack, len(gotCall.Args))
 		for i := range gotCall.Args {
 			argInputShape := Shape{
-				Type:  params[i].InputType.Instantiate(bindings), // TODO what if we don't have the binding yet at this stage?
+				Type:  pars[i].InputType.Instantiate(bindings), // TODO what if we don't have the binding yet at this stage?
 				Stack: gotInputShape.Stack,
 			}
-			argOutputShape, argAction, argIDs, err := gotCall.Args[i].Typecheck(argInputShape, instantiate(params[i].Params, bindings))
+			argOutputShape, argAction, argIDs, err := gotCall.Args[i].Typecheck(argInputShape, instantiate(pars[i].Params, bindings))
 			if err != nil {
 				return Shape{}, nil, nil, false, err
 			}
-			if !params[i].OutputType.Bind(argOutputShape.Type, bindings) {
+			if !pars[i].OutputType.Bind(argOutputShape.Type, bindings) {
 				return Shape{}, nil, nil, false, errors.TypeError(
 					errors.Code(errors.ArgHasWrongOutputType),
 					errors.Pos(gotCall.Pos),
 					errors.ArgNum(i+1),
-					errors.WantType(params[i].OutputType.Instantiate(bindings)),
+					errors.WantType(pars[i].OutputType.Instantiate(bindings)),
 					errors.GotType(argOutputShape.Type),
 				)
 			}
-			if !params[i].OutputType.Instantiate(bindings).Subsumes(argOutputShape.Type) {
+			if !pars[i].OutputType.Instantiate(bindings).Subsumes(argOutputShape.Type) {
 				return Shape{}, nil, nil, false, errors.TypeError(
 					errors.Code(errors.ArgHasWrongOutputType),
 					errors.Pos(gotCall.Pos),
 					errors.ArgNum(i+1),
-					errors.WantType(params[i].OutputType.Instantiate(bindings)),
+					errors.WantType(pars[i].OutputType.Instantiate(bindings)),
 					errors.GotType(argOutputShape.Type),
 				)
 			}
@@ -239,7 +239,7 @@ func RegularFuncer(wantInputType types.Type, wantName string, params []*paramete
 		}
 		// typecheck parameters not filled by the call
 		for i, gotParam := range gotParams {
-			wantParam := params[len(gotCall.Args)+i].Instantiate(bindings)
+			wantParam := pars[len(gotCall.Args)+i].Instantiate(bindings)
 			if !gotParam.Subsumes(wantParam) {
 				return Shape{}, nil, nil, false, errors.TypeError(
 					errors.Code(errors.ParamDoesNotMatch),

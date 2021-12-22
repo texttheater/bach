@@ -1,4 +1,4 @@
-package parameters
+package params
 
 import (
 	"bytes"
@@ -6,21 +6,21 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-type Parameter struct {
+type Param struct {
 	InputType  types.Type
-	Params     []*Parameter
+	Params     []*Param
 	OutputType types.Type
 }
 
-func SimpleParam(outputType types.Type) *Parameter {
-	return &Parameter{
+func SimpleParam(outputType types.Type) *Param {
+	return &Param{
 		InputType:  types.Any{},
 		Params:     nil,
 		OutputType: outputType,
 	}
 }
 
-func (p *Parameter) Subsumes(q *Parameter) bool {
+func (p *Param) Subsumes(q *Param) bool {
 	if len(p.Params) != len(q.Params) {
 		return false
 	}
@@ -38,28 +38,28 @@ func (p *Parameter) Subsumes(q *Parameter) bool {
 	return true
 }
 
-func (p *Parameter) Equivalent(q *Parameter) bool {
+func (p *Param) Equivalent(q *Param) bool {
 	return p.Subsumes(q) && q.Subsumes(p)
 }
 
-func (p *Parameter) Instantiate(bindings map[string]types.Type) *Parameter {
+func (p *Param) Instantiate(bindings map[string]types.Type) *Param {
 	inputType := p.InputType.Instantiate(bindings)
-	var params []*Parameter
+	var params []*Param
 	if p.Params != nil {
-		params = make([]*Parameter, len(p.Params))
+		params = make([]*Param, len(p.Params))
 		for i, param := range p.Params {
 			params[i] = param.Instantiate(bindings)
 		}
 	}
 	outputType := p.OutputType.Instantiate(bindings)
-	return &Parameter{
+	return &Param{
 		InputType:  inputType,
 		Params:     params,
 		OutputType: outputType,
 	}
 }
 
-func (p Parameter) String() string {
+func (p Param) String() string {
 	buffer := bytes.Buffer{}
 	if !p.InputType.Subsumes(types.Any{}) || len(p.Params) > 0 {
 		buffer.WriteString("for ")

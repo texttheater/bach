@@ -3,41 +3,41 @@ package grammar
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/expressions"
-	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/types"
 )
 
 type Definition struct {
 	Pos        lexer.Position
-	InputType  *TypeTemplate     `"for" @@`
-	Name       *string           `"def" ( ( @Lid | @Op1 | @Op2 )`
-	NameLpar   *string           `      | @NameLpar`
-	Parameter  *NamedParameter   `        @@`
-	Params     []*NamedParameter `        ( "," @@ )* ")" )`
-	OutputType *Type             `@@`
-	Body       *Composition      `"as" @@ "ok"`
+	InputType  *TypeTemplate `"for" @@`
+	Name       *string       `"def" ( ( @Lid | @Op1 | @Op2 )`
+	NameLpar   *string       `      | @NameLpar`
+	Param      *NamedParam   `        @@`
+	Params     []*NamedParam `        ( "," @@ )* ")" )`
+	OutputType *Type         `@@`
+	Body       *Composition  `"as" @@ "ok"`
 }
 
 func (g *Definition) Ast() (expressions.Expression, error) {
 	inputType := g.InputType.Ast()
 	var name string
-	var params []*parameters.Parameter
-	var paramNames []string
+	var pars []*params.Param
+	var parNames []string
 	if g.Name != nil {
 		name = *g.Name
 	} else {
 		nameLpar := *g.NameLpar
 		name = nameLpar[:len(nameLpar)-1]
-		params = make([]*parameters.Parameter, len(g.Params)+1)
-		paramNames = make([]string, len(g.Params)+1)
-		param, paramName, err := g.Parameter.Ast()
+		pars = make([]*params.Param, len(g.Params)+1)
+		parNames = make([]string, len(g.Params)+1)
+		par, parName, err := g.Param.Ast()
 		if err != nil {
 			return nil, err
 		}
-		params[0] = param
-		paramNames[0] = paramName
-		for i, param := range g.Params {
-			params[i+1], paramNames[i+1], err = param.Ast()
+		pars[0] = par
+		parNames[0] = parName
+		for i, par := range g.Params {
+			pars[i+1], parNames[i+1], err = par.Ast()
 			if err != nil {
 				return nil, err
 			}
@@ -52,113 +52,113 @@ func (g *Definition) Ast() (expressions.Expression, error) {
 		Pos:        g.Pos,
 		InputType:  inputType,
 		Name:       name,
-		Params:     params,
-		ParamNames: paramNames,
+		Params:     pars,
+		ParamNames: parNames,
 		OutputType: outputType,
 		Body:       body,
 	}, nil
 }
 
-type NamedParameter struct {
+type NamedParam struct {
 	Pos   lexer.Position
-	Long  *NamedParameterLongForm  `( @@`
-	Short *NamedParameterShortForm `| @@ )`
+	Long  *NamedParamLongForm  `( @@`
+	Short *NamedParamShortForm `| @@ )`
 }
 
-func (g *NamedParameter) Ast() (*parameters.Parameter, string, error) {
+func (g *NamedParam) Ast() (*params.Param, string, error) {
 	if g.Long != nil {
 		return g.Long.Ast()
 	}
 	return g.Short.Ast()
 }
 
-type NamedParameterLongForm struct {
+type NamedParamLongForm struct {
 	Pos        lexer.Position
 	InputType  *TypeTemplate `"for" @@`
 	Name       *string       `( ( @Lid | @Op1 | @Op2 )`
 	NameLpar   *string       `| @NameLpar`
-	Parameter  *Parameter    `  @@`
-	Params     []*Parameter  `  ( "," @@ )* ")" )`
+	Param      *Param        `  @@`
+	Params     []*Param      `  ( "," @@ )* ")" )`
 	OutputType *TypeTemplate `@@`
 }
 
-func (g *NamedParameterLongForm) Ast() (*parameters.Parameter, string, error) {
+func (g *NamedParamLongForm) Ast() (*params.Param, string, error) {
 	inputType := g.InputType.Ast()
 	var name string
-	var params []*parameters.Parameter
+	var pars []*params.Param
 	if g.Name != nil {
 		name = *g.Name
 	} else {
 		name = (*g.NameLpar)[:len(*g.NameLpar)-1]
-		params = make([]*parameters.Parameter, len(g.Params)+1)
+		pars = make([]*params.Param, len(g.Params)+1)
 		var err error
-		params[0], err = g.Parameter.Ast()
+		pars[0], err = g.Param.Ast()
 		if err != nil {
 			return nil, "", err
 		}
 		for i := range g.Params {
-			params[i+1], err = g.Params[i].Ast()
+			pars[i+1], err = g.Params[i].Ast()
 			if err != nil {
 				return nil, "", err
 			}
 		}
 	}
 	outputType := g.OutputType.Ast()
-	return &parameters.Parameter{
+	return &params.Param{
 		InputType:  inputType,
-		Params:     params,
+		Params:     pars,
 		OutputType: outputType,
 	}, name, nil
 }
 
-type NamedParameterShortForm struct {
+type NamedParamShortForm struct {
 	Pos        lexer.Position
 	Name       string        `( @Lid | @Op1 | @Op2)`
 	OutputType *TypeTemplate `@@`
 }
 
-func (g *NamedParameterShortForm) Ast() (*parameters.Parameter, string, error) {
+func (g *NamedParamShortForm) Ast() (*params.Param, string, error) {
 	outputType := g.OutputType.Ast()
-	return &parameters.Parameter{
+	return &params.Param{
 		InputType:  types.Any{},
 		OutputType: outputType,
 	}, g.Name, nil
 }
 
-type Parameter struct {
+type Param struct {
 	Pos        lexer.Position
 	InputType  *TypeTemplate `( "for" @@`
-	Parameter  *Parameter    `  ( "(" @@`
-	Params     []*Parameter  `    ( "," @@ )* ")" )? )?`
+	Param      *Param        `  ( "(" @@`
+	Params     []*Param      `    ( "," @@ )* ")" )? )?`
 	OutputType *TypeTemplate `@@`
 }
 
-func (g *Parameter) Ast() (*parameters.Parameter, error) {
+func (g *Param) Ast() (*params.Param, error) {
 	var inputType types.Type
 	if g.InputType != nil {
 		inputType = g.InputType.Ast()
 	} else {
 		inputType = types.Any{}
 	}
-	var params []*parameters.Parameter
-	if g.Parameter != nil {
-		params = make([]*parameters.Parameter, len(g.Params)+1)
+	var pars []*params.Param
+	if g.Param != nil {
+		pars = make([]*params.Param, len(g.Params)+1)
 		var err error
-		params[0], err = g.Parameter.Ast()
+		pars[0], err = g.Param.Ast()
 		if err != nil {
 			return nil, err
 		}
 		for i, param := range g.Params {
-			params[i+1], err = param.Ast()
+			pars[i+1], err = param.Ast()
 			if err != nil {
 				return nil, err
 			}
 		}
 	}
 	outputType := g.OutputType.Ast()
-	return &parameters.Parameter{
+	return &params.Param{
 		InputType:  inputType,
-		Params:     params,
+		Params:     pars,
 		OutputType: outputType,
 	}, nil
 }

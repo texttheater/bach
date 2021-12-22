@@ -4,7 +4,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/expressions"
-	"github.com/texttheater/bach/parameters"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -17,8 +17,8 @@ func initObj() {
 				Rest:  types.NewVar("A", types.Any{}),
 			},
 			"get",
-			[]*parameters.Parameter{
-				parameters.SimpleParam(types.NewUnion(types.Str{}, types.Num{})),
+			[]*params.Param{
+				params.SimpleParam(types.NewUnion(types.Str{}, types.Num{})),
 			},
 			types.NewVar("A", types.Any{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
