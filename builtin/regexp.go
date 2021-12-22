@@ -16,19 +16,16 @@ func initRegexp() {
 			[]*parameters.Parameter{
 				{
 					InputType: types.Str{},
-					OutputType: types.Var{
-						Name: "A",
-						Bound: types.NewUnion(
-							types.Null{},
-							types.Obj{
-								Props: map[string]types.Type{
-									"start": types.Num{},
-									"0":     types.Str{},
-								},
-								Rest: types.Any{},
+					OutputType: types.NewVar("A", types.NewUnion(
+						types.Null{},
+						types.Obj{
+							Props: map[string]types.Type{
+								"start": types.Num{},
+								"0":     types.Str{},
 							},
-						),
-					},
+							Rest: types.Any{},
+						},
+					)),
 				},
 			},
 			types.Var{
@@ -43,26 +40,24 @@ func initRegexp() {
 			types.Str{},
 			"findAll",
 			[]*parameters.Parameter{
-				&parameters.Parameter{
+				{
 					InputType: types.Str{},
-					OutputType: types.Var{
-						Name: "A",
-						Bound: types.NewUnion(
-							types.Null{},
-							types.Obj{
-								Props: map[string]types.Type{
-									"start": types.Num{},
-									"0":     types.Str{},
-								},
-								Rest: types.Any{},
+					OutputType: types.NewVar("A", types.NewUnion(
+						types.Null{},
+						types.Obj{
+							Props: map[string]types.Type{
+								"start": types.Num{},
+								"0":     types.Str{},
 							},
-						),
-					},
+							Rest: types.Any{},
+						},
+					)),
 				},
 			},
-			&types.Arr{types.Var{
+			types.NewArr(types.Var{
 				Name: "A",
-			}},
+			}),
+
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				offset := 0
 				v := inputState.Value.(states.StrValue)

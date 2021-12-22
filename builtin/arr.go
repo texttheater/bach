@@ -14,10 +14,14 @@ import (
 func initArr() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
-			&types.Arr{types.Str{}},
+			types.NewArr(
+				types.Str{},
+			),
 			"sort",
 			nil,
-			&types.Arr{types.Str{}},
+			types.NewArr(
+				types.Str{},
+			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				slice, err := states.SliceFromValue(inputState.Value)
 				if err != nil {
@@ -34,10 +38,14 @@ func initArr() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			&types.Arr{types.Num{}},
+			types.NewArr(
+				types.Num{},
+			),
 			"sort",
 			nil,
-			&types.Arr{types.Num{}},
+			types.NewArr(
+				types.Num{},
+			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				slice, err := states.SliceFromValue(inputState.Value)
 				if err != nil {
@@ -54,17 +62,20 @@ func initArr() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			&types.Arr{types.Var{"A", types.Any{}}},
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
 			"+",
 			[]*parameters.Parameter{
-				parameters.SimpleParam(&types.Arr{
-					types.Var{"B", types.Any{}},
-				}),
+				parameters.SimpleParam(types.NewArr(
+					types.NewVar("B", types.Any{}),
+				)),
 			},
-			&types.Arr{types.NewUnion(
-				types.Var{"A", types.Any{}},
-				types.Var{"B", types.Any{}},
-			)},
+			types.NewArr(types.NewUnion(
+				types.NewVar("A", types.Any{}),
+				types.NewVar("B", types.Any{}),
+			)),
+
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				input1 := states.IterFromValue(inputState.Value)
 				input2 := states.IterFromAction(inputState.Clear(), args[0])
@@ -90,20 +101,14 @@ func initArr() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			&types.Arr{
-				El: types.Var{
-					Name:  "A",
-					Bound: types.Any{},
-				},
-			},
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
 			"rev",
 			nil,
-			&types.Arr{
-				El: types.Var{
-					Name:  "A",
-					Bound: types.Any{},
-				},
-			},
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				input := states.IterFromValue(inputState.Value)
 				var outputArr *states.ArrValue
@@ -125,22 +130,16 @@ func initArr() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			&types.Arr{
-				El: types.Var{
-					Name:  "A",
-					Bound: types.Any{},
-				},
-			},
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
 			"drop",
 			[]*parameters.Parameter{
 				parameters.SimpleParam(types.Num{}),
 			},
-			&types.Arr{
-				El: types.Var{
-					Name:  "A",
-					Bound: types.Any{},
-				},
-			},
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				from, err := states.NumFromAction(inputState.Clear(), args[0])
 				if err != nil {
@@ -168,22 +167,16 @@ func initArr() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			&types.Arr{
-				El: types.Var{
-					Name:  "A",
-					Bound: types.Any{},
-				},
-			},
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
 			"take",
 			[]*parameters.Parameter{
 				parameters.SimpleParam(types.Num{}),
 			},
-			&types.Arr{
-				El: types.Var{
-					Name:  "A",
-					Bound: types.Any{},
-				},
-			},
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				to, err := states.NumFromAction(inputState.Clear(), args[0])
 				if err != nil {
@@ -216,23 +209,17 @@ func initArr() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			&types.Arr{
-				El: types.Var{
-					Name:  "A",
-					Bound: types.Any{},
-				},
-			},
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
 			"slice",
 			[]*parameters.Parameter{
 				parameters.SimpleParam(types.Num{}),
 				parameters.SimpleParam(types.Num{}),
 			},
-			&types.Arr{
-				El: types.Var{
-					Name:  "A",
-					Bound: types.Any{},
-				},
-			},
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				argInputState := inputState.Clear()
 				from, err := states.NumFromAction(argInputState, args[0])
@@ -315,7 +302,9 @@ func initArr() {
 				parameters.SimpleParam(types.Num{}),
 				parameters.SimpleParam(types.Num{}),
 			},
-			&types.Arr{types.Num{}},
+			types.NewArr(
+				types.Num{},
+			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				argInputState := inputState.Clear()
 				from, err := states.NumFromAction(argInputState, args[0])
@@ -341,20 +330,14 @@ func initArr() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			&types.Arr{
-				El: types.Var{
-					Name:  "A",
-					Bound: types.Any{},
-				},
-			},
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
 			"get",
 			[]*parameters.Parameter{
 				parameters.SimpleParam(types.Num{}),
 			},
-			types.Var{
-				Name:  "A",
-				Bound: types.Any{},
-			},
+			types.NewVar("A", types.Any{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				index, err := states.NumFromAction(inputState.Clear(), args[0])
 				if err != nil {

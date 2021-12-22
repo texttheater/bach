@@ -140,7 +140,7 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			&types.Arr{types.Num{}},
+			types.NewArr(types.Num{}),
 			"sum",
 			nil,
 			types.Num{},
@@ -160,7 +160,7 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			&types.Arr{types.Num{}},
+			types.NewArr(types.Num{}),
 			"avg",
 			nil,
 			types.Num{},
@@ -530,7 +530,7 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			&types.Arr{types.Num{}},
+			types.NewArr(types.Num{}),
 			"hypot",
 			nil,
 			types.Num{},
@@ -604,7 +604,7 @@ func initMath() {
 		),
 		// TODO max, min with key function
 		expressions.SimpleFuncer(
-			&types.Arr{types.Num{}},
+			types.NewArr(types.Num{}),
 			"max",
 			nil,
 			types.Num{},
@@ -623,7 +623,7 @@ func initMath() {
 			},
 		),
 		expressions.SimpleFuncer(
-			&types.Arr{types.Num{}},
+			types.NewArr(types.Num{}),
 			"min",
 			nil,
 			types.Num{},

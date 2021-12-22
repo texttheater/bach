@@ -12,6 +12,12 @@ var AnyArr Type = &Arr{Any{}}
 
 var VoidArr Type = &Arr{Void{}}
 
+func NewArr(el Type) *Arr {
+	return &Arr{
+		El: el,
+	}
+}
+
 func (t *Arr) Subsumes(u Type) bool {
 	switch u := u.(type) {
 	case Void:

@@ -17,7 +17,7 @@ func initText() {
 			types.Str{},
 			"bytes",
 			nil,
-			&types.Arr{types.Num{}},
+			types.NewArr(types.Num{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				str := string(inputState.Value.(states.StrValue))
 				bytes := []byte(str)
@@ -39,7 +39,7 @@ func initText() {
 			types.Str{},
 			"split",
 			nil,
-			&types.Arr{types.Str{}},
+			types.NewArr(types.Str{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				str := string(inputState.Value.(states.StrValue))
 				fields := strings.Fields(str)
@@ -63,7 +63,7 @@ func initText() {
 			[]*parameters.Parameter{
 				parameters.SimpleParam(types.Str{}),
 			},
-			&types.Arr{types.Str{}},
+			types.NewArr(types.Str{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				str := string(inputState.Value.(states.StrValue))
 				res0 := args[0](inputState.Clear(), nil).Eval()
@@ -87,7 +87,7 @@ func initText() {
 			nil,
 		),
 		expressions.SimpleFuncer(
-			&types.Arr{types.Str{}},
+			types.NewArr(types.Str{}),
 			"join",
 			nil,
 			types.Str{},
@@ -107,7 +107,7 @@ func initText() {
 			},
 		),
 		expressions.SimpleFuncer(
-			&types.Arr{types.Str{}},
+			types.NewArr(types.Str{}),
 			"join",
 			[]types.Type{types.Str{}},
 			types.Str{},

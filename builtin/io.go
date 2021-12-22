@@ -19,16 +19,14 @@ func initIO() {
 			nil,
 			types.Reader{},
 			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
-				return states.ReaderValue{
-					os.Stdin,
-				}, nil
+				return states.ReaderValue{Reader: os.Stdin}, nil
 			},
 		),
 		expressions.RegularFuncer(
 			types.Reader{},
 			"lines",
 			nil,
-			&types.Arr{types.Str{}},
+			types.NewArr(types.Str{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				reader := inputState.Value.(states.ReaderValue)
 				scanner := bufio.NewScanner(reader.Reader)
@@ -45,10 +43,10 @@ func initIO() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			&types.Arr{types.Str{}},
+			types.NewArr(types.Str{}),
 			"blocks",
 			nil,
-			&types.Arr{&types.Arr{types.Str{}}},
+			types.NewArr(types.NewArr(types.Str{})),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				var nextBlock func(lines *states.ArrValue) (*states.ArrValue, *states.ArrValue, error)
 				nextBlock = func(lines *states.ArrValue) (*states.ArrValue, *states.ArrValue, error) {

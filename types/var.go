@@ -9,6 +9,13 @@ type Var struct {
 	Bound Type
 }
 
+func NewVar(name string, bound Type) Var {
+	return Var{
+		Name:  name,
+		Bound: bound,
+	}
+}
+
 func (t Var) Subsumes(u Type) bool {
 	switch u := u.(type) {
 	case Void:

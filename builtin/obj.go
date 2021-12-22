@@ -14,19 +14,13 @@ func initObj() {
 		expressions.RegularFuncer(
 			types.Obj{
 				Props: map[string]types.Type{},
-				Rest: types.Var{
-					Name:  "A",
-					Bound: types.Any{},
-				},
+				Rest:  types.NewVar("A", types.Any{}),
 			},
 			"get",
 			[]*parameters.Parameter{
 				parameters.SimpleParam(types.NewUnion(types.Str{}, types.Num{})),
 			},
-			types.Var{
-				Name:  "A",
-				Bound: types.Any{},
-			},
+			types.NewVar("A", types.Any{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				inputValue := inputState.Value.(states.ObjValue)
 				res0 := args[0](inputState.Clear(), nil).Eval()

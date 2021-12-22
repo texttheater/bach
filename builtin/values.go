@@ -11,16 +11,10 @@ import (
 func initValues() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.SimpleFuncer(
-			types.Var{
-				Name:  "A",
-				Bound: types.Any{},
-			},
+			types.NewVar("A", types.Any{}),
 			"id",
 			nil,
-			types.Var{
-				Name:  "A",
-				Bound: types.Any{},
-			},
+			types.NewVar("A", types.Any{}),
 			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
 				return inputValue, nil
 			},

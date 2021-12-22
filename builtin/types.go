@@ -10,10 +10,7 @@ import (
 func initTypes() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
-			types.Var{
-				Name:  "A",
-				Bound: types.Any{},
-			},
+			types.NewVar("A", types.Any{}),
 			"type",
 			nil,
 			types.Str{},

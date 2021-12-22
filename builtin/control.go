@@ -29,17 +29,11 @@ func initControl() {
 		expressions.RegularFuncer(
 			types.NewUnion(
 				types.Null{},
-				types.Var{
-					Name:  "A",
-					Bound: types.Any{},
-				},
+				types.NewVar("A", types.Any{}),
 			),
 			"must",
 			nil,
-			types.Var{
-				Name:  "A",
-				Bound: types.Any{},
-			},
+			types.NewVar("A", types.Any{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				switch inputState.Value.(type) {
 				case states.NullValue:
