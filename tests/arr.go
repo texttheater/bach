@@ -398,6 +398,13 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	TestProgramStr(
+		`"Zwölf Boxkämpfer jagen Victor quer über den großen Sylter Deich . Voilà !" split sort(>)`,
+		`Arr<Str>`,
+		`["über", "quer", "jagen", "großen", "den", "Zwölf", "Voilà", "Victor", "Sylter", "Deich", "Boxkämpfer", ".", "!"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
 		`[7, 3, 2, 5] sort(>)`,
 		`Arr<Num>`,
 		`[7, 5, 3, 2]`,
@@ -413,6 +420,20 @@ func TestArrays(t *testing.T) {
 	)
 	TestProgramStr(
 		`[{a: 7, b: 2}, {a: 3, b: 1}, {a: 2, b: 2}, {a: 5, b: 2}] for Obj<a: Num, b: Num, Void> def <(other Obj<a: Num, b: Num, Void>) Bool as @b <(other @b) ok sort(<)`,
+		`Arr<Obj<a: Num, b: Num, Void>>`,
+		`[{a: 3, b: 1}, {a: 7, b: 2}, {a: 2, b: 2}, {a: 5, b: 2}]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[{a: 7}, {a: 3}, {a: 2}, {a: 5}] sortBy(@a, <)`,
+		`Arr<Obj<a: Num, Void>>`,
+		`[{a: 2}, {a: 3}, {a: 5}, {a: 7}]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[{a: 7, b: 2}, {a: 3, b: 1}, {a: 2, b: 2}, {a: 5, b: 2}] sortBy(@b, <)`,
 		`Arr<Obj<a: Num, b: Num, Void>>`,
 		`[{a: 3, b: 1}, {a: 7, b: 2}, {a: 2, b: 2}, {a: 5, b: 2}]`,
 		nil,
