@@ -134,6 +134,28 @@ func initText() {
 		),
 		expressions.SimpleFuncer(
 			types.Str{},
+			"<",
+			[]types.Type{types.Str{}},
+			types.Bool{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str1 := string(inputValue.(states.StrValue))
+				str2 := string(argumentValues[0].(states.StrValue))
+				return states.BoolValue(str1 < str2), nil
+			},
+		),
+		expressions.SimpleFuncer(
+			types.Str{},
+			">",
+			[]types.Type{types.Str{}},
+			types.Bool{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str1 := string(inputValue.(states.StrValue))
+				str2 := string(argumentValues[0].(states.StrValue))
+				return states.BoolValue(str1 > str2), nil
+			},
+		),
+		expressions.SimpleFuncer(
+			types.Str{},
 			"==",
 			[]types.Type{types.Str{}},
 			types.Bool{},
@@ -141,6 +163,28 @@ func initText() {
 				str1 := string(inputValue.(states.StrValue))
 				str2 := string(argumentValues[0].(states.StrValue))
 				return states.BoolValue(str1 == str2), nil
+			},
+		),
+		expressions.SimpleFuncer(
+			types.Str{},
+			"<=",
+			[]types.Type{types.Str{}},
+			types.Bool{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str1 := string(inputValue.(states.StrValue))
+				str2 := string(argumentValues[0].(states.StrValue))
+				return states.BoolValue(str1 <= str2), nil
+			},
+		),
+		expressions.SimpleFuncer(
+			types.Str{},
+			">=",
+			[]types.Type{types.Str{}},
+			types.Bool{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str1 := string(inputValue.(states.StrValue))
+				str2 := string(argumentValues[0].(states.StrValue))
+				return states.BoolValue(str1 >= str2), nil
 			},
 		),
 		expressions.SimpleFuncer(
