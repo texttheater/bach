@@ -90,14 +90,10 @@ func initIO() {
 			nil,
 		),
 		expressions.SimpleFuncer(
-			types.Var{
-				Name: "A",
-			},
+			types.NewVar("A", types.Any{}),
 			"out",
 			nil,
-			types.Var{
-				Name: "A",
-			},
+			types.NewVar("A", types.Any{}),
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
 				str, err := inputValue.Str()
 				if err != nil {
@@ -108,16 +104,12 @@ func initIO() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.Var{
-				Name: "A",
-			},
+			types.NewVar("A", types.Any{}),
 			"out",
 			[]types.Type{
 				types.Str{},
 			},
-			types.Var{
-				Name: "A",
-			},
+			types.NewVar("A", types.Any{}),
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
 				str, err := inputValue.Str()
 				if err != nil {
@@ -130,14 +122,10 @@ func initIO() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.Var{
-				Name: "A",
-			},
+			types.NewVar("A", types.Any{}),
 			"err",
 			nil,
-			types.Var{
-				Name: "A",
-			},
+			types.NewVar("A", types.Any{}),
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
 				str, err := inputValue.Str()
 				if err != nil {
@@ -148,16 +136,12 @@ func initIO() {
 			},
 		),
 		expressions.SimpleFuncer(
-			types.Var{
-				Name: "A",
-			},
+			types.NewVar("A", types.Any{}),
 			"err",
 			[]types.Type{
 				types.Str{},
 			},
-			types.Var{
-				Name: "A",
-			},
+			types.NewVar("A", types.Any{}),
 			func(inputValue states.Value, args []states.Value) (states.Value, error) {
 				str, err := inputValue.Str()
 				if err != nil {

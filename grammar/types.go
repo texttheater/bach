@@ -219,7 +219,8 @@ type TypeVariable struct {
 }
 
 func (g *TypeVariable) Ast() types.Type {
-	return types.Var{
-		Name: g.LangleLid[1:len(g.LangleLid)],
-	}
+	return types.NewVar(
+		g.LangleLid[1:len(g.LangleLid)],
+		types.Any{},
+	)
 }

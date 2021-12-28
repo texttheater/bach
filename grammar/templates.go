@@ -146,6 +146,8 @@ func (g *TypeVariableTemplate) Ast() types.Type {
 	}
 	if g.UpperBound != nil {
 		t.Bound = g.UpperBound.Ast()
+	} else {
+		t.Bound = types.Any{}
 	}
 	return t
 }

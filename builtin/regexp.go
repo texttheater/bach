@@ -28,9 +28,7 @@ func initRegexp() {
 					)),
 				},
 			},
-			types.Var{
-				Name: "A",
-			},
+			types.NewVar("A", types.Any{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				return args[0](inputState, nil)
 			},
@@ -54,10 +52,9 @@ func initRegexp() {
 					)),
 				},
 			},
-			types.NewArr(types.Var{
-				Name: "A",
-			}),
-
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				offset := 0
 				v := inputState.Value.(states.StrValue)
