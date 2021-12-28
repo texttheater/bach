@@ -14,6 +14,41 @@ import (
 func initArr() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
+			types.NewArr(
+				types.NewArr(types.NewVar("A", types.Any{})),
+			),
+			"join",
+			nil,
+			types.NewArr(types.NewVar("A", types.Any{})),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				input := states.IterFromValue(inputState.Value)
+				var arrIter func() (states.Value, bool, error)
+				output := func() (states.Value, bool, error) {
+					for {
+						if arrIter != nil {
+							val, ok, err := arrIter()
+							if err != nil {
+								return nil, false, nil
+							}
+							if ok {
+								return val, true, nil
+							}
+						}
+						arrVal, ok, err := input()
+						if err != nil {
+							return nil, false, err
+						}
+						if !ok {
+							return nil, false, nil
+						}
+						arrIter = states.IterFromValue(arrVal)
+					}
+				}
+				return states.ThunkFromIter(output)
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
 			"sortBy",
 			[]*params.Param{

@@ -439,4 +439,53 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`[] join`,
+		`Arr<<A>>`, // FIXME we want Arr<Void>
+		`[]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[[]] join`,
+		`Arr<Void>`,
+		`[]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[[1]] join`,
+		`Arr<Num>`,
+		`[1]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[[1, 2]] join`,
+		`Arr<Num>`,
+		`[1, 2]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[[], []] join`,
+		`Arr<Void>`,
+		`[]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[[], [1]] join`,
+		`Arr<Num>`,
+		`[1]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[[1], [2, 3]] join`,
+		`Arr<Num>`,
+		`[1, 2, 3]`,
+		nil,
+		t,
+	)
 }
