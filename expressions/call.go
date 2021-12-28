@@ -192,7 +192,9 @@ func RegularFuncer(wantInputType types.Type, wantName string, pars []*params.Par
 		argIDss := make([]*states.IDStack, len(gotCall.Args))
 		for i := range gotCall.Args {
 			argInputShape := Shape{
-				Type:  pars[i].InputType.Instantiate(bindings), // TODO what if we don't have the binding yet at this stage?
+				Type: pars[i].InputType.Instantiate(bindings),
+				// TODO what if we don't have the bindings yet?
+				// TODO what if an incompatible bound is declared?
 				Stack: gotInputShape.Stack,
 			}
 			argOutputShape, argAction, argIDs, err := gotCall.Args[i].Typecheck(argInputShape, instantiate(pars[i].Params, bindings))
