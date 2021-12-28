@@ -28,23 +28,14 @@ func (t Var) Subsumes(u Type) bool {
 }
 
 func (t Var) Bind(u Type, bindings map[string]Type) bool {
-	instType, ok := bindings[t.Name]
-	if !ok {
-		if t.Bound == nil {
-			instType = Any{}
-		} else {
-			instType = t.Bound
-		}
-	}
-	var newInstType Type
-	// pick the more specific type
-	if instType.Subsumes(u) {
-		newInstType = u
-	} else if u.Subsumes(instType) {
-		newInstType = instType
-	} else {
+	if !t.Bound.Subsumes(u) {
 		return false
 	}
+	instType, ok := bindings[t.Name]
+	if !ok {
+		instType = Void{}
+	}
+	newInstType := NewUnion(instType, u)
 	bindings[t.Name] = newInstType
 	return true
 }
