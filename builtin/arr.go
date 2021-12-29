@@ -28,7 +28,7 @@ func initArr() {
 			},
 			types.NewVar("B", types.Any{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				acc, err := states.ValueFromAction(inputState.Clear(), args[0])
+				acc, err := args[0].Eval(inputState.Clear(), nil)
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -46,11 +46,13 @@ func initArr() {
 						return states.ThunkFromValue(acc)
 					}
 					opInputState.Value = acc
-					res := args[1](opInputState, []states.Action{states.SimpleAction(el)}).Eval()
-					if res.Error != nil {
-						return states.ThunkFromError(res.Error)
+					acc, err = args[1].Eval(
+						opInputState,
+						[]states.Action{states.SimpleAction(el)},
+					)
+					if err != nil {
+						return states.ThunkFromError(err)
 					}
-					acc = res.Value
 				}
 			},
 			nil,
@@ -365,7 +367,7 @@ func initArr() {
 				types.NewVar("A", types.Any{}),
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				from, err := states.NumFromAction(inputState.Clear(), args[0])
+				from, err := args[0].EvalNum(inputState.Clear(), nil)
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -402,7 +404,7 @@ func initArr() {
 				types.NewVar("A", types.Any{}),
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				to, err := states.NumFromAction(inputState.Clear(), args[0])
+				to, err := args[0].EvalNum(inputState.Clear(), nil)
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -446,7 +448,7 @@ func initArr() {
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				argInputState := inputState.Clear()
-				from, err := states.NumFromAction(argInputState, args[0])
+				from, err := args[0].EvalNum(argInputState, nil)
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -457,7 +459,7 @@ func initArr() {
 						errors.GotValue(states.NumValue(from)),
 					))
 				}
-				to, err := states.NumFromAction(argInputState, args[1])
+				to, err := args[1].EvalNum(argInputState, nil)
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -531,11 +533,11 @@ func initArr() {
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				argInputState := inputState.Clear()
-				from, err := states.NumFromAction(argInputState, args[0])
+				from, err := args[0].EvalNum(argInputState, nil)
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
-				to, err := states.NumFromAction(argInputState, args[1])
+				to, err := args[1].EvalNum(argInputState, nil)
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -563,7 +565,7 @@ func initArr() {
 			},
 			types.NewVar("A", types.Any{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				index, err := states.NumFromAction(inputState.Clear(), args[0])
+				index, err := args[0].EvalNum(inputState.Clear(), nil)
 				if err != nil {
 					return states.ThunkFromError(err)
 				}

@@ -23,11 +23,3 @@ func inhabits(v Value, t types.Union, stack *BindingStack) (bool, error) {
 	}
 	return false, nil
 }
-
-func ValueFromAction(state State, action Action) (Value, error) {
-	res := action(state, nil).Eval()
-	if res.Error != nil {
-		return nil, res.Error
-	}
-	return res.Value, nil
-}
