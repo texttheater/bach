@@ -488,4 +488,60 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`[] every`,
+		`Bool`,
+		`true`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[true] every`,
+		`Bool`,
+		`true`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[true, true] every`,
+		`Bool`,
+		`true`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[true, false, true] every`,
+		`Bool`,
+		`false`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[] some`,
+		`Bool`,
+		`false`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[false] some`,
+		`Bool`,
+		`false`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[false, false] some`,
+		`Bool`,
+		`false`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[false, true, false] some`,
+		`Bool`,
+		`true`,
+		nil,
+		t,
+	)
 }

@@ -14,6 +14,50 @@ import (
 func initArr() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
+			types.NewArr(types.Bool{}),
+			"some",
+			nil,
+			types.Bool{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				input := states.IterFromValue(inputState.Value)
+				for {
+					val, ok, err := input()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					if !ok {
+						return states.ThunkFromValue(states.BoolValue(false))
+					}
+					if val.(states.BoolValue) {
+						return states.ThunkFromValue(states.BoolValue(true))
+					}
+				}
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
+			types.NewArr(types.Bool{}),
+			"every",
+			nil,
+			types.Bool{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				input := states.IterFromValue(inputState.Value)
+				for {
+					val, ok, err := input()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					if !ok {
+						return states.ThunkFromValue(states.BoolValue(true))
+					}
+					if !val.(states.BoolValue) {
+						return states.ThunkFromValue(states.BoolValue(false))
+					}
+				}
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
 			types.NewArr(
 				types.NewArr(types.NewVar("A", types.Any{})),
 			),
