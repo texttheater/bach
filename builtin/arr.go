@@ -15,6 +15,71 @@ func initArr() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
+			"enum",
+			[]*params.Param{
+				params.SimpleParam(types.Num{}),
+			},
+			types.NewArr(types.NewTup([]types.Type{
+				types.Num{},
+				types.NewVar("A", types.Any{}),
+			})),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				input := states.IterFromValue(inputState.Value)
+				i, err := args[0].EvalNum(inputState.Clear(), nil)
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				output := func() (states.Value, bool, error) {
+					val, ok, err := input()
+					if err != nil {
+						return nil, false, err
+					}
+					if !ok {
+						return nil, false, nil
+					}
+					num := states.NumValue(i)
+					i++
+					return states.NewArrValue([]states.Value{
+						num,
+						val,
+					}), true, nil
+				}
+				return states.ThunkFromIter(output)
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
+			"enum",
+			nil,
+			types.NewArr(types.NewTup([]types.Type{
+				types.Num{},
+				types.NewVar("A", types.Any{}),
+			})),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				input := states.IterFromValue(inputState.Value)
+				i := 0
+				output := func() (states.Value, bool, error) {
+					val, ok, err := input()
+					if err != nil {
+						return nil, false, err
+					}
+					if !ok {
+						return nil, false, nil
+					}
+					num := states.NumValue(i)
+					i++
+					return states.NewArrValue([]states.Value{
+						num,
+						val,
+					}), true, nil
+				}
+				return states.ThunkFromIter(output)
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
 			"fold",
 			[]*params.Param{
 				params.SimpleParam(types.NewVar("B", types.Any{})),
