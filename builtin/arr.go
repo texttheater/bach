@@ -14,6 +14,48 @@ import (
 func initArr() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
+			"fold",
+			[]*params.Param{
+				params.SimpleParam(types.NewVar("B", types.Any{})),
+				{
+					InputType: types.NewVar("B", types.Any{}),
+					Params: []*params.Param{
+						params.SimpleParam(types.NewVar("A", types.Any{})),
+					},
+					OutputType: types.NewVar("B", types.Any{}),
+				},
+			},
+			types.NewVar("B", types.Any{}),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				acc, err := states.ValueFromAction(inputState.Clear(), args[0])
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				opInputState := states.State{
+					Value: nil,
+					Stack: inputState.Stack,
+				}
+				input := states.IterFromValue(inputState.Value)
+				for {
+					el, ok, err := input()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					if !ok {
+						return states.ThunkFromValue(acc)
+					}
+					opInputState.Value = acc
+					res := args[1](opInputState, []states.Action{states.SimpleAction(el)}).Eval()
+					if res.Error != nil {
+						return states.ThunkFromError(res.Error)
+					}
+					acc = res.Value
+				}
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
 			types.NewArr(types.Bool{}),
 			"some",
 			nil,

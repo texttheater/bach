@@ -544,4 +544,16 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgram(`[1, 2, 3] fold(0, +)`,
+		types.Num{},
+		states.NumValue(6),
+		nil,
+		t,
+	)
+	TestProgram(`[2, 3, 4] fold(1, *)`,
+		types.Num{},
+		states.NumValue(24),
+		nil,
+		t,
+	)
 }
