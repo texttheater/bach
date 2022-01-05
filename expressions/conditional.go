@@ -456,6 +456,10 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 				}
 			}
 		}
+	case types.Any:
+		for prop := range p.PropPatternMap {
+			propInputTypeMap[prop] = types.Any{}
+		}
 	default:
 		for prop := range p.PropPatternMap {
 			propInputTypeMap[prop] = types.Void{}
