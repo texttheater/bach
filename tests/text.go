@@ -8,7 +8,7 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-func TestStrings(t *testing.T) {
+func TestText(t *testing.T) {
 	TestProgram(
 		`"abc"`,
 		types.Str{},
