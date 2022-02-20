@@ -11,6 +11,7 @@ type State struct {
 }
 
 // Clear returns an identical state except that the Value is replaced with null
+// TODO do we still need this method?
 func (s State) Clear() State {
 	return State{
 		Value:     NullValue{},

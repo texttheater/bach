@@ -29,7 +29,7 @@ func (x WrapExpression) Typecheck(inputShape Shape, params []*params.Param) (Sha
 			Props: map[string]types.Type{
 				x.Prop: inputShape.Type,
 			},
-			Rest: types.Any{},
+			Rest: types.Void{},
 		},
 		Stack: inputShape.Stack,
 	}

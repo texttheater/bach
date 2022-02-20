@@ -47,6 +47,60 @@ func initArr() {
 		),
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
+			"keep",
+			[]*params.Param{
+				{
+					InputType: types.NewVar("A", types.Any{}),
+					Params:    nil,
+					OutputType: types.NewUnion(
+						types.Obj{
+							Props: map[string]types.Type{
+								"yes": types.NewVar("B", types.Any{}),
+							},
+							Rest: types.Void{},
+						},
+						types.Obj{
+							Props: map[string]types.Type{
+								"no": types.NewVar("C", types.Any{}),
+							},
+							Rest: types.Void{},
+						},
+					),
+				},
+			},
+			types.NewArr(types.NewVar("B", types.Any{})),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				input := states.IterFromValue(inputState.Value)
+				var output func() (states.Value, bool, error)
+				output = func() (states.Value, bool, error) {
+					val, ok, err := input()
+					if err != nil {
+						return nil, false, err
+					}
+					if !ok {
+						return nil, false, nil
+					}
+					argInputState := inputState.Replace(val)
+					res := args[0](argInputState, nil).Eval()
+					if res.Error != nil {
+						return nil, false, res.Error
+					}
+					obj := res.Value.(states.ObjValue)
+					if thunk, ok := obj["yes"]; ok {
+						res = thunk.Eval()
+						if res.Error != nil {
+							return nil, false, res.Error
+						}
+						return res.Value, true, nil
+					}
+					return output()
+				}
+				return states.ThunkFromIter(output)
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
 			"enum",
 			[]*params.Param{
 				params.SimpleParam(types.Num{}),
