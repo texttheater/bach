@@ -374,8 +374,7 @@ func initArr() {
 						Stack: inputState.Stack,
 					}
 					arg1 := states.SimpleAction(slice[j])
-					thunk := args[0](arg0, []states.Action{arg1})
-					res := thunk.Eval()
+					res := args[0](arg0, []states.Action{arg1}).Eval()
 					if res.Error != nil {
 						err = res.Error
 						return true
