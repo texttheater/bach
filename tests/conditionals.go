@@ -55,36 +55,36 @@ func TestConditionals(t *testing.T) {
 	)
 	TestProgramStr(
 		`2 is Num with >3`,
-		`Bool`,
-		`false`,
+		`Obj<yes: Num>|Obj<no: Num>`,
+		`{no: 2}`,
 		nil,
 		t,
 	)
 	TestProgramStr(
 		`4 is Num with >3`,
-		`Bool`,
-		`true`,
+		`Obj<yes: Num>|Obj<no: Num>`,
+		`{yes: 4}`,
 		nil,
 		t,
 	)
 	TestProgramStr(
 		`2 if >3`,
-		`Bool`,
-		`false`,
+		`Obj<yes: Num>|Obj<no: Num>`,
+		`{no: 2}`,
 		nil,
 		t,
 	)
 	TestProgramStr(
 		`4 if >3`,
-		`Bool`,
-		`true`,
+		`Obj<yes: Num>|Obj<no: Num>`,
+		`{yes: 4}`,
 		nil,
 		t,
 	)
 	TestProgramStr(
 		`for Any def f Num|Str as 2 ok f is Num _`,
-		`Bool`,
-		`true`,
+		`Obj<yes: Num>|Obj<no: Str>`,
+		`{yes: 2}`,
 		nil,
 		t,
 	)

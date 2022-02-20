@@ -3,7 +3,6 @@ package grammar
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/expressions"
-	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
@@ -65,10 +64,9 @@ func (g *Conditional) Ast() (expressions.Expression, error) {
 	alternativeGuards := make([]expressions.Expression, len(g.Alternatives))
 	alternativeConsequents := make([]expressions.Expression, len(g.Alternatives))
 	if g.Consequent == nil { // predicate form
-		yesExpression := expressions.ConstantExpression{
-			Pos:   g.Pos,
-			Type:  types.Bool{},
-			Value: states.BoolValue(true),
+		yesExpression := &expressions.WrapExpression{
+			Pos:  g.Pos,
+			Prop: "yes",
 		}
 		consequent = yesExpression
 		// build alternative patterns, guards, and consequents
@@ -135,10 +133,9 @@ func (g *Conditional) Ast() (expressions.Expression, error) {
 	// build final alternative
 	var alternative expressions.Expression
 	if g.Consequent == nil { // predicate form
-		alternative = &expressions.ConstantExpression{
-			Pos:   g.Pos,
-			Type:  types.Bool{},
-			Value: states.BoolValue(false),
+		alternative = &expressions.WrapExpression{
+			Pos:  g.Pos,
+			Prop: "no",
 		}
 	} else {
 		if g.Alternative != nil {
