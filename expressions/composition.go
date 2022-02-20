@@ -45,13 +45,6 @@ func (x CompositionExpression) Typecheck(inputShape Shape, params []*params.Para
 		if res.Error != nil {
 			return states.ThunkFromError(res.Error)
 		}
-		if res.Drop {
-			return &states.Thunk{
-				Result: states.Result{
-					Drop: true,
-				},
-			}
-		}
 		state := states.State{
 			Value:     res.Value,
 			Stack:     thunk.Stack,

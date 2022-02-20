@@ -18,24 +18,6 @@ func TestGrammar(t *testing.T) {
 		),
 		t,
 	)
-	TestProgram(
-		"drop",
-		nil,
-		nil,
-		errors.SyntaxError(
-			errors.Code(errors.Syntax),
-		),
-		t,
-	)
-	TestProgram(
-		"if true then drop else true ok",
-		nil,
-		nil,
-		errors.SyntaxError(
-			errors.Code(errors.Syntax),
-		),
-		t,
-	)
 	// The following program requires a lookahead of 1 (participle's
 	// default) so > is not interpreted as a property identifier.
 	TestProgram(

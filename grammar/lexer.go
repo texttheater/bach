@@ -26,7 +26,7 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		// assignment
 		{"Assignment", `=(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)`, nil},
 		// keywords
-		{"Keyword", `(?:for|def|as|ok|if|then|elif|else|each|all|is|elis|with|drop)\b`, nil},
+		{"Keyword", `(?:for|def|as|ok|if|then|elif|else|each|all|is|elis|with)\b`, nil},
 		// names
 		{"Lid", `[\p{L}_][\p{L}_0-9]*`, nil},
 		{"Op2", `==|<=|>=|\*\*`, nil},
