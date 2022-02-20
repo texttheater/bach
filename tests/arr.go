@@ -80,11 +80,14 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`1 each *2 all`,
+		`1 each(*2)`,
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.MappingRequiresArrType),
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.Num{}),
+			errors.Name("each"),
+			errors.NumParams(1),
 		),
 		t,
 	)

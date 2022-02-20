@@ -57,13 +57,13 @@ func initArr() {
 							Props: map[string]types.Type{
 								"yes": types.NewVar("B", types.Any{}),
 							},
-							Rest: types.Void{},
+							Rest: types.Any{},
 						},
 						types.Obj{
 							Props: map[string]types.Type{
 								"no": types.NewVar("C", types.Any{}),
 							},
-							Rest: types.Void{},
+							Rest: types.Any{},
 						},
 					),
 				},

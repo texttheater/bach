@@ -82,3 +82,18 @@ func TestSubsumption4(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestSubsumption5(t *testing.T) {
+	general := types.Obj{
+		Props: map[string]types.Type{"yes": types.Num{}},
+		Rest:  types.Any{},
+	}
+	specific := types.Obj{
+		Props: map[string]types.Type{"yes": types.Num{}},
+		Rest:  types.Void{},
+	}
+	if !general.Subsumes(specific) {
+		t.Logf("%s should subsume %s", general, specific)
+		t.Fail()
+	}
+}

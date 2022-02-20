@@ -10,7 +10,7 @@ import (
 
 func TestFilters(t *testing.T) {
 	TestProgram(
-		`["a", 1, "b", 2, "c", 3] each is Num with %2 >0 elis Str all`,
+		`["a", 1, "b", 2, "c", 3] keep(is Num with %2 >0 elis Str)`,
 		&types.Arr{types.NewUnion(types.Num{}, types.Str{})},
 		states.NewArrValue([]states.Value{
 			states.StrValue("a"),
@@ -23,7 +23,7 @@ func TestFilters(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[{n: 1}, {n: 2}, {n: 3}] each is {n: n} with n %2 >0 all`,
+		`[{n: 1}, {n: 2}, {n: 3}] keep(is {n: n} with n %2 >0)`,
 		&types.Arr{types.Obj{
 			Props: map[string]types.Type{
 				"n": types.Num{},
@@ -42,7 +42,7 @@ func TestFilters(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[1, 2, 3, 4, 5, 6] each if %2 ==0 then *2 else drop ok all`,
+		`[1, 2, 3, 4, 5, 6] keep(if %2 ==0) each(*2)`,
 		&types.Arr{types.Num{}},
 		states.NewArrValue([]states.Value{
 			states.NumValue(4),
@@ -53,7 +53,7 @@ func TestFilters(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[1, 2, 3, 4, 5, 6] each if %2 ==0 then drop else id ok all`,
+		`[1, 2, 3, 4, 5, 6] keep(if %2 ==0 not) each(id)`,
 		&types.Arr{types.Num{}},
 		states.NewArrValue([]states.Value{
 			states.NumValue(1),
@@ -64,7 +64,7 @@ func TestFilters(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[1, 2, 3] each if %2 ==0 then drop else id ok +1 all`,
+		`[1, 2, 3] keep(if %2 ==0 not) each(+1)`,
 		&types.Arr{types.Num{}},
 		states.NewArrValue([]states.Value{
 			states.NumValue(2),
@@ -74,36 +74,24 @@ func TestFilters(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[1, 2, 3] each drop all`,
-		&types.Arr{types.Void{}},
+		`[1, 2, 3] keep(if false)`,
+		&types.Arr{types.Num{}},
 		states.NewArrValue([]states.Value{}),
 		nil,
 		t,
 	)
 	TestProgram(
-		`[{n: 1}, {n: 2}, {n: 3}] each is {n: n} then n ok all`,
+		`[{n: 1}, 2, {n: 3}] keep(is {n: n}) each(@n)`,
 		&types.Arr{types.Num{}},
 		states.NewArrValue([]states.Value{
 			states.NumValue(1),
-			states.NumValue(2),
 			states.NumValue(3),
 		}),
 		nil,
 		t,
 	)
 	TestProgram(
-		`[1, 2, 3] each is Num all`,
-		&types.Arr{types.Num{}},
-		states.NewArrValue([]states.Value{
-			states.NumValue(1),
-			states.NumValue(2),
-			states.NumValue(3),
-		}),
-		nil,
-		t,
-	)
-	TestProgram(
-		`[1, 2, 3] each if ==1 then "a" elif ==2 then "b" else "c" ok all`,
+		`[1, 2, 3] each(if ==1 then "a" elif ==2 then "b" else "c" ok)`,
 		&types.Arr{types.Str{}},
 		states.NewArrValue([]states.Value{
 			states.StrValue("a"),
@@ -114,7 +102,7 @@ func TestFilters(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[1, 2, 3] each if ==1 then "a" elif ==2 then "b" else "c" all`,
+		`[1, 2, 3] each(if ==1 then "a" elif ==2 then "b" else "c")`,
 		nil,
 		nil,
 		errors.SyntaxError(
@@ -123,7 +111,7 @@ func TestFilters(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[1, 2, 3] each is Num ok +1 all`,
+		`[1, 2, 3] each(+1)`,
 		&types.Arr{types.Num{}},
 		states.NewArrValue([]states.Value{
 			states.NumValue(2),
