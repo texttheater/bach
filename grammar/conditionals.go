@@ -60,10 +60,13 @@ func (g *Conditional) Ast() (expressions.Expression, error) {
 	}
 	// build consequent and alternatives
 	var consequent expressions.Expression
-	alternativePatterns := make([]expressions.Pattern, len(g.Alternatives))
-	alternativeGuards := make([]expressions.Expression, len(g.Alternatives))
-	alternativeConsequents := make([]expressions.Expression, len(g.Alternatives))
+	var alternativePatterns []expressions.Pattern
+	var alternativeGuards []expressions.Expression
+	var alternativeConsequents []expressions.Expression
 	if g.Consequent == nil { // predicate form
+		alternativePatterns = make([]expressions.Pattern, len(g.PredAlternatives))
+		alternativeGuards = make([]expressions.Expression, len(g.PredAlternatives))
+		alternativeConsequents = make([]expressions.Expression, len(g.PredAlternatives))
 		yesExpression := &expressions.WrapExpression{
 			Pos:  g.Pos,
 			Prop: "yes",
@@ -96,6 +99,9 @@ func (g *Conditional) Ast() (expressions.Expression, error) {
 			alternativeConsequents[i] = yesExpression
 		}
 	} else {
+		alternativePatterns = make([]expressions.Pattern, len(g.Alternatives))
+		alternativeGuards = make([]expressions.Expression, len(g.Alternatives))
+		alternativeConsequents = make([]expressions.Expression, len(g.Alternatives))
 		consequent, err = g.Consequent.Ast()
 		if err != nil {
 			return nil, err
