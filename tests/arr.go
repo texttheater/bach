@@ -65,7 +65,7 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`[1, 2, 3] each *2 all`,
+		`[1, 2, 3] each(*2)`,
 		&types.Arr{
 			types.Num{},
 		},

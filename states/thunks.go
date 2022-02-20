@@ -7,6 +7,7 @@ type Thunk struct {
 	TypeStack *BindingStack
 }
 
+// TODO get rid of this type
 type Result struct {
 	Value Value
 	Drop  bool

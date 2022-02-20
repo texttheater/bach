@@ -15,6 +15,38 @@ func initArr() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
+			"each",
+			[]*params.Param{
+				{
+					InputType:  types.NewVar("A", types.Any{}),
+					Params:     nil,
+					OutputType: types.NewVar("B", types.Any{}),
+				},
+			},
+			types.NewArr(types.NewVar("B", types.Any{})),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				input := states.IterFromValue(inputState.Value)
+				output := func() (states.Value, bool, error) {
+					val, ok, err := input()
+					if err != nil {
+						return nil, false, err
+					}
+					if !ok {
+						return nil, false, nil
+					}
+					argInputState := inputState.Replace(val)
+					res := args[0](argInputState, nil).Eval()
+					if res.Error != nil {
+						return nil, false, res.Error
+					}
+					return res.Value, true, nil
+				}
+				return states.ThunkFromIter(output)
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
 			"enum",
 			[]*params.Param{
 				params.SimpleParam(types.Num{}),

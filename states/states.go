@@ -19,6 +19,15 @@ func (s State) Clear() State {
 	}
 }
 
+// Replace returns an identical state except that the Value is replaced with the given value
+func (s State) Replace(v Value) State {
+	return State{
+		Value:     v,
+		Stack:     s.Stack,
+		TypeStack: s.TypeStack,
+	}
+}
+
 type VariableStack struct {
 	Head Variable
 	Tail *VariableStack
