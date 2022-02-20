@@ -22,5 +22,4 @@ func init() {
 	initValues()
 	initRegexp()
 	initControl()
-	initNet()
 }
