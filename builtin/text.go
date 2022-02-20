@@ -19,11 +19,11 @@ func initText() {
 			nil,
 			types.NewArr(types.Num{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				str := string(inputState.Value.(states.StrValue))
+				str := inputState.Value.(states.StrValue)
 				bytes := []byte(str)
-				var iter func() (states.Value, bool, error)
+				var output func() (states.Value, bool, error)
 				i := 0
-				iter = func() (states.Value, bool, error) {
+				output = func() (states.Value, bool, error) {
 					if i >= len(bytes) {
 						return nil, false, nil
 					}
@@ -31,7 +31,28 @@ func initText() {
 					i++
 					return v, true, nil
 				}
-				return states.ThunkFromIter(iter)
+				return states.ThunkFromIter(output)
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
+			types.Str{},
+			"codePoints",
+			nil,
+			types.NewArr(types.Num{}),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				str := inputState.Value.(states.StrValue)
+				runes := []rune(str)
+				i := 0
+				output := func() (states.Value, bool, error) {
+					if i >= len(runes) {
+						return nil, false, nil
+					}
+					v := states.NumValue(runes[i])
+					i++
+					return v, true, nil
+				}
+				return states.ThunkFromIter(output)
 			},
 			nil,
 		),

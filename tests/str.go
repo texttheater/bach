@@ -45,6 +45,20 @@ func TestStrings(t *testing.T) {
 		t,
 	)
 	TestProgram(
+		`"a" codePoints len`,
+		types.Num{},
+		states.NumValue(1),
+		nil,
+		t,
+	)
+	TestProgram(
+		`"ü" codePoints len`,
+		types.Num{},
+		states.NumValue(1),
+		nil,
+		t,
+	)
+	TestProgram(
 		`"a{2 +2}"`,
 		types.Str{},
 		states.StrValue("a4"),
