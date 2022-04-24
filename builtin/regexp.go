@@ -40,18 +40,20 @@ func initRegexp() {
 					regexpInputState := states.State{
 						Value: v,
 					}
-					res := args[0](regexpInputState, nil).Eval()
-					if res.Error != nil {
-						return nil, false, res.Error
+					val, err := args[0](regexpInputState, nil).Eval()
+					if err != nil {
+						return nil, false, err
 					}
-					objValue, ok := (res.Value.(states.ObjValue))
+					objValue, ok := (val.(states.ObjValue))
 					if !ok {
 						return nil, false, nil
 					}
 					obj := map[string]*states.Thunk(objValue)
-					start := int(obj["start"].Eval().Value.(states.NumValue))
+					startFloat, _, _ := obj["start"].EvalNum()
+					start := int(startFloat)
 					obj["start"] = states.ThunkFromValue(states.NumValue(start + offset))
-					length := len(string(obj["0"].Eval().Value.(states.StrValue)))
+					group, _, _ := obj["0"].EvalStr()
+					length := len(group)
 					end := start + length
 					offset += end
 					v = states.StrValue(string(v)[end:])
@@ -89,11 +91,11 @@ func initRegexp() {
 				regexpInputState := states.State{
 					Value: states.StrValue(""),
 				}
-				res := args[0](regexpInputState, nil).Eval()
-				if res.Error != nil {
-					return states.ThunkFromError(res.Error)
+				val, err := args[0](regexpInputState, nil).Eval()
+				if err != nil {
+					return states.ThunkFromError(err)
 				}
-				_, ok := res.Value.(states.ObjValue)
+				_, ok := val.(states.ObjValue)
 				if ok {
 					iter := func() (states.Value, bool, error) {
 						if len(v) == 0 {
@@ -127,17 +129,19 @@ func initRegexp() {
 					regexpInputState := states.State{
 						Value: v,
 					}
-					res := args[0](regexpInputState, nil).Eval()
-					if res.Error != nil {
-						return nil, false, res.Error
+					val, err := args[0](regexpInputState, nil).Eval()
+					if err != nil {
+						return nil, false, err
 					}
-					objValue, ok := (res.Value.(states.ObjValue))
+					objValue, ok := val.(states.ObjValue)
 					var piece states.StrValue
 					if ok {
 						// separator found in string
 						obj := map[string]*states.Thunk(objValue)
-						sepStart := int(obj["start"].Eval().Value.(states.NumValue))
-						sepLength := len(string(obj["0"].Eval().Value.(states.StrValue)))
+						sepStartFloat, _, _ := obj["start"].EvalNum()
+						sepStart := int(sepStartFloat)
+						sep, _, _ := obj["0"].EvalStr()
+						sepLength := len(sep)
 						sepEnd := sepStart + sepLength
 						piece = v[:sepStart]
 						v = v[sepEnd:]

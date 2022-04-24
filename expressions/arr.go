@@ -69,13 +69,13 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*params.Param) (Shap
 		}
 		tailAction := action
 		action = func(inputState states.State, args []states.Action) *states.Thunk {
-			res := elementAction(inputState, nil).Eval()
-			if res.Error != nil {
-				return states.ThunkFromError(res.Error)
+			val, err := elementAction(inputState, nil).Eval()
+			if err != nil {
+				return states.ThunkFromError(err)
 			}
 			return states.ThunkFromState(states.State{
 				Value: &states.ArrValue{
-					Head: res.Value,
+					Head: val,
 					Tail: tailAction(inputState, nil),
 				},
 				Stack: inputState.Stack,

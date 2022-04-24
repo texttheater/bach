@@ -103,12 +103,12 @@ func thunkFromData(data interface{}) *states.Thunk {
 			if i >= len(data) {
 				return nil, false, nil
 			}
-			res := thunkFromData(data[i]).Eval()
-			if res.Error != nil {
-				return nil, false, res.Error
+			val, err := thunkFromData(data[i]).Eval()
+			if err != nil {
+				return nil, false, err
 			}
 			i += 1
-			return res.Value, true, nil
+			return val, true, nil
 		}
 		return states.ThunkFromIter(iter)
 	case map[string]interface{}:

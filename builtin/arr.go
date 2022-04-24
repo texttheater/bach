@@ -35,11 +35,11 @@ func initArr() {
 						return nil, false, nil
 					}
 					argInputState := inputState.Replace(val)
-					res := args[0](argInputState, nil).Eval()
-					if res.Error != nil {
-						return nil, false, res.Error
+					val, err = args[0](argInputState, nil).Eval()
+					if err != nil {
+						return nil, false, err
 					}
-					return res.Value, true, nil
+					return val, true, nil
 				}
 				return states.ThunkFromIter(output)
 			},
@@ -81,17 +81,17 @@ func initArr() {
 						return nil, false, nil
 					}
 					argInputState := inputState.Replace(val)
-					res := args[0](argInputState, nil).Eval()
-					if res.Error != nil {
-						return nil, false, res.Error
+					val, err = args[0](argInputState, nil).Eval()
+					if err != nil {
+						return nil, false, err
 					}
-					obj := res.Value.(states.ObjValue)
+					obj := val.(states.ObjValue)
 					if thunk, ok := obj["yes"]; ok {
-						res = thunk.Eval()
-						if res.Error != nil {
-							return nil, false, res.Error
+						val, err = thunk.Eval()
+						if err != nil {
+							return nil, false, err
 						}
-						return res.Value, true, nil
+						return val, true, nil
 					}
 					return output()
 				}
@@ -317,30 +317,28 @@ func initArr() {
 						Value: slice[i],
 						Stack: inputState.Stack,
 					}
-					res := key(keyInputState, nil).Eval()
-					if res.Error != nil {
-						err = res.Error
+					a, err2 := key(keyInputState, nil).Eval()
+					if err2 != nil {
+						err = err2
 						return true
 					}
-					a := res.Value
 					keyInputState.Value = slice[j]
-					res = key(keyInputState, nil).Eval()
-					if res.Error != nil {
-						err = res.Error
+					b, err2 := key(keyInputState, nil).Eval()
+					if err2 != nil {
+						err = err2
 						return true
 					}
-					b := res.Value
 					arg0 := states.State{
 						Value: a,
 						Stack: inputState.Stack,
 					}
 					arg1 := states.SimpleAction(b)
-					res = cmp(arg0, []states.Action{arg1}).Eval()
-					if res.Error != nil {
-						err = res.Error
+					val, err2 := cmp(arg0, []states.Action{arg1}).Eval()
+					if err2 != nil {
+						err = err2
 						return true
 					}
-					return bool(res.Value.(states.BoolValue))
+					return bool(val.(states.BoolValue))
 				}
 				sort.SliceStable(slice, less)
 				if err != nil {
@@ -374,12 +372,12 @@ func initArr() {
 						Stack: inputState.Stack,
 					}
 					arg1 := states.SimpleAction(slice[j])
-					res := args[0](arg0, []states.Action{arg1}).Eval()
-					if res.Error != nil {
-						err = res.Error
+					val, err2 := args[0](arg0, []states.Action{arg1}).Eval()
+					if err2 != nil {
+						err = err2
 						return true
 					}
-					return bool(res.Value.(states.BoolValue))
+					return bool(val.(states.BoolValue))
 				}
 				sort.SliceStable(slice, less)
 				if err != nil {

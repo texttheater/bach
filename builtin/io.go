@@ -54,11 +54,11 @@ func initIO() {
 						return nil, nil, nil
 					}
 					head := lines.Head.(states.StrValue)
-					res := lines.Tail.Eval()
-					if res.Error != nil {
-						return nil, nil, res.Error
+					val, err := lines.Tail.Eval()
+					if err != nil {
+						return nil, nil, err
 					}
-					tail := res.Value.(*states.ArrValue)
+					tail := val.(*states.ArrValue)
 					if head == "" {
 						return nil, tail, nil
 					}

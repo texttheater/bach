@@ -30,14 +30,14 @@ type ArrValue struct {
 }
 
 func (v *ArrValue) GetTail() (*ArrValue, error) {
-	res := v.Tail.Eval()
-	if res.Error != nil {
-		return nil, res.Error
+	val, err := v.Tail.Eval()
+	if err != nil {
+		return nil, err
 	}
-	if res.Value == nil {
+	if val == nil {
 		return nil, nil
 	}
-	return res.Value.(*ArrValue), nil
+	return val.(*ArrValue), nil
 }
 
 func (v *ArrValue) Repr() (string, error) {

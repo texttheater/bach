@@ -117,11 +117,11 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 	regularKernel := func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		argValues := make([]states.Value, len(argTypes))
 		for i, arg := range args {
-			res := arg(inputState.Clear(), nil).Eval()
-			if res.Error != nil {
-				return states.ThunkFromError(res.Error)
+			val, err := arg(inputState.Clear(), nil).Eval()
+			if err != nil {
+				return states.ThunkFromError(err)
 			}
-			argValues[i] = res.Value
+			argValues[i] = val
 		}
 		value, err := simpleKernel(inputState.Value, argValues)
 		if err != nil {
@@ -144,12 +144,12 @@ func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
 		stack := inputState.Stack
 		for stack != nil {
 			if stack.Head.ID == id {
-				res := stack.Head.Action(states.InitialState, nil).Eval()
-				if res.Error != nil {
-					return states.ThunkFromError(res.Error)
+				val, err := stack.Head.Action(states.InitialState, nil).Eval()
+				if err != nil {
+					return states.ThunkFromError(err)
 				}
 				return states.ThunkFromState(states.State{
-					Value:     res.Value,
+					Value:     val,
 					Stack:     inputState.Stack,
 					TypeStack: inputState.TypeStack,
 				})

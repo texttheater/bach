@@ -42,12 +42,12 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*params.Param) (S
 			Stack: inputShape.Stack,
 		}
 		action := func(inputState states.State, args []states.Action) *states.Thunk {
-			result := inputState.Value.(states.ObjValue)[x.Name].Eval()
-			if result.Error != nil {
-				return states.ThunkFromError(result.Error)
+			val, err := inputState.Value.(states.ObjValue)[x.Name].Eval()
+			if err != nil {
+				return states.ThunkFromError(err)
 			}
 			outputState := states.State{
-				Value:     result.Value,
+				Value:     val,
 				Stack:     inputState.Stack,
 				TypeStack: inputState.TypeStack,
 			}
@@ -81,11 +81,11 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*params.Param) (S
 		action := func(inputState states.State, args []states.Action) *states.Thunk {
 			arr := inputState.Value.(*states.ArrValue)
 			for i := 0; i < index; i++ {
-				result := arr.Tail.Eval()
-				if result.Error != nil {
-					return states.ThunkFromError(result.Error)
+				val, err := arr.Tail.Eval()
+				if err != nil {
+					return states.ThunkFromError(err)
 				}
-				arr = result.Value.(*states.ArrValue)
+				arr = val.(*states.ArrValue)
 			}
 			outputState := states.State{
 				Value:     arr.Head,

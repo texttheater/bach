@@ -41,11 +41,11 @@ func (x *TemplateLiteralExpression) Typecheck(inputShape Shape, params []*params
 	action := func(inputState states.State, args []states.Action) *states.Thunk {
 		buffer := bytes.Buffer{}
 		for _, pieceAction := range pieceActions {
-			res := pieceAction(inputState, nil).Eval()
-			if res.Error != nil {
-				return states.ThunkFromError(res.Error)
+			val, err := pieceAction(inputState, nil).Eval()
+			if err != nil {
+				return states.ThunkFromError(err)
 			}
-			out, err := res.Value.Str()
+			out, err := val.Str()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}

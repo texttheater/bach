@@ -7,12 +7,13 @@ type Thunk struct {
 	TypeStack *BindingStack
 }
 
+// TODO make this type private, perhaps abolish it
 type Result struct {
 	Value Value
 	Error error
 }
 
-func (t *Thunk) Eval() Result {
+func (t *Thunk) eval() Result {
 	for t.Func != nil {
 		thunk := t.Func()
 		t.Func = thunk.Func
@@ -21,16 +22,35 @@ func (t *Thunk) Eval() Result {
 	return t.Result
 }
 
+// TODO check where this is called, see if we can call type-specific versions
+// instead
+func (t *Thunk) Eval() (Value, error) {
+	res := t.eval()
+	return res.Value, res.Error
+}
+
 func (t *Thunk) EvalNum() (float64, bool, error) {
-	res := t.Eval()
-	if res.Error != nil {
-		return 0, false, res.Error
+	val, err := t.Eval()
+	if err != nil {
+		return 0, false, err
 	}
-	val, ok := res.Value.(NumValue)
+	v, ok := val.(NumValue)
 	if !ok {
 		return 0, false, nil
 	}
-	return float64(val), true, nil
+	return float64(v), true, nil
+}
+
+func (t *Thunk) EvalStr() (string, bool, error) {
+	val, err := t.Eval()
+	if err != nil {
+		return "", false, err
+	}
+	v, ok := val.(StrValue)
+	if !ok {
+		return "", false, nil
+	}
+	return string(v), true, nil
 }
 
 func ThunkFromValue(v Value) *Thunk {
@@ -64,9 +84,9 @@ func IterFromError(err error) func() (Value, bool, error) {
 }
 
 func IterFromAction(state State, action Action) func() (Value, bool, error) {
-	res := action(state, nil).Eval()
-	if res.Error != nil {
-		return IterFromError(res.Error)
+	val, err := action(state, nil).Eval()
+	if err != nil {
+		return IterFromError(err)
 	}
-	return IterFromValue(res.Value)
+	return IterFromValue(val)
 }

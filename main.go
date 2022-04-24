@@ -100,11 +100,11 @@ func forceEvaluation(v states.Value) error {
 		}
 	case states.ObjValue:
 		for _, w := range v {
-			res := w.Eval()
-			if res.Error != nil {
-				return res.Error
+			val, err := w.Eval()
+			if err != nil {
+				return err
 			}
-			forceEvaluation(res.Value)
+			forceEvaluation(val)
 		}
 	}
 	return nil

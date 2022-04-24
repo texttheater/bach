@@ -38,11 +38,11 @@ func (v ObjValue) Repr() (string, error) {
 			buffer.WriteString(fmt.Sprintf("%q", k))
 		}
 		buffer.WriteString(": ")
-		res := w.Eval()
-		if res.Error != nil {
-			return "", res.Error
+		val, err := w.Eval()
+		if err != nil {
+			return "", err
 		}
-		wString, err := res.Value.Repr()
+		wString, err := val.Repr()
 		if err != nil {
 			return "", err
 		}
@@ -66,11 +66,11 @@ func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 			}
 		}
 		for gotProp, thunk := range v {
-			res := thunk.Eval()
-			if res.Error != nil {
-				return false, res.Error
+			val, err := thunk.Eval()
+			if err != nil {
+				return false, err
 			}
-			if ok, err := res.Value.Inhabits(t.TypeForProp(gotProp), stack); !ok {
+			if ok, err := val.Inhabits(t.TypeForProp(gotProp), stack); !ok {
 				return false, err
 			}
 		}
@@ -97,15 +97,15 @@ func (v ObjValue) Equal(w Value) (bool, error) {
 			if !ok {
 				return false, nil
 			}
-			vRes := vThunk.Eval()
-			if vRes.Error != nil {
-				return false, vRes.Error
+			vVal, vErr := vThunk.Eval()
+			if vErr != nil {
+				return false, vErr
 			}
-			wRes := wThunk.Eval()
-			if wRes.Error != nil {
-				return false, wRes.Error
+			wVal, wErr := wThunk.Eval()
+			if wErr != nil {
+				return false, wErr
 			}
-			equal, err := vRes.Value.Equal(wRes.Value)
+			equal, err := vVal.Equal(wVal)
 			if err != nil {
 				return false, err
 			}

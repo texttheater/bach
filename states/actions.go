@@ -13,9 +13,9 @@ func SimpleAction(value Value) Action {
 }
 
 func (a Action) Eval(inputState State, args []Action) (Value, error) {
-	res := a(inputState, args).Eval()
-	if res.Error != nil {
-		return nil, res.Error
+	val, err := a(inputState, args).Eval()
+	if err != nil {
+		return nil, err
 	}
-	return res.Value, nil
+	return val, nil
 }

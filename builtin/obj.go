@@ -23,11 +23,11 @@ func initObj() {
 			types.NewVar("A", types.Any{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				inputValue := inputState.Value.(states.ObjValue)
-				res0 := args[0](inputState.Clear(), nil).Eval()
-				if res0.Error != nil {
-					return states.ThunkFromError(res0.Error)
+				val, err := args[0](inputState.Clear(), nil).Eval()
+				if err != nil {
+					return states.ThunkFromError(err)
 				}
-				prop, err := res0.Value.Str() // TODO ???
+				prop, err := val.Str() // TODO ???
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -38,11 +38,11 @@ func initObj() {
 						errors.Pos(pos),
 					))
 				}
-				res := thunk.Eval()
-				if res.Error != nil {
-					return states.ThunkFromError(res.Error)
+				val, err = thunk.Eval()
+				if err != nil {
+					return states.ThunkFromError(err)
 				}
-				return states.ThunkFromValue(res.Value)
+				return states.ThunkFromValue(val)
 			},
 			nil,
 		),
