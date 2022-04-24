@@ -78,7 +78,35 @@ func TestRegexp(t *testing.T) {
 		t,
 	)
 	TestProgramStr(
+		`"zabacad" split(~a~, 1)`,
+		`Arr<Str>`,
+		`["z", "bacad"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
 		`"zabaca" split~a~`,
+		`Arr<Str>`,
+		`["z", "b", "c", ""]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"zabaca" split(~a~, 1)`,
+		`Arr<Str>`,
+		`["z", "baca"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"zabaca" split(~a~, 3)`,
+		`Arr<Str>`,
+		`["z", "b", "c", ""]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"zabaca" split(~a~, 4)`,
 		`Arr<Str>`,
 		`["z", "b", "c", ""]`,
 		nil,
@@ -92,7 +120,42 @@ func TestRegexp(t *testing.T) {
 		t,
 	)
 	TestProgramStr(
+		`"abacad" split(~a~, 1)`,
+		`Arr<Str>`,
+		`["", "bacad"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abacad" split(~a~, 2)`,
+		`Arr<Str>`,
+		`["", "b", "cad"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
 		`"abaca" split~a~`,
+		`Arr<Str>`,
+		`["", "b", "c", ""]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abaca" split(~a~, 1)`,
+		`Arr<Str>`,
+		`["", "baca"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abaca" split(~a~, 2)`,
+		`Arr<Str>`,
+		`["", "b", "ca"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abaca" split(~a~, 3)`,
 		`Arr<Str>`,
 		`["", "b", "c", ""]`,
 		nil,
@@ -106,9 +169,30 @@ func TestRegexp(t *testing.T) {
 		t,
 	)
 	TestProgramStr(
+		`"abaca" split(~~, 2)`,
+		`Arr<Str>`,
+		`["a", "b", "aca"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abaca" split(~~, 1000)`,
+		`Arr<Str>`,
+		`["a", "b", "a", "c", "a"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
 		`"你好" split~~`,
 		`Arr<Str>`,
 		`["你", "好"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"你好" split(~~, 0)`,
+		`Arr<Str>`,
+		`["你好"]`,
 		nil,
 		t,
 	)
@@ -120,7 +204,35 @@ func TestRegexp(t *testing.T) {
 		t,
 	)
 	TestProgramStr(
+		`"" split(~a~, 0)`,
+		`Arr<Str>`,
+		`[""]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"" split(~a~, 1)`,
+		`Arr<Str>`,
+		`[""]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
 		`"" split~~`,
+		`Arr<Str>`,
+		`[]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"" split(~~, 0)`,
+		`Arr<Str>`,
+		`[]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"" split(~~, 1)`,
 		`Arr<Str>`,
 		`[]`,
 		nil,

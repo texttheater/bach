@@ -8,8 +8,6 @@ type Thunk struct {
 	TypeStack *BindingStack
 }
 
-// TODO check where this is called, see if we can call type-specific versions
-// instead
 func (t *Thunk) Eval() (Value, error) {
 	for t.Func != nil {
 		thunk := t.Func()
@@ -30,6 +28,18 @@ func (t *Thunk) EvalNum() (float64, bool, error) {
 		return 0, false, nil
 	}
 	return float64(v), true, nil
+}
+
+func (t *Thunk) EvalInt() (int, bool, error) {
+	val, err := t.Eval()
+	if err != nil {
+		return 0, false, err
+	}
+	v, ok := val.(NumValue)
+	if !ok {
+		return 0, false, nil
+	}
+	return int(v), true, nil
 }
 
 func (t *Thunk) EvalStr() (string, bool, error) {
