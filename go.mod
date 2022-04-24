@@ -15,4 +15,5 @@ require (
 	github.com/mattn/go-tty v0.0.3 // indirect
 	github.com/pkg/term v1.2.0-beta.2 // indirect
 	golang.org/x/sys v0.0.0-20200918174421-af09f7315aff // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
