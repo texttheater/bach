@@ -692,8 +692,7 @@ func initArr() {
 					return states.ThunkFromError(err)
 				}
 				i := from
-				var iter func() (states.Value, bool, error)
-				iter = func() (states.Value, bool, error) {
+				iter := func() (states.Value, bool, error) {
 					if i >= to {
 						return nil, false, nil
 					}
