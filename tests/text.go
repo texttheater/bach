@@ -117,7 +117,7 @@ func TestText(t *testing.T) {
 		t,
 	)
 	TestProgramStr(
-		`"  foo bar  baz   " split`,
+		`"  foo bar  baz   " fields`,
 		`Arr<Str>`,
 		`["foo", "bar", "baz"]`,
 		nil,

@@ -57,7 +57,7 @@ func initText() {
 		),
 		expressions.RegularFuncer(
 			types.Str{},
-			"split",
+			"fields",
 			nil,
 			types.NewArr(types.Str{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {

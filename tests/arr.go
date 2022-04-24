@@ -394,14 +394,14 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	TestProgramStr(
-		`"Zwölf Boxkämpfer jagen Victor quer über den großen Sylter Deich . Voilà !" split sort`,
+		`"Zwölf Boxkämpfer jagen Victor quer über den großen Sylter Deich . Voilà !" fields sort`,
 		`Arr<Str>`,
 		`["!", ".", "Boxkämpfer", "Deich", "Sylter", "Victor", "Voilà", "Zwölf", "den", "großen", "jagen", "quer", "über"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"Zwölf Boxkämpfer jagen Victor quer über den großen Sylter Deich . Voilà !" split sort(>)`,
+		`"Zwölf Boxkämpfer jagen Victor quer über den großen Sylter Deich . Voilà !" fields sort(>)`,
 		`Arr<Str>`,
 		`["über", "quer", "jagen", "großen", "den", "Zwölf", "Voilà", "Victor", "Sylter", "Deich", "Boxkämpfer", ".", "!"]`,
 		nil,
