@@ -70,4 +70,60 @@ func TestRegexp(t *testing.T) {
 		),
 		t,
 	)
+	TestProgramStr(
+		`"zabacad" split~a~`,
+		`Arr<Str>`,
+		`["z", "b", "c", "d"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"zabaca" split~a~`,
+		`Arr<Str>`,
+		`["z", "b", "c", ""]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abacad" split~a~`,
+		`Arr<Str>`,
+		`["", "b", "c", "d"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abaca" split~a~`,
+		`Arr<Str>`,
+		`["", "b", "c", ""]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abaca" split~~`,
+		`Arr<Str>`,
+		`["a", "b", "a", "c", "a"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"你好" split~~`,
+		`Arr<Str>`,
+		`["你", "好"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"" split~a~`,
+		`Arr<Str>`,
+		`[""]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"" split~~`,
+		`Arr<Str>`,
+		`[]`,
+		nil,
+		t,
+	)
 }

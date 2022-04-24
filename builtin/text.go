@@ -6,7 +6,6 @@ import (
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/expressions"
-	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -64,38 +63,8 @@ func initText() {
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				str := string(inputState.Value.(states.StrValue))
 				fields := strings.Fields(str)
-				var iter func() (states.Value, bool, error)
 				i := 0
-				iter = func() (states.Value, bool, error) {
-					if i >= len(fields) {
-						return nil, false, nil
-					}
-					v := states.StrValue(fields[i])
-					i++
-					return v, true, nil
-				}
-				return states.ThunkFromIter(iter)
-			},
-			nil,
-		),
-		expressions.RegularFuncer(
-			types.Str{},
-			"split",
-			[]*params.Param{
-				params.SimpleParam(types.Str{}),
-			},
-			types.NewArr(types.Str{}),
-			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				str := string(inputState.Value.(states.StrValue))
-				res0 := args[0](inputState.Clear(), nil).Eval()
-				if res0.Error != nil {
-					return states.ThunkFromError(res0.Error)
-				}
-				sep := string(res0.Value.(states.StrValue))
-				fields := strings.Split(str, sep)
-				var iter func() (states.Value, bool, error)
-				i := 0
-				iter = func() (states.Value, bool, error) {
+				iter := func() (states.Value, bool, error) {
 					if i >= len(fields) {
 						return nil, false, nil
 					}

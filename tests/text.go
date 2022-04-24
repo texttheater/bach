@@ -116,4 +116,11 @@ func TestText(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`"  foo bar  baz   " split`,
+		`Arr<Str>`,
+		`["foo", "bar", "baz"]`,
+		nil,
+		t,
+	)
 }

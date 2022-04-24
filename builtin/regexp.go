@@ -1,6 +1,8 @@
 package builtin
 
 import (
+	"unicode/utf8"
+
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/params"
@@ -32,10 +34,9 @@ func initRegexp() {
 				types.NewVar("A", types.Any{}),
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				offset := 0
 				v := inputState.Value.(states.StrValue)
-				var iter func() (states.Value, bool, error)
-				iter = func() (states.Value, bool, error) {
+				offset := 0
+				iter := func() (states.Value, bool, error) {
 					regexpInputState := states.State{
 						Value: v,
 					}
@@ -60,5 +61,100 @@ func initRegexp() {
 			},
 			nil,
 		),
+		expressions.RegularFuncer(
+			types.Str{},
+			"split",
+			[]*params.Param{
+				{
+					InputType: types.Str{},
+					OutputType: types.NewUnion(
+						types.Null{},
+						types.Obj{
+							Props: map[string]types.Type{
+								"start": types.Num{},
+								"0":     types.Str{},
+							},
+							Rest: types.Any{},
+						},
+					),
+				},
+			},
+			types.NewArr(
+				types.Str{},
+			),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				v := inputState.Value.(states.StrValue)
+				// Edge case 1: if the separator is empty, split the string into
+				// codepoints.
+				regexpInputState := states.State{
+					Value: states.StrValue(""),
+				}
+				res := args[0](regexpInputState, nil).Eval()
+				if res.Error != nil {
+					return states.ThunkFromError(res.Error)
+				}
+				_, ok := res.Value.(states.ObjValue)
+				if ok {
+					iter := func() (states.Value, bool, error) {
+						if len(v) == 0 {
+							return nil, false, nil
+						}
+						_, l := utf8.DecodeRuneInString(string(v))
+						piece := v[:l]
+						v = v[l:]
+						return piece, true, nil
+					}
+					return states.ThunkFromIter(iter)
+				}
+				// Edge case 2: if the string is empty, return a single-element
+				// list containing the empty string.
+				if v == "" {
+					return states.ThunkFromSlice([]states.Value{
+						states.StrValue(""),
+					})
+				}
+				// Now for the normal cases.
+				sepAtEnd := false
+				iter := func() (states.Value, bool, error) {
+					if sepAtEnd {
+						sepAtEnd = false
+						return states.StrValue(""), true, nil
+					}
+					if len(v) == 0 {
+						// end of string reached
+						return nil, false, nil
+					}
+					regexpInputState := states.State{
+						Value: v,
+					}
+					res := args[0](regexpInputState, nil).Eval()
+					if res.Error != nil {
+						return nil, false, res.Error
+					}
+					objValue, ok := (res.Value.(states.ObjValue))
+					var piece states.StrValue
+					if ok {
+						// separator found in string
+						obj := map[string]*states.Thunk(objValue)
+						sepStart := int(obj["start"].Eval().Value.(states.NumValue))
+						sepLength := len(string(obj["0"].Eval().Value.(states.StrValue)))
+						sepEnd := sepStart + sepLength
+						piece = v[:sepStart]
+						v = v[sepEnd:]
+						if len(v) == 0 && sepLength > 0 {
+							sepAtEnd = true
+						}
+					} else {
+						// separator not found in string
+						piece = v
+						v = ""
+					}
+					return piece, true, nil
+				}
+				return states.ThunkFromIter(iter)
+			},
+			nil,
+		),
+		// TODO maxsplits
 	})
 }
