@@ -2,18 +2,18 @@ package states
 
 type Thunk struct {
 	Func      func() *Thunk
-	Result    Result
+	Result    result
 	Stack     *VariableStack
 	TypeStack *BindingStack
 }
 
 // TODO make this type private, perhaps abolish it
-type Result struct {
+type result struct {
 	Value Value
 	Error error
 }
 
-func (t *Thunk) eval() Result {
+func (t *Thunk) eval() result {
 	for t.Func != nil {
 		thunk := t.Func()
 		t.Func = thunk.Func
@@ -61,7 +61,7 @@ func ThunkFromValue(v Value) *Thunk {
 
 func ThunkFromError(err error) *Thunk {
 	return &Thunk{
-		Result: Result{
+		Result: result{
 			Error: err,
 		},
 	}
@@ -69,7 +69,7 @@ func ThunkFromError(err error) *Thunk {
 
 func ThunkFromState(state State) *Thunk {
 	return &Thunk{
-		Result: Result{
+		Result: result{
 			Value: state.Value,
 		},
 		Stack:     state.Stack,
