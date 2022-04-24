@@ -12,30 +12,6 @@ func initRegexp() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
 			types.Str{},
-			"findFirst",
-			[]*params.Param{
-				{
-					InputType: types.Str{},
-					OutputType: types.NewVar("A", types.NewUnion(
-						types.Null{},
-						types.Obj{
-							Props: map[string]types.Type{
-								"start": types.Num{},
-								"0":     types.Str{},
-							},
-							Rest: types.Any{},
-						},
-					)),
-				},
-			},
-			types.NewVar("A", types.Any{}),
-			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				return args[0](inputState, nil)
-			},
-			nil,
-		),
-		expressions.RegularFuncer(
-			types.Str{},
 			"findAll",
 			[]*params.Param{
 				{

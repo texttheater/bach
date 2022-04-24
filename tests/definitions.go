@@ -99,7 +99,7 @@ func TestDefinitions(t *testing.T) {
 		t,
 	)
 	TestProgram(
-		`for Str def f Obj<> as {} ok "abc" findFirst(f)`,
+		`for Str def f Obj<> as {} ok "abc" findAll(f)`,
 		nil,
 		nil,
 		errors.TypeError(
