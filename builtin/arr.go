@@ -111,7 +111,7 @@ func initArr() {
 			})),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				input := states.IterFromValue(inputState.Value)
-				i, err := args[0].EvalNum(inputState.Clear(), nil)
+				i, _, err := args[0](inputState.Clear(), nil).EvalNum()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -517,7 +517,7 @@ func initArr() {
 				types.NewVar("A", types.Any{}),
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				from, err := args[0].EvalNum(inputState.Clear(), nil)
+				from, _, err := args[0](inputState.Clear(), nil).EvalNum()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -554,7 +554,7 @@ func initArr() {
 				types.NewVar("A", types.Any{}),
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				to, err := args[0].EvalNum(inputState.Clear(), nil)
+				to, _, err := args[0](inputState.Clear(), nil).EvalNum()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -598,7 +598,7 @@ func initArr() {
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				argInputState := inputState.Clear()
-				from, err := args[0].EvalNum(argInputState, nil)
+				from, _, err := args[0](argInputState, nil).EvalNum()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -609,7 +609,7 @@ func initArr() {
 						errors.GotValue(states.NumValue(from)),
 					))
 				}
-				to, err := args[1].EvalNum(argInputState, nil)
+				to, _, err := args[1](argInputState, nil).EvalNum()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -683,11 +683,11 @@ func initArr() {
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				argInputState := inputState.Clear()
-				from, err := args[0].EvalNum(argInputState, nil)
+				from, _, err := args[0](argInputState, nil).EvalNum()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
-				to, err := args[1].EvalNum(argInputState, nil)
+				to, _, err := args[1](argInputState, nil).EvalNum()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -715,7 +715,7 @@ func initArr() {
 			},
 			types.NewVar("A", types.Any{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				index, err := args[0].EvalNum(inputState.Clear(), nil)
+				index, _, err := args[0](inputState.Clear(), nil).EvalNum()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}

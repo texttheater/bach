@@ -21,6 +21,18 @@ func (t *Thunk) Eval() Result {
 	return t.Result
 }
 
+func (t *Thunk) EvalNum() (float64, bool, error) {
+	res := t.Eval()
+	if res.Error != nil {
+		return 0, false, res.Error
+	}
+	val, ok := res.Value.(NumValue)
+	if !ok {
+		return 0, false, nil
+	}
+	return float64(val), true, nil
+}
+
 func ThunkFromValue(v Value) *Thunk {
 	return ThunkFromState(State{
 		Value: v,

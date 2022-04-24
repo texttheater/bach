@@ -39,11 +39,3 @@ func (v NumValue) Equal(w Value) (bool, error) {
 		return false, nil
 	}
 }
-
-func (a Action) EvalNum(inputState State, args []Action) (float64, error) {
-	val, err := a.Eval(inputState, args)
-	if err != nil {
-		return 0.0, err
-	}
-	return float64(val.(NumValue)), nil
-}
