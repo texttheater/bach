@@ -449,7 +449,6 @@ func initArr() {
 				types.NewVar("A", types.Any{}),
 				types.NewVar("B", types.Any{}),
 			)),
-
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				input1 := states.IterFromValue(inputState.Value)
 				input2 := states.IterFromAction(inputState.Clear(), args[0])
