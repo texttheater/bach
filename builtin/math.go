@@ -108,17 +108,6 @@ func initMath() {
 		),
 		expressions.SimpleFuncer(
 			types.Num{},
-			"==",
-			[]types.Type{types.Num{}},
-			types.Bool{},
-			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				inputNum := inputValue.(states.NumValue)
-				argumentNum := argumentValues[0].(states.NumValue)
-				return states.BoolValue(inputNum == argumentNum), nil
-			},
-		),
-		expressions.SimpleFuncer(
-			types.Num{},
 			"<=",
 			[]types.Type{types.Num{}},
 			types.Bool{},

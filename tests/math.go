@@ -22,7 +22,6 @@ func TestMath(t *testing.T) {
 	TestProgram("2 <3", types.Bool{}, states.BoolValue(true), nil, t)
 	TestProgram("3 >2", types.Bool{}, states.BoolValue(true), nil, t)
 	TestProgram("3 <2", types.Bool{}, states.BoolValue(false), nil, t)
-	TestProgram("1 +1 ==2", types.Bool{}, states.BoolValue(true), nil, t)
 	TestProgram("1 +1 >=2", types.Bool{}, states.BoolValue(true), nil, t)
 	TestProgram("1 +1 <=2", types.Bool{}, states.BoolValue(true), nil, t)
 }

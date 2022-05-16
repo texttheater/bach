@@ -20,9 +20,5 @@ func TestLogic(t *testing.T) {
 	TestProgram("false or(true)", types.Bool{}, states.BoolValue(true), nil, t)
 	TestProgram("false not", types.Bool{}, states.BoolValue(true), nil, t)
 	TestProgram("true not", types.Bool{}, states.BoolValue(false), nil, t)
-	TestProgram("true ==true", types.Bool{}, states.BoolValue(true), nil, t)
-	TestProgram("true ==false", types.Bool{}, states.BoolValue(false), nil, t)
-	TestProgram("false ==false", types.Bool{}, states.BoolValue(true), nil, t)
-	TestProgram("false ==true", types.Bool{}, states.BoolValue(false), nil, t)
 	TestProgram("1 +1 ==2 and(2 +2 ==5 not)", types.Bool{}, states.BoolValue(true), nil, t)
 }
