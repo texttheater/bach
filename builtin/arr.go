@@ -388,14 +388,10 @@ func initArr() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			types.NewArr(
-				types.Str{},
-			),
+			types.NewArr(types.Str{}),
 			"sort",
 			nil,
-			types.NewArr(
-				types.Str{},
-			),
+			types.NewArr(types.Str{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				slice, err := states.SliceFromValue(inputState.Value)
 				if err != nil {
@@ -412,14 +408,10 @@ func initArr() {
 			nil,
 		),
 		expressions.RegularFuncer(
-			types.NewArr(
-				types.Num{},
-			),
+			types.NewArr(types.Num{}),
 			"sort",
 			nil,
-			types.NewArr(
-				types.Num{},
-			),
+			types.NewArr(types.Num{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				slice, err := states.SliceFromValue(inputState.Value)
 				if err != nil {

@@ -118,7 +118,7 @@ func TestDefinitions(t *testing.T) {
 				),
 			},
 			),
-			errors.GotType(types.AnyObjType),
+			errors.GotType(types.AnyObj),
 			errors.ArgNum(1),
 		),
 		t,
@@ -129,7 +129,7 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.VoidObjType),
+			errors.InputType(types.VoidObj),
 			errors.Name("f"),
 			errors.NumParams(0),
 		),

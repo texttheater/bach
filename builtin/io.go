@@ -30,8 +30,7 @@ func initIO() {
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				reader := inputState.Value.(states.ReaderValue)
 				scanner := bufio.NewScanner(reader.Reader)
-				var iter func() (states.Value, bool, error)
-				iter = func() (states.Value, bool, error) {
+				iter := func() (states.Value, bool, error) {
 					ok := scanner.Scan()
 					if !ok {
 						return nil, false, nil
@@ -72,8 +71,7 @@ func initIO() {
 					}, rest, nil
 				}
 				lines := inputState.Value.(*states.ArrValue)
-				var iter func() (states.Value, bool, error)
-				iter = func() (states.Value, bool, error) {
+				iter := func() (states.Value, bool, error) {
 					if lines == nil {
 						return nil, false, nil
 					}

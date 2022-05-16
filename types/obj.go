@@ -10,12 +10,12 @@ type Obj struct {
 	Rest  Type
 }
 
-var VoidObjType Type = Obj{
+var VoidObj Type = Obj{
 	Props: make(map[string]Type),
 	Rest:  Void{},
 }
 
-var AnyObjType Type = Obj{
+var AnyObj Type = Obj{
 	Props: make(map[string]Type),
 	Rest:  Any{},
 }
