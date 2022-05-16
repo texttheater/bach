@@ -29,17 +29,6 @@ type ArrValue struct {
 	Tail *Thunk
 }
 
-func (v *ArrValue) GetTail() (*ArrValue, error) {
-	val, err := v.Tail.Eval()
-	if err != nil {
-		return nil, err
-	}
-	if val == nil {
-		return nil, nil
-	}
-	return val.(*ArrValue), nil
-}
-
 func (v *ArrValue) Repr() (string, error) {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("[")
@@ -49,7 +38,7 @@ func (v *ArrValue) Repr() (string, error) {
 			return "", err
 		}
 		buffer.WriteString(head)
-		v, err = v.GetTail()
+		v, err = v.Tail.EvalArr()
 		if err != nil {
 			return "", err
 		}
@@ -60,7 +49,7 @@ func (v *ArrValue) Repr() (string, error) {
 				return "", err
 			}
 			buffer.WriteString(head)
-			v, err = v.GetTail()
+			v, err = v.Tail.EvalArr()
 			if err != nil {
 				return "", err
 			}
@@ -87,7 +76,7 @@ func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 		if !ok {
 			return false, nil
 		}
-		tail, err := v.GetTail()
+		tail, err := v.Tail.EvalArr()
 		if err != nil {
 			return false, err
 		}
@@ -104,7 +93,7 @@ func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 			if !ok {
 				return false, nil
 			}
-			v, err = v.GetTail()
+			v, err = v.Tail.EvalArr()
 			if err != nil {
 				return false, err
 			}
@@ -137,11 +126,11 @@ func (v *ArrValue) Equal(w Value) (bool, error) {
 		if !ok {
 			return false, nil
 		}
-		vTail, err := v.GetTail()
+		vTail, err := v.Tail.EvalArr()
 		if err != nil {
 			return false, err
 		}
-		wTail, err := w.GetTail()
+		wTail, err := w.Tail.EvalArr()
 		if err != nil {
 			return false, err
 		}
@@ -158,7 +147,7 @@ func IterFromValue(v Value) func() (Value, bool, error) {
 			return nil, false, nil
 		}
 		var err error
-		v, err = arr.GetTail()
+		v, err = arr.Tail.EvalArr()
 		if err != nil {
 			return nil, false, err
 		}

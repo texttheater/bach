@@ -540,7 +540,7 @@ func initMath() {
 				for v != nil {
 					x = append(x, float64(v.Head.(states.NumValue)))
 					var err error
-					v, err = v.GetTail()
+					v, err = v.Tail.EvalArr()
 					if err != nil {
 						return nil, err
 					}
@@ -614,7 +614,7 @@ func initMath() {
 				for v != nil {
 					max = math.Max(max, float64(v.Head.(states.NumValue)))
 					var err error
-					v, err = v.GetTail()
+					v, err = v.Tail.EvalArr()
 					if err != nil {
 						return nil, err
 					}
@@ -633,7 +633,7 @@ func initMath() {
 				for v != nil {
 					min = math.Min(min, float64(v.Head.(states.NumValue)))
 					var err error
-					v, err = v.GetTail()
+					v, err = v.Tail.EvalArr()
 					if err != nil {
 						return nil, err
 					}

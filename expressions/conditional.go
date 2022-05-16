@@ -383,7 +383,7 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 				if !ok {
 					return nil, false, err
 				}
-				v, err = v.GetTail()
+				v, err = v.Tail.EvalArr()
 				if err != nil {
 					return nil, false, err
 				}

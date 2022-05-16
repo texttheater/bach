@@ -93,7 +93,7 @@ func forceEvaluation(v states.Value) error {
 			if err != nil {
 				return err
 			}
-			v, err = v.GetTail()
+			v, err = v.Tail.EvalArr()
 			if err != nil {
 				return err
 			}
