@@ -268,62 +268,6 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	TestProgramStr(
-		`[1, 2, 3] slice(0, 1)`,
-		`Arr<Num>`,
-		`[1]`,
-		nil,
-		t,
-	)
-	TestProgramStr(
-		`[1, 2, 3] slice(0, 2)`,
-		`Arr<Num>`,
-		`[1, 2]`,
-		nil,
-		t,
-	)
-	TestProgramStr(
-		`[1, 2, 3] slice(0, 3)`,
-		`Arr<Num>`,
-		`[1, 2, 3]`,
-		nil,
-		t,
-	)
-	TestProgramStr(
-		`[1, 2, 3] slice(0, 4)`,
-		`Arr<Num>`,
-		`[1, 2, 3]`,
-		nil,
-		t,
-	)
-	TestProgramStr(
-		`[1, 2, 3] slice(1, 3)`,
-		`Arr<Num>`,
-		`[2, 3]`,
-		nil,
-		t,
-	)
-	TestProgramStr(
-		`[1, 2, 3] slice(2, 3)`,
-		`Arr<Num>`,
-		`[3]`,
-		nil,
-		t,
-	)
-	TestProgramStr(
-		`[1, 2, 3] slice(3, 3)`,
-		`Arr<Num>`,
-		`[]`,
-		nil,
-		t,
-	)
-	TestProgramStr(
-		`[1, 2, 3] slice(4, 3)`,
-		`Arr<Num>`,
-		`[]`,
-		nil,
-		t,
-	)
-	TestProgramStr(
 		`[1, 2, 3] rev`,
 		`Arr<Num>`,
 		`[3, 2, 1]`,

@@ -514,28 +514,18 @@ func initArr() {
 				types.NewVar("A", types.Any{}),
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				from, _, err := args[0](inputState.Clear(), nil).EvalNum()
+				arr := inputState.Value.(*states.ArrValue)
+				start, err := args[0](inputState.Clear(), nil).EvalInt()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
-				intFrom := int(from)
-				if float64(intFrom) != from {
-					return states.ThunkFromError(errors.ValueError(
-						errors.Code(errors.BadIndex),
-						errors.GotValue(states.NumValue(from)),
-					))
-				}
-				input := states.IterFromValue(inputState.Value)
-				for i := 0; i < intFrom; i++ {
-					_, ok, err := input()
+				for i := 0; i < start && arr != nil; i++ {
+					arr, err = arr.Tail.EvalArr()
 					if err != nil {
 						return states.ThunkFromError(err)
 					}
-					if !ok {
-						break
-					}
 				}
-				return states.ThunkFromIter(input)
+				return states.ThunkFromValue(arr)
 			},
 			nil,
 		),
@@ -551,96 +541,25 @@ func initArr() {
 				types.NewVar("A", types.Any{}),
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				to, _, err := args[0](inputState.Clear(), nil).EvalNum()
+				arr := inputState.Value.(*states.ArrValue)
+				stop, err := args[0](inputState.Clear(), nil).EvalInt()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
-				intTo := int(to)
-				if float64(intTo) != to {
-					return states.ThunkFromError(errors.ValueError(
-						errors.Code(errors.BadIndex),
-						errors.GotValue(states.NumValue(to)),
-					))
-				}
-				input := states.IterFromValue(inputState.Value)
+				i := 0
 				output := func() (states.Value, bool, error) {
-					if intTo <= 0 {
+					if i >= stop {
 						return nil, false, nil
 					}
-					el, ok, err := input()
+					if arr == nil {
+						return nil, false, nil
+					}
+					el := arr.Head
+					i += 1
+					arr, err = arr.Tail.EvalArr()
 					if err != nil {
 						return nil, false, err
 					}
-					if !ok {
-						return nil, false, nil
-					}
-					intTo--
-					return el, true, nil
-				}
-				return states.ThunkFromIter(output)
-			},
-			nil,
-		),
-		expressions.RegularFuncer(
-			types.NewArr(
-				types.NewVar("A", types.Any{}),
-			),
-			"slice",
-			[]*params.Param{
-				params.SimpleParam(types.Num{}),
-				params.SimpleParam(types.Num{}),
-			},
-			types.NewArr(
-				types.NewVar("A", types.Any{}),
-			),
-			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				argInputState := inputState.Clear()
-				from, _, err := args[0](argInputState, nil).EvalNum()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				intFrom := int(from)
-				if float64(intFrom) != from || intFrom < 0 {
-					return states.ThunkFromError(errors.ValueError(
-						errors.Code(errors.BadIndex),
-						errors.GotValue(states.NumValue(from)),
-					))
-				}
-				to, _, err := args[1](argInputState, nil).EvalNum()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				intTo := int(to)
-				if float64(intTo) != to || intTo < 0 {
-					return states.ThunkFromError(errors.ValueError(
-						errors.Code(errors.BadIndex),
-						errors.GotValue(states.NumValue(to)),
-					))
-				}
-				input := states.IterFromValue(inputState.Value)
-				// drop
-				for i := 0; i < intFrom; i++ {
-					_, ok, err := input()
-					if err != nil {
-						return states.ThunkFromError(err)
-					}
-					if !ok {
-						break
-					}
-				}
-				// take
-				output := func() (states.Value, bool, error) {
-					if intTo <= 0 {
-						return nil, false, nil
-					}
-					el, ok, err := input()
-					if err != nil {
-						return nil, false, err
-					}
-					if !ok {
-						return nil, false, nil
-					}
-					intTo--
 					return el, true, nil
 				}
 				return states.ThunkFromIter(output)
@@ -711,34 +630,28 @@ func initArr() {
 			},
 			types.NewVar("A", types.Any{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				index, _, err := args[0](inputState.Clear(), nil).EvalNum()
+				arr := inputState.Value.(*states.ArrValue)
+				index, err := args[0](inputState.Clear(), nil).EvalInt()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
-				intIndex := int(index)
-				if float64(intIndex) != index || intIndex < 0 {
+				if index < 0 {
 					return states.ThunkFromError(errors.ValueError(
 						errors.Code(errors.BadIndex),
 						errors.GotValue(states.NumValue(index)),
+						errors.Pos(pos),
 					))
 				}
-				input := states.IterFromValue(inputState.Value)
-				var el states.Value
-				for i := 0; i <= intIndex; i++ {
-					var ok bool
-					var err error
-					el, ok, err = input()
-					if err != nil {
-						return states.ThunkFromError(err)
-					}
-					if !ok {
+				for i := 0; i < index; i++ {
+					if arr == nil {
 						return states.ThunkFromError(errors.ValueError(
 							errors.Code(errors.NoSuchIndex),
+							errors.GotValue(states.NumValue(index)),
 							errors.Pos(pos),
 						))
 					}
 				}
-				return states.ThunkFromValue(el)
+				return states.ThunkFromValue(arr.Head)
 			},
 			nil,
 		),
