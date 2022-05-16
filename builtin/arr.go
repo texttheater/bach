@@ -111,7 +111,7 @@ func initArr() {
 			})),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				input := states.IterFromValue(inputState.Value)
-				i, _, err := args[0](inputState.Clear(), nil).EvalNum()
+				i, err := args[0](inputState.Clear(), nil).EvalNum()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -681,11 +681,11 @@ func initArr() {
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				argInputState := inputState.Clear()
-				from, _, err := args[0](argInputState, nil).EvalNum()
+				from, err := args[0](argInputState, nil).EvalNum()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
-				to, _, err := args[1](argInputState, nil).EvalNum()
+				to, err := args[1](argInputState, nil).EvalNum()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}

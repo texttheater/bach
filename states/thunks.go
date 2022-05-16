@@ -18,40 +18,36 @@ func (t *Thunk) Eval() (Value, error) {
 	return t.Value, t.Error
 }
 
-func (t *Thunk) EvalNum() (float64, bool, error) {
+func (t *Thunk) EvalNum() (float64, error) {
 	val, err := t.Eval()
 	if err != nil {
-		return 0, false, err
+		return 0, err
 	}
-	v, ok := val.(NumValue)
-	if !ok {
-		return 0, false, nil
-	}
-	return float64(v), true, nil
+	return float64(val.(NumValue)), nil
 }
 
-func (t *Thunk) EvalInt() (int, bool, error) {
+func (t *Thunk) EvalInt() (int, error) {
 	val, err := t.Eval()
 	if err != nil {
-		return 0, false, err
+		return 0, err
 	}
-	v, ok := val.(NumValue)
-	if !ok {
-		return 0, false, nil
-	}
-	return int(v), true, nil
+	return int(val.(NumValue)), nil
 }
 
-func (t *Thunk) EvalStr() (string, bool, error) {
+func (t *Thunk) EvalStr() (string, error) {
 	val, err := t.Eval()
 	if err != nil {
-		return "", false, err
+		return "", err
 	}
-	v, ok := val.(StrValue)
-	if !ok {
-		return "", false, nil
+	return string(val.(StrValue)), nil
+}
+
+func (t *Thunk) EvalArr() (*ArrValue, error) {
+	val, err := t.Eval()
+	if err != nil {
+		return nil, err
 	}
-	return string(v), true, nil
+	return val.(*ArrValue), nil
 }
 
 func ThunkFromValue(v Value) *Thunk {

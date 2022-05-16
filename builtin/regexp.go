@@ -49,9 +49,15 @@ func initRegexp() {
 						return nil, false, nil
 					}
 					obj := map[string]*states.Thunk(objValue)
-					start, _, _ := obj["start"].EvalInt()
+					start, err := obj["start"].EvalInt()
+					if err != nil {
+						return nil, false, err
+					}
 					obj["start"] = states.ThunkFromValue(states.NumValue(start + offset))
-					group, _, _ := obj["0"].EvalStr()
+					group, err := obj["0"].EvalStr()
+					if err != nil {
+						return nil, false, err
+					}
 					length := len(group)
 					end := start + length
 					offset += end
@@ -123,7 +129,11 @@ func split(inputState states.State, args []states.Action, bindings map[string]ty
 	regexp := args[0]
 	maxSplits := -1
 	if len(args) > 1 {
-		maxSplits, _, _ = args[1](inputState.Clear(), nil).EvalInt()
+		var err error
+		maxSplits, err = args[1](inputState.Clear(), nil).EvalInt()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
 	}
 	splits := 0
 	// Edge case 1: if the separator is empty, split the string into
@@ -192,8 +202,14 @@ func split(inputState states.State, args []states.Action, bindings map[string]ty
 			return piece, true, nil
 		}
 		obj := map[string]*states.Thunk(objValue)
-		sepStart, _, _ := obj["start"].EvalInt()
-		sep, _, _ := obj["0"].EvalStr()
+		sepStart, err := obj["start"].EvalInt()
+		if err != nil {
+			return nil, false, err
+		}
+		sep, err := obj["0"].EvalStr()
+		if err != nil {
+			return nil, false, err
+		}
 		sepLength := len(sep)
 		sepEnd := sepStart + sepLength
 		piece := v[:sepStart]
