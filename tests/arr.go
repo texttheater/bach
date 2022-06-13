@@ -503,4 +503,18 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`[1, 3, 5, 2, 4, 7] keepWhile(if %2 ==1)`,
+		`Arr<Num>`,
+		`[1, 3, 5]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[1, 3, 5, 2, 4, 7] keepWhile(if %2 ==0)`,
+		`Arr<Num>`,
+		`[]`,
+		nil,
+		t,
+	)
 }

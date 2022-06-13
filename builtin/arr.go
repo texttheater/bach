@@ -647,5 +647,62 @@ func initArr() {
 			},
 			nil,
 		),
+		expressions.RegularFuncer(
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
+			"keepWhile",
+			[]*params.Param{
+				{
+					InputType: types.NewVar("A", types.Any{}),
+					Params:    nil,
+					OutputType: types.NewUnion(
+						types.Obj{
+							Props: map[string]types.Type{
+								"yes": types.NewVar("B", types.Any{}),
+							},
+							Rest: types.Any{},
+						},
+						types.Obj{
+							Props: map[string]types.Type{
+								"no": types.NewVar("C", types.Any{}),
+							},
+							Rest: types.Any{},
+						},
+					),
+				},
+			},
+			types.NewArr(
+				types.NewVar("B", types.NewVar("A", types.Any{})),
+			),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				input := states.IterFromValue(inputState.Value)
+				output := func() (states.Value, bool, error) {
+					val, ok, err := input()
+					if err != nil {
+						return nil, false, err
+					}
+					if !ok {
+						return nil, false, nil
+					}
+					argInputState := inputState.Replace(val)
+					val, err = args[0](argInputState, nil).Eval()
+					if err != nil {
+						return nil, false, err
+					}
+					obj := val.(states.ObjValue)
+					if thunk, ok := obj["yes"]; ok {
+						val, err = thunk.Eval()
+						if err != nil {
+							return nil, false, err
+						}
+						return val, true, nil
+					}
+					return nil, false, nil
+				}
+				return states.ThunkFromIter(output)
+			},
+			nil,
+		),
 	})
 }
