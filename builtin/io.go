@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -21,6 +22,33 @@ func initIO() {
 			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
 				return states.ReaderValue{Reader: os.Stdin}, nil
 			},
+		),
+		expressions.RegularFuncer(
+			types.Reader{},
+			"json",
+			nil,
+			types.Any{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				reader := inputState.Value.(states.ReaderValue).Reader
+				dec := json.NewDecoder(reader)
+				output := func() (states.Value, bool, error) {
+					if !dec.More() {
+						return nil, false, nil
+					}
+					var o any
+					err := dec.Decode(o)
+					if err != nil {
+						return nil, false, err
+					}
+					val, err := thunkFromData(o).Eval()
+					if err != nil {
+						return nil, false, err
+					}
+					return val, true, nil
+				}
+				return states.ThunkFromIter(output)
+			},
+			nil,
 		),
 		expressions.RegularFuncer(
 			types.Reader{},
