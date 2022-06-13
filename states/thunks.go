@@ -50,6 +50,14 @@ func (t *Thunk) EvalArr() (*ArrValue, error) {
 	return val.(*ArrValue), nil
 }
 
+func (t *Thunk) EvalObj() (ObjValue, error) {
+	val, err := t.Eval()
+	if err != nil {
+		return nil, err
+	}
+	return val.(ObjValue), nil
+}
+
 func ThunkFromValue(v Value) *Thunk {
 	return ThunkFromState(State{
 		Value: v,

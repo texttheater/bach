@@ -81,11 +81,10 @@ func initArr() {
 							return nil, false, nil
 						}
 						argInputState := inputState.Replace(val)
-						val, err = args[0](argInputState, nil).Eval()
+						obj, err := args[0](argInputState, nil).EvalObj()
 						if err != nil {
 							return nil, false, err
 						}
-						obj := val.(states.ObjValue)
 						if thunk, ok := obj["yes"]; ok {
 							val, err = thunk.Eval()
 							if err != nil {
@@ -686,11 +685,10 @@ func initArr() {
 						return nil, false, nil
 					}
 					argInputState := inputState.Replace(val)
-					val, err = args[0](argInputState, nil).Eval()
+					obj, err := args[0](argInputState, nil).EvalObj()
 					if err != nil {
 						return nil, false, err
 					}
-					obj := val.(states.ObjValue)
 					if thunk, ok := obj["yes"]; ok {
 						val, err = thunk.Eval()
 						if err != nil {
