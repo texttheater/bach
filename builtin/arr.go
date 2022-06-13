@@ -702,5 +702,56 @@ func initArr() {
 			},
 			nil,
 		),
+		expressions.RegularFuncer(
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
+			"dropWhile",
+			[]*params.Param{
+				{
+					InputType: types.NewVar("A", types.Any{}),
+					Params:    nil,
+					OutputType: types.NewUnion(
+						types.Obj{
+							Props: map[string]types.Type{
+								"yes": types.NewVar("B", types.Any{}),
+							},
+							Rest: types.Any{},
+						},
+						types.Obj{
+							Props: map[string]types.Type{
+								"no": types.NewVar("C", types.Any{}),
+							},
+							Rest: types.Any{},
+						},
+					),
+				},
+			},
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				arr := inputState.Value.(*states.ArrValue)
+				for {
+					if arr == nil {
+						return states.ThunkFromValue(nil)
+					}
+					argInputState := inputState.Replace(arr.Head)
+					obj, err := args[0](argInputState, nil).EvalObj()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					_, ok := obj["yes"]
+					if !ok {
+						return states.ThunkFromValue(arr)
+					}
+					arr, err = arr.Tail.EvalArr()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+				}
+			},
+			nil,
+		),
 	})
 }

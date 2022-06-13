@@ -508,4 +508,11 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] dropWhile(is {a: _})`,
+		`Arr<Obj<b: Num, Void>|Obj<a: Num, Void>>`,
+		`[{b: 3}, {a: 4}]`,
+		nil,
+		t,
+	)
 }
