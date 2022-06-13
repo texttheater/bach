@@ -49,33 +49,17 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`for Arr<Num> def f Arr<Num> as =x x ok [1, 2, 3] f`,
-		&types.Arr{
-			types.Num{},
-		},
-		states.NewArrValue(
-			[]states.Value{
-				states.NumValue(1),
-				states.NumValue(2),
-				states.NumValue(3),
-			},
-		),
+		`Arr<Num>`,
+		`[1, 2, 3]`,
 		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`[1, 2, 3] each(*2)`,
-		&types.Arr{
-			types.Num{},
-		},
-		states.NewArrValue(
-			[]states.Value{
-				states.NumValue(2),
-				states.NumValue(4),
-				states.NumValue(6),
-			},
-		),
+		`Arr<Num>`,
+		`[2, 4, 6]`,
 		nil,
 		t,
 	)
@@ -500,6 +484,34 @@ func TestArrays(t *testing.T) {
 	TestProgram(`[2, 3, 4] fold(1, *)`,
 		types.Num{},
 		states.NumValue(24),
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[1, 3, 5, 2, 4, 7] takeWhile(if %2 ==1)`,
+		`Arr<Num>`,
+		`[1, 3, 5]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[1, 3, 5, 2, 4, 7] takeWhile(if %2 ==0)`,
+		`Arr<Num>`,
+		`[]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] takeWhile(is {a: _}) each(@a)`,
+		`Arr<Num>`,
+		`[1, 2]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] dropWhile(is {a: _})`,
+		`Arr<Obj<b: Num, Void>|Obj<a: Num, Void>>`,
+		`[{b: 3}, {a: 4}]`,
 		nil,
 		t,
 	)
