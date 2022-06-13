@@ -123,4 +123,165 @@ func TestText(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`"abc" startsWith"ab"`,
+		`Bool`,
+		`true`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" startsWith"b"`,
+		`Bool`,
+		`false`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" endsWith"bc"`,
+		`Bool`,
+		`true`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" endsWith"b"`,
+		`Bool`,
+		`false`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(0)`,
+		`Str`,
+		`"abc"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(1)`,
+		`Str`,
+		`"bc"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(1, 2)`,
+		`Str`,
+		`"b"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(1, -1)`,
+		`Str`,
+		`"b"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(-2, -1)`,
+		`Str`,
+		`"b"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(-1, -2)`,
+		`Str`,
+		`""`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(2, 1)`,
+		`Str`,
+		`""`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(-2)`,
+		`Str`,
+		`"bc"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(-4)`,
+		`Str`,
+		`"abc"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(-5, -4)`,
+		`Str`,
+		`""`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(-5, -3)`,
+		`Str`,
+		`""`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(-5, -2)`,
+		`Str`,
+		`"a"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(-5, -1)`,
+		`Str`,
+		`"ab"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(-1, -5)`,
+		`Str`,
+		`""`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" slice(2, -5)`,
+		`Str`,
+		`""`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" repeat(3)`,
+		`Str`,
+		`"abcabcabc"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" repeat(0)`,
+		`Str`,
+		`""`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" repeat(-1)`,
+		`Str`,
+		`""`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" repeat(1.6)`,
+		`Str`,
+		`"abc"`,
+		nil,
+		t,
+	)
 }

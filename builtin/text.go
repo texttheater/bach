@@ -177,5 +177,87 @@ func initText() {
 				return states.StrValue(str1 + str2), nil
 			},
 		),
+		expressions.SimpleFuncer(
+			types.Str{},
+			"startsWith",
+			[]types.Type{types.Str{}},
+			types.Bool{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str1 := string(inputValue.(states.StrValue))
+				str2 := string(argumentValues[0].(states.StrValue))
+				return states.BoolValue(strings.HasPrefix(str1, str2)), nil
+			},
+		),
+		expressions.SimpleFuncer(
+			types.Str{},
+			"endsWith",
+			[]types.Type{types.Str{}},
+			types.Bool{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str1 := string(inputValue.(states.StrValue))
+				str2 := string(argumentValues[0].(states.StrValue))
+				return states.BoolValue(strings.HasSuffix(str1, str2)), nil
+			},
+		),
+		expressions.SimpleFuncer(
+			types.Str{},
+			"slice",
+			[]types.Type{types.Num{}},
+			types.Str{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str := string(inputValue.(states.StrValue))
+				start := int(argumentValues[0].(states.NumValue))
+				if start < 0 {
+					start = len(str) + start
+					if start < 0 {
+						start = 0
+					}
+				}
+				return states.StrValue(str[start:]), nil
+			},
+		),
+		expressions.SimpleFuncer(
+			types.Str{},
+			"slice",
+			[]types.Type{
+				types.Num{},
+				types.Num{},
+			},
+			types.Str{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str := string(inputValue.(states.StrValue))
+				start := int(argumentValues[0].(states.NumValue))
+				end := int(argumentValues[1].(states.NumValue))
+				if start < 0 {
+					start = len(str) + start
+				}
+				if start < 0 {
+					start = 0
+				}
+				if end < 0 {
+					end = len(str) + end
+				}
+				if end < start {
+					end = start
+				}
+				return states.StrValue(str[start:end]), nil
+			},
+		),
+		expressions.SimpleFuncer(
+			types.Str{},
+			"repeat",
+			[]types.Type{
+				types.Num{},
+			},
+			types.Str{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str := string(inputValue.(states.StrValue))
+				n := int(argumentValues[0].(states.NumValue))
+				if n < 0 {
+					n = 0
+				}
+				return states.StrValue(strings.Repeat(str, n)), nil
+			},
+		),
 	})
 }
