@@ -76,7 +76,7 @@ func initValues() {
 			types.Any{},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				str := inputState.Value.(states.StrValue)
-				var data interface{}
+				var data any
 				err := json.Unmarshal([]byte(str), &data)
 				if err != nil {
 					return states.ThunkFromError(err)
@@ -109,7 +109,7 @@ func initValues() {
 	})
 }
 
-func thunkFromData(data interface{}) *states.Thunk {
+func thunkFromData(data any) *states.Thunk {
 	switch data := data.(type) {
 	case nil:
 		return states.ThunkFromValue(states.NullValue{})
@@ -119,7 +119,7 @@ func thunkFromData(data interface{}) *states.Thunk {
 		return states.ThunkFromValue(states.NumValue(data))
 	case string:
 		return states.ThunkFromValue(states.StrValue(data))
-	case []interface{}:
+	case []any:
 		i := 0
 		iter := func() (states.Value, bool, error) {
 			if i >= len(data) {
@@ -133,7 +133,7 @@ func thunkFromData(data interface{}) *states.Thunk {
 			return val, true, nil
 		}
 		return states.ThunkFromIter(iter)
-	case map[string]interface{}:
+	case map[string]any:
 		obj := make(map[string]*states.Thunk)
 		for k, v := range data {
 			obj[k] = thunkFromData(v)

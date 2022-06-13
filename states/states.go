@@ -63,16 +63,16 @@ func (s *VariableStack) Keep(ids *IDStack) *VariableStack {
 }
 
 type Variable struct {
-	ID     interface{}
+	ID     any
 	Action Action
 }
 
 type IDStack struct {
-	Head interface{}
+	Head any
 	Tail *IDStack
 }
 
-func (s *IDStack) Contains(element interface{}) bool {
+func (s *IDStack) Contains(element any) bool {
 	for s != nil {
 		if s.Head == element {
 			return true
@@ -82,7 +82,7 @@ func (s *IDStack) Contains(element interface{}) bool {
 	return false
 }
 
-func (s *IDStack) Add(element interface{}) *IDStack {
+func (s *IDStack) Add(element any) *IDStack {
 	if s.Contains(element) {
 		return s
 	}
@@ -101,7 +101,7 @@ func (s *IDStack) AddAll(t *IDStack) *IDStack {
 }
 
 func (s *IDStack) String() string {
-	var slice []interface{}
+	var slice []any
 	for s != nil {
 		slice = append(slice, s.Head)
 		s = s.Tail

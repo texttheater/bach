@@ -210,7 +210,7 @@ type e struct {
 }
 
 func (err *e) Error() string {
-	m := make(map[string]interface{})
+	m := make(map[string]any)
 	if err.Kind != nil {
 		m["kind"] = err.Kind.String()
 	}

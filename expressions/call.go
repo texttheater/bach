@@ -139,7 +139,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 	return RegularFuncer(wantInputType, wantName, pars, outputType, regularKernel, nil)
 }
 
-func VariableFuncer(id interface{}, name string, varType types.Type) Funcer {
+func VariableFuncer(id any, name string, varType types.Type) Funcer {
 	kernel := func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		stack := inputState.Stack
 		for stack != nil {
