@@ -170,7 +170,7 @@ func TestDefinitions(t *testing.T) {
 		errors.TypeError(
 			errors.Code(errors.ArgHasWrongOutputType),
 			errors.ArgNum(1),
-			errors.WantType(types.Var{"A", types.AnyArr}),
+			errors.WantType(types.NewVar("A", types.AnyArr)),
 			errors.GotType(types.Str{}),
 		),
 		t,

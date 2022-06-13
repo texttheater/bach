@@ -49,33 +49,17 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`for Arr<Num> def f Arr<Num> as =x x ok [1, 2, 3] f`,
-		&types.Arr{
-			types.Num{},
-		},
-		states.NewArrValue(
-			[]states.Value{
-				states.NumValue(1),
-				states.NumValue(2),
-				states.NumValue(3),
-			},
-		),
+		`Arr<Num>`,
+		`[1, 2, 3]`,
 		nil,
 		t,
 	)
-	TestProgram(
+	TestProgramStr(
 		`[1, 2, 3] each(*2)`,
-		&types.Arr{
-			types.Num{},
-		},
-		states.NewArrValue(
-			[]states.Value{
-				states.NumValue(2),
-				states.NumValue(4),
-				states.NumValue(6),
-			},
-		),
+		`Arr<Num>`,
+		`[2, 4, 6]`,
 		nil,
 		t,
 	)
