@@ -650,7 +650,7 @@ func initArr() {
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
 			),
-			"takeWhile",
+			"take",
 			[]*params.Param{
 				{
 					InputType: types.NewVar("A", types.Any{}),
@@ -706,7 +706,7 @@ func initArr() {
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
 			),
-			"dropWhile",
+			"drop",
 			[]*params.Param{
 				{
 					InputType: types.NewVar("A", types.Any{}),

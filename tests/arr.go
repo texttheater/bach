@@ -488,28 +488,28 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	TestProgramStr(
-		`[1, 3, 5, 2, 4, 7] takeWhile(if %2 ==1)`,
+		`[1, 3, 5, 2, 4, 7] take(if %2 ==1)`,
 		`Arr<Num>`,
 		`[1, 3, 5]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`[1, 3, 5, 2, 4, 7] takeWhile(if %2 ==0)`,
+		`[1, 3, 5, 2, 4, 7] take(if %2 ==0)`,
 		`Arr<Num>`,
 		`[]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] takeWhile(is {a: _}) each(@a)`,
+		`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] take(is {a: _}) each(@a)`,
 		`Arr<Num>`,
 		`[1, 2]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] dropWhile(is {a: _})`,
+		`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] drop(is {a: _})`,
 		`Arr<Obj<b: Num, Void>|Obj<a: Num, Void>>`,
 		`[{b: 3}, {a: 4}]`,
 		nil,
