@@ -198,9 +198,10 @@ func RegularFuncer(wantInputType types.Type, wantName string, pars []*params.Par
 				// TODO what if an incompatible bound is declared?
 				Stack: gotInputShape.Stack,
 			}
-			argOutputShape, argAction, argIDs, err := gotCall.Args[i].Typecheck(argInputShape, instantiate(pars[i].Params, bindings))
+			argOutputShape, argAction, argIDs, err := gotCall.Args[i].Typecheck(
+				argInputShape, instantiate(pars[i].Params, bindings))
 			if err != nil {
-				return Shape{}, nil, nil, false, err
+				return Shape{}, nil, nil, false, nil
 			}
 			if !pars[i].OutputType.Bind(argOutputShape.Type, bindings) {
 				return Shape{}, nil, nil, false, nil

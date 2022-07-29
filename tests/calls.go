@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -108,9 +107,9 @@ func TestCalls(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.Num{}),
-			errors.Name("g"),
-			errors.NumParams(0),
+			errors.InputType(types.Null{}),
+			errors.Name("f"),
+			errors.NumParams(1),
 		),
 		t,
 	)
@@ -188,9 +187,9 @@ func TestCalls(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.Num{}),
-			errors.Name("+"),
-			errors.NumParams(2),
+			errors.InputType(types.Null{}),
+			errors.Name("f"),
+			errors.NumParams(1),
 		),
 		t,
 	)
@@ -206,18 +205,10 @@ func TestCalls(t *testing.T) {
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.ParamDoesNotMatch),
-			errors.ParamNum(1),
-			errors.WantParam(&params.Param{
-				InputType:  types.Any{},
-				Params:     nil,
-				OutputType: types.Num{},
-			}),
-			errors.GotParam(&params.Param{
-				InputType:  types.Any{},
-				Params:     nil,
-				OutputType: types.Str{},
-			}),
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.Null{}),
+			errors.Name("f"),
+			errors.NumParams(1),
 		),
 		t,
 	)
@@ -226,18 +217,10 @@ func TestCalls(t *testing.T) {
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.ParamDoesNotMatch),
-			errors.ParamNum(1),
-			errors.WantParam(&params.Param{
-				InputType:  types.Any{},
-				Params:     nil,
-				OutputType: types.Num{},
-			}),
-			errors.GotParam(&params.Param{
-				InputType:  types.Str{},
-				Params:     nil,
-				OutputType: types.Num{},
-			}),
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.Null{}),
+			errors.Name("f"),
+			errors.NumParams(1),
 		),
 		t,
 	)
@@ -261,6 +244,32 @@ func TestCalls(t *testing.T) {
 			errors.Code(errors.NoSuchFunction),
 			errors.InputType(types.Null{}),
 			errors.Name(`a`),
+			errors.NumParams(1),
+		),
+		t,
+	)
+	TestProgramStr(
+		`for Num def applyWith2AsArg(for Num f(Num) <A>) <A> as f(2) ok 1 applyWith2AsArg(+)`,
+		`Num`,
+		`3`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`for Num def applyWith2AsArg(for Num f(Num) <A>) <A> as f(2) ok 1 applyWith2AsArg(*)`,
+		`Num`,
+		`2`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`for Num def applyWithABCAsArg(for Num f(Str) <A>) <A> as f("abc") ok 1 applyWithABCAsArg(+)`,
+		``,
+		``,
+		errors.TypeError(
+			errors.Code(errors.NoSuchFunction),
+			errors.InputType(types.Num{}),
+			errors.Name("applyWithABCAsArg"),
 			errors.NumParams(1),
 		),
 		t,
