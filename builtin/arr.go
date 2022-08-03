@@ -641,6 +641,17 @@ func initArr() {
 							errors.Pos(pos),
 						))
 					}
+					arr, err = arr.Tail.EvalArr()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+				}
+				if arr == nil {
+					return states.ThunkFromError(errors.ValueError(
+						errors.Code(errors.NoSuchIndex),
+						errors.GotValue(states.NumValue(index)),
+						errors.Pos(pos),
+					))
 				}
 				return states.ThunkFromValue(arr.Head)
 			},

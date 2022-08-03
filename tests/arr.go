@@ -515,4 +515,45 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`[1, 2, 3] get(-1)`,
+		``,
+		``,
+		errors.ValueError(
+			errors.Code(errors.BadIndex),
+			errors.GotValue(states.NumValue(-1)),
+		),
+		t,
+	)
+	TestProgramStr(
+		`[1, 2, 3] get(0)`,
+		`Num`,
+		`1`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[1, 2, 3] get(1)`,
+		`Num`,
+		`2`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[1, 2, 3] get(2)`,
+		`Num`,
+		`3`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[1, 2, 3] get(3)`,
+		``,
+		``,
+		errors.ValueError(
+			errors.Code(errors.NoSuchIndex),
+			errors.GotValue(states.NumValue(3)),
+		),
+		t,
+	)
 }
