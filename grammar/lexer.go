@@ -25,6 +25,8 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		{"NameLbrace", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*){`, stateful.Push("Braces")},
 		// assignment
 		{"EqName", `=(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)`, nil},
+		{"EqLbrack", `=\[`, nil},
+		{"EqLbrace", `={`, nil},
 		// keywords
 		{"Keyword", `(?:for|def|as|ok|if|then|elif|else|each|all|is|elis|with)\b`, nil},
 		// names
