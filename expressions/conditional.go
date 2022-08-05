@@ -412,7 +412,6 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	}
 	// return
 	return outputShape, complement, matcher, nil
-
 }
 
 type ObjPattern struct {
