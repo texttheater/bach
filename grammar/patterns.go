@@ -68,7 +68,6 @@ type ArrPattern struct {
 	Element  *Pattern       `( @@`
 	Elements []*Pattern     `  ( "," @@ )*`
 	Rest     *Pattern       `  ( ";" @@ )? )? "]"`
-	Name     *string        `( @Lid | @Op1 | @Op2 )?`
 }
 
 func (g *ArrPattern) Ast() (expressions.Pattern, error) {
@@ -105,7 +104,6 @@ func (g *ArrPattern) Ast() (expressions.Pattern, error) {
 		Pos:             g.Pos,
 		ElementPatterns: elPatterns,
 		RestPattern:     restPattern,
-		Name:            g.Name,
 	}, nil
 }
 
@@ -115,7 +113,6 @@ type ObjPattern struct {
 	Value  *Pattern       `  ":" @@`
 	Props  []string       `   ( "," ( @Lid | @Op1 | @Op2 | @NumLiteral )`
 	Values []*Pattern     `     ":" @@ )* )? "}"`
-	Name   *string        `( @Lid | @Op1 | @Op2 )?`
 }
 
 func (g *ObjPattern) Ast() (expressions.Pattern, error) {
@@ -134,5 +131,8 @@ func (g *ObjPattern) Ast() (expressions.Pattern, error) {
 			propPatternMap[prop] = p
 		}
 	}
-	return &expressions.ObjPattern{g.Pos, propPatternMap, g.Name}, nil
+	return &expressions.ObjPattern{
+		Pos:            g.Pos,
+		PropPatternMap: propPatternMap,
+	}, nil
 }

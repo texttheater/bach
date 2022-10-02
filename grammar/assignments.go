@@ -83,7 +83,6 @@ func (g *ArrAssignment) Ast() (expressions.Expression, error) {
 			Pos:             g.Pos,
 			ElementPatterns: elPatterns,
 			RestPattern:     restPattern,
-			Name:            nil,
 		},
 	}, nil
 }

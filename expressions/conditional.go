@@ -254,7 +254,6 @@ type ArrPattern struct {
 	Pos             lexer.Position
 	ElementPatterns []Pattern
 	RestPattern     Pattern
-	Name            *string
 }
 
 func (p ArrPattern) Position() lexer.Position {
@@ -360,11 +359,6 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 		Type:  intersection,
 		Stack: funcerStack,
 	}
-	if p.Name != nil {
-		outputShape.Stack = outputShape.Stack.Push(
-			VariableFuncer(p, *p.Name, outputShape.Type),
-		)
-	}
 	// build matcher
 	matcher := func(inputState states.State) (*states.VariableStack, bool, error) {
 		varStack := inputState.Stack
@@ -396,15 +390,6 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 			if !ok {
 				return nil, false, err
 			}
-			if p.Name != nil {
-				varStack = &states.VariableStack{
-					Head: states.Variable{
-						ID:     p,
-						Action: states.SimpleAction(inputState.Value),
-					},
-					Tail: varStack,
-				}
-			}
 			return varStack, true, nil
 		default:
 			return nil, false, nil
@@ -417,7 +402,6 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 type ObjPattern struct {
 	Pos            lexer.Position
 	PropPatternMap map[string]Pattern
-	Name           *string
 }
 
 func (p ObjPattern) Position() lexer.Position {
@@ -500,12 +484,6 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 		Type:  intersection,
 		Stack: funcerStack,
 	}
-	if p.Name != nil {
-		outputShape.Stack = &FuncerStack{
-			Head: VariableFuncer(p, *p.Name, outputShape.Type),
-			Tail: outputShape.Stack,
-		}
-	}
 	// build matcher
 	matcher := func(inputState states.State) (*states.VariableStack, bool, error) {
 		varStack := inputState.Stack
@@ -527,15 +505,6 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 				})
 				if !ok {
 					return nil, false, err
-				}
-			}
-			if p.Name != nil {
-				varStack = &states.VariableStack{
-					Head: states.Variable{
-						ID:     p,
-						Action: states.SimpleAction(inputState.Value),
-					},
-					Tail: varStack,
 				}
 			}
 			return varStack, true, nil
