@@ -35,8 +35,6 @@ func (x AssignmentExpression) Typecheck(inputShape Shape, params []*params.Param
 		return Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.NonExhaustiveMatch),
 			errors.Pos(x.Pos),
-			errors.GotType(types.Void{}),
-			errors.GotType(restType),
 		)
 	}
 	// make action
