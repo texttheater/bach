@@ -255,6 +255,82 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> find(for <A> Obj<yes: <B>|Obj<no: C>) Tup<Num, <B>>
+		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
+			"find",
+			[]*params.Param{
+				{
+					InputType: types.NewVar("A", types.Any{}),
+					Params:    nil,
+					OutputType: types.NewUnion(
+						types.Obj{
+							Props: map[string]types.Type{
+								"yes": types.NewVar("B", types.Any{}),
+							},
+							Rest: types.Any{},
+						},
+						types.Obj{
+							Props: map[string]types.Type{
+								"no": types.NewVar("C", types.Any{}),
+							},
+							Rest: types.Any{},
+						},
+					),
+				},
+			},
+			types.NewUnion(
+				types.Obj{
+					Props: map[string]types.Type{
+						"yes": types.NewNearr([]types.Type{
+							types.Num{},
+							types.NewVar("A", types.Any{}),
+						}, types.VoidArr),
+					},
+					Rest: types.Any{},
+				},
+				types.Obj{
+					Props: map[string]types.Type{
+						"no": types.Null{},
+					},
+					Rest: types.Any{},
+				},
+			),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				arr := inputState.Value.(*states.ArrValue)
+				i := 0
+				for {
+					if arr == nil {
+						return states.ThunkFromValue(states.ObjValueFromMap(map[string]states.Value{
+							"no": states.NullValue{},
+						}))
+					}
+					argInputState := inputState.Replace(arr.Head)
+					obj, err := args[0](argInputState, nil).EvalObj()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					if thunk, ok := obj["yes"]; ok {
+						val, err := thunk.Eval()
+						if err != nil {
+							return states.ThunkFromError(err)
+						}
+						return states.ThunkFromValue(states.ObjValue(map[string]*states.Thunk{
+							"yes": states.ThunkFromSlice([]states.Value{
+								states.NumValue(i),
+								val,
+							})}))
+					}
+					i += 1
+					arr, err = arr.Tail.EvalArr()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+				}
+			},
+			nil,
+		),
+		// for Arr<<A>> fold(<B>, for <B> (<A>) <B>) <B>
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
 			"fold",
