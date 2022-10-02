@@ -7,7 +7,7 @@ import (
 
 type Assignment struct {
 	Pos    lexer.Position
-	EqName *EqName `  @@`
+	EqName *EqName `@@`
 }
 
 func (g *Assignment) Ast() (expressions.Expression, error) {

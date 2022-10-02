@@ -7,7 +7,7 @@ import (
 
 type ArrLiteral struct {
 	Pos  lexer.Position  `"["`
-	Rest *ArrLiteralRest "@@"
+	Rest *ArrLiteralRest `@@`
 }
 
 func (g *ArrLiteral) Ast() (expressions.Expression, error) {
