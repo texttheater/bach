@@ -182,7 +182,7 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 		for prop := range p.PropPatternMap {
 			valType, ok := t.Props[prop]
 			if !ok {
-				valType = types.Void{}
+				valType = t.Rest
 			}
 			propInputTypeMap[prop] = valType
 		}
