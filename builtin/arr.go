@@ -13,6 +13,7 @@ import (
 
 func initArr() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		// for Arr<<A>> +(Arr<<A>>) Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
@@ -51,6 +52,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> drop(Num) Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
@@ -78,6 +80,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> drop(for <<A>> Obj<yes: B>|Obj<no: C>) Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
@@ -129,6 +132,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> each(for <<A>> <<B>>) Arr<<B>>
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
 			"each",
@@ -161,6 +165,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> enum(Num) Arr<Tup<Num, <A>>>
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
 			"enum",
@@ -196,6 +201,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> enum Arr<Tup<Num, <A>>>
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
 			"enum",
@@ -226,6 +232,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<Bool> every Bool
 		expressions.RegularFuncer(
 			types.NewArr(types.Bool{}),
 			"every",
@@ -292,6 +299,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> get(Num) <A>
 		expressions.RegularFuncer(
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
@@ -338,6 +346,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<Arr<<A>>> join Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(
 				types.NewArr(types.NewVar("A", types.Any{})),
@@ -373,6 +382,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> keep(for <A> Obj<yes: <B>>|Obj<no: <C>>) Arr<B>
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
 			"keep",
@@ -426,6 +436,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> len Num
 		expressions.RegularFuncer(
 			types.AnyArr,
 			"len",
@@ -447,6 +458,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Any range(Num, Num) Arr<Num>
 		expressions.RegularFuncer(
 			types.Any{},
 			"range",
@@ -480,6 +492,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> rev Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
@@ -509,6 +522,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<Bool> some Bool
 		expressions.RegularFuncer(
 			types.NewArr(types.Bool{}),
 			"some",
@@ -531,6 +545,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<Num> sort Arr<Num>
 		expressions.RegularFuncer(
 			types.NewArr(types.Num{}),
 			"sort",
@@ -551,6 +566,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<Str> sort Arr<Str>
 		expressions.RegularFuncer(
 			types.NewArr(types.Str{}),
 			"sort",
@@ -571,6 +587,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> sort(for <A> (<A>) Bool) Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
 			"sort",
@@ -610,6 +627,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> sortBy(for <A> <B>, for <B> (<B>) Bool) Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
 			"sortBy",
@@ -671,6 +689,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> take(Num) Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
@@ -708,6 +727,7 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> take(for <<A>> Obj<yes: B>|Obj<no: C>) Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
