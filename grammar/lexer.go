@@ -18,11 +18,11 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		{"LangleLid", `<(?:[\p{L}_][\p{L}_0-9]*)`, nil}, // special case of Op1Lid, but also used for type variables
 		{"Op1Lid", `[+\-*/%>](?:[\p{L}_][\p{L}_0-9]*)`, nil},
 		{"Op2Lid", `(?:==|<=|>=|\*\*)(?:[\p{L}_][\p{L}_0-9]*)`, nil},
-		{"NameQuot", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)"`, stateful.Push("StrLiteral")},
-		{"NameRegexp", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)~(?:\\.|[^/])*~`, nil},
-		{"NameLpar", `(?:[+\-*/%<>=]|==|<=|>=|\*\*|[\p{L}_][\p{L}_0-9]*)\(`, nil},
-		{"NameLbrack", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\[`, nil},
-		{"NameLbrace", `(?:[+\-*/%<>=]|==|<=|>=|[\p{L}_][\p{L}_0-9]*){`, stateful.Push("Braces")},
+		{"NameQuot", `(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)"`, stateful.Push("StrLiteral")},
+		{"NameRegexp", `(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)~(?:\\.|[^/])*~`, nil},
+		{"NameLpar", `(?:[+\-*/%<>]|==|<=|>=|\*\*|[\p{L}_][\p{L}_0-9]*)\(`, nil},
+		{"NameLbrack", `(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\[`, nil},
+		{"NameLbrace", `(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*){`, stateful.Push("Braces")},
 		// assignment
 		{"EqName", `=(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)`, nil},
 		{"EqLbrack", `=\[`, nil},
