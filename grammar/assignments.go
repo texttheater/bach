@@ -10,6 +10,7 @@ type Assignment struct {
 	Pos            lexer.Position
 	NameAssignment *NameAssignment `  @@`
 	ArrAssignment  *ArrAssignment  `| @@`
+	ObjAssignment  *ObjAssignment  `| @@`
 }
 
 func (g *Assignment) Ast() (expressions.Expression, error) {
@@ -18,6 +19,9 @@ func (g *Assignment) Ast() (expressions.Expression, error) {
 	}
 	if g.ArrAssignment != nil {
 		return g.ArrAssignment.Ast()
+	}
+	if g.ObjAssignment != nil {
+		return g.ObjAssignment.Ast()
 	}
 	panic("invalid assignment")
 }
@@ -83,6 +87,39 @@ func (g *ArrAssignment) Ast() (expressions.Expression, error) {
 			Pos:             g.Pos,
 			ElementPatterns: elPatterns,
 			RestPattern:     restPattern,
+		},
+	}, nil
+}
+
+type ObjAssignment struct {
+	Pos    lexer.Position `"={"`
+	Prop   *string        `( ( @Lid | @Op1 | @Op2 | @NumLiteral )`
+	Value  *Pattern       `  ":" @@`
+	Props  []string       `   ( "," ( @Lid | @Op1 | @Op2 | @NumLiteral )`
+	Values []*Pattern     `     ":" @@ )* )? "}"`
+}
+
+func (g *ObjAssignment) Ast() (expressions.Expression, error) {
+	propPatternMap := make(map[string]expressions.Pattern)
+	if g.Prop != nil {
+		p, err := g.Value.Ast()
+		if err != nil {
+			return nil, err
+		}
+		propPatternMap[*g.Prop] = p
+		for i, prop := range g.Props {
+			p, err := g.Values[i].Ast()
+			if err != nil {
+				return nil, err
+			}
+			propPatternMap[prop] = p
+		}
+	}
+	return &expressions.AssignmentExpression{
+		Pos: g.Pos,
+		Pattern: expressions.ObjPattern{
+			Pos:            g.Pos,
+			PropPatternMap: propPatternMap,
 		},
 	}, nil
 }

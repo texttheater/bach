@@ -60,4 +60,61 @@ func TestAssignment(t *testing.T) {
 		),
 		t,
 	)
+	TestProgramStr(
+		`{a: 1, b: 2, c: 3} ={a: d, b: e, c: f} d`,
+		`Num`,
+		`1`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`{a: 1, b: 2, c: 3} ={a: d, b: e, c: f} f`,
+		`Num`,
+		`3`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`{a: 1, b: 2, c: 3} ={a: d, b: e} e`,
+		`Num`,
+		`2`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`{a: 1, b: 2, c: 3} =[a, b]`,
+		``,
+		``,
+		errors.TypeError(
+			errors.Code(errors.ImpossibleMatch),
+		),
+		t,
+	)
+	TestProgramStr(
+		`{a: 1, b: 2, c: 3} ={g: h}`,
+		``,
+		``,
+		errors.TypeError(
+			errors.Code(errors.ImpossibleMatch),
+		),
+		t,
+	)
+	TestProgramStr(
+		`for Obj<a: Num, Num> def f Num as ={a: a, b: b} a +b ok`,
+		``,
+		``,
+		errors.TypeError(
+			errors.Code(errors.NonExhaustiveMatch),
+		),
+		t,
+	)
+	TestProgramStr(
+		`for Obj<a: Num, Num> def f Num as ={b: b} b ok`,
+		``,
+		``,
+		errors.TypeError(
+			errors.Code(errors.NonExhaustiveMatch),
+		),
+		t,
+	)
 }
