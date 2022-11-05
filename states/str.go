@@ -2,6 +2,7 @@ package states
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/texttheater/bach/types"
 )
@@ -9,7 +10,11 @@ import (
 type StrValue string
 
 func (v StrValue) Repr() (string, error) {
-	return fmt.Sprintf("%q", string(v)), nil
+	s := string(v)
+	s = strings.Replace(s, "{", "{{", -1)
+	s = strings.Replace(s, "}", "}}", -1)
+	s = fmt.Sprintf("%q", s)
+	return s, nil
 }
 
 func (v StrValue) Str() (string, error) {
