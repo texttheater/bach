@@ -570,4 +570,18 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`[1, 2, 3, 4] findLast(is Num with %2 ==0)`,
+		`Null|Tup<Num, Num>`,
+		`[3, 4]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`[1, 2, 3, 4] findLast(is Num with %8 ==0)`,
+		`Null|Tup<Num, Num>`,
+		`null`,
+		nil,
+		t,
+	)
 }

@@ -255,7 +255,7 @@ func initArr() {
 			},
 			nil,
 		),
-		// for Arr<<A>> find(for <A> Obj<yes: <B>|Obj<no: C>) Tup<Num, <B>>
+		// for Arr<<A>> find(for <A> Obj<yes: <B>|Obj<no: C>) Null|Tup<Num, <B>>
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
 			"find",
@@ -280,6 +280,7 @@ func initArr() {
 				},
 			},
 			types.NewUnion(
+				types.Null{},
 				types.NewNearr(
 					[]types.Type{
 						types.Num{},
@@ -287,7 +288,6 @@ func initArr() {
 					},
 					types.VoidArr,
 				),
-				types.Null{},
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				arr := inputState.Value.(*states.ArrValue)
@@ -317,6 +317,75 @@ func initArr() {
 						return states.ThunkFromError(err)
 					}
 				}
+			},
+			nil,
+		),
+		// for Arr<<A>> findLast(for <A> Obj<yes: <B>|Obj<no: C>) Null|Tup<Num, <B>>
+		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
+			"findLast",
+			[]*params.Param{
+				{
+					InputType: types.NewVar("A", types.Any{}),
+					Params:    nil,
+					OutputType: types.NewUnion(
+						types.Obj{
+							Props: map[string]types.Type{
+								"yes": types.NewVar("B", types.Any{}),
+							},
+							Rest: types.Any{},
+						},
+						types.Obj{
+							Props: map[string]types.Type{
+								"no": types.NewVar("C", types.Any{}),
+							},
+							Rest: types.Any{},
+						},
+					),
+				},
+			},
+			types.NewUnion(
+				types.Null{},
+				types.NewNearr(
+					[]types.Type{
+						types.Num{},
+						types.NewVar("A", types.Any{}),
+					},
+					types.VoidArr,
+				),
+			),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				arr := inputState.Value.(*states.ArrValue)
+				i := -1
+				var val states.Value
+				for {
+					if arr == nil {
+						break
+					}
+					argInputState := inputState.Replace(arr.Head)
+					obj, err := args[0](argInputState, nil).EvalObj()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					if thunk, ok := obj["yes"]; ok {
+						val, err = thunk.Eval()
+						if err != nil {
+							return states.ThunkFromError(err)
+						}
+					}
+					i += 1
+					arr, err = arr.Tail.EvalArr()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+				}
+				if val == nil {
+					return states.ThunkFromValue(states.NullValue{})
+				}
+				return states.ThunkFromSlice([]states.Value{
+					states.NumValue(i),
+					val,
+				})
 			},
 			nil,
 		),
