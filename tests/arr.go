@@ -558,15 +558,15 @@ func TestArrays(t *testing.T) {
 	)
 	TestProgramStr(
 		`[1, 2, 3] find(is Num with %2 ==0)`,
-		`Obj<yes: Tup<Num, Num>>|Obj<no: Null>`,
-		`{yes: [1, 2]}`,
+		`Null|Tup<Num, Num>`,
+		`[1, 2]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
 		`[1, 2, 3] find(is Num with %4 ==0)`,
-		`Obj<yes: Tup<Num, Num>>|Obj<no: Null>`,
-		`{no: null}`,
+		`Null|Tup<Num, Num>`,
+		`null`,
 		nil,
 		t,
 	)

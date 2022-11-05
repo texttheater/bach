@@ -280,30 +280,21 @@ func initArr() {
 				},
 			},
 			types.NewUnion(
-				types.Obj{
-					Props: map[string]types.Type{
-						"yes": types.NewNearr([]types.Type{
-							types.Num{},
-							types.NewVar("A", types.Any{}),
-						}, types.VoidArr),
+				types.NewNearr(
+					[]types.Type{
+						types.Num{},
+						types.NewVar("A", types.Any{}),
 					},
-					Rest: types.Any{},
-				},
-				types.Obj{
-					Props: map[string]types.Type{
-						"no": types.Null{},
-					},
-					Rest: types.Any{},
-				},
+					types.VoidArr,
+				),
+				types.Null{},
 			),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				arr := inputState.Value.(*states.ArrValue)
 				i := 0
 				for {
 					if arr == nil {
-						return states.ThunkFromValue(states.ObjValueFromMap(map[string]states.Value{
-							"no": states.NullValue{},
-						}))
+						return states.ThunkFromValue(states.NullValue{})
 					}
 					argInputState := inputState.Replace(arr.Head)
 					obj, err := args[0](argInputState, nil).EvalObj()
@@ -315,11 +306,10 @@ func initArr() {
 						if err != nil {
 							return states.ThunkFromError(err)
 						}
-						return states.ThunkFromValue(states.ObjValue(map[string]*states.Thunk{
-							"yes": states.ThunkFromSlice([]states.Value{
-								states.NumValue(i),
-								val,
-							})}))
+						return states.ThunkFromSlice([]states.Value{
+							states.NumValue(i),
+							val,
+						})
 					}
 					i += 1
 					arr, err = arr.Tail.EvalArr()
