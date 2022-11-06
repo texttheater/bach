@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -121,7 +122,11 @@ func initIO() {
 					var o any
 					err := dec.Decode(&o)
 					if err != nil {
-						return nil, false, err
+						return nil, false, errors.ValueError(
+							errors.Pos(pos),
+							errors.Code(errors.UnexpectedValue),
+							errors.Message(err.Error()),
+						)
 					}
 					val, err := thunkFromData(o, pos).Eval()
 					if err != nil {
