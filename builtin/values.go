@@ -52,6 +52,9 @@ func initValues() {
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				s := string(inputState.Value.(states.StrValue))
 				b, err := args[0](inputState.Clear(), nil).EvalNum()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
 				n, err := strconv.ParseInt(s, int(b), 64)
 				if err != nil {
 					return states.ThunkFromError(errors.ValueError(
