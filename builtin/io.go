@@ -95,6 +95,7 @@ func initIO() {
 				return inputValue, nil
 			},
 		),
+		// FIXME get rid of Reader type
 		// for Any in Reader
 		expressions.SimpleFuncer(
 			types.Any{},
