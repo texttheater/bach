@@ -16,6 +16,10 @@ func (v BoolValue) Str() (string, error) {
 	return v.Repr()
 }
 
+func (v BoolValue) Data() (any, error) {
+	return v, nil
+}
+
 func (v BoolValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case types.Bool:

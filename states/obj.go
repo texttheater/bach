@@ -57,6 +57,22 @@ func (v ObjValue) Str() (string, error) {
 	return v.Repr()
 }
 
+func (v ObjValue) Data() (any, error) {
+	res := make(map[string]any, 0)
+	for k, t := range v {
+		val, err := t.Eval()
+		if err != nil {
+			return nil, err
+		}
+		data, err := val.Data()
+		if err != nil {
+			return nil, err
+		}
+		res[k] = data
+	}
+	return res, nil
+}
+
 func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case types.Obj:

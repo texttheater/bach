@@ -7,6 +7,7 @@ import (
 type Value interface {
 	Repr() (string, error)
 	Str() (string, error)
+	Data() (any, error)
 	Inhabits(types.Type, *BindingStack) (bool, error)
 	Equal(Value) (bool, error)
 }

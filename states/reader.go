@@ -18,6 +18,10 @@ func (v ReaderValue) Str() (string, error) {
 	return v.Repr()
 }
 
+func (v ReaderValue) Data() (any, error) {
+	return v, nil
+}
+
 func (v ReaderValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case types.Reader:

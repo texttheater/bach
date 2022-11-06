@@ -21,6 +21,10 @@ func (v StrValue) Str() (string, error) {
 	return string(v), nil
 }
 
+func (v StrValue) Data() (any, error) {
+	return v, nil
+}
+
 func (v StrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case types.Str:

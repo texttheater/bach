@@ -63,6 +63,22 @@ func (v *ArrValue) Str() (string, error) {
 	return v.Repr()
 }
 
+func (v *ArrValue) Data() (any, error) {
+	res := make([]any, 0)
+	for v != nil {
+		data, err := v.Head.Data()
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, data)
+		v, err = v.Tail.EvalArr()
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case *types.Nearr:

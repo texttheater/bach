@@ -15,6 +15,10 @@ func (v NullValue) Str() (string, error) {
 	return v.Repr()
 }
 
+func (v NullValue) Data() (any, error) {
+	return nil, nil
+}
+
 func (v NullValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
 	case types.Null:
