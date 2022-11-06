@@ -13,62 +13,8 @@ import (
 )
 
 func initIO() {
+	// for Arr<Str> blocks Arr<Arr<Str>>
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
-		expressions.SimpleFuncer(
-			types.Any{},
-			"in",
-			nil,
-			types.Reader{},
-			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
-				return states.ReaderValue{Reader: os.Stdin}, nil
-			},
-		),
-		expressions.RegularFuncer(
-			types.Reader{},
-			"json",
-			nil,
-			types.Any{},
-			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				reader := inputState.Value.(states.ReaderValue).Reader
-				dec := json.NewDecoder(reader)
-				output := func() (states.Value, bool, error) {
-					if !dec.More() {
-						return nil, false, nil
-					}
-					var o any
-					err := dec.Decode(o)
-					if err != nil {
-						return nil, false, err
-					}
-					val, err := thunkFromData(o).Eval()
-					if err != nil {
-						return nil, false, err
-					}
-					return val, true, nil
-				}
-				return states.ThunkFromIter(output)
-			},
-			nil,
-		),
-		expressions.RegularFuncer(
-			types.Reader{},
-			"lines",
-			nil,
-			types.NewArr(types.Str{}),
-			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				reader := inputState.Value.(states.ReaderValue)
-				scanner := bufio.NewScanner(reader.Reader)
-				iter := func() (states.Value, bool, error) {
-					ok := scanner.Scan()
-					if !ok {
-						return nil, false, nil
-					}
-					return states.StrValue(scanner.Text()), true, nil
-				}
-				return states.ThunkFromIter(iter)
-			},
-			nil,
-		),
 		expressions.RegularFuncer(
 			types.NewArr(types.Str{}),
 			"blocks",
@@ -115,38 +61,7 @@ func initIO() {
 			},
 			nil,
 		),
-		expressions.SimpleFuncer(
-			types.NewVar("A", types.Any{}),
-			"out",
-			nil,
-			types.NewVar("A", types.Any{}),
-			func(inputValue states.Value, args []states.Value) (states.Value, error) {
-				str, err := inputValue.Str()
-				if err != nil {
-					return nil, err
-				}
-				fmt.Println(str)
-				return inputValue, nil
-			},
-		),
-		expressions.SimpleFuncer(
-			types.NewVar("A", types.Any{}),
-			"out",
-			[]types.Type{
-				types.Str{},
-			},
-			types.NewVar("A", types.Any{}),
-			func(inputValue states.Value, args []states.Value) (states.Value, error) {
-				str, err := inputValue.Str()
-				if err != nil {
-					return nil, err
-				}
-				end := string(args[0].(states.StrValue))
-				fmt.Print(str)
-				fmt.Print(end)
-				return inputValue, nil
-			},
-		),
+		// for <A> err <A>
 		expressions.SimpleFuncer(
 			types.NewVar("A", types.Any{}),
 			"err",
@@ -161,6 +76,7 @@ func initIO() {
 				return inputValue, nil
 			},
 		),
+		// for <A> err(Str) <A>
 		expressions.SimpleFuncer(
 			types.NewVar("A", types.Any{}),
 			"err",
@@ -176,6 +92,98 @@ func initIO() {
 				end := string(args[0].(states.StrValue))
 				fmt.Fprint(os.Stderr, str)
 				fmt.Fprint(os.Stderr, end)
+				return inputValue, nil
+			},
+		),
+		// for Any in Reader
+		expressions.SimpleFuncer(
+			types.Any{},
+			"in",
+			nil,
+			types.Reader{},
+			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
+				return states.ReaderValue{Reader: os.Stdin}, nil
+			},
+		),
+		// for Reader json Any
+		expressions.RegularFuncer(
+			types.Reader{},
+			"json",
+			nil,
+			types.Any{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				reader := inputState.Value.(states.ReaderValue).Reader
+				dec := json.NewDecoder(reader)
+				output := func() (states.Value, bool, error) {
+					if !dec.More() {
+						return nil, false, nil
+					}
+					var o any
+					err := dec.Decode(o)
+					if err != nil {
+						return nil, false, err
+					}
+					val, err := thunkFromData(o).Eval()
+					if err != nil {
+						return nil, false, err
+					}
+					return val, true, nil
+				}
+				return states.ThunkFromIter(output)
+			},
+			nil,
+		),
+		// for Reader lines Arr<Str>
+		expressions.RegularFuncer(
+			types.Reader{},
+			"lines",
+			nil,
+			types.NewArr(types.Str{}),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				reader := inputState.Value.(states.ReaderValue)
+				scanner := bufio.NewScanner(reader.Reader)
+				iter := func() (states.Value, bool, error) {
+					ok := scanner.Scan()
+					if !ok {
+						return nil, false, nil
+					}
+					return states.StrValue(scanner.Text()), true, nil
+				}
+				return states.ThunkFromIter(iter)
+			},
+			nil,
+		),
+		// for <A> out <A>
+		expressions.SimpleFuncer(
+			types.NewVar("A", types.Any{}),
+			"out",
+			nil,
+			types.NewVar("A", types.Any{}),
+			func(inputValue states.Value, args []states.Value) (states.Value, error) {
+				str, err := inputValue.Str()
+				if err != nil {
+					return nil, err
+				}
+				fmt.Println(str)
+				return inputValue, nil
+			},
+		),
+		// for <A> out(Str) <A>
+		expressions.SimpleFuncer(
+			types.NewVar("A", types.Any{}),
+			"out",
+			[]types.Type{
+				types.Str{},
+			},
+			types.NewVar("A", types.Any{}),
+			func(inputValue states.Value, args []states.Value) (states.Value, error) {
+				str, err := inputValue.Str()
+				if err != nil {
+					return nil, err
+				}
+				end := string(args[0].(states.StrValue))
+				fmt.Print(str)
+				fmt.Print(end)
 				return inputValue, nil
 			},
 		),
