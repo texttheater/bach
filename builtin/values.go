@@ -23,51 +23,66 @@ func initValues() {
 				return inputValue, nil
 			},
 		),
-		expressions.SimpleFuncer(
+		expressions.RegularFuncer(
 			types.Str{},
 			"parseFloat",
 			nil,
 			types.Num{},
-			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
-				s := string(inputValue.(states.StrValue))
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				s := string(inputState.Value.(states.StrValue))
 				n, err := strconv.ParseFloat(s, 64)
 				if err != nil {
-					return nil, err
+					return states.ThunkFromError(errors.ValueError(
+						errors.Pos(pos),
+						errors.Code(errors.UnexpectedValue),
+						errors.Message(err.Error()),
+					))
 				}
-				return states.NumValue(n), nil
+				return states.ThunkFromValue(states.NumValue(n))
 			},
+			nil,
 		),
-		expressions.SimpleFuncer(
+		expressions.RegularFuncer(
 			types.Str{},
 			"parseInt",
-			[]types.Type{
-				types.Num{},
+			[]*params.Param{
+				params.SimpleParam(types.Num{}),
 			},
 			types.Num{},
-			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
-				s := string(inputValue.(states.StrValue))
-				b := argValues[0].(states.NumValue)
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				s := string(inputState.Value.(states.StrValue))
+				b, err := args[0](inputState.Clear(), nil).EvalNum()
 				n, err := strconv.ParseInt(s, int(b), 64)
 				if err != nil {
-					return nil, err
+					return states.ThunkFromError(errors.ValueError(
+						errors.Pos(pos),
+						errors.Code(errors.UnexpectedValue),
+						errors.Message(err.Error()),
+					))
 				}
-				return states.NumValue(n), nil
+				return states.ThunkFromValue(states.NumValue(n))
 			},
+			nil,
 		),
-		expressions.SimpleFuncer(
+		expressions.RegularFuncer(
 			types.Str{},
 			"parseInt",
 			nil,
 			types.Num{},
-			func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
-				s := string(inputValue.(states.StrValue))
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				s := string(inputState.Value.(states.StrValue))
 				b := 10
 				n, err := strconv.ParseInt(s, int(b), 64)
 				if err != nil {
-					return nil, err
+					return states.ThunkFromError(errors.ValueError(
+						errors.Pos(pos),
+						errors.Code(errors.UnexpectedValue),
+						errors.Message(err.Error()),
+					))
 				}
-				return states.NumValue(n), nil
+				return states.ThunkFromValue(states.NumValue(n))
 			},
+			nil,
 		),
 		expressions.RegularFuncer(
 			types.Str{},
@@ -79,7 +94,11 @@ func initValues() {
 				var data any
 				err := json.Unmarshal([]byte(str), &data)
 				if err != nil {
-					return states.ThunkFromError(err)
+					return states.ThunkFromError(errors.ValueError(
+						errors.Pos(pos),
+						errors.Code(errors.UnexpectedValue),
+						errors.Message(err.Error()),
+					))
 				}
 				return thunkFromData(data, pos)
 			},
@@ -97,7 +116,11 @@ func initValues() {
 				}
 				bytes, err := json.Marshal(data)
 				if err != nil {
-					return states.ThunkFromError(err)
+					return states.ThunkFromError(errors.ValueError(
+						errors.Pos(pos),
+						errors.Code(errors.UnexpectedValue),
+						errors.Message(err.Error()),
+					))
 				}
 				return states.ThunkFromValue(states.StrValue(bytes))
 			},
