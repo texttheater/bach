@@ -11,6 +11,31 @@ import (
 
 func initObj() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		// for Obj<Any> +(Obj<Any>) Obj<Any>
+		expressions.RegularFuncer(
+			types.AnyObj,
+			"+",
+			[]*params.Param{
+				params.SimpleParam(types.AnyObj),
+			},
+			types.AnyObj,
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				res := states.ObjValue{}
+				for k, v := range inputState.Value.(states.ObjValue) {
+					res[k] = v
+				}
+				arg, err := args[0](inputState.Clear(), nil).EvalObj()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				for k, v := range arg {
+					res[k] = v
+				}
+				return states.ThunkFromValue(res)
+			},
+			nil,
+		),
+		// for Obj<<A>> get(Str) <A>
 		expressions.RegularFuncer(
 			types.Obj{
 				Props: map[string]types.Type{},
