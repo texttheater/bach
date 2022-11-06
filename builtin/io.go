@@ -119,7 +119,7 @@ func initIO() {
 						return nil, false, nil
 					}
 					var o any
-					err := dec.Decode(o)
+					err := dec.Decode(&o)
 					if err != nil {
 						return nil, false, err
 					}
