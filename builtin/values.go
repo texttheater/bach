@@ -81,7 +81,7 @@ func initValues() {
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
-				return thunkFromData(data)
+				return thunkFromData(data, pos)
 			},
 			nil,
 		),
@@ -109,7 +109,7 @@ func initValues() {
 	})
 }
 
-func thunkFromData(data any) *states.Thunk {
+func thunkFromData(data any, pos lexer.Position) *states.Thunk {
 	switch data := data.(type) {
 	case nil:
 		return states.ThunkFromValue(states.NullValue{})
@@ -125,7 +125,7 @@ func thunkFromData(data any) *states.Thunk {
 			if i >= len(data) {
 				return nil, false, nil
 			}
-			val, err := thunkFromData(data[i]).Eval()
+			val, err := thunkFromData(data[i], pos).Eval()
 			if err != nil {
 				return nil, false, err
 			}
@@ -136,11 +136,13 @@ func thunkFromData(data any) *states.Thunk {
 	case map[string]any:
 		obj := make(map[string]*states.Thunk)
 		for k, v := range data {
-			obj[k] = thunkFromData(v)
+			obj[k] = thunkFromData(v, pos)
 		}
 		return states.ThunkFromValue(states.ObjValue(obj))
 	default:
 		return states.ThunkFromError(errors.ValueError(
+			errors.Pos(pos),
+			errors.Code(errors.UnexpectedValue),
 			errors.Message("encountered unexpected object while converting from JSON"),
 		))
 	}

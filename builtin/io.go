@@ -123,7 +123,7 @@ func initIO() {
 					if err != nil {
 						return nil, false, err
 					}
-					val, err := thunkFromData(o).Eval()
+					val, err := thunkFromData(o, pos).Eval()
 					if err != nil {
 						return nil, false, err
 					}
