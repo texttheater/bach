@@ -87,6 +87,24 @@ func initValues() {
 		),
 		expressions.RegularFuncer(
 			types.Any{},
+			"toJSON",
+			nil,
+			types.Str{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				data, err := inputState.Value.Data()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				bytes, err := json.Marshal(data)
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				return states.ThunkFromValue(states.StrValue(bytes))
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
+			types.Any{},
 			"==",
 			[]*params.Param{
 				params.SimpleParam((types.Any{})),
