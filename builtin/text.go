@@ -6,6 +6,7 @@ import (
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -73,6 +74,24 @@ func initText() {
 					return v, true, nil
 				}
 				return states.ThunkFromIter(iter)
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
+			types.Str{},
+			"find",
+			[]*params.Param{
+				params.SimpleParam(types.Str{}),
+			},
+			types.Num{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				haystack := string(inputState.Value.(states.StrValue))
+				needle, err := args[0](inputState.Clear(), nil).EvalStr()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				result := states.NumValue(strings.Index(haystack, needle))
+				return states.ThunkFromValue(result)
 			},
 			nil,
 		),
