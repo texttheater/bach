@@ -217,3 +217,14 @@ func ThunkFromSlice(slice []Value) *Thunk {
 	}
 	return ThunkFromIter(iter)
 }
+
+func ThunkFromChannel(c <-chan Value) *Thunk {
+	iter := func() (Value, bool, error) {
+		v := <-c
+		if v == nil {
+			return nil, false, nil
+		}
+		return v, true, nil
+	}
+	return ThunkFromIter(iter)
+}
