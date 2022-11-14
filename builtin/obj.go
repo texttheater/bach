@@ -35,7 +35,7 @@ func initObj() {
 			},
 			nil,
 		),
-		// for Obj<<A>> get(Str) <A>
+		// for Obj<<A>> get(Str|Str) <A>
 		expressions.RegularFuncer(
 			types.Obj{
 				Props: map[string]types.Type{},
@@ -68,6 +68,32 @@ func initObj() {
 					return states.ThunkFromError(err)
 				}
 				return states.ThunkFromValue(val)
+			},
+			nil,
+		),
+		// for Obj<<A>> has(Str|Num) Bool
+		expressions.RegularFuncer(
+			types.Obj{
+				Props: map[string]types.Type{},
+				Rest:  types.NewVar("A", types.Any{}),
+			},
+			"has",
+			[]*params.Param{
+				params.SimpleParam(types.NewUnion(types.Str{}, types.Num{})),
+			},
+			types.Bool{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				inputValue := inputState.Value.(states.ObjValue)
+				val, err := args[0](inputState.Clear(), nil).Eval()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				prop, err := val.Str() // TODO ???
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				_, ok := inputValue[prop]
+				return states.ThunkFromValue(states.BoolValue(ok))
 			},
 			nil,
 		),
