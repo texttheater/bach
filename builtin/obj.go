@@ -97,6 +97,42 @@ func initObj() {
 			},
 			nil,
 		),
+		// for Obj<<A>> items Arr<Tup<Str, <A>>>
+		expressions.RegularFuncer(
+			types.Obj{
+				Props: map[string]types.Type{},
+				Rest:  types.NewVar("A", types.Any{}),
+			},
+			"items",
+			nil,
+			types.NewArr(
+				types.NewTup([]types.Type{
+					types.Str{},
+					types.NewVar("A", types.Any{}),
+				}),
+			),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				inputValue := inputState.Value.(states.ObjValue)
+				c := make(chan *states.Thunk)
+				go func() {
+					for prop, thk := range inputValue {
+						val, err := thk.Eval()
+						if err != nil {
+							c <- states.ThunkFromError(err)
+							return
+						}
+						item := states.NewArrValue([]states.Value{
+							states.StrValue(prop),
+							val,
+						})
+						c <- states.ThunkFromValue(item)
+					}
+					c <- states.ThunkFromValue(nil)
+				}()
+				return states.ThunkFromChannel(c)
+			},
+			nil,
+		),
 		// for Obj<<A>> props Arr<Str>
 		expressions.RegularFuncer(
 			types.Obj{
