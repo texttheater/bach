@@ -762,6 +762,94 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> sortBy(for <A> Num) Arr<<A>>
+		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
+			"sortBy",
+			[]*params.Param{
+				{
+					InputType:  types.NewVar("A", types.Any{}),
+					Params:     nil,
+					OutputType: types.Num{},
+				},
+			},
+			types.NewArr(types.NewVar("A", types.Any{})),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				slice, err := states.SliceFromValue(inputState.Value)
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				less := func(i, j int) bool {
+					key := args[0]
+					keyInputState := states.State{
+						Value: slice[i],
+						Stack: inputState.Stack,
+					}
+					a, err2 := key(keyInputState, nil).EvalNum()
+					if err2 != nil {
+						err = err2
+						return true
+					}
+					keyInputState.Value = slice[j]
+					b, err2 := key(keyInputState, nil).EvalNum()
+					if err2 != nil {
+						err = err2
+						return true
+					}
+					return a < b
+				}
+				sort.SliceStable(slice, less)
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				return states.ThunkFromSlice(slice)
+			},
+			nil,
+		),
+		// for Arr<<A>> sortBy(for <A> Str) Arr<<A>>
+		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
+			"sortBy",
+			[]*params.Param{
+				{
+					InputType:  types.NewVar("A", types.Any{}),
+					Params:     nil,
+					OutputType: types.Str{},
+				},
+			},
+			types.NewArr(types.NewVar("A", types.Any{})),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				slice, err := states.SliceFromValue(inputState.Value)
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				less := func(i, j int) bool {
+					key := args[0]
+					keyInputState := states.State{
+						Value: slice[i],
+						Stack: inputState.Stack,
+					}
+					a, err2 := key(keyInputState, nil).EvalStr()
+					if err2 != nil {
+						err = err2
+						return true
+					}
+					keyInputState.Value = slice[j]
+					b, err2 := key(keyInputState, nil).EvalStr()
+					if err2 != nil {
+						err = err2
+						return true
+					}
+					return a < b
+				}
+				sort.SliceStable(slice, less)
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				return states.ThunkFromSlice(slice)
+			},
+			nil,
+		),
 		// for Arr<<A>> sortBy(for <A> <B>, for <B> (<B>) Bool) Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
