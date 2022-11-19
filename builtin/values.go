@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/alecthomas/participle/lexer"
@@ -126,6 +127,50 @@ func initValues() {
 					))
 				}
 				return states.ThunkFromValue(states.StrValue(bytes))
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
+			types.NewArr(types.NewTup([]types.Type{
+				types.NewUnion(types.Str{}, types.Num{}),
+				types.NewVar("A", types.Any{}),
+			})),
+			"toObj",
+			nil,
+			types.Obj{
+				Props: map[string]types.Type{},
+				Rest:  types.NewVar("A", types.Any{}),
+			},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				var res states.ObjValue = make(map[string]*states.Thunk)
+				iter := states.IterFromValue(inputState.Value)
+				for {
+					val, ok, err := iter()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					if !ok {
+						break
+					}
+					arr := val.(*states.ArrValue)
+					prop := arr.Head
+					var k string
+					switch prop := prop.(type) {
+					case states.StrValue:
+						k = string(prop)
+					case states.NumValue:
+						k = fmt.Sprintf("%f", prop)
+					default:
+						panic("unexpected type")
+					}
+					tail, err := arr.Tail.Eval()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					v := states.ThunkFromValue(tail.(*states.ArrValue).Head)
+					res[k] = v
+				}
+				return states.ThunkFromValue(res)
 			},
 			nil,
 		),
