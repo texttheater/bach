@@ -110,10 +110,32 @@ func initObj() {
 				inputValue := inputState.Value.(states.ObjValue)
 				c := make(chan *states.Thunk)
 				go func() {
-					for p := range inputValue {
+					for prop := range inputValue {
 						c <- states.ThunkFromValue(
-							states.StrValue(p),
+							states.StrValue(prop),
 						)
+					}
+					c <- states.ThunkFromValue(nil)
+				}()
+				return states.ThunkFromChannel(c)
+			},
+			nil,
+		),
+		// for Obj<<A>> values Arr<<A>>
+		expressions.RegularFuncer(
+			types.Obj{
+				Props: map[string]types.Type{},
+				Rest:  types.NewVar("A", types.Any{}),
+			},
+			"values",
+			nil,
+			types.NewArr(types.NewVar("A", types.Any{})),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				inputValue := inputState.Value.(states.ObjValue)
+				c := make(chan *states.Thunk)
+				go func() {
+					for _, thk := range inputValue {
+						c <- thk
 					}
 					c <- states.ThunkFromValue(nil)
 				}()
