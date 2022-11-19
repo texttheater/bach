@@ -51,4 +51,18 @@ func TestObjects(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`{a: 1, b: 2} props sort`,
+		`Arr<Str>`,
+		`["a", "b"]`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`{} props`,
+		`Arr<Str>`,
+		`[]`,
+		nil,
+		t,
+	)
 }
