@@ -179,5 +179,35 @@ func initObj() {
 			},
 			nil,
 		),
+		// for Obj<<A>> without(Str) Obj<<A>>
+		expressions.RegularFuncer(
+			types.Obj{
+				Props: map[string]types.Type{},
+				Rest:  types.NewVar("A", types.Any{}),
+			},
+			"without",
+			[]*params.Param{
+				params.SimpleParam(types.Str{}),
+			},
+			types.Obj{
+				Props: map[string]types.Type{},
+				Rest:  types.NewVar("A", types.Any{}),
+			},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				inputValue := inputState.Value.(states.ObjValue)
+				prop, err := args[0](inputState.Clear(), nil).EvalStr()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				res := states.ObjValue{}
+				for k, v := range inputValue {
+					if k != prop {
+						res[k] = v
+					}
+				}
+				return states.ThunkFromValue(res)
+			},
+			nil,
+		),
 	})
 }
