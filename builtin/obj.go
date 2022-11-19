@@ -108,12 +108,14 @@ func initObj() {
 			types.NewArr(types.Str{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				inputValue := inputState.Value.(states.ObjValue)
-				c := make(chan states.Value)
+				c := make(chan *states.Thunk)
 				go func() {
 					for p := range inputValue {
-						c <- states.StrValue(p)
+						c <- states.ThunkFromValue(
+							states.StrValue(p),
+						)
 					}
-					c <- nil
+					c <- states.ThunkFromValue(nil)
 				}()
 				return states.ThunkFromChannel(c)
 			},
