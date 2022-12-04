@@ -36,6 +36,29 @@ func initText() {
 			},
 			nil,
 		),
+		// for Arr<Num> bytesToStr Str
+		expressions.RegularFuncer(
+			types.NewArr(types.Num{}),
+			"bytesToStr",
+			nil,
+			types.Str{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				input := states.IterFromValue(inputState.Value)
+				var output strings.Builder
+				for {
+					v, ok, err := input()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					if !ok {
+						break
+					}
+					output.WriteByte(byte(v.(states.NumValue)))
+				}
+				return states.ThunkFromValue(states.StrValue(output.String()))
+			},
+			nil,
+		),
 		// for Str codePoints Arr<Num>
 		expressions.RegularFuncer(
 			types.Str{},
@@ -55,6 +78,29 @@ func initText() {
 					return v, true, nil
 				}
 				return states.ThunkFromIter(output)
+			},
+			nil,
+		),
+		// for Arr<Num> codePointsToStr Str
+		expressions.RegularFuncer(
+			types.NewArr(types.Num{}),
+			"codePointsToStr",
+			nil,
+			types.Str{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				input := states.IterFromValue(inputState.Value)
+				var output strings.Builder
+				for {
+					v, ok, err := input()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					if !ok {
+						break
+					}
+					output.WriteRune(rune(v.(states.NumValue)))
+				}
+				return states.ThunkFromValue(states.StrValue(output.String()))
 			},
 			nil,
 		),
