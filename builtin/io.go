@@ -14,8 +14,8 @@ import (
 )
 
 func initIO() {
-	// for Arr<Str> blocks Arr<Arr<Str>>
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		// for Arr<Str> blocks Arr<Arr<Str>>
 		expressions.RegularFuncer(
 			types.NewArr(types.Str{}),
 			"blocks",

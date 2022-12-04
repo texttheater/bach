@@ -13,6 +13,7 @@ import (
 
 func initText() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		// for Str bytes Arr<Num>
 		expressions.RegularFuncer(
 			types.Str{},
 			"bytes",
@@ -35,6 +36,7 @@ func initText() {
 			},
 			nil,
 		),
+		// for Str codePoints Arr<Num>
 		expressions.RegularFuncer(
 			types.Str{},
 			"codePoints",
@@ -56,6 +58,7 @@ func initText() {
 			},
 			nil,
 		),
+		// for Str fields Arr<Str>
 		expressions.RegularFuncer(
 			types.Str{},
 			"fields",
@@ -77,6 +80,7 @@ func initText() {
 			},
 			nil,
 		),
+		// for Str find(Str) Num
 		expressions.RegularFuncer(
 			types.Str{},
 			"find",
@@ -95,6 +99,7 @@ func initText() {
 			},
 			nil,
 		),
+		// for Arr<Str> join Str
 		expressions.SimpleFuncer(
 			types.NewArr(types.Str{}),
 			"join",
@@ -115,6 +120,7 @@ func initText() {
 				}
 			},
 		),
+		// for Arr<Str> join(Str) Str
 		expressions.SimpleFuncer(
 			types.NewArr(types.Str{}),
 			"join",
@@ -141,6 +147,7 @@ func initText() {
 				}
 			},
 		),
+		// for Str <(Str) Bool
 		expressions.SimpleFuncer(
 			types.Str{},
 			"<",
@@ -152,6 +159,7 @@ func initText() {
 				return states.BoolValue(str1 < str2), nil
 			},
 		),
+		// for Str >(Str) Bool
 		expressions.SimpleFuncer(
 			types.Str{},
 			">",
@@ -163,6 +171,7 @@ func initText() {
 				return states.BoolValue(str1 > str2), nil
 			},
 		),
+		// for Str <=(Str) Bool
 		expressions.SimpleFuncer(
 			types.Str{},
 			"<=",
@@ -174,6 +183,7 @@ func initText() {
 				return states.BoolValue(str1 <= str2), nil
 			},
 		),
+		// for Str >=(Str) Bool
 		expressions.SimpleFuncer(
 			types.Str{},
 			">=",
@@ -185,6 +195,7 @@ func initText() {
 				return states.BoolValue(str1 >= str2), nil
 			},
 		),
+		// for Str +(Str) Bool
 		expressions.SimpleFuncer(
 			types.Str{},
 			"+",
@@ -196,6 +207,7 @@ func initText() {
 				return states.StrValue(str1 + str2), nil
 			},
 		),
+		// for Str startsWith(Str) Bool
 		expressions.SimpleFuncer(
 			types.Str{},
 			"startsWith",
@@ -207,6 +219,7 @@ func initText() {
 				return states.BoolValue(strings.HasPrefix(str1, str2)), nil
 			},
 		),
+		// for Str endsWith(Str) Bool
 		expressions.SimpleFuncer(
 			types.Str{},
 			"endsWith",
@@ -218,6 +231,7 @@ func initText() {
 				return states.BoolValue(strings.HasSuffix(str1, str2)), nil
 			},
 		),
+		// for Str slice(Num) Str
 		expressions.SimpleFuncer(
 			types.Str{},
 			"slice",
@@ -235,6 +249,7 @@ func initText() {
 				return states.StrValue(str[start:]), nil
 			},
 		),
+		// for Str slice(Num, Num) Str
 		expressions.SimpleFuncer(
 			types.Str{},
 			"slice",
@@ -262,6 +277,7 @@ func initText() {
 				return states.StrValue(str[start:end]), nil
 			},
 		),
+		// for Str repeat(Num) Str
 		expressions.SimpleFuncer(
 			types.Str{},
 			"repeat",
