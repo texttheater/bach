@@ -193,6 +193,21 @@ func initValues() {
 			},
 			nil,
 		),
+		// for Any toStr Str
+		expressions.RegularFuncer(
+			types.Any{},
+			"toStr",
+			nil,
+			types.Str{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				str, err := inputState.Value.Str()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				return states.ThunkFromValue(states.StrValue(str))
+			},
+			nil,
+		),
 	})
 }
 
