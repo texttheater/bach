@@ -627,6 +627,44 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> repeat(Num) Arr<<A>>
+		expressions.RegularFuncer(
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
+			"repeat",
+			[]*params.Param{
+				params.SimpleParam(types.Num{}),
+			},
+			types.NewArr(
+				types.NewVar("A", types.Any{}),
+			),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				input := inputState.Value.(*states.ArrValue)
+				n, err := args[0](inputState.Clear(), nil).EvalNum()
+				nInt := int(n)
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				c := make(chan *states.Thunk)
+				go func() {
+					for i := 0; i < nInt; i++ {
+						arr := input
+						for arr != nil {
+							c <- states.ThunkFromValue(arr.Head)
+							arr, err = arr.Tail.EvalArr()
+							if err != nil {
+								c <- states.ThunkFromError(err)
+								return
+							}
+						}
+					}
+					c <- states.ThunkFromValue(nil)
+				}()
+				return states.ThunkFromChannel(c)
+			},
+			nil,
+		),
 		// for Arr<<A>> rev Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(
