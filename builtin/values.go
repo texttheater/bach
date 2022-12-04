@@ -14,6 +14,29 @@ import (
 
 func initValues() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		// for Any ==(Any) Bool
+		expressions.RegularFuncer(
+			types.Any{},
+			"==",
+			[]*params.Param{
+				params.SimpleParam((types.Any{})),
+			},
+			types.Bool{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				a := inputState.Value
+				b, err := args[0](inputState.Clear(), nil).Eval()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				equal, err := a.Equal(b)
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				return states.ThunkFromValue(states.BoolValue(equal))
+			},
+			nil,
+		),
+		// for <A> id <A>
 		expressions.SimpleFuncer(
 			types.NewVar("A", types.Any{}),
 			"id",
@@ -23,6 +46,7 @@ func initValues() {
 				return inputValue, nil
 			},
 		),
+		// for Str parseFloat Num
 		expressions.RegularFuncer(
 			types.Str{},
 			"parseFloat",
@@ -42,6 +66,7 @@ func initValues() {
 			},
 			nil,
 		),
+		// for Str parseInt(Num) Num
 		expressions.RegularFuncer(
 			types.Str{},
 			"parseInt",
@@ -67,6 +92,7 @@ func initValues() {
 			},
 			nil,
 		),
+		// for Str parseInt Num
 		expressions.RegularFuncer(
 			types.Str{},
 			"parseInt",
@@ -87,6 +113,7 @@ func initValues() {
 			},
 			nil,
 		),
+		// for Str parseJSON Any
 		expressions.RegularFuncer(
 			types.Str{},
 			"parseJSON",
@@ -107,6 +134,7 @@ func initValues() {
 			},
 			nil,
 		),
+		// for Any toJSON Str
 		expressions.RegularFuncer(
 			types.Any{},
 			"toJSON",
@@ -129,6 +157,7 @@ func initValues() {
 			},
 			nil,
 		),
+		// for Arr<Tup<Str, <A>>> toObj Obj<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(types.NewTup([]types.Type{
 				types.Str{},
@@ -161,27 +190,6 @@ func initValues() {
 					res[prop] = v
 				}
 				return states.ThunkFromValue(res)
-			},
-			nil,
-		),
-		expressions.RegularFuncer(
-			types.Any{},
-			"==",
-			[]*params.Param{
-				params.SimpleParam((types.Any{})),
-			},
-			types.Bool{},
-			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				a := inputState.Value
-				b, err := args[0](inputState.Clear(), nil).Eval()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				equal, err := a.Equal(b)
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				return states.ThunkFromValue(states.BoolValue(equal))
 			},
 			nil,
 		),
