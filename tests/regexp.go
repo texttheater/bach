@@ -238,4 +238,32 @@ func TestRegexp(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`"" replaceFirst(~bc~, "hurz")`,
+		`Str`,
+		`""`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abcd" replaceFirst(~bc~, "hurz")`,
+		`Str`,
+		`"ahurzd"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abcdabcd" replaceFirst(~bc~, "hurz")`,
+		`Str`,
+		`"ahurzdabcd"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abcd" replaceFirst(~bd~, "hurz")`,
+		`Str`,
+		`"abcd"`,
+		nil,
+		t,
+	)
 }

@@ -70,6 +70,57 @@ func initRegexp() {
 		),
 		expressions.RegularFuncer(
 			types.Str{},
+			"replaceFirst",
+			[]*params.Param{
+				{
+					InputType: types.Str{},
+					OutputType: types.NewUnion(
+						types.Null{},
+						types.Obj{
+							Props: map[string]types.Type{
+								"start": types.Num{},
+								"0":     types.Str{},
+							},
+							Rest: types.Any{},
+						},
+					),
+				},
+				params.SimpleParam(types.Str{}),
+			},
+			types.Str{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				match, err := args[0](inputState, nil).Eval()
+				if err != nil {
+					return states.ThunkFromError(nil)
+				}
+				switch match := match.(type) {
+				case states.NullValue:
+					return states.ThunkFromValue(inputState.Value)
+				case states.ObjValue:
+					old := string(inputState.Value.(states.StrValue))
+					start, err := match["start"].EvalInt()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					replaced, err := match["0"].EvalStr()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					length := len(replaced)
+					replacement, err := args[1](inputState.Clear(), nil).EvalStr()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					new_ := old[:start] + replacement + old[start+length:]
+					return states.ThunkFromValue(states.StrValue(new_))
+				default:
+					panic("unexpected type")
+				}
+			},
+			nil,
+		),
+		expressions.RegularFuncer(
+			types.Str{},
 			"split",
 			[]*params.Param{
 				{
