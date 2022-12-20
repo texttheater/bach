@@ -12,6 +12,7 @@ import (
 
 func initRegexp() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		// for Str findAll(for Str <A Null|Obj<start: Num, 0: Str, Any>>) Arr<<A>>
 		expressions.RegularFuncer(
 			types.Str{},
 			"findAll",
@@ -68,6 +69,7 @@ func initRegexp() {
 			},
 			nil,
 		),
+		// for Str replaceFirst(for Str Null|Obj<start: Num, 0: Str, Any>, Str) Str
 		expressions.RegularFuncer(
 			types.Str{},
 			"replaceFirst",
@@ -119,6 +121,13 @@ func initRegexp() {
 			},
 			nil,
 		),
+		// for Str replaceFirst(for Str Null|Obj<start: Num, 0: Str, Any>, Obj<start: Num, 0: Str, Any>) Str
+		// TODO
+		// for Str replaceAll(for Str Null|Obj<start: Num, 0: Str, Any>, Str) Str
+		// TODO
+		// for Str replaceAll(for Str Null|Obj<start: Num, 0: Str, Any>, Obj<start: Num, 0: Str, Any>) Str
+		// TODO
+		// for Str split(for Str Null|Obj<start: Num, 0: Str, Any>) Arr<Str>
 		expressions.RegularFuncer(
 			types.Str{},
 			"split",
@@ -145,6 +154,7 @@ func initRegexp() {
 			},
 			nil,
 		),
+		// for Str split(for Str Null|Obj<start: Num, 0: Str, Any>, Num) Arr<Str>
 		expressions.RegularFuncer(
 			types.Str{},
 			"split",
