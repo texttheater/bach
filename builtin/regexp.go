@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	"strings"
 	"unicode/utf8"
 
 	"github.com/alecthomas/participle/lexer"
@@ -121,11 +122,66 @@ func initRegexp() {
 			},
 			nil,
 		),
-		// for Str replaceFirst(for Str Null|Obj<start: Num, 0: Str, Any>, Obj<start: Num, 0: Str, Any>) Str
+		// for Str replaceFirst(for Str Null|Obj<start: Num, 0: Str, Any>, for Obj<start: Num, 0: Str, Any> Str) Str
 		// TODO
 		// for Str replaceAll(for Str Null|Obj<start: Num, 0: Str, Any>, Str) Str
-		// TODO
-		// for Str replaceAll(for Str Null|Obj<start: Num, 0: Str, Any>, Obj<start: Num, 0: Str, Any>) Str
+		expressions.RegularFuncer(
+			types.Str{},
+			"replaceAll",
+			[]*params.Param{
+				{
+					InputType: types.Str{},
+					OutputType: types.NewVar("A", types.NewUnion(
+						types.Null{},
+						types.Obj{
+							Props: map[string]types.Type{
+								"start": types.Num{},
+								"0":     types.Str{},
+							},
+							Rest: types.Any{},
+						},
+					)),
+				},
+				params.SimpleParam(types.Str{}),
+			},
+			types.Str{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				input := string(inputState.Value.(states.StrValue))
+				replacement, err := args[1](inputState.Clear(), nil).EvalStr()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				var output strings.Builder
+			loop:
+				for {
+					val, err := args[0](inputState.Replace(states.StrValue(input)), nil).Eval()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					switch m := val.(type) {
+					case states.NullValue:
+						output.WriteString(input)
+						break loop
+					case states.ObjValue:
+						start, err := m["start"].EvalInt()
+						if err != nil {
+							return states.ThunkFromError(err)
+						}
+						group, err := m["0"].EvalStr()
+						if err != nil {
+							return states.ThunkFromError(err)
+						}
+						length := len(group)
+						output.WriteString(input[:start])
+						output.WriteString(replacement)
+						input = input[start+length:]
+					}
+				}
+				return states.ThunkFromValue(states.StrValue(output.String()))
+			},
+			nil,
+		),
+		// for Str replaceAll(for Str Null|Obj<start: Num, 0: Str, Any>, for Obj<start: Num, 0: Str, Any> Str) Str
 		// TODO
 		// for Str split(for Str Null|Obj<start: Num, 0: Str, Any>) Arr<Str>
 		expressions.RegularFuncer(

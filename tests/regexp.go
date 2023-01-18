@@ -266,4 +266,25 @@ func TestRegexp(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`"" replaceAll(~a~, "b")`,
+		`Str`,
+		`""`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"ababa" replaceAll(~a~, "b")`,
+		`Str`,
+		`"bbbbb"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"babab" replaceAll(~a~, "b")`,
+		`Str`,
+		`"bbbbb"`,
+		nil,
+		t,
+	)
 }
