@@ -287,4 +287,18 @@ func TestRegexp(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`" a b c " replaceFirst(~[abc]~, "({@0})")`,
+		`Str`,
+		`" (a) b c "`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`" a b c " replaceAll(~[abc]~, "({@0})")`,
+		`Str`,
+		`" (a) (b) (c) "`,
+		nil,
+		t,
+	)
 }

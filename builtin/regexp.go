@@ -88,7 +88,16 @@ func initRegexp() {
 						},
 					),
 				},
-				params.SimpleParam(types.Str{}),
+				{
+					InputType: types.Obj{
+						Props: map[string]types.Type{
+							"start": types.Num{},
+							"0":     types.Str{},
+						},
+						Rest: types.Any{},
+					},
+					OutputType: types.Str{},
+				},
 			},
 			types.Str{},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -110,7 +119,7 @@ func initRegexp() {
 						return states.ThunkFromError(err)
 					}
 					length := len(replaced)
-					replacement, err := args[1](inputState.Clear(), nil).EvalStr()
+					replacement, err := args[1](inputState.Replace(match), nil).EvalStr()
 					if err != nil {
 						return states.ThunkFromError(err)
 					}
@@ -122,8 +131,6 @@ func initRegexp() {
 			},
 			nil,
 		),
-		// for Str replaceFirst(for Str Null|Obj<start: Num, 0: Str, Any>, for Obj<start: Num, 0: Str, Any> Str) Str
-		// TODO
 		// for Str replaceAll(for Str Null|Obj<start: Num, 0: Str, Any>, Str) Str
 		expressions.RegularFuncer(
 			types.Str{},
@@ -142,15 +149,20 @@ func initRegexp() {
 						},
 					)),
 				},
-				params.SimpleParam(types.Str{}),
+				{
+					InputType: types.Obj{
+						Props: map[string]types.Type{
+							"start": types.Num{},
+							"0":     types.Str{},
+						},
+						Rest: types.Any{},
+					},
+					OutputType: types.Str{},
+				},
 			},
 			types.Str{},
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 				input := string(inputState.Value.(states.StrValue))
-				replacement, err := args[1](inputState.Clear(), nil).EvalStr()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
 				var output strings.Builder
 			loop:
 				for {
@@ -158,21 +170,25 @@ func initRegexp() {
 					if err != nil {
 						return states.ThunkFromError(err)
 					}
-					switch m := val.(type) {
+					switch match := val.(type) {
 					case states.NullValue:
 						output.WriteString(input)
 						break loop
 					case states.ObjValue:
-						start, err := m["start"].EvalInt()
+						start, err := match["start"].EvalInt()
 						if err != nil {
 							return states.ThunkFromError(err)
 						}
-						group, err := m["0"].EvalStr()
+						group, err := match["0"].EvalStr()
 						if err != nil {
 							return states.ThunkFromError(err)
 						}
 						length := len(group)
 						output.WriteString(input[:start])
+						replacement, err := args[1](inputState.Replace(match), nil).EvalStr()
+						if err != nil {
+							return states.ThunkFromError(err)
+						}
 						output.WriteString(replacement)
 						input = input[start+length:]
 					}
@@ -181,8 +197,6 @@ func initRegexp() {
 			},
 			nil,
 		),
-		// for Str replaceAll(for Str Null|Obj<start: Num, 0: Str, Any>, for Obj<start: Num, 0: Str, Any> Str) Str
-		// TODO
 		// for Str split(for Str Null|Obj<start: Num, 0: Str, Any>) Arr<Str>
 		expressions.RegularFuncer(
 			types.Str{},
