@@ -126,10 +126,10 @@ func initText() {
 			},
 			nil,
 		),
-		// for Str find(Str) Num
+		// for Str indexOf(Str) Num
 		expressions.RegularFuncer(
 			types.Str{},
-			"find",
+			"indexOf",
 			[]*params.Param{
 				params.SimpleParam(types.Str{}),
 			},
@@ -145,6 +145,8 @@ func initText() {
 			},
 			nil,
 		),
+		// for Str indexOf(Str, Num) Num
+		// TODO
 		// for Arr<Str> join Str
 		expressions.SimpleFuncer(
 			types.NewArr(types.Str{}),

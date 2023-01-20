@@ -284,4 +284,18 @@ func TestText(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`"abc" indexOf"b"`,
+		`Num`,
+		`1`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"abc" indexOf"d"`,
+		`Num`,
+		`-1`,
+		nil,
+		t,
+	)
 }
