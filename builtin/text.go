@@ -13,6 +13,66 @@ import (
 
 func initText() {
 	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+		// for Str <(Str) Bool
+		expressions.SimpleFuncer(
+			types.Str{},
+			"<",
+			[]types.Type{types.Str{}},
+			types.Bool{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str1 := string(inputValue.(states.StrValue))
+				str2 := string(argumentValues[0].(states.StrValue))
+				return states.BoolValue(str1 < str2), nil
+			},
+		),
+		// for Str >(Str) Bool
+		expressions.SimpleFuncer(
+			types.Str{},
+			">",
+			[]types.Type{types.Str{}},
+			types.Bool{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str1 := string(inputValue.(states.StrValue))
+				str2 := string(argumentValues[0].(states.StrValue))
+				return states.BoolValue(str1 > str2), nil
+			},
+		),
+		// for Str <=(Str) Bool
+		expressions.SimpleFuncer(
+			types.Str{},
+			"<=",
+			[]types.Type{types.Str{}},
+			types.Bool{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str1 := string(inputValue.(states.StrValue))
+				str2 := string(argumentValues[0].(states.StrValue))
+				return states.BoolValue(str1 <= str2), nil
+			},
+		),
+		// for Str >=(Str) Bool
+		expressions.SimpleFuncer(
+			types.Str{},
+			">=",
+			[]types.Type{types.Str{}},
+			types.Bool{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str1 := string(inputValue.(states.StrValue))
+				str2 := string(argumentValues[0].(states.StrValue))
+				return states.BoolValue(str1 >= str2), nil
+			},
+		),
+		// for Str +(Str) Bool
+		expressions.SimpleFuncer(
+			types.Str{},
+			"+",
+			[]types.Type{types.Str{}},
+			types.Str{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str1 := string(inputValue.(states.StrValue))
+				str2 := string(argumentValues[0].(states.StrValue))
+				return states.StrValue(str1 + str2), nil
+			},
+		),
 		// for Str bytes Arr<Num>
 		expressions.RegularFuncer(
 			types.Str{},
@@ -193,65 +253,53 @@ func initText() {
 				}
 			},
 		),
-		// for Str <(Str) Bool
-		expressions.SimpleFuncer(
+		// for Str replaceFirst(Str, Str) Str
+		expressions.RegularFuncer(
 			types.Str{},
-			"<",
-			[]types.Type{types.Str{}},
-			types.Bool{},
-			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				str1 := string(inputValue.(states.StrValue))
-				str2 := string(argumentValues[0].(states.StrValue))
-				return states.BoolValue(str1 < str2), nil
+			"replaceFirst",
+			[]*params.Param{
+				params.SimpleParam(types.Str{}),
+				params.SimpleParam(types.Str{}),
 			},
+			types.Str{},
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				haystack := inputState.Value.(states.StrValue)
+				needle, err := args[0](inputState.Clear(), nil).EvalStr()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				replacement, err := args[1](inputState.Clear(), nil).EvalStr()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				result := strings.Replace(string(haystack), string(needle), string(replacement), 1)
+				return states.ThunkFromValue(states.StrValue(result))
+			},
+			nil,
 		),
-		// for Str >(Str) Bool
-		expressions.SimpleFuncer(
+		// for Str replaceFirst(Str, Str) Str
+		expressions.RegularFuncer(
 			types.Str{},
-			">",
-			[]types.Type{types.Str{}},
-			types.Bool{},
-			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				str1 := string(inputValue.(states.StrValue))
-				str2 := string(argumentValues[0].(states.StrValue))
-				return states.BoolValue(str1 > str2), nil
+			"replaceAll",
+			[]*params.Param{
+				params.SimpleParam(types.Str{}),
+				params.SimpleParam(types.Str{}),
 			},
-		),
-		// for Str <=(Str) Bool
-		expressions.SimpleFuncer(
 			types.Str{},
-			"<=",
-			[]types.Type{types.Str{}},
-			types.Bool{},
-			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				str1 := string(inputValue.(states.StrValue))
-				str2 := string(argumentValues[0].(states.StrValue))
-				return states.BoolValue(str1 <= str2), nil
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				haystack := inputState.Value.(states.StrValue)
+				needle, err := args[0](inputState.Clear(), nil).EvalStr()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				replacement, err := args[1](inputState.Clear(), nil).EvalStr()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				result := strings.ReplaceAll(string(haystack), string(needle), string(replacement))
+				return states.ThunkFromValue(states.StrValue(result))
 			},
-		),
-		// for Str >=(Str) Bool
-		expressions.SimpleFuncer(
-			types.Str{},
-			">=",
-			[]types.Type{types.Str{}},
-			types.Bool{},
-			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				str1 := string(inputValue.(states.StrValue))
-				str2 := string(argumentValues[0].(states.StrValue))
-				return states.BoolValue(str1 >= str2), nil
-			},
-		),
-		// for Str +(Str) Bool
-		expressions.SimpleFuncer(
-			types.Str{},
-			"+",
-			[]types.Type{types.Str{}},
-			types.Str{},
-			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-				str1 := string(inputValue.(states.StrValue))
-				str2 := string(argumentValues[0].(states.StrValue))
-				return states.StrValue(str1 + str2), nil
-			},
+			nil,
 		),
 		// for Str startsWith(Str) Bool
 		expressions.SimpleFuncer(

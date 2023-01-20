@@ -298,4 +298,18 @@ func TestText(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`"ababa" replaceFirst("b", "c")`,
+		`Str`,
+		`"acaba"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"ababa" replaceAll("b", "c")`,
+		`Str`,
+		`"acaca"`,
+		nil,
+		t,
+	)
 }
