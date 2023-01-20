@@ -145,8 +145,6 @@ func initText() {
 			},
 			nil,
 		),
-		// for Str indexOf(Str, Num) Num
-		// TODO
 		// for Arr<Str> join Str
 		expressions.SimpleFuncer(
 			types.NewArr(types.Str{}),
