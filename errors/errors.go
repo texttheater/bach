@@ -18,18 +18,18 @@ type errorAttribute func(err *e)
 // SyntaxError builds a syntax error value from a number of error attributes.
 // The following functions can be used to create error attributes:
 //
-//    Code
-//    Pos
-//    Message
-//    WantType
-//    GotType
-//    GotValue
-//    InputType
-//    Name
-//    NumParams
-//    ParamNum
-//    WantParam
-//    GotParam
+//	Code
+//	Pos
+//	Message
+//	WantType
+//	GotType
+//	GotValue
+//	InputType
+//	Name
+//	NumParams
+//	ParamNum
+//	WantParam
+//	GotParam
 func SyntaxError(atts ...errorAttribute) error {
 	return makeError(SyntaxKind, atts...)
 }
@@ -37,18 +37,18 @@ func SyntaxError(atts ...errorAttribute) error {
 // TypeError builds a syntax error value from a number of error attributes.
 // The following functions can be used to create error attributes:
 //
-//    Code
-//    Pos
-//    Message
-//    WantType
-//    GotType
-//    GotValue
-//    InputType
-//    Name
-//    NumParams
-//    ParamNum
-//    WantParam
-//    GotParam
+//	Code
+//	Pos
+//	Message
+//	WantType
+//	GotType
+//	GotValue
+//	InputType
+//	Name
+//	NumParams
+//	ParamNum
+//	WantParam
+//	GotParam
 func TypeError(atts ...errorAttribute) error {
 	return makeError(TypeKind, atts...)
 }
@@ -56,18 +56,18 @@ func TypeError(atts ...errorAttribute) error {
 // ValueError builds a syntax error value from a number of error attributes.
 // The following functions can be used to create error attributes:
 //
-//    Code
-//    Pos
-//    Message
-//    WantType
-//    GotType
-//    GotValue
-//    InputType
-//    Name
-//    NumParams
-//    ParamNum
-//    WantParam
-//    GotParam
+//	Code
+//	Pos
+//	Message
+//	WantType
+//	GotType
+//	GotValue
+//	InputType
+//	Name
+//	NumParams
+//	ParamNum
+//	WantParam
+//	GotParam
 func ValueError(atts ...errorAttribute) error {
 	return makeError(ValueKind, atts...)
 }
@@ -75,18 +75,18 @@ func ValueError(atts ...errorAttribute) error {
 // UnknownError builds a syntax error value from a number of error attributes.
 // The following functions can be used to create error attributes:
 //
-//    Code
-//    Pos
-//    Message
-//    WantType
-//    GotType
-//    GotValue
-//    InputType
-//    Name
-//    NumParams
-//    ParamNum
-//    WantParam
-//    GotParam
+//	Code
+//	Pos
+//	Message
+//	WantType
+//	GotType
+//	GotValue
+//	InputType
+//	Name
+//	NumParams
+//	ParamNum
+//	WantParam
+//	GotParam
 func UnknownError(atts ...errorAttribute) error {
 	return makeError(UnknownKind, atts...)
 }
