@@ -277,7 +277,7 @@ func initText() {
 			},
 			nil,
 		),
-		// for Str replaceFirst(Str, Str) Str
+		// for Str replaceAll(Str, Str) Str
 		expressions.RegularFuncer(
 			types.Str{},
 			"replaceAll",
