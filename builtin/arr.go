@@ -966,3 +966,51 @@ func mySort(inputState states.State, key states.Action, less states.Action) *sta
 	}
 	return states.ThunkFromSlice(slice)
 }
+
+func max(inputState states.State, def states.Action, key states.Action, less states.Action) *states.Thunk {
+	acc, err := def(inputState, nil).Eval()
+	if err != nil {
+		return states.ThunkFromError(err)
+	}
+	arr := inputState.Value.(*states.ArrValue)
+	for {
+		if arr == nil {
+			return states.ThunkFromValue(acc)
+		}
+		l, err := less(inputState.Replace(acc), []states.Action{states.SimpleAction(arr.Head)}).EvalBool()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		if l {
+			acc = arr.Head
+		}
+		arr, err = arr.Tail.EvalArr()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+	}
+}
+
+func min(inputState states.State, def states.Action, key states.Action, less states.Action) *states.Thunk {
+	acc, err := def(inputState, nil).Eval()
+	if err != nil {
+		return states.ThunkFromError(err)
+	}
+	arr := inputState.Value.(*states.ArrValue)
+	for {
+		if arr == nil {
+			return states.ThunkFromValue(acc)
+		}
+		l, err := less(inputState.Replace(arr.Head), []states.Action{states.SimpleAction(acc)}).EvalBool()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		if l {
+			acc = arr.Head
+		}
+		arr, err = arr.Tail.EvalArr()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+	}
+}
