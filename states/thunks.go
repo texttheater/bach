@@ -18,6 +18,14 @@ func (t *Thunk) Eval() (Value, error) {
 	return t.Value, t.Error
 }
 
+func (t *Thunk) EvalBool() (bool, error) {
+	val, err := t.Eval()
+	if err != nil {
+		return false, err
+	}
+	return bool(val.(BoolValue)), nil
+}
+
 func (t *Thunk) EvalNum() (float64, error) {
 	val, err := t.Eval()
 	if err != nil {

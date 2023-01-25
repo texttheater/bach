@@ -725,17 +725,7 @@ func initArr() {
 			nil,
 			types.NewArr(types.Num{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				slice, err := states.SliceFromValue(inputState.Value)
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				less := func(i, j int) bool {
-					a := slice[i].(states.NumValue)
-					b := slice[j].(states.NumValue)
-					return a < b
-				}
-				sort.Slice(slice, less)
-				return states.ThunkFromSlice(slice)
+				return mySort(inputState, id, numLess)
 			},
 			nil,
 		),
@@ -746,17 +736,7 @@ func initArr() {
 			nil,
 			types.NewArr(types.Str{}),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				slice, err := states.SliceFromValue(inputState.Value)
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				less := func(i, j int) bool {
-					a := slice[i].(states.StrValue)
-					b := slice[j].(states.StrValue)
-					return a < b
-				}
-				sort.Slice(slice, less)
-				return states.ThunkFromSlice(slice)
+				return mySort(inputState, id, strLess)
 			},
 			nil,
 		),
@@ -775,28 +755,7 @@ func initArr() {
 			},
 			types.NewArr(types.NewVar("A", types.Any{})),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				slice, err := states.SliceFromValue(inputState.Value)
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				less := func(i, j int) bool {
-					arg0 := states.State{
-						Value: slice[i],
-						Stack: inputState.Stack,
-					}
-					arg1 := states.SimpleAction(slice[j])
-					val, err2 := args[0](arg0, []states.Action{arg1}).Eval()
-					if err2 != nil {
-						err = err2
-						return true
-					}
-					return bool(val.(states.BoolValue))
-				}
-				sort.SliceStable(slice, less)
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				return states.ThunkFromSlice(slice)
+				return mySort(inputState, id, args[0])
 			},
 			nil,
 		),
@@ -813,34 +772,7 @@ func initArr() {
 			},
 			types.NewArr(types.NewVar("A", types.Any{})),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				slice, err := states.SliceFromValue(inputState.Value)
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				less := func(i, j int) bool {
-					key := args[0]
-					keyInputState := states.State{
-						Value: slice[i],
-						Stack: inputState.Stack,
-					}
-					a, err2 := key(keyInputState, nil).EvalNum()
-					if err2 != nil {
-						err = err2
-						return true
-					}
-					keyInputState.Value = slice[j]
-					b, err2 := key(keyInputState, nil).EvalNum()
-					if err2 != nil {
-						err = err2
-						return true
-					}
-					return a < b
-				}
-				sort.SliceStable(slice, less)
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				return states.ThunkFromSlice(slice)
+				return mySort(inputState, args[0], numLess)
 			},
 			nil,
 		),
@@ -857,34 +789,7 @@ func initArr() {
 			},
 			types.NewArr(types.NewVar("A", types.Any{})),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				slice, err := states.SliceFromValue(inputState.Value)
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				less := func(i, j int) bool {
-					key := args[0]
-					keyInputState := states.State{
-						Value: slice[i],
-						Stack: inputState.Stack,
-					}
-					a, err2 := key(keyInputState, nil).EvalStr()
-					if err2 != nil {
-						err = err2
-						return true
-					}
-					keyInputState.Value = slice[j]
-					b, err2 := key(keyInputState, nil).EvalStr()
-					if err2 != nil {
-						err = err2
-						return true
-					}
-					return a < b
-				}
-				sort.SliceStable(slice, less)
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				return states.ThunkFromSlice(slice)
+				return mySort(inputState, args[0], strLess)
 			},
 			nil,
 		),
@@ -908,45 +813,7 @@ func initArr() {
 			},
 			types.NewArr(types.NewVar("A", types.Any{})),
 			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				slice, err := states.SliceFromValue(inputState.Value)
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				less := func(i, j int) bool {
-					key := args[0]
-					cmp := args[1]
-					keyInputState := states.State{
-						Value: slice[i],
-						Stack: inputState.Stack,
-					}
-					a, err2 := key(keyInputState, nil).Eval()
-					if err2 != nil {
-						err = err2
-						return true
-					}
-					keyInputState.Value = slice[j]
-					b, err2 := key(keyInputState, nil).Eval()
-					if err2 != nil {
-						err = err2
-						return true
-					}
-					arg0 := states.State{
-						Value: a,
-						Stack: inputState.Stack,
-					}
-					arg1 := states.SimpleAction(b)
-					val, err2 := cmp(arg0, []states.Action{arg1}).Eval()
-					if err2 != nil {
-						err = err2
-						return true
-					}
-					return bool(val.(states.BoolValue))
-				}
-				sort.SliceStable(slice, less)
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				return states.ThunkFromSlice(slice)
+				return mySort(inputState, args[0], args[1])
 			},
 			nil,
 		),
@@ -1046,4 +913,56 @@ func initArr() {
 			nil,
 		),
 	})
+}
+
+func id(inputState states.State, args []states.Action) *states.Thunk {
+	return states.ThunkFromValue(inputState.Value)
+}
+
+func numLess(inputState states.State, args []states.Action) *states.Thunk {
+	a := float64(inputState.Value.(states.NumValue))
+	b, err := args[0](inputState.Clear(), nil).EvalNum()
+	if err != nil {
+		return states.ThunkFromError(err)
+	}
+	return states.ThunkFromValue(states.BoolValue(a < b))
+}
+
+func strLess(inputState states.State, args []states.Action) *states.Thunk {
+	a := string(inputState.Value.(states.StrValue))
+	b, err := args[0](inputState.Clear(), nil).EvalStr()
+	if err != nil {
+		return states.ThunkFromError(err)
+	}
+	return states.ThunkFromValue(states.BoolValue(a < b))
+}
+
+func mySort(inputState states.State, key states.Action, less states.Action) *states.Thunk {
+	slice, err := states.SliceFromValue(inputState.Value)
+	if err != nil {
+		return states.ThunkFromError(err)
+	}
+	myLess := func(i int, j int) bool {
+		aKey, err2 := key(inputState.Replace(slice[i]), nil).Eval()
+		if err2 != nil {
+			err = err2
+			return true
+		}
+		bKey, err2 := key(inputState.Replace(slice[j]), nil).Eval()
+		if err2 != nil {
+			err = err2
+			return true
+		}
+		less, err2 := less(inputState.Replace(aKey), []states.Action{states.SimpleAction(bKey)}).EvalBool()
+		if err2 != nil {
+			err = err2
+			return true
+		}
+		return less
+	}
+	sort.SliceStable(slice, myLess)
+	if err != nil {
+		return states.ThunkFromError(err)
+	}
+	return states.ThunkFromSlice(slice)
 }
