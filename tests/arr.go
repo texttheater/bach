@@ -584,4 +584,39 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`["abc", "b", "ab"] max(<, "")`,
+		`Str`,
+		`"b"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`["abc", "b", "ab"] min(<, "")`,
+		`Str`,
+		`"ab"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`["abc", "b", "ab"] max(bytes len, <, "")`,
+		`Str`,
+		`"abc"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`["abc", "b", "ab"] min(bytes len, <, "")`,
+		`Str`,
+		`"b"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`for Any def f Arr<Num> as [] ok f max(<, 0)`,
+		`Num`,
+		`0`,
+		nil,
+		t,
+	)
 }

@@ -593,6 +593,96 @@ func initArr() {
 			},
 			nil,
 		),
+		// for Arr<<A>> max(for <A> (<A>) Bool, <A>) <A>
+		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
+			"max",
+			[]*params.Param{
+				{
+					InputType: types.NewVar("A", types.Any{}),
+					Params: []*params.Param{
+						params.SimpleParam(types.NewVar("A", types.Any{})),
+					},
+					OutputType: types.Bool{},
+				},
+				params.SimpleParam(types.NewVar("A", types.Any{})),
+			},
+			types.NewVar("A", types.Any{}),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				return max(inputState, id, args[0], args[1])
+			},
+			nil,
+		),
+		// for Arr<<A>> max(for <A> <B>, for <B> (<B>) Bool, <A>) <A>
+		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
+			"max",
+			[]*params.Param{
+				{
+					InputType:  types.NewVar("A", types.Any{}),
+					Params:     nil,
+					OutputType: types.NewVar("B", types.Any{}),
+				},
+				{
+					InputType: types.NewVar("B", types.Any{}),
+					Params: []*params.Param{
+						params.SimpleParam(types.NewVar("B", types.Any{})),
+					},
+					OutputType: types.Bool{},
+				},
+				params.SimpleParam(types.NewVar("A", types.Any{})),
+			},
+			types.NewVar("A", types.Any{}),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				return max(inputState, args[0], args[1], args[2])
+			},
+			nil,
+		),
+		// for Arr<<A>> min(for <A> (<A>) Bool, <A>) <A>
+		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
+			"min",
+			[]*params.Param{
+				{
+					InputType: types.NewVar("A", types.Any{}),
+					Params: []*params.Param{
+						params.SimpleParam(types.NewVar("A", types.Any{})),
+					},
+					OutputType: types.Bool{},
+				},
+				params.SimpleParam(types.NewVar("A", types.Any{})),
+			},
+			types.NewVar("A", types.Any{}),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				return min(inputState, id, args[0], args[1])
+			},
+			nil,
+		),
+		// for Arr<<A>> max(for <A> <B>, for <B> (<B>) Bool, <A>) <A>
+		expressions.RegularFuncer(
+			types.NewArr(types.NewVar("A", types.Any{})),
+			"min",
+			[]*params.Param{
+				{
+					InputType:  types.NewVar("A", types.Any{}),
+					Params:     nil,
+					OutputType: types.NewVar("B", types.Any{}),
+				},
+				{
+					InputType: types.NewVar("B", types.Any{}),
+					Params: []*params.Param{
+						params.SimpleParam(types.NewVar("B", types.Any{})),
+					},
+					OutputType: types.Bool{},
+				},
+				params.SimpleParam(types.NewVar("A", types.Any{})),
+			},
+			types.NewVar("A", types.Any{}),
+			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+				return min(inputState, args[0], args[1], args[2])
+			},
+			nil,
+		),
 		// for Any range(Num, Num) Arr<Num>
 		expressions.RegularFuncer(
 			types.Any{},
@@ -967,50 +1057,82 @@ func mySort(inputState states.State, key states.Action, less states.Action) *sta
 	return states.ThunkFromSlice(slice)
 }
 
-func max(inputState states.State, def states.Action, key states.Action, less states.Action) *states.Thunk {
-	acc, err := def(inputState, nil).Eval()
+func max(inputState states.State, key states.Action, less states.Action, def states.Action) *states.Thunk {
+	arr := inputState.Value.(*states.ArrValue)
+	if arr == nil {
+		d, err := def(inputState, nil).Eval()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		return states.ThunkFromValue(d)
+	}
+	record, err := key(inputState.Replace(arr.Head), nil).Eval()
 	if err != nil {
 		return states.ThunkFromError(err)
 	}
-	arr := inputState.Value.(*states.ArrValue)
+	recordHolder := arr.Head
 	for {
-		if arr == nil {
-			return states.ThunkFromValue(acc)
+		arr, err = arr.Tail.EvalArr()
+		if err != nil {
+			return states.ThunkFromError(err)
 		}
-		l, err := less(inputState.Replace(acc), []states.Action{states.SimpleAction(arr.Head)}).EvalBool()
+		if arr == nil {
+			return states.ThunkFromValue(recordHolder)
+		}
+		val, err := key(inputState.Replace(arr.Head), nil).Eval()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		l, err := less(
+			inputState.Replace(record),
+			[]states.Action{states.SimpleAction(val)},
+		).EvalBool()
 		if err != nil {
 			return states.ThunkFromError(err)
 		}
 		if l {
-			acc = arr.Head
-		}
-		arr, err = arr.Tail.EvalArr()
-		if err != nil {
-			return states.ThunkFromError(err)
+			record = val
+			recordHolder = arr.Head
 		}
 	}
 }
 
-func min(inputState states.State, def states.Action, key states.Action, less states.Action) *states.Thunk {
-	acc, err := def(inputState, nil).Eval()
+func min(inputState states.State, key states.Action, less states.Action, def states.Action) *states.Thunk {
+	arr := inputState.Value.(*states.ArrValue)
+	if arr == nil {
+		d, err := def(inputState, nil).Eval()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		return states.ThunkFromValue(d)
+	}
+	record, err := key(inputState.Replace(arr.Head), nil).Eval()
 	if err != nil {
 		return states.ThunkFromError(err)
 	}
-	arr := inputState.Value.(*states.ArrValue)
+	recordHolder := arr.Head
 	for {
-		if arr == nil {
-			return states.ThunkFromValue(acc)
+		arr, err = arr.Tail.EvalArr()
+		if err != nil {
+			return states.ThunkFromError(err)
 		}
-		l, err := less(inputState.Replace(arr.Head), []states.Action{states.SimpleAction(acc)}).EvalBool()
+		if arr == nil {
+			return states.ThunkFromValue(recordHolder)
+		}
+		val, err := key(inputState.Replace(arr.Head), nil).Eval()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		l, err := less(
+			inputState.Replace(val),
+			[]states.Action{states.SimpleAction(record)},
+		).EvalBool()
 		if err != nil {
 			return states.ThunkFromError(err)
 		}
 		if l {
-			acc = arr.Head
-		}
-		arr, err = arr.Tail.EvalArr()
-		if err != nil {
-			return states.ThunkFromError(err)
+			record = val
+			recordHolder = arr.Head
 		}
 	}
 }
