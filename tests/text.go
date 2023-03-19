@@ -312,4 +312,74 @@ func TestText(t *testing.T) {
 		nil,
 		t,
 	)
+	TestProgramStr(
+		`"z" padEnd(2, " ")`,
+		`Str`,
+		`"z "`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"z" padEnd(3, " ")`,
+		`Str`,
+		`"z  "`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"zzz" padEnd(3, " ")`,
+		`Str`,
+		`"zzz"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"zzzz" padEnd(3, " ")`,
+		`Str`,
+		`"zzzz"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"zzzz" padEnd(7, "ab")`,
+		`Str`,
+		`"zzzzaba"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"z" padStart(2, " ")`,
+		`Str`,
+		`" z"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"z" padStart(3, " ")`,
+		`Str`,
+		`"  z"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"zzz" padStart(3, " ")`,
+		`Str`,
+		`"zzz"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"zzzz" padStart(3, " ")`,
+		`Str`,
+		`"zzzz"`,
+		nil,
+		t,
+	)
+	TestProgramStr(
+		`"zzzz" padStart(7, "ab")`,
+		`Str`,
+		`"abazzzz"`,
+		nil,
+		t,
+	)
 }

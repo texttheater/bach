@@ -253,6 +253,58 @@ func initText() {
 				}
 			},
 		),
+		// for Str padEnd(Num, Str) Str
+		expressions.SimpleFuncer(
+			types.Str{},
+			"padEnd",
+			[]types.Type{types.Num{}, types.Str{}},
+			types.Str{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str := string(inputValue.(states.StrValue))
+				length := int(argumentValues[0].(states.NumValue))
+				padding := string(argumentValues[1].(states.StrValue))
+				var builder strings.Builder
+				builder.WriteString(str)
+				for {
+					delta := length - builder.Len()
+					if delta <= 0 {
+						break
+					}
+					if delta < len(padding) {
+						builder.WriteString(padding[:delta])
+						break
+					}
+					builder.WriteString(padding)
+				}
+				return states.StrValue(builder.String()), nil
+			},
+		),
+		// for Str padEnd(Num, Str) Str
+		expressions.SimpleFuncer(
+			types.Str{},
+			"padStart",
+			[]types.Type{types.Num{}, types.Str{}},
+			types.Str{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str := string(inputValue.(states.StrValue))
+				length := int(argumentValues[0].(states.NumValue))
+				padding := string(argumentValues[1].(states.StrValue))
+				var builder strings.Builder
+				for {
+					delta := length - len(str) - builder.Len()
+					if delta <= 0 {
+						break
+					}
+					if delta < len(padding) {
+						builder.WriteString(padding[:delta])
+						break
+					}
+					builder.WriteString(padding)
+				}
+				builder.WriteString(str)
+				return states.StrValue(builder.String()), nil
+			},
+		),
 		// for Str replaceFirst(Str, Str) Str
 		expressions.RegularFuncer(
 			types.Str{},
