@@ -103,10 +103,23 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.Str{}),
-			errors.Name("findAll"),
-			errors.NumParams(1),
+			errors.Code(errors.ArgHasWrongOutputType),
+			errors.WantType(types.Var{
+				Name: "A",
+				Bound: types.NewUnion(
+					types.Null{},
+					types.Obj{
+						Props: map[string]types.Type{
+							"start": types.Num{},
+							"0":     types.Str{},
+						},
+						Rest: types.Any{},
+					},
+				),
+			},
+			),
+			errors.GotType(types.AnyObj),
+			errors.ArgNum(1),
 		),
 		t,
 	)
@@ -155,10 +168,10 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.Null{}),
-			errors.Name("f"),
-			errors.NumParams(1),
+			errors.Code(errors.ArgHasWrongOutputType),
+			errors.ArgNum(1),
+			errors.WantType(types.NewVar("A", types.AnyArr)),
+			errors.GotType(types.Str{}),
 		),
 		t,
 	)

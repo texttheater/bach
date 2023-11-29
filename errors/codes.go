@@ -28,6 +28,7 @@ const (
 	Syntax ErrorCode = iota
 	ParamsNotAllowed
 	NoSuchFunction
+	ArgHasWrongOutputType
 	ParamDoesNotMatch
 	FunctionBodyHasWrongOutputType
 	ConditionMustBeBool
@@ -56,6 +57,8 @@ func (code ErrorCode) String() string {
 		return "ParamsNotAllowed"
 	case NoSuchFunction:
 		return "NoSuchFunction"
+	case ArgHasWrongOutputType:
+		return "ArgHasWrongOutputType"
 	case ParamDoesNotMatch:
 		return "ParamDoesNotMatch"
 	case FunctionBodyHasWrongOutputType:
@@ -104,7 +107,9 @@ func (code ErrorCode) DefaultMessage() string {
 	case ParamsNotAllowed:
 		return "This expression cannot be used as an argument here because it does not take parameters."
 	case NoSuchFunction:
-		return "no matching function"
+		return "no such function"
+	case ArgHasWrongOutputType:
+		return "An argument has the wrong output type."
 	case ParamDoesNotMatch:
 		return "Cannot use this function here because one of its parameters does not match the expected parameter."
 	case FunctionBodyHasWrongOutputType:

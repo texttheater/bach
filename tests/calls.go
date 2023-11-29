@@ -82,16 +82,14 @@ func TestCalls(t *testing.T) {
 	)
 	TestProgram(
 		`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok f(1)`,
-		types.Num{},
-		states.NumValue(1),
 		nil,
-		t,
-	)
-	TestProgram(
-		`for Any def f(x Num) Num as x ok for Any def f(x Str) Str as x ok f("abc")`,
-		types.Str{},
-		states.StrValue("abc"),
 		nil,
+		errors.TypeError(
+			errors.Code(errors.ArgHasWrongOutputType),
+			errors.ArgNum(1),
+			errors.WantType(types.Str{}),
+			errors.GotType(types.Num{}),
+		),
 		t,
 	)
 	TestProgram(

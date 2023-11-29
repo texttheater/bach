@@ -33,7 +33,6 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*params.Param) (Sha
 				errors.InputType(inputShape.Type),
 				errors.Name(x.Name),
 				errors.NumParams(len(x.Args)+len(params)),
-				// TODO be more specific about params
 			)
 		}
 		// try the funcer on top of the stack
@@ -204,10 +203,22 @@ func RegularFuncer(wantInputType types.Type, wantName string, pars []*params.Par
 				return Shape{}, nil, nil, false, nil
 			}
 			if !pars[i].OutputType.Bind(argOutputShape.Type, bindings) {
-				return Shape{}, nil, nil, false, nil
+				return Shape{}, nil, nil, false, errors.TypeError(
+					errors.Code(errors.ArgHasWrongOutputType),
+					errors.Pos(gotCall.Pos),
+					errors.ArgNum(i+1),
+					errors.WantType(pars[i].OutputType.Instantiate(bindings)),
+					errors.GotType(argOutputShape.Type),
+				)
 			}
 			if !pars[i].OutputType.Instantiate(bindings).Subsumes(argOutputShape.Type) {
-				return Shape{}, nil, nil, false, nil
+				return Shape{}, nil, nil, false, errors.TypeError(
+					errors.Code(errors.ArgHasWrongOutputType),
+					errors.Pos(gotCall.Pos),
+					errors.ArgNum(i+1),
+					errors.WantType(pars[i].OutputType.Instantiate(bindings)),
+					errors.GotType(argOutputShape.Type),
+				)
 			}
 			argActions[i] = argAction
 			argIDss[i] = argIDs

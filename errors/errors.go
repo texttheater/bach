@@ -26,6 +26,7 @@ type errorAttribute func(err *e)
 //	GotValue
 //	InputType
 //	Name
+//	ArgNum
 //	NumParams
 //	ParamNum
 //	WantParam
@@ -45,6 +46,7 @@ func SyntaxError(atts ...errorAttribute) error {
 //	GotValue
 //	InputType
 //	Name
+//	ArgNum
 //	NumParams
 //	ParamNum
 //	WantParam
@@ -64,6 +66,7 @@ func TypeError(atts ...errorAttribute) error {
 //	GotValue
 //	InputType
 //	Name
+//	ArgNum
 //	NumParams
 //	ParamNum
 //	WantParam
@@ -83,6 +86,7 @@ func ValueError(atts ...errorAttribute) error {
 //	GotValue
 //	InputType
 //	Name
+//	ArgNum
 //	NumParams
 //	ParamNum
 //	WantParam
@@ -150,6 +154,12 @@ func Name(name string) errorAttribute {
 	}
 }
 
+func ArgNum(argNum int) errorAttribute {
+	return func(err *e) {
+		err.ArgNum = &argNum
+	}
+}
+
 func NumParams(numParams int) errorAttribute {
 	return func(err *e) {
 		err.NumParams = &numParams
@@ -191,6 +201,7 @@ type e struct {
 	GotValue  states.Value
 	InputType types.Type
 	Name      *string
+	ArgNum    *int
 	NumParams *int
 	ParamNum  *int
 	WantParam *params.Param
@@ -226,6 +237,9 @@ func (err *e) Error() string {
 	}
 	if err.Name != nil {
 		m["Name"] = *err.Name
+	}
+	if err.ArgNum != nil {
+		m["ArgNum"] = *err.ArgNum
 	}
 	if err.NumParams != nil {
 		m["NumParams"] = *err.NumParams
@@ -296,6 +310,9 @@ func Explain(err error, program string) {
 	if e.Name != nil {
 		fmt.Fprintln(os.Stderr, "Name:      ", *e.Name)
 	}
+	if e.ArgNum != nil {
+		fmt.Fprintln(os.Stderr, "Arg #:     ", *e.ArgNum)
+	}
 	if e.NumParams != nil {
 		fmt.Fprintln(os.Stderr, "# params:  ", *e.NumParams)
 	}
@@ -354,6 +371,9 @@ func Match(err1, err2 error) bool {
 		return false
 	}
 	if e1.Name != nil && *e2.Name != *e1.Name {
+		return false
+	}
+	if e1.ArgNum != nil && *e2.ArgNum != *e1.ArgNum {
 		return false
 	}
 	if e1.NumParams != nil && *e2.NumParams != *e1.NumParams {
