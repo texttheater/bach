@@ -15,7 +15,6 @@ func init() {
 	initIO()
 	initLogic()
 	initMath()
-	initFmt()
 	initText()
 	initArr()
 	initObj()

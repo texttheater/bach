@@ -1,9 +1,11 @@
 package builtin
 
 import (
+	"fmt"
 	"math"
 	"math/bits"
 	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/texttheater/bach/expressions"
@@ -294,6 +296,43 @@ func initMath() {
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.BoolValue(x >= -9007199254740991 && x <= 9007199254740991), nil
+			},
+		),
+		// for Num toExponential Str
+		expressions.SimpleFuncer(
+			types.Num{},
+			"toExponential",
+			nil,
+			types.Str{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				return states.StrValue(fmt.Sprintf("%e", x)), nil
+			},
+		),
+		// for Num toExponential(Num) Str
+		expressions.SimpleFuncer(
+			types.Num{},
+			"toExponential",
+			[]types.Type{types.Num{}},
+			types.Str{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				f := int(argumentValues[0].(states.NumValue))
+				format := "%." + strconv.Itoa(f) + "e"
+				return states.StrValue(fmt.Sprintf(format, x)), nil
+			},
+		),
+		// for Num toFixed(Num) Str
+		expressions.SimpleFuncer(
+			types.Num{},
+			"toFixed",
+			[]types.Type{types.Num{}},
+			types.Str{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				f := int(argumentValues[0].(states.NumValue))
+				format := "%." + strconv.Itoa(f) + "f"
+				return states.StrValue(fmt.Sprintf(format, x)), nil
 			},
 		),
 		// for Any e Num
