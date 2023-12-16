@@ -715,7 +715,6 @@ func initMath() {
 				return states.NumValue(math.Log2(x)), nil
 			},
 		),
-		// TODO max, min with key function
 		expressions.SimpleFuncer(
 			types.NewArr(types.Num{}),
 			"max",
