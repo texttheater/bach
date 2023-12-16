@@ -309,8 +309,8 @@ func initMath() {
 				x := float64(inputValue.(states.NumValue))
 				xInt := int64(x)
 				if x != float64(xInt) {
-					return nil, errors.ValueError((
-						errors.Code(errors.UnexpectedValue)),
+					return nil, errors.ValueError(
+						errors.Code(errors.UnexpectedValue),
 						errors.GotValue(inputValue),
 						errors.Message("base conversion for non-integers not yet supported"),
 						// TODO add pos
@@ -319,8 +319,8 @@ func initMath() {
 				radix := float64(argumentValues[0].(states.NumValue))
 				radixInt := int(radix)
 				if radix != float64(radixInt) || radixInt < 2 || radixInt > 36 {
-					return nil, errors.ValueError((
-						errors.Code(errors.UnexpectedValue)),
+					return nil, errors.ValueError(
+						errors.Code(errors.UnexpectedValue),
 						errors.GotValue(argumentValues[0]),
 						errors.Message("radix must be an integer between 2 and 36 (inclusive)"),
 						// TODO add pos
