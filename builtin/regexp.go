@@ -16,7 +16,7 @@ func initRegexp() {
 		// for Str findAll(for Str <A Null|Obj<start: Num, 0: Str, Any>>) Arr<<A>>
 		expressions.RegularFuncer(
 			types.Str{},
-			"findAll",
+			"reFindAll",
 			[]*params.Param{
 				{
 					InputType: types.Str{},
@@ -73,7 +73,7 @@ func initRegexp() {
 		// for Str replaceFirst(for Str Null|Obj<start: Num, 0: Str, Any>, Str) Str
 		expressions.RegularFuncer(
 			types.Str{},
-			"replaceFirst",
+			"reReplaceFirst",
 			[]*params.Param{
 				{
 					InputType: types.Str{},
@@ -134,7 +134,7 @@ func initRegexp() {
 		// for Str replaceAll(for Str Null|Obj<start: Num, 0: Str, Any>, Str) Str
 		expressions.RegularFuncer(
 			types.Str{},
-			"replaceAll",
+			"reReplaceAll",
 			[]*params.Param{
 				{
 					InputType: types.Str{},
@@ -200,7 +200,7 @@ func initRegexp() {
 		// for Str split(for Str Null|Obj<start: Num, 0: Str, Any>) Arr<Str>
 		expressions.RegularFuncer(
 			types.Str{},
-			"split",
+			"reSplit",
 			[]*params.Param{
 				{
 					InputType: types.Str{},
@@ -227,7 +227,7 @@ func initRegexp() {
 		// for Str split(for Str Null|Obj<start: Num, 0: Str, Any>, Num) Arr<Str>
 		expressions.RegularFuncer(
 			types.Str{},
-			"split",
+			"reSplit",
 			[]*params.Param{
 				{
 					InputType: types.Str{},

@@ -71,231 +71,231 @@ func TestRegexp(t *testing.T) {
 		t,
 	)
 	TestProgramStr(
-		`"zabacad" split~a~`,
+		`"zabacad" reSplit~a~`,
 		`Arr<Str>`,
 		`["z", "b", "c", "d"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"zabacad" split(~a~, 1)`,
+		`"zabacad" reSplit(~a~, 1)`,
 		`Arr<Str>`,
 		`["z", "bacad"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"zabaca" split~a~`,
+		`"zabaca" reSplit~a~`,
 		`Arr<Str>`,
 		`["z", "b", "c", ""]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"zabaca" split(~a~, 1)`,
+		`"zabaca" reSplit(~a~, 1)`,
 		`Arr<Str>`,
 		`["z", "baca"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"zabaca" split(~a~, 3)`,
+		`"zabaca" reSplit(~a~, 3)`,
 		`Arr<Str>`,
 		`["z", "b", "c", ""]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"zabaca" split(~a~, 4)`,
+		`"zabaca" reSplit(~a~, 4)`,
 		`Arr<Str>`,
 		`["z", "b", "c", ""]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"abacad" split~a~`,
+		`"abacad" reSplit~a~`,
 		`Arr<Str>`,
 		`["", "b", "c", "d"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"abacad" split(~a~, 1)`,
+		`"abacad" reSplit(~a~, 1)`,
 		`Arr<Str>`,
 		`["", "bacad"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"abacad" split(~a~, 2)`,
+		`"abacad" reSplit(~a~, 2)`,
 		`Arr<Str>`,
 		`["", "b", "cad"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"abaca" split~a~`,
+		`"abaca" reSplit~a~`,
 		`Arr<Str>`,
 		`["", "b", "c", ""]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"abaca" split(~a~, 1)`,
+		`"abaca" reSplit(~a~, 1)`,
 		`Arr<Str>`,
 		`["", "baca"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"abaca" split(~a~, 2)`,
+		`"abaca" reSplit(~a~, 2)`,
 		`Arr<Str>`,
 		`["", "b", "ca"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"abaca" split(~a~, 3)`,
+		`"abaca" reSplit(~a~, 3)`,
 		`Arr<Str>`,
 		`["", "b", "c", ""]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"abaca" split~~`,
+		`"abaca" reSplit~~`,
 		`Arr<Str>`,
 		`["a", "b", "a", "c", "a"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"abaca" split(~~, 2)`,
+		`"abaca" reSplit(~~, 2)`,
 		`Arr<Str>`,
 		`["a", "b", "aca"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"abaca" split(~~, 1000)`,
+		`"abaca" reSplit(~~, 1000)`,
 		`Arr<Str>`,
 		`["a", "b", "a", "c", "a"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"你好" split~~`,
+		`"你好" reSplit~~`,
 		`Arr<Str>`,
 		`["你", "好"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"你好" split(~~, 0)`,
+		`"你好" reSplit(~~, 0)`,
 		`Arr<Str>`,
 		`["你好"]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"" split~a~`,
+		`"" reSplit~a~`,
 		`Arr<Str>`,
 		`[""]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"" split(~a~, 0)`,
+		`"" reSplit(~a~, 0)`,
 		`Arr<Str>`,
 		`[""]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"" split(~a~, 1)`,
+		`"" reSplit(~a~, 1)`,
 		`Arr<Str>`,
 		`[""]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"" split~~`,
+		`"" reSplit~~`,
 		`Arr<Str>`,
 		`[]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"" split(~~, 0)`,
+		`"" reSplit(~~, 0)`,
 		`Arr<Str>`,
 		`[]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"" split(~~, 1)`,
+		`"" reSplit(~~, 1)`,
 		`Arr<Str>`,
 		`[]`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"" replaceFirst(~bc~, "hurz")`,
+		`"" reReplaceFirst(~bc~, "hurz")`,
 		`Str`,
 		`""`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"abcd" replaceFirst(~bc~, "hurz")`,
+		`"abcd" reReplaceFirst(~bc~, "hurz")`,
 		`Str`,
 		`"ahurzd"`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"abcdabcd" replaceFirst(~bc~, "hurz")`,
+		`"abcdabcd" reReplaceFirst(~bc~, "hurz")`,
 		`Str`,
 		`"ahurzdabcd"`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"abcd" replaceFirst(~bd~, "hurz")`,
+		`"abcd" reReplaceFirst(~bd~, "hurz")`,
 		`Str`,
 		`"abcd"`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"" replaceAll(~a~, "b")`,
+		`"" reReplaceAll(~a~, "b")`,
 		`Str`,
 		`""`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"ababa" replaceAll(~a~, "b")`,
+		`"ababa" reReplaceAll(~a~, "b")`,
 		`Str`,
 		`"bbbbb"`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`"babab" replaceAll(~a~, "b")`,
+		`"babab" reReplaceAll(~a~, "b")`,
 		`Str`,
 		`"bbbbb"`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`" a b c " replaceFirst(~[abc]~, "({@0})")`,
+		`" a b c " reReplaceFirst(~[abc]~, "({@0})")`,
 		`Str`,
 		`" (a) b c "`,
 		nil,
 		t,
 	)
 	TestProgramStr(
-		`" a b c " replaceAll(~[abc]~, "({@0})")`,
+		`" a b c " reReplaceAll(~[abc]~, "({@0})")`,
 		`Str`,
 		`" (a) (b) (c) "`,
 		nil,

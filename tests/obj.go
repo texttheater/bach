@@ -94,7 +94,7 @@ func TestObjects(t *testing.T) {
 		t,
 	)
 	TestProgramStr(
-		`{a: 1, b: 2} items sortBy(@0)`,
+		`{a: 1, b: 2} items sortByStr(@0)`,
 		`Arr<Tup<Str, Num>>`,
 		`[["a", 1], ["b", 2]]`,
 		nil,

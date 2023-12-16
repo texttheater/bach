@@ -80,12 +80,12 @@ func initArr() {
 			},
 			nil,
 		),
-		// for Arr<<A>> drop(for <<A>> Obj<yes: B>|Obj<no: C>) Arr<<A>>
+		// for Arr<<A>> dropWhile(for <<A>> Obj<yes: B>|Obj<no: C>) Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
 			),
-			"drop",
+			"dropWhile",
 			[]*params.Param{
 				{
 					InputType: types.NewVar("A", types.Any{}),
@@ -849,10 +849,10 @@ func initArr() {
 			},
 			nil,
 		),
-		// for Arr<<A>> sortBy(for <A> Num) Arr<<A>>
+		// for Arr<<A>> sortByNum(for <A> Num) Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
-			"sortBy",
+			"sortByNum",
 			[]*params.Param{
 				{
 					InputType:  types.NewVar("A", types.Any{}),
@@ -866,10 +866,10 @@ func initArr() {
 			},
 			nil,
 		),
-		// for Arr<<A>> sortBy(for <A> Str) Arr<<A>>
+		// for Arr<<A>> sortByStr(for <A> Str) Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(types.NewVar("A", types.Any{})),
-			"sortBy",
+			"sortByStr",
 			[]*params.Param{
 				{
 					InputType:  types.NewVar("A", types.Any{}),
@@ -945,12 +945,12 @@ func initArr() {
 			},
 			nil,
 		),
-		// for Arr<<A>> take(for <<A>> Obj<yes: B>|Obj<no: C>) Arr<<A>>
+		// for Arr<<A>> takeWhile(for <<A>> Obj<yes: B>|Obj<no: C>) Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(
 				types.NewVar("A", types.Any{}),
 			),
-			"take",
+			"takeWhile",
 			[]*params.Param{
 				{
 					InputType: types.NewVar("A", types.Any{}),
