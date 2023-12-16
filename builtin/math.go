@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
@@ -296,6 +297,36 @@ func initMath() {
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				x := float64(inputValue.(states.NumValue))
 				return states.BoolValue(x >= -9007199254740991 && x <= 9007199254740991), nil
+			},
+		),
+		// for Num toBase Str
+		expressions.SimpleFuncer(
+			types.Num{},
+			"toBase",
+			[]types.Type{types.Num{}},
+			types.Str{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				x := float64(inputValue.(states.NumValue))
+				xInt := int64(x)
+				if x != float64(xInt) {
+					return nil, errors.ValueError((
+						errors.Code(errors.UnexpectedValue)),
+						errors.GotValue(inputValue),
+						errors.Message("base conversion for non-integers not yet supported"),
+						// TODO add pos
+					)
+				}
+				radix := float64(argumentValues[0].(states.NumValue))
+				radixInt := int(radix)
+				if radix != float64(radixInt) || radixInt < 2 || radixInt > 36 {
+					return nil, errors.ValueError((
+						errors.Code(errors.UnexpectedValue)),
+						errors.GotValue(argumentValues[0]),
+						errors.Message("radix must be an integer between 2 and 36 (inclusive)"),
+						// TODO add pos
+					)
+				}
+				return states.StrValue(strconv.FormatInt(xInt, radixInt)), nil
 			},
 		),
 		// for Num toExponential Str
