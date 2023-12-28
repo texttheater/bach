@@ -114,7 +114,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 		}
 	}
 	// make regular kernel from simple kernel
-	kernel := func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+	regularKernel := func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		argValues := make([]states.Value, len(argTypes))
 		for i, arg := range args {
 			val, err := arg(inputState.Clear(), nil).Eval()
@@ -136,7 +136,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 
 	}
 	// return
-	return RegularFuncer(wantInputType, wantName, pars, outputType, kernel, nil)
+	return RegularFuncer(wantInputType, wantName, pars, outputType, regularKernel, nil)
 }
 
 func VariableFuncer(id any, name string, varType types.Type) Funcer {
@@ -164,9 +164,9 @@ func VariableFuncer(id any, name string, varType types.Type) Funcer {
 	})
 }
 
-type FuncerKernel func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk
+type RegularKernel func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk
 
-func RegularFuncer(wantInputType types.Type, wantName string, pars []*params.Param, outputType types.Type, kernel FuncerKernel, ids *states.IDStack) Funcer {
+func RegularFuncer(wantInputType types.Type, wantName string, pars []*params.Param, outputType types.Type, kernel RegularKernel, ids *states.IDStack) Funcer {
 	return func(gotInputShape Shape, gotCall CallExpression, gotParams []*params.Param) (Shape, states.Action, *states.IDStack, bool, error) {
 		// match number of parameters
 		if len(gotCall.Args)+len(gotParams) != len(pars) {
