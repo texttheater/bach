@@ -440,5 +440,16 @@ func initText() {
 				return states.StrValue(strings.Repeat(str, n)), nil
 			},
 		),
+		// for Str trim Str
+		expressions.SimpleFuncer(
+			types.Str{},
+			"trim",
+			nil,
+			types.Str{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str := string(inputValue.(states.StrValue))
+				return states.StrValue(strings.TrimSpace(str)), nil
+			},
+		),
 	})
 }
