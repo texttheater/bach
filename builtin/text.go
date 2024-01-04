@@ -3,6 +3,7 @@ package builtin
 import (
 	"bytes"
 	"strings"
+	"unicode"
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/expressions"
@@ -449,6 +450,28 @@ func initText() {
 			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 				str := string(inputValue.(states.StrValue))
 				return states.StrValue(strings.TrimSpace(str)), nil
+			},
+		),
+		// for Str trimStart Str
+		expressions.SimpleFuncer(
+			types.Str{},
+			"trimStart",
+			nil,
+			types.Str{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str := string(inputValue.(states.StrValue))
+				return states.StrValue(strings.TrimLeftFunc(str, unicode.IsSpace)), nil
+			},
+		),
+		// for Str trimEnd Str
+		expressions.SimpleFuncer(
+			types.Str{},
+			"trimEnd",
+			nil,
+			types.Str{},
+			func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+				str := string(inputValue.(states.StrValue))
+				return states.StrValue(strings.TrimRightFunc(str, unicode.IsSpace)), nil
 			},
 		),
 	})
