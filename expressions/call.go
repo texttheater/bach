@@ -96,7 +96,6 @@ type FuncerDefinition struct {
 	Name       string
 	Params     []*params.Param
 	OutputType types.Type
-	Kernel     RegularKernel
 	Funcer     Funcer
 }
 
