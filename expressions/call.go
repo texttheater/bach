@@ -91,6 +91,14 @@ func (s *FuncerStack) String() string {
 	return fmt.Sprintf("%v", slice)
 }
 
+type FuncerDefinition struct {
+	InputType  types.Type
+	Name       string
+	Params     []*params.Param
+	OutputType types.Type
+	Kernel     RegularKernel
+}
+
 func instantiate(pars []*params.Param, bindings map[string]types.Type) []*params.Param {
 	result := make([]*(params.Param), len(pars))
 	for i, par := range pars {
