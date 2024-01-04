@@ -12,7 +12,7 @@ import (
 )
 
 func initArr() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.FuncerDefinition{
 		// for Arr<<A>> +(Arr<<A>>) Arr<<A>>
 		expressions.RegularFuncer(
 			types.NewArr(

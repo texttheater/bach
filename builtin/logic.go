@@ -7,7 +7,7 @@ import (
 )
 
 func initLogic() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.FuncerDefinition{
 		expressions.SimpleFuncer(
 			types.Any{},
 			"true",

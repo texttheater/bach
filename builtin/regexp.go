@@ -12,7 +12,7 @@ import (
 )
 
 func initRegexp() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.FuncerDefinition{
 		// for Str findAll(for Str <A Null|Obj<start: Num, 0: Str, Any>>) Arr<<A>>
 		expressions.RegularFuncer(
 			types.Str{},

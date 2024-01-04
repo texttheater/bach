@@ -10,7 +10,7 @@ import (
 )
 
 func initObj() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.FuncerDefinition{
 		// for Obj<Any> +(Obj<Any>) Obj<Any>
 		expressions.RegularFuncer(
 			types.AnyObj,
