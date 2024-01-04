@@ -309,10 +309,9 @@ func (p TypePattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, er
 		Stack: inputShape.Stack,
 	}
 	if p.Name != nil {
-		outputShape.Stack = &FuncerStack{
-			Head: VariableFuncer(p, *p.Name, outputShape.Type),
-			Tail: outputShape.Stack,
-		}
+		outputShape.Stack = outputShape.Stack.Push(
+			VariableFuncer(p, *p.Name, outputShape.Type),
+		)
 	}
 	// build matcher
 	matcher := func(inputState states.State) (*states.VariableStack, bool, error) {
