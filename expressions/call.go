@@ -51,10 +51,10 @@ func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, s
 			}
 			// match input type
 			bindings := make(map[string]types.Type)
-			if !funcerDefinition.InputType.Bind(gotInputShape.Type, bindings) {
+			if !funcerDefinition.InputType.Bind(inputShape.Type, bindings) {
 				return Shape{}, nil, nil, false, nil
 			}
-			if !funcerDefinition.InputType.Instantiate(bindings).Subsumes(gotInputShape.Type) {
+			if !funcerDefinition.InputType.Instantiate(bindings).Subsumes(inputShape.Type) {
 				return Shape{}, nil, nil, false, nil
 			}
 			// typecheck and set parameters filled by this call
@@ -68,7 +68,7 @@ func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, s
 					Type: funcerDefinition.Params[i].InputType.Instantiate(bindings),
 					// TODO what if we don't have the bindings yet?
 					// TODO what if an incompatible bound is declared?
-					Stack: gotInputShape.Stack,
+					Stack: inputShape.Stack,
 				}
 				argOutputShape, argAction, argIDs, err := gotCall.Args[i].Typecheck(
 					argInputShape, instantiate(funcerDefinition.Params[i].Params, bindings))
@@ -129,7 +129,7 @@ func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, s
 			// create output shape
 			funOutputShape = Shape{
 				Type:  funcerDefinition.OutputType.Instantiate(bindings),
-				Stack: gotInputShape.Stack,
+				Stack: inputShape.Stack,
 			}
 			// set new type variables on action
 			funAction3 = func(inputState states.State, args []states.Action) *states.Thunk {
