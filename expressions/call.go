@@ -20,7 +20,7 @@ func (x CallExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x CallExpression) Typecheck(inputShape Shape, params []*params.Param) (Shape, states.Action, *states.IDStack, error) {
+func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, states.Action, *states.IDStack, error) {
 	// go down the function stack and find the function invoked by this
 	// call
 	stack := inputShape.Stack
@@ -32,12 +32,114 @@ func (x CallExpression) Typecheck(inputShape Shape, params []*params.Param) (Sha
 				errors.Pos(x.Pos),
 				errors.InputType(inputShape.Type),
 				errors.Name(x.Name),
-				errors.NumParams(len(x.Args)+len(params)),
+				errors.NumParams(len(x.Args)+len(p)),
 			)
 		}
 		// try the funcer on top of the stack
-		funcer := stack.Head
-		funOutputShape, funAction, ids, ok, err := funcer.Funcer(inputShape, x, params)
+		funcerDefinition := stack.Head
+		ids := funcerDefinition.IDs
+		funcer := func(gotInputShape Shape, gotCall CallExpression, gotParams []*params.Param) (Shape, states.Action, *states.IDStack, bool, error) {
+			// match number of parameters
+			if len(gotCall.Args)+len(gotParams) != len(funcerDefinition.Params) {
+				return Shape{}, nil, nil, false, nil
+			}
+			// match name
+			if gotCall.Name != funcerDefinition.Name {
+				return Shape{}, nil, nil, false, nil
+			}
+			// match input type
+			bindings := make(map[string]types.Type)
+			if !funcerDefinition.InputType.Bind(gotInputShape.Type, bindings) {
+				return Shape{}, nil, nil, false, nil
+			}
+			if !funcerDefinition.InputType.Instantiate(bindings).Subsumes(gotInputShape.Type) {
+				return Shape{}, nil, nil, false, nil
+			}
+			// typecheck and set parameters filled by this call
+			funAction := func(inputState states.State, args []states.Action) *states.Thunk {
+				return funcerDefinition.Kernel(inputState, args, bindings, gotCall.Position())
+			}
+			argActions := make([]states.Action, len(gotCall.Args))
+			argIDss := make([]*states.IDStack, len(gotCall.Args))
+			for i := range gotCall.Args {
+				argInputShape := Shape{
+					Type: funcerDefinition.Params[i].InputType.Instantiate(bindings),
+					// TODO what if we don't have the bindings yet?
+					// TODO what if an incompatible bound is declared?
+					Stack: gotInputShape.Stack,
+				}
+				argOutputShape, argAction, argIDs, err := gotCall.Args[i].Typecheck(
+					argInputShape, instantiate(funcerDefinition.Params[i].Params, bindings))
+				if err != nil {
+					return Shape{}, nil, nil, false, nil
+				}
+				if !funcerDefinition.Params[i].OutputType.Bind(argOutputShape.Type, bindings) {
+					return Shape{}, nil, nil, false, errors.TypeError(
+						errors.Code(errors.ArgHasWrongOutputType),
+						errors.Pos(gotCall.Pos),
+						errors.ArgNum(i+1),
+						errors.WantType(funcerDefinition.Params[i].OutputType.Instantiate(bindings)),
+						errors.GotType(argOutputShape.Type),
+					)
+				}
+				if !funcerDefinition.Params[i].OutputType.Instantiate(bindings).Subsumes(argOutputShape.Type) {
+					return Shape{}, nil, nil, false, errors.TypeError(
+						errors.Code(errors.ArgHasWrongOutputType),
+						errors.Pos(gotCall.Pos),
+						errors.ArgNum(i+1),
+						errors.WantType(funcerDefinition.Params[i].OutputType.Instantiate(bindings)),
+						errors.GotType(argOutputShape.Type),
+					)
+				}
+				argActions[i] = argAction
+				argIDss[i] = argIDs
+				ids = ids.AddAll(argIDs)
+			}
+			// pass input variable stack to arguments
+			funAction2 := func(inputState states.State, args []states.Action) *states.Thunk {
+				args2 := make([]states.Action, len(argActions)+len(args))
+				for i := range argActions {
+					prunedStack := inputState.Stack.Keep(argIDss[i]) // pass only what is needed to avoid memory leak
+					i := i
+					args2[i] = func(argInputState states.State, argArgs []states.Action) *states.Thunk {
+						argInputState.Stack = prunedStack
+						return argActions[i](argInputState, argArgs)
+					}
+				}
+				for i := 0; i < len(args); i++ {
+					args2[len(argActions)+i] = args[i]
+				}
+				return funAction(inputState, args2)
+			}
+			// typecheck parameters not filled by the call
+			for i, gotParam := range gotParams {
+				wantParam := funcerDefinition.Params[len(gotCall.Args)+i].Instantiate(bindings)
+				if !gotParam.Subsumes(wantParam) {
+					return Shape{}, nil, nil, false, errors.TypeError(
+						errors.Code(errors.ParamDoesNotMatch),
+						errors.Pos(gotCall.Pos),
+						errors.ParamNum(i+1),
+						errors.WantParam(gotParam),
+						errors.GotParam(wantParam),
+					)
+				}
+			}
+			// create output shape
+			outputShape := Shape{
+				Type:  funcerDefinition.OutputType.Instantiate(bindings),
+				Stack: gotInputShape.Stack,
+			}
+			// set new type variables on action
+			funAction3 := func(inputState states.State, args []states.Action) *states.Thunk {
+				for n, t := range bindings {
+					inputState.TypeStack = inputState.TypeStack.Update(n, t)
+				}
+				return funAction2(inputState, args)
+			}
+			// return
+			return outputShape, funAction3, ids, true, nil
+		}
+		funOutputShape, funAction, ids, ok, err := funcer(inputShape, x, p)
 		if err != nil {
 			return Shape{}, nil, nil, err
 		}
@@ -96,7 +198,8 @@ type FuncerDefinition struct {
 	Name       string
 	Params     []*params.Param
 	OutputType types.Type
-	Funcer     Funcer
+	Kernel     RegularKernel
+	IDs        *states.IDStack
 }
 
 func instantiate(pars []*params.Param, bindings map[string]types.Type) []*params.Param {
@@ -106,8 +209,6 @@ func instantiate(pars []*params.Param, bindings map[string]types.Type) []*params
 	}
 	return result
 }
-
-type Funcer func(gotInputShape Shape, gotCall CallExpression, gotParams []*params.Param) (outputShape Shape, action states.Action, ids *states.IDStack, ok bool, err error)
 
 type SimpleKernel func(inputValue states.Value, argValues []states.Value) (states.Value, error)
 
@@ -175,112 +276,12 @@ func VariableFuncer(id any, name string, varType types.Type) FuncerDefinition {
 type RegularKernel func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk
 
 func RegularFuncer(wantInputType types.Type, wantName string, pars []*params.Param, outputType types.Type, kernel RegularKernel, ids *states.IDStack) FuncerDefinition {
-	funcer := func(gotInputShape Shape, gotCall CallExpression, gotParams []*params.Param) (Shape, states.Action, *states.IDStack, bool, error) {
-		// match number of parameters
-		if len(gotCall.Args)+len(gotParams) != len(pars) {
-			return Shape{}, nil, nil, false, nil
-		}
-		// match name
-		if gotCall.Name != wantName {
-			return Shape{}, nil, nil, false, nil
-		}
-		// match input type
-		bindings := make(map[string]types.Type)
-		if !wantInputType.Bind(gotInputShape.Type, bindings) {
-			return Shape{}, nil, nil, false, nil
-		}
-		if !wantInputType.Instantiate(bindings).Subsumes(gotInputShape.Type) {
-			return Shape{}, nil, nil, false, nil
-		}
-		// typecheck and set parameters filled by this call
-		funAction := func(inputState states.State, args []states.Action) *states.Thunk {
-			return kernel(inputState, args, bindings, gotCall.Position())
-		}
-		argActions := make([]states.Action, len(gotCall.Args))
-		argIDss := make([]*states.IDStack, len(gotCall.Args))
-		for i := range gotCall.Args {
-			argInputShape := Shape{
-				Type: pars[i].InputType.Instantiate(bindings),
-				// TODO what if we don't have the bindings yet?
-				// TODO what if an incompatible bound is declared?
-				Stack: gotInputShape.Stack,
-			}
-			argOutputShape, argAction, argIDs, err := gotCall.Args[i].Typecheck(
-				argInputShape, instantiate(pars[i].Params, bindings))
-			if err != nil {
-				return Shape{}, nil, nil, false, nil
-			}
-			if !pars[i].OutputType.Bind(argOutputShape.Type, bindings) {
-				return Shape{}, nil, nil, false, errors.TypeError(
-					errors.Code(errors.ArgHasWrongOutputType),
-					errors.Pos(gotCall.Pos),
-					errors.ArgNum(i+1),
-					errors.WantType(pars[i].OutputType.Instantiate(bindings)),
-					errors.GotType(argOutputShape.Type),
-				)
-			}
-			if !pars[i].OutputType.Instantiate(bindings).Subsumes(argOutputShape.Type) {
-				return Shape{}, nil, nil, false, errors.TypeError(
-					errors.Code(errors.ArgHasWrongOutputType),
-					errors.Pos(gotCall.Pos),
-					errors.ArgNum(i+1),
-					errors.WantType(pars[i].OutputType.Instantiate(bindings)),
-					errors.GotType(argOutputShape.Type),
-				)
-			}
-			argActions[i] = argAction
-			argIDss[i] = argIDs
-			ids = ids.AddAll(argIDs)
-		}
-		// pass input variable stack to arguments
-		funAction2 := func(inputState states.State, args []states.Action) *states.Thunk {
-			args2 := make([]states.Action, len(argActions)+len(args))
-			for i := range argActions {
-				prunedStack := inputState.Stack.Keep(argIDss[i]) // pass only what is needed to avoid memory leak
-				i := i
-				args2[i] = func(argInputState states.State, argArgs []states.Action) *states.Thunk {
-					argInputState.Stack = prunedStack
-					return argActions[i](argInputState, argArgs)
-				}
-			}
-			for i := 0; i < len(args); i++ {
-				args2[len(argActions)+i] = args[i]
-			}
-			return funAction(inputState, args2)
-		}
-		// typecheck parameters not filled by the call
-		for i, gotParam := range gotParams {
-			wantParam := pars[len(gotCall.Args)+i].Instantiate(bindings)
-			if !gotParam.Subsumes(wantParam) {
-				return Shape{}, nil, nil, false, errors.TypeError(
-					errors.Code(errors.ParamDoesNotMatch),
-					errors.Pos(gotCall.Pos),
-					errors.ParamNum(i+1),
-					errors.WantParam(gotParam),
-					errors.GotParam(wantParam),
-				)
-			}
-		}
-		// create output shape
-		outputShape := Shape{
-			Type:  outputType.Instantiate(bindings),
-			Stack: gotInputShape.Stack,
-		}
-		// set new type variables on action
-		funAction3 := func(inputState states.State, args []states.Action) *states.Thunk {
-			for n, t := range bindings {
-				inputState.TypeStack = inputState.TypeStack.Update(n, t)
-			}
-			return funAction2(inputState, args)
-		}
-		// return
-		return outputShape, funAction3, ids, true, nil
-	}
 	return FuncerDefinition{
 		InputType:  wantInputType,
 		Name:       wantName,
 		Params:     pars,
 		OutputType: outputType,
-		Funcer:     funcer,
+		Kernel:     kernel,
+		IDs:        ids,
 	}
 }
