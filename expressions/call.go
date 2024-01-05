@@ -38,8 +38,6 @@ funcers:
 		}
 		// try the funcer on top of the stack
 		funcerDefinition := stack.Head
-		var funOutputShape Shape
-		var funAction3 states.Action
 		ids := funcerDefinition.IDs
 		// match number of parameters
 		if len(x.Args)+len(p) != len(funcerDefinition.Params) {
@@ -62,7 +60,7 @@ funcers:
 			continue funcers
 		}
 		// typecheck and set parameters filled by this call
-		funAction := func(inputState states.State, args []states.Action) *states.Thunk {
+		action1 := func(inputState states.State, args []states.Action) *states.Thunk {
 			return funcerDefinition.Kernel(inputState, args, bindings, x.Position())
 		}
 		argActions := make([]states.Action, len(x.Args))
@@ -103,7 +101,7 @@ funcers:
 			ids = ids.AddAll(argIDs)
 		}
 		// pass input variable stack to arguments
-		funAction2 := func(inputState states.State, args []states.Action) *states.Thunk {
+		action2 := func(inputState states.State, args []states.Action) *states.Thunk {
 			args2 := make([]states.Action, len(argActions)+len(args))
 			for i := range argActions {
 				prunedStack := inputState.Stack.Keep(argIDss[i]) // pass only what is needed to avoid memory leak
@@ -116,7 +114,7 @@ funcers:
 			for i := 0; i < len(args); i++ {
 				args2[len(argActions)+i] = args[i]
 			}
-			return funAction(inputState, args2)
+			return action1(inputState, args2)
 		}
 		// typecheck parameters not filled by the call
 		for i, gotParam := range p {
@@ -132,29 +130,29 @@ funcers:
 			}
 		}
 		// create output shape
-		funOutputShape = Shape{
+		outputShape := Shape{
 			Type:  funcerDefinition.OutputType.Instantiate(bindings),
 			Stack: inputShape.Stack,
 		}
 		// set new type variables on action
-		funAction3 = func(inputState states.State, args []states.Action) *states.Thunk {
+		action3 := func(inputState states.State, args []states.Action) *states.Thunk {
 			for n, t := range bindings {
 				inputState.TypeStack = inputState.TypeStack.Update(n, t)
 			}
-			return funAction2(inputState, args)
+			return action2(inputState, args)
 		}
 		// make call lazy
 		action := func(inputState states.State, args []states.Action) *states.Thunk {
 			return &states.Thunk{
 				Func: func() *states.Thunk {
-					return funAction3(inputState, args)
+					return action3(inputState, args)
 				},
 				Stack:     inputState.Stack,
 				TypeStack: inputState.TypeStack,
 			}
 		}
 		// return
-		return funOutputShape, action, ids, nil
+		return outputShape, action, ids, nil
 	}
 }
 
