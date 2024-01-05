@@ -37,6 +37,8 @@ func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, s
 		}
 		// try the funcer on top of the stack
 		funcerDefinition := stack.Head
+		var funOutputShape Shape
+		var funAction3 states.Action
 		ids := funcerDefinition.IDs
 		funcer := func(gotInputShape Shape, gotCall CallExpression, gotParams []*params.Param) (Shape, states.Action, *states.IDStack, bool, error) {
 			// match number of parameters
@@ -125,21 +127,21 @@ func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, s
 				}
 			}
 			// create output shape
-			outputShape := Shape{
+			funOutputShape = Shape{
 				Type:  funcerDefinition.OutputType.Instantiate(bindings),
 				Stack: gotInputShape.Stack,
 			}
 			// set new type variables on action
-			funAction3 := func(inputState states.State, args []states.Action) *states.Thunk {
+			funAction3 = func(inputState states.State, args []states.Action) *states.Thunk {
 				for n, t := range bindings {
 					inputState.TypeStack = inputState.TypeStack.Update(n, t)
 				}
 				return funAction2(inputState, args)
 			}
 			// return
-			return outputShape, funAction3, ids, true, nil
+			return funOutputShape, funAction3, ids, true, nil
 		}
-		funOutputShape, funAction, ids, ok, err := funcer(inputShape, x, p)
+		_, _, _, ok, err := funcer(inputShape, x, p)
 		if err != nil {
 			return Shape{}, nil, nil, err
 		}
@@ -151,7 +153,7 @@ func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, s
 		action := func(inputState states.State, args []states.Action) *states.Thunk {
 			return &states.Thunk{
 				Func: func() *states.Thunk {
-					return funAction(inputState, args)
+					return funAction3(inputState, args)
 				},
 				Stack:     inputState.Stack,
 				TypeStack: inputState.TypeStack,
