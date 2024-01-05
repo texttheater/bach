@@ -7,7 +7,7 @@ import (
 )
 
 func initNull() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.FuncerDefinition{
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.SimpleFuncer(
 			types.Any{},
 			"null",

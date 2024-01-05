@@ -162,15 +162,15 @@ type Shape struct {
 }
 
 type FuncerStack struct {
-	Head FuncerDefinition
+	Head Funcer
 	Tail *FuncerStack
 }
 
-func (s *FuncerStack) Push(funcer FuncerDefinition) *FuncerStack {
+func (s *FuncerStack) Push(funcer Funcer) *FuncerStack {
 	return &FuncerStack{funcer, s}
 }
 
-func (s *FuncerStack) PushAll(funcers []FuncerDefinition) *FuncerStack {
+func (s *FuncerStack) PushAll(funcers []Funcer) *FuncerStack {
 	for i := len(funcers) - 1; i >= 0; i-- {
 		s = s.Push(funcers[i])
 	}
@@ -178,7 +178,7 @@ func (s *FuncerStack) PushAll(funcers []FuncerDefinition) *FuncerStack {
 }
 
 func (s *FuncerStack) String() string {
-	slice := make([]FuncerDefinition, 0)
+	slice := make([]Funcer, 0)
 	stack := s
 	for stack != nil {
 		slice = append(slice, stack.Head)
@@ -187,7 +187,7 @@ func (s *FuncerStack) String() string {
 	return fmt.Sprintf("%v", slice)
 }
 
-type FuncerDefinition struct {
+type Funcer struct {
 	InputType  types.Type
 	Name       string
 	Params     []*params.Param
@@ -206,7 +206,7 @@ func instantiate(pars []*params.Param, bindings map[string]types.Type) []*params
 
 type SimpleKernel func(inputValue states.Value, argValues []states.Value) (states.Value, error)
 
-func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, simpleKernel SimpleKernel) FuncerDefinition {
+func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, simpleKernel SimpleKernel) Funcer {
 	// make parameters from argument types
 	pars := make([]*params.Param, len(argTypes))
 	for i, argType := range argTypes {
@@ -242,7 +242,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Ty
 	return RegularFuncer(wantInputType, wantName, pars, outputType, regularKernel, nil)
 }
 
-func VariableFuncer(id any, name string, varType types.Type) FuncerDefinition {
+func VariableFuncer(id any, name string, varType types.Type) Funcer {
 	kernel := func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		stack := inputState.Stack
 		for stack != nil {
@@ -269,8 +269,8 @@ func VariableFuncer(id any, name string, varType types.Type) FuncerDefinition {
 
 type RegularKernel func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk
 
-func RegularFuncer(wantInputType types.Type, wantName string, pars []*params.Param, outputType types.Type, kernel RegularKernel, ids *states.IDStack) FuncerDefinition {
-	return FuncerDefinition{
+func RegularFuncer(wantInputType types.Type, wantName string, pars []*params.Param, outputType types.Type, kernel RegularKernel, ids *states.IDStack) Funcer {
+	return Funcer{
 		InputType:  wantInputType,
 		Name:       wantName,
 		Params:     pars,

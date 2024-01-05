@@ -13,7 +13,7 @@ import (
 )
 
 func initValues() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.FuncerDefinition{
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		// for Any ==(Any) Bool
 		expressions.RegularFuncer(
 			types.Any{},

@@ -17,7 +17,7 @@ import (
 
 func initMath() {
 	rand.Seed(time.Now().UnixNano())
-	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.FuncerDefinition{
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		// for Num +Num Num
 		expressions.SimpleFuncer(
 			types.Num{},

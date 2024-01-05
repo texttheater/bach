@@ -9,7 +9,7 @@ import (
 )
 
 func initControl() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.FuncerDefinition{
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
 			types.Any{},
 			"fatal",

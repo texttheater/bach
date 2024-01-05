@@ -8,7 +8,7 @@ import (
 )
 
 func initTypes() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.FuncerDefinition{
+	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
 		expressions.RegularFuncer(
 			types.NewVar("A", types.Any{}),
 			"type",
