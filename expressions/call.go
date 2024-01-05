@@ -42,7 +42,7 @@ func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, s
 		ids := funcerDefinition.IDs
 		funcer := func(gotInputShape Shape, gotCall CallExpression, gotParams []*params.Param) (Shape, states.Action, *states.IDStack, bool, error) {
 			// match number of parameters
-			if len(x.Args)+len(gotParams) != len(funcerDefinition.Params) {
+			if len(x.Args)+len(p) != len(funcerDefinition.Params) {
 				return Shape{}, nil, nil, false, nil
 			}
 			// match name
@@ -114,7 +114,7 @@ func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, s
 				return funAction(inputState, args2)
 			}
 			// typecheck parameters not filled by the call
-			for i, gotParam := range gotParams {
+			for i, gotParam := range p {
 				wantParam := funcerDefinition.Params[len(x.Args)+i].Instantiate(bindings)
 				if !gotParam.Subsumes(wantParam) {
 					return Shape{}, nil, nil, false, errors.TypeError(
