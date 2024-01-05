@@ -42,11 +42,11 @@ func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, s
 		ids := funcerDefinition.IDs
 		funcer := func(gotInputShape Shape, gotCall CallExpression, gotParams []*params.Param) (Shape, states.Action, *states.IDStack, bool, error) {
 			// match number of parameters
-			if len(gotCall.Args)+len(gotParams) != len(funcerDefinition.Params) {
+			if len(x.Args)+len(gotParams) != len(funcerDefinition.Params) {
 				return Shape{}, nil, nil, false, nil
 			}
 			// match name
-			if gotCall.Name != funcerDefinition.Name {
+			if x.Name != funcerDefinition.Name {
 				return Shape{}, nil, nil, false, nil
 			}
 			// match input type
@@ -59,18 +59,18 @@ func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, s
 			}
 			// typecheck and set parameters filled by this call
 			funAction := func(inputState states.State, args []states.Action) *states.Thunk {
-				return funcerDefinition.Kernel(inputState, args, bindings, gotCall.Position())
+				return funcerDefinition.Kernel(inputState, args, bindings, x.Position())
 			}
-			argActions := make([]states.Action, len(gotCall.Args))
-			argIDss := make([]*states.IDStack, len(gotCall.Args))
-			for i := range gotCall.Args {
+			argActions := make([]states.Action, len(x.Args))
+			argIDss := make([]*states.IDStack, len(x.Args))
+			for i := range x.Args {
 				argInputShape := Shape{
 					Type: funcerDefinition.Params[i].InputType.Instantiate(bindings),
 					// TODO what if we don't have the bindings yet?
 					// TODO what if an incompatible bound is declared?
 					Stack: inputShape.Stack,
 				}
-				argOutputShape, argAction, argIDs, err := gotCall.Args[i].Typecheck(
+				argOutputShape, argAction, argIDs, err := x.Args[i].Typecheck(
 					argInputShape, instantiate(funcerDefinition.Params[i].Params, bindings))
 				if err != nil {
 					return Shape{}, nil, nil, false, nil
@@ -78,7 +78,7 @@ func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, s
 				if !funcerDefinition.Params[i].OutputType.Bind(argOutputShape.Type, bindings) {
 					return Shape{}, nil, nil, false, errors.TypeError(
 						errors.Code(errors.ArgHasWrongOutputType),
-						errors.Pos(gotCall.Pos),
+						errors.Pos(x.Pos),
 						errors.ArgNum(i+1),
 						errors.WantType(funcerDefinition.Params[i].OutputType.Instantiate(bindings)),
 						errors.GotType(argOutputShape.Type),
@@ -87,7 +87,7 @@ func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, s
 				if !funcerDefinition.Params[i].OutputType.Instantiate(bindings).Subsumes(argOutputShape.Type) {
 					return Shape{}, nil, nil, false, errors.TypeError(
 						errors.Code(errors.ArgHasWrongOutputType),
-						errors.Pos(gotCall.Pos),
+						errors.Pos(x.Pos),
 						errors.ArgNum(i+1),
 						errors.WantType(funcerDefinition.Params[i].OutputType.Instantiate(bindings)),
 						errors.GotType(argOutputShape.Type),
@@ -115,11 +115,11 @@ func (x CallExpression) Typecheck(inputShape Shape, p []*params.Param) (Shape, s
 			}
 			// typecheck parameters not filled by the call
 			for i, gotParam := range gotParams {
-				wantParam := funcerDefinition.Params[len(gotCall.Args)+i].Instantiate(bindings)
+				wantParam := funcerDefinition.Params[len(x.Args)+i].Instantiate(bindings)
 				if !gotParam.Subsumes(wantParam) {
 					return Shape{}, nil, nil, false, errors.TypeError(
 						errors.Code(errors.ParamDoesNotMatch),
-						errors.Pos(gotCall.Pos),
+						errors.Pos(x.Pos),
 						errors.ParamNum(i+1),
 						errors.WantParam(gotParam),
 						errors.GotParam(wantParam),
