@@ -15,7 +15,7 @@ var ObjFuncers = []expressions.Funcer{
 		types.AnyObj,
 		"+",
 		[]*params.Param{
-			params.SimpleParam(types.AnyObj),
+			params.SimpleParam("other", types.AnyObj),
 		},
 		types.AnyObj,
 		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -42,7 +42,7 @@ var ObjFuncers = []expressions.Funcer{
 		},
 		"get",
 		[]*params.Param{
-			params.SimpleParam(types.NewUnion(types.Str{}, types.Num{})),
+			params.SimpleParam("key", types.NewUnion(types.Str{}, types.Num{})),
 		},
 		types.NewVar("A", types.Any{}),
 		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -78,7 +78,7 @@ var ObjFuncers = []expressions.Funcer{
 		},
 		"has",
 		[]*params.Param{
-			params.SimpleParam(types.NewUnion(types.Str{}, types.Num{})),
+			params.SimpleParam("key", types.NewUnion(types.Str{}, types.Num{})),
 		},
 		types.Bool{},
 		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -186,7 +186,7 @@ var ObjFuncers = []expressions.Funcer{
 		},
 		"without",
 		[]*params.Param{
-			params.SimpleParam(types.Str{}),
+			params.SimpleParam("key", types.Str{}),
 		},
 		types.Obj{
 			Props: map[string]types.Type{},

@@ -8,13 +8,15 @@ import (
 
 type Param struct {
 	InputType  types.Type
+	Name       string
 	Params     []*Param
 	OutputType types.Type
 }
 
-func SimpleParam(outputType types.Type) *Param {
+func SimpleParam(Name string, outputType types.Type) *Param {
 	return &Param{
 		InputType:  types.Any{},
+		Name:       Name,
 		Params:     nil,
 		OutputType: outputType,
 	}
@@ -54,6 +56,7 @@ func (p *Param) Instantiate(bindings map[string]types.Type) *Param {
 	outputType := p.OutputType.Instantiate(bindings)
 	return &Param{
 		InputType:  inputType,
+		Name:       p.Name,
 		Params:     params,
 		OutputType: outputType,
 	}

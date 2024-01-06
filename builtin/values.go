@@ -18,7 +18,7 @@ var ValueFuncers = []expressions.Funcer{
 		types.Any{},
 		"==",
 		[]*params.Param{
-			params.SimpleParam((types.Any{})),
+			params.SimpleParam("other", (types.Any{})),
 		},
 		types.Bool{},
 		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -70,7 +70,7 @@ var ValueFuncers = []expressions.Funcer{
 		types.Str{},
 		"parseInt",
 		[]*params.Param{
-			params.SimpleParam(types.Num{}),
+			params.SimpleParam("base", types.Num{}),
 		},
 		types.Num{},
 		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {

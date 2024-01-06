@@ -241,7 +241,7 @@ var RegexpFuncers = []expressions.Funcer{
 					},
 				),
 			},
-			params.SimpleParam(types.Num{}),
+			params.SimpleParam("maxSplit", types.Num{}),
 		},
 		types.NewArr(
 			types.Str{},

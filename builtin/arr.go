@@ -12,14 +12,14 @@ import (
 )
 
 var ArrFuncers = []expressions.Funcer{
-	// for Arr<<A>> +(Arr<<A>>) Arr<<A>>
+	// for Arr<<A>> +(Arr<<B>>) Arr<<A|B>>
 	expressions.RegularFuncer(
 		types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
 		"+",
 		[]*params.Param{
-			params.SimpleParam(types.NewArr(
+			params.SimpleParam("other", types.NewArr(
 				types.NewVar("B", types.Any{}),
 			)),
 		},
@@ -58,7 +58,7 @@ var ArrFuncers = []expressions.Funcer{
 		),
 		"drop",
 		[]*params.Param{
-			params.SimpleParam(types.Num{}),
+			params.SimpleParam("n", types.Num{}),
 		},
 		types.NewArr(
 			types.NewVar("A", types.Any{}),
@@ -169,7 +169,7 @@ var ArrFuncers = []expressions.Funcer{
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"enum",
 		[]*params.Param{
-			params.SimpleParam(types.Num{}),
+			params.SimpleParam("start", types.Num{}),
 		},
 		types.NewArr(types.NewTup([]types.Type{
 			types.Num{},
@@ -393,11 +393,11 @@ var ArrFuncers = []expressions.Funcer{
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"fold",
 		[]*params.Param{
-			params.SimpleParam(types.NewVar("B", types.Any{})),
+			params.SimpleParam("start", types.NewVar("B", types.Any{})),
 			{
 				InputType: types.NewVar("B", types.Any{}),
 				Params: []*params.Param{
-					params.SimpleParam(types.NewVar("A", types.Any{})),
+					params.SimpleParam("next", types.NewVar("A", types.Any{})),
 				},
 				OutputType: types.NewVar("B", types.Any{}),
 			},
@@ -440,7 +440,7 @@ var ArrFuncers = []expressions.Funcer{
 		),
 		"get",
 		[]*params.Param{
-			params.SimpleParam(types.Num{}),
+			params.SimpleParam("index", types.Num{}),
 		},
 		types.NewVar("A", types.Any{}),
 		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -600,11 +600,11 @@ var ArrFuncers = []expressions.Funcer{
 			{
 				InputType: types.NewVar("A", types.Any{}),
 				Params: []*params.Param{
-					params.SimpleParam(types.NewVar("A", types.Any{})),
+					params.SimpleParam("other", types.NewVar("A", types.Any{})),
 				},
 				OutputType: types.Bool{},
 			},
-			params.SimpleParam(types.NewVar("A", types.Any{})),
+			params.SimpleParam("default", types.NewVar("A", types.Any{})),
 		},
 		types.NewVar("A", types.Any{}),
 		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -625,11 +625,11 @@ var ArrFuncers = []expressions.Funcer{
 			{
 				InputType: types.NewVar("B", types.Any{}),
 				Params: []*params.Param{
-					params.SimpleParam(types.NewVar("B", types.Any{})),
+					params.SimpleParam("other", types.NewVar("B", types.Any{})),
 				},
 				OutputType: types.Bool{},
 			},
-			params.SimpleParam(types.NewVar("A", types.Any{})),
+			params.SimpleParam("default", types.NewVar("A", types.Any{})),
 		},
 		types.NewVar("A", types.Any{}),
 		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -645,11 +645,11 @@ var ArrFuncers = []expressions.Funcer{
 			{
 				InputType: types.NewVar("A", types.Any{}),
 				Params: []*params.Param{
-					params.SimpleParam(types.NewVar("A", types.Any{})),
+					params.SimpleParam("other", types.NewVar("A", types.Any{})),
 				},
 				OutputType: types.Bool{},
 			},
-			params.SimpleParam(types.NewVar("A", types.Any{})),
+			params.SimpleParam("default", types.NewVar("A", types.Any{})),
 		},
 		types.NewVar("A", types.Any{}),
 		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -670,11 +670,11 @@ var ArrFuncers = []expressions.Funcer{
 			{
 				InputType: types.NewVar("B", types.Any{}),
 				Params: []*params.Param{
-					params.SimpleParam(types.NewVar("B", types.Any{})),
+					params.SimpleParam("other", types.NewVar("B", types.Any{})),
 				},
 				OutputType: types.Bool{},
 			},
-			params.SimpleParam(types.NewVar("A", types.Any{})),
+			params.SimpleParam("default", types.NewVar("A", types.Any{})),
 		},
 		types.NewVar("A", types.Any{}),
 		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -687,8 +687,8 @@ var ArrFuncers = []expressions.Funcer{
 		types.Any{},
 		"range",
 		[]*params.Param{
-			params.SimpleParam(types.Num{}),
-			params.SimpleParam(types.Num{}),
+			params.SimpleParam("from", types.Num{}),
+			params.SimpleParam("to", types.Num{}),
 		},
 		types.NewArr(
 			types.Num{},
@@ -723,7 +723,7 @@ var ArrFuncers = []expressions.Funcer{
 		),
 		"repeat",
 		[]*params.Param{
-			params.SimpleParam(types.Num{}),
+			params.SimpleParam("times", types.Num{}),
 		},
 		types.NewArr(
 			types.NewVar("A", types.Any{}),
@@ -837,7 +837,7 @@ var ArrFuncers = []expressions.Funcer{
 			{
 				InputType: types.NewVar("A", types.Any{}),
 				Params: []*params.Param{
-					params.SimpleParam(types.NewVar("A", types.Any{})),
+					params.SimpleParam("other", types.NewVar("A", types.Any{})),
 				},
 				OutputType: types.Bool{},
 			},
@@ -895,7 +895,7 @@ var ArrFuncers = []expressions.Funcer{
 			{
 				InputType: types.NewVar("B", types.Any{}),
 				Params: []*params.Param{
-					params.SimpleParam(types.NewVar("B", types.Any{})),
+					params.SimpleParam("other", types.NewVar("B", types.Any{})),
 				},
 				OutputType: types.Bool{},
 			},
@@ -913,7 +913,7 @@ var ArrFuncers = []expressions.Funcer{
 		),
 		"take",
 		[]*params.Param{
-			params.SimpleParam(types.Num{}),
+			params.SimpleParam("n", types.Num{}),
 		},
 		types.NewArr(
 			types.NewVar("A", types.Any{}),

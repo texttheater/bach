@@ -191,7 +191,7 @@ var TextFuncers = []expressions.Funcer{
 		types.Str{},
 		"indexOf",
 		[]*params.Param{
-			params.SimpleParam(types.Str{}),
+			params.SimpleParam("needle", types.Str{}),
 		},
 		types.Num{},
 		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -310,8 +310,8 @@ var TextFuncers = []expressions.Funcer{
 		types.Str{},
 		"replaceFirst",
 		[]*params.Param{
-			params.SimpleParam(types.Str{}),
-			params.SimpleParam(types.Str{}),
+			params.SimpleParam("needle", types.Str{}),
+			params.SimpleParam("replacement", types.Str{}),
 		},
 		types.Str{},
 		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -334,8 +334,8 @@ var TextFuncers = []expressions.Funcer{
 		types.Str{},
 		"replaceAll",
 		[]*params.Param{
-			params.SimpleParam(types.Str{}),
-			params.SimpleParam(types.Str{}),
+			params.SimpleParam("needle", types.Str{}),
+			params.SimpleParam("replacement", types.Str{}),
 		},
 		types.Str{},
 		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
