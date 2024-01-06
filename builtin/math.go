@@ -9,17 +9,19 @@ import (
 
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/golang-variadic-hypot/varhypot"
 )
 
 var MathFuncers = []expressions.Funcer{
-	// for Num +Num Num
 	expressions.SimpleFuncer(
 		types.Num{},
 		"+",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("b", types.Num{}),
+		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			inputNum := inputValue.(states.NumValue)
@@ -27,11 +29,12 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(inputNum + argumentNum), nil
 		},
 	),
-	// for Num -Num Num
 	expressions.SimpleFuncer(
 		types.Num{},
 		"-",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("b", types.Num{}),
+		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			inputNum := inputValue.(states.NumValue)
@@ -39,11 +42,12 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(inputNum - argumentNum), nil
 		},
 	),
-	// for Any -Num Num
 	expressions.SimpleFuncer(
 		types.Any{},
 		"-",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("n", types.Num{}),
+		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(argumentValues[0].(states.NumValue))
@@ -54,11 +58,12 @@ var MathFuncers = []expressions.Funcer{
 			}
 		},
 	),
-	// for Num *Num Num
 	expressions.SimpleFuncer(
 		types.Num{},
 		"*",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("b", types.Num{}),
+		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			inputNum := inputValue.(states.NumValue)
@@ -66,11 +71,12 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(inputNum * argumentNum), nil
 		},
 	),
-	// for Num /Num Num
 	expressions.SimpleFuncer(
 		types.Num{},
 		"/",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("b", types.Num{}),
+		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			inputNum := inputValue.(states.NumValue)
@@ -78,11 +84,12 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(inputNum / argumentNum), nil
 		},
 	),
-	// for Num %Num Num
 	expressions.SimpleFuncer(
 		types.Num{},
 		"%",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("b", types.Num{}),
+		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			inputNum := inputValue.(states.NumValue)
@@ -90,11 +97,12 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(math.Mod(float64(inputNum), float64(argumentNum))), nil
 		},
 	),
-	// for Num <Num Bool
 	expressions.SimpleFuncer(
 		types.Num{},
 		"<",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("other", types.Num{}),
+		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			inputNum := inputValue.(states.NumValue)
@@ -102,11 +110,12 @@ var MathFuncers = []expressions.Funcer{
 			return states.BoolValue(inputNum < argumentNum), nil
 		},
 	),
-	// for Num >Num Bool
 	expressions.SimpleFuncer(
 		types.Num{},
 		">",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("other", types.Num{}),
+		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			inputNum := inputValue.(states.NumValue)
@@ -114,11 +123,12 @@ var MathFuncers = []expressions.Funcer{
 			return states.BoolValue(inputNum > argumentNum), nil
 		},
 	),
-	// for Num <=Num Bool
 	expressions.SimpleFuncer(
 		types.Num{},
 		"<=",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("other", types.Num{}),
+		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			inputNum := inputValue.(states.NumValue)
@@ -126,11 +136,12 @@ var MathFuncers = []expressions.Funcer{
 			return states.BoolValue(inputNum <= argumentNum), nil
 		},
 	),
-	// for Num >=Num Bool
 	expressions.SimpleFuncer(
 		types.Num{},
 		">=",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("other", types.Num{}),
+		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			inputNum := inputValue.(states.NumValue)
@@ -296,11 +307,12 @@ var MathFuncers = []expressions.Funcer{
 			return states.BoolValue(x >= -9007199254740991 && x <= 9007199254740991), nil
 		},
 	),
-	// for Num toBase Str
 	expressions.SimpleFuncer(
 		types.Num{},
 		"toBase",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("base", types.Num{}),
+		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
@@ -310,7 +322,6 @@ var MathFuncers = []expressions.Funcer{
 					errors.Code(errors.UnexpectedValue),
 					errors.GotValue(inputValue),
 					errors.Message("base conversion for non-integers not yet supported"),
-					// TODO add pos
 				)
 			}
 			radix := float64(argumentValues[0].(states.NumValue))
@@ -320,7 +331,6 @@ var MathFuncers = []expressions.Funcer{
 					errors.Code(errors.UnexpectedValue),
 					errors.GotValue(argumentValues[0]),
 					errors.Message("radix must be an integer between 2 and 36 (inclusive)"),
-					// TODO add pos
 				)
 			}
 			return states.StrValue(strconv.FormatInt(xInt, radixInt)), nil
@@ -337,11 +347,12 @@ var MathFuncers = []expressions.Funcer{
 			return states.StrValue(fmt.Sprintf("%e", x)), nil
 		},
 	),
-	// for Num toExponential(Num) Str
 	expressions.SimpleFuncer(
 		types.Num{},
 		"toExponential",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("precision", types.Num{}),
+		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
@@ -350,11 +361,12 @@ var MathFuncers = []expressions.Funcer{
 			return states.StrValue(fmt.Sprintf(format, x)), nil
 		},
 	),
-	// for Num toFixed(Num) Str
 	expressions.SimpleFuncer(
 		types.Num{},
 		"toFixed",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("precision", types.Num{}),
+		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
@@ -520,12 +532,11 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(math.Atanh(x)), nil
 		},
 	),
-	// for Num atan2(Num) Num
 	expressions.SimpleFuncer(
 		types.Num{},
 		"atan2",
-		[]types.Type{
-			types.Num{},
+		[]*params.Param{
+			params.SimpleParam("x", types.Num{}),
 		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -654,12 +665,11 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(float64(hypot)), nil
 		},
 	),
-	// for Num imul(Num) Num
 	expressions.SimpleFuncer(
 		types.Num{},
 		"imul",
-		[]types.Type{
-			types.Num{},
+		[]*params.Param{
+			params.SimpleParam("y", types.Num{}),
 		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -750,12 +760,11 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(min), nil
 		},
 	),
-	// for Num **Num Num
 	expressions.SimpleFuncer(
 		types.Num{},
 		"**",
-		[]types.Type{
-			types.Num{},
+		[]*params.Param{
+			params.SimpleParam("y", types.Num{}),
 		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {

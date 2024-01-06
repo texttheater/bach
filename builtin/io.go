@@ -9,6 +9,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -80,8 +81,8 @@ var IOFuncers = []expressions.Funcer{
 	expressions.SimpleFuncer(
 		types.NewVar("A", types.Any{}),
 		"err",
-		[]types.Type{
-			types.Str{},
+		[]*params.Param{
+			params.SimpleParam("message", types.Str{}),
 		},
 		types.NewVar("A", types.Any{}),
 		func(inputValue states.Value, args []states.Value) (states.Value, error) {
@@ -176,8 +177,8 @@ var IOFuncers = []expressions.Funcer{
 	expressions.SimpleFuncer(
 		types.NewVar("A", types.Any{}),
 		"out",
-		[]types.Type{
-			types.Str{},
+		[]*params.Param{
+			params.SimpleParam("message", types.Str{}),
 		},
 		types.NewVar("A", types.Any{}),
 		func(inputValue states.Value, args []states.Value) (states.Value, error) {

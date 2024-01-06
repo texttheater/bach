@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -28,7 +29,9 @@ var LogicFuncers = []expressions.Funcer{
 	expressions.SimpleFuncer(
 		types.Bool{},
 		"and",
-		[]types.Type{types.Bool{}},
+		[]*params.Param{
+			params.SimpleParam("q", types.Bool{}),
+		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			inputBool := inputValue.(states.BoolValue)
@@ -39,7 +42,9 @@ var LogicFuncers = []expressions.Funcer{
 	expressions.SimpleFuncer(
 		types.Bool{},
 		"or",
-		[]types.Type{types.Bool{}},
+		[]*params.Param{
+			params.SimpleParam("q", types.Bool{}),
+		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			inputBool := inputValue.(states.BoolValue)
@@ -60,7 +65,9 @@ var LogicFuncers = []expressions.Funcer{
 	expressions.SimpleFuncer(
 		types.Bool{},
 		"==",
-		[]types.Type{types.Bool{}},
+		[]*params.Param{
+			params.SimpleParam("q", types.Bool{}),
+		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			inputBool := inputValue.(states.BoolValue)

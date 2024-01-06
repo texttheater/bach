@@ -13,66 +13,66 @@ import (
 )
 
 var TextFuncers = []expressions.Funcer{
-	// for Str <(Str) Bool
 	expressions.SimpleFuncer(
 		types.Str{},
 		"<",
-		[]types.Type{types.Str{}},
+		[]*params.Param{
+			params.SimpleParam("other", types.Str{}),
+		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 < str2), nil
-		},
-	),
-	// for Str >(Str) Bool
+		}),
 	expressions.SimpleFuncer(
 		types.Str{},
 		">",
-		[]types.Type{types.Str{}},
+		[]*params.Param{
+			params.SimpleParam("other", types.Str{}),
+		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 > str2), nil
-		},
-	),
-	// for Str <=(Str) Bool
+		}),
 	expressions.SimpleFuncer(
 		types.Str{},
 		"<=",
-		[]types.Type{types.Str{}},
+		[]*params.Param{
+			params.SimpleParam("other", types.Str{}),
+		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 <= str2), nil
-		},
-	),
-	// for Str >=(Str) Bool
+		}),
 	expressions.SimpleFuncer(
 		types.Str{},
 		">=",
-		[]types.Type{types.Str{}},
+		[]*params.Param{
+			params.SimpleParam("other", types.Str{}),
+		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 >= str2), nil
-		},
-	),
-	// for Str +(Str) Bool
+		}),
 	expressions.SimpleFuncer(
 		types.Str{},
 		"+",
-		[]types.Type{types.Str{}},
+		[]*params.Param{
+			params.SimpleParam("b", types.Str{}),
+		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.StrValue(str1 + str2), nil
-		},
-	),
+		}),
 	// for Str bytes Arr<Num>
 	expressions.RegularFuncer(
 		types.Str{},
@@ -226,11 +226,12 @@ var TextFuncers = []expressions.Funcer{
 			}
 		},
 	),
-	// for Arr<Str> join(Str) Str
 	expressions.SimpleFuncer(
 		types.NewArr(types.Str{}),
 		"join",
-		[]types.Type{types.Str{}},
+		[]*params.Param{
+			params.SimpleParam("glue", types.Str{}),
+		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			iter := states.IterFromValue(inputValue)
@@ -251,13 +252,14 @@ var TextFuncers = []expressions.Funcer{
 				buffer.WriteString(string(value.(states.StrValue)))
 				firstWritten = true
 			}
-		},
-	),
-	// for Str padEnd(Num, Str) Str
+		}),
 	expressions.SimpleFuncer(
 		types.Str{},
 		"padEnd",
-		[]types.Type{types.Num{}, types.Str{}},
+		[]*params.Param{
+			params.SimpleParam("targetLength", types.Num{}),
+			params.SimpleParam("padString", types.Str{}),
+		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str := string(inputValue.(states.StrValue))
@@ -277,13 +279,14 @@ var TextFuncers = []expressions.Funcer{
 				builder.WriteString(padding)
 			}
 			return states.StrValue(builder.String()), nil
-		},
-	),
-	// for Str padEnd(Num, Str) Str
+		}),
 	expressions.SimpleFuncer(
 		types.Str{},
 		"padStart",
-		[]types.Type{types.Num{}, types.Str{}},
+		[]*params.Param{
+			params.SimpleParam("targetLength", types.Num{}),
+			params.SimpleParam("padString", types.Str{}),
+		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str := string(inputValue.(states.StrValue))
@@ -303,8 +306,7 @@ var TextFuncers = []expressions.Funcer{
 			}
 			builder.WriteString(str)
 			return states.StrValue(builder.String()), nil
-		},
-	),
+		}),
 	// for Str replaceFirst(Str, Str) Str
 	expressions.RegularFuncer(
 		types.Str{},
@@ -353,35 +355,36 @@ var TextFuncers = []expressions.Funcer{
 		},
 		nil,
 	),
-	// for Str startsWith(Str) Bool
 	expressions.SimpleFuncer(
 		types.Str{},
 		"startsWith",
-		[]types.Type{types.Str{}},
+		[]*params.Param{
+			params.SimpleParam("needle", types.Str{}),
+		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(strings.HasPrefix(str1, str2)), nil
-		},
-	),
-	// for Str endsWith(Str) Bool
+		}),
 	expressions.SimpleFuncer(
 		types.Str{},
 		"endsWith",
-		[]types.Type{types.Str{}},
+		[]*params.Param{
+			params.SimpleParam("needle", types.Str{}),
+		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(strings.HasSuffix(str1, str2)), nil
-		},
-	),
-	// for Str slice(Num) Str
+		}),
 	expressions.SimpleFuncer(
 		types.Str{},
 		"slice",
-		[]types.Type{types.Num{}},
+		[]*params.Param{
+			params.SimpleParam("start", types.Num{}),
+		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str := string(inputValue.(states.StrValue))
@@ -393,15 +396,13 @@ var TextFuncers = []expressions.Funcer{
 				}
 			}
 			return states.StrValue(str[start:]), nil
-		},
-	),
-	// for Str slice(Num, Num) Str
+		}),
 	expressions.SimpleFuncer(
 		types.Str{},
 		"slice",
-		[]types.Type{
-			types.Num{},
-			types.Num{},
+		[]*params.Param{
+			params.SimpleParam("start", types.Num{}),
+			params.SimpleParam("end", types.Num{}),
 		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -421,14 +422,12 @@ var TextFuncers = []expressions.Funcer{
 				end = start
 			}
 			return states.StrValue(str[start:end]), nil
-		},
-	),
-	// for Str repeat(Num) Str
+		}),
 	expressions.SimpleFuncer(
 		types.Str{},
 		"repeat",
-		[]types.Type{
-			types.Num{},
+		[]*params.Param{
+			params.SimpleParam("times", types.Num{}),
 		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -438,8 +437,7 @@ var TextFuncers = []expressions.Funcer{
 				n = 0
 			}
 			return states.StrValue(strings.Repeat(str, n)), nil
-		},
-	),
+		}),
 	// for Str trim Str
 	expressions.SimpleFuncer(
 		types.Str{},

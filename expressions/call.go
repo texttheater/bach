@@ -190,7 +190,7 @@ func (s *FuncerStack) String() string {
 type Funcer struct {
 	InputType  types.Type
 	Name       string
-	Params     []*params.Param
+	Params     []*params.Param // TODO does this need to be a slice of pointers?
 	OutputType types.Type
 	Kernel     RegularKernel
 	IDs        *states.IDStack
@@ -206,19 +206,10 @@ func instantiate(pars []*params.Param, bindings map[string]types.Type) []*params
 
 type SimpleKernel func(inputValue states.Value, argValues []states.Value) (states.Value, error)
 
-func SimpleFuncer(wantInputType types.Type, wantName string, argTypes []types.Type, outputType types.Type, simpleKernel SimpleKernel) Funcer {
-	// make parameters from argument types
-	pars := make([]*params.Param, len(argTypes))
-	for i, argType := range argTypes {
-		pars[i] = &params.Param{
-			InputType:  types.Any{},
-			Params:     nil,
-			OutputType: argType,
-		}
-	}
+func SimpleFuncer(wantInputType types.Type, wantName string, pars []*params.Param, outputType types.Type, simpleKernel SimpleKernel) Funcer {
 	// make regular kernel from simple kernel
 	regularKernel := func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		argValues := make([]states.Value, len(argTypes))
+		argValues := make([]states.Value, len(pars))
 		for i, arg := range args {
 			val, err := arg(inputState.Clear(), nil).Eval()
 			if err != nil {
