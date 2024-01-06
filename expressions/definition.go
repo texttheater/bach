@@ -13,7 +13,7 @@ type DefinitionExpression struct {
 	Pos        lexer.Position
 	InputType  types.Type
 	Name       string
-	Params     []*params.Param
+	Params     []*params.Param // these have to be pointers because we use them as IDs
 	ParamNames []string
 	OutputType types.Type
 	Body       Expression
