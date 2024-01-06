@@ -34,6 +34,6 @@ func main() {
 		os.Exit(1)
 	}
 	for _, funcer := range funcers {
-		fmt.Printf("## `%s`\n\n", funcer.Name)
+		fmt.Printf("## %s\n\n", funcer.SignatureAsMarkdown())
 	}
 }

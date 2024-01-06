@@ -2,6 +2,7 @@ package shapes
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/params"
@@ -16,6 +17,29 @@ type Funcer struct {
 	OutputType types.Type
 	Kernel     RegularKernel
 	IDs        *states.IDStack
+}
+
+func (f Funcer) SignatureAsMarkdown() string {
+	var output strings.Builder
+	output.WriteString("`for ")
+	output.WriteString(f.InputType.String())
+	output.WriteString("` **`")
+	output.WriteString(f.Name)
+	output.WriteString("`** `")
+	if len(f.Params) > 0 {
+		output.WriteString("(")
+		for i, p := range f.Params {
+			if i > 0 {
+				output.WriteString(", ")
+			}
+			output.WriteString(p.String())
+		}
+		output.WriteString(")")
+	}
+	output.WriteString(" ")
+	output.WriteString(f.OutputType.String())
+	output.WriteString("`")
+	return output.String()
 }
 
 type SimpleKernel func(inputValue states.Value, argValues []states.Value) (states.Value, error)
