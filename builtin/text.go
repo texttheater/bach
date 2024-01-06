@@ -24,7 +24,8 @@ var TextFuncers = []shapes.Funcer{
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 < str2), nil
-		}),
+		},
+	),
 	shapes.SimpleFuncer(
 		types.Str{},
 		">",
@@ -36,7 +37,8 @@ var TextFuncers = []shapes.Funcer{
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 > str2), nil
-		}),
+		},
+	),
 	shapes.SimpleFuncer(
 		types.Str{},
 		"<=",
@@ -48,7 +50,8 @@ var TextFuncers = []shapes.Funcer{
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 <= str2), nil
-		}),
+		},
+	),
 	shapes.SimpleFuncer(
 		types.Str{},
 		">=",
@@ -60,7 +63,8 @@ var TextFuncers = []shapes.Funcer{
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 >= str2), nil
-		}),
+		},
+	),
 	shapes.SimpleFuncer(
 		types.Str{},
 		"+",
@@ -72,7 +76,8 @@ var TextFuncers = []shapes.Funcer{
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.StrValue(str1 + str2), nil
-		}),
+		},
+	),
 	// for Str bytes Arr<Num>
 	shapes.RegularFuncer(
 		types.Str{},
@@ -252,7 +257,8 @@ var TextFuncers = []shapes.Funcer{
 				buffer.WriteString(string(value.(states.StrValue)))
 				firstWritten = true
 			}
-		}),
+		},
+	),
 	shapes.SimpleFuncer(
 		types.Str{},
 		"padEnd",
@@ -279,7 +285,8 @@ var TextFuncers = []shapes.Funcer{
 				builder.WriteString(padding)
 			}
 			return states.StrValue(builder.String()), nil
-		}),
+		},
+	),
 	shapes.SimpleFuncer(
 		types.Str{},
 		"padStart",
@@ -306,7 +313,8 @@ var TextFuncers = []shapes.Funcer{
 			}
 			builder.WriteString(str)
 			return states.StrValue(builder.String()), nil
-		}),
+		},
+	),
 	// for Str replaceFirst(Str, Str) Str
 	shapes.RegularFuncer(
 		types.Str{},
@@ -366,7 +374,8 @@ var TextFuncers = []shapes.Funcer{
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(strings.HasPrefix(str1, str2)), nil
-		}),
+		},
+	),
 	shapes.SimpleFuncer(
 		types.Str{},
 		"endsWith",
@@ -378,7 +387,8 @@ var TextFuncers = []shapes.Funcer{
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(strings.HasSuffix(str1, str2)), nil
-		}),
+		},
+	),
 	shapes.SimpleFuncer(
 		types.Str{},
 		"slice",
@@ -396,7 +406,8 @@ var TextFuncers = []shapes.Funcer{
 				}
 			}
 			return states.StrValue(str[start:]), nil
-		}),
+		},
+	),
 	shapes.SimpleFuncer(
 		types.Str{},
 		"slice",
@@ -422,7 +433,8 @@ var TextFuncers = []shapes.Funcer{
 				end = start
 			}
 			return states.StrValue(str[start:end]), nil
-		}),
+		},
+	),
 	shapes.SimpleFuncer(
 		types.Str{},
 		"repeat",
@@ -437,7 +449,8 @@ var TextFuncers = []shapes.Funcer{
 				n = 0
 			}
 			return states.StrValue(strings.Repeat(str, n)), nil
-		}),
+		},
+	),
 	// for Str trim Str
 	shapes.SimpleFuncer(
 		types.Str{},
