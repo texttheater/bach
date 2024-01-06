@@ -4,6 +4,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -19,10 +20,10 @@ func (x ArrExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x ArrExpression) Typecheck(inputShape Shape, params []*params.Param) (Shape, states.Action, *states.IDStack, error) {
+func (x ArrExpression) Typecheck(inputShape shapes.Shape, params []*params.Param) (shapes.Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no params
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.TypeError(
+		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos))
 
@@ -40,15 +41,15 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*params.Param) (Shap
 			})
 		}
 	} else {
-		var restShape Shape
+		var restShape shapes.Shape
 		var restIDs *states.IDStack
 		var err error
 		restShape, action, restIDs, err = x.Rest.Typecheck(inputShape, nil)
 		if err != nil {
-			return Shape{}, nil, nil, err
+			return shapes.Shape{}, nil, nil, err
 		}
 		if !(types.AnyArr).Subsumes(restShape.Type) {
-			return Shape{}, nil, nil, errors.TypeError(
+			return shapes.Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.RestRequiresArrType),
 				errors.Pos(x.RestPos),
 				errors.WantType(types.AnyArr),
@@ -61,7 +62,7 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*params.Param) (Shap
 	for i := len(x.Elements) - 1; i >= 0; i-- {
 		elementShape, elementAction, elementIDs, err := x.Elements[i].Typecheck(inputShape, nil)
 		if err != nil {
-			return Shape{}, nil, nil, err
+			return shapes.Shape{}, nil, nil, err
 		}
 		outputType = &types.Nearr{
 			Head: elementShape.Type,
@@ -84,7 +85,7 @@ func (x ArrExpression) Typecheck(inputShape Shape, params []*params.Param) (Shap
 		ids = ids.AddAll(elementIDs)
 	}
 	// make output shape
-	outputShape := Shape{
+	outputShape := shapes.Shape{
 		Type:  outputType,
 		Stack: inputShape.Stack,
 	}

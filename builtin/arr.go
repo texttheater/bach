@@ -5,15 +5,15 @@ import (
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
-var ArrFuncers = []expressions.Funcer{
+var ArrFuncers = []shapes.Funcer{
 	// for Arr<<A>> +(Arr<<B>>) Arr<<A|B>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
@@ -52,7 +52,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> drop(Num) Arr<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
@@ -80,7 +80,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> dropWhile(for <<A>> Obj<yes: B>|Obj<no: C>) Arr<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
@@ -133,7 +133,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> each(for <<A>> <<B>>) Arr<<B>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"each",
 		[]*params.Param{
@@ -167,7 +167,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> enum(Num) Arr<Tup<Num, <A>>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"enum",
 		[]*params.Param{
@@ -203,7 +203,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> enum Arr<Tup<Num, <A>>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"enum",
 		nil,
@@ -234,7 +234,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<Bool> every Bool
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.Bool{}),
 		"every",
 		nil,
@@ -257,7 +257,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> find(for <A> Obj<yes: <B>|Obj<no: C>) Null|Tup<Num, <B>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"find",
 		[]*params.Param{
@@ -323,7 +323,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> findLast(for <A> Obj<yes: <B>|Obj<no: C>) Null|Tup<Num, <B>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"findLast",
 		[]*params.Param{
@@ -393,7 +393,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> fold(<B>, for <B> (<A>) <B>) <B>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"fold",
 		[]*params.Param{
@@ -439,7 +439,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> get(Num) <A>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
@@ -486,7 +486,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<Arr<<A>>> join Arr<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(
 			types.NewArr(types.NewVar("A", types.Any{})),
 		),
@@ -522,7 +522,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> keep(for <A> Obj<yes: <B>>|Obj<no: <C>>) Arr<B>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"keep",
 		[]*params.Param{
@@ -577,7 +577,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> len Num
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.AnyArr,
 		"len",
 		nil,
@@ -599,7 +599,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> max(for <A> (<A>) Bool, <A>) <A>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"max",
 		[]*params.Param{
@@ -620,7 +620,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> max(for <A> <B>, for <B> (<B>) Bool, <A>) <A>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"max",
 		[]*params.Param{
@@ -647,7 +647,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> min(for <A> (<A>) Bool, <A>) <A>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"min",
 		[]*params.Param{
@@ -668,7 +668,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> max(for <A> <B>, for <B> (<B>) Bool, <A>) <A>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"min",
 		[]*params.Param{
@@ -695,7 +695,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Any range(Num, Num) Arr<Num>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Any{},
 		"range",
 		[]*params.Param{
@@ -729,7 +729,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> repeat(Num) Arr<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
@@ -767,7 +767,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> rev Arr<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
@@ -797,7 +797,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<Bool> some Bool
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.Bool{}),
 		"some",
 		nil,
@@ -820,7 +820,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<Num> sort Arr<Num>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.Num{}),
 		"sort",
 		nil,
@@ -831,7 +831,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<Str> sort Arr<Str>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.Str{}),
 		"sort",
 		nil,
@@ -842,7 +842,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> sort(for <A> (<A>) Bool) Arr<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"sort",
 		[]*params.Param{
@@ -862,7 +862,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> sortByNum(for <A> Num) Arr<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"sortByNum",
 		[]*params.Param{
@@ -880,7 +880,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> sortByStr(for <A> Str) Arr<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"sortByStr",
 		[]*params.Param{
@@ -898,7 +898,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> sortBy(for <A> <B>, for <B> (<B>) Bool) Arr<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewVar("A", types.Any{})),
 		"sortBy",
 		[]*params.Param{
@@ -924,7 +924,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> take(Num) Arr<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
@@ -962,7 +962,7 @@ var ArrFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<<A>> takeWhile(for <<A>> Obj<yes: B>|Obj<no: C>) Arr<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),

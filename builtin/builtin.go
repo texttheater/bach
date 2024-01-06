@@ -4,11 +4,11 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/types"
 )
 
-var InitialShape expressions.Shape = expressions.Shape{
+var InitialShape shapes.Shape = shapes.Shape{
 	Type:  types.Null{},
 	Stack: nil,
 }

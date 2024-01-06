@@ -5,15 +5,15 @@ import (
 	"unicode/utf8"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
-var RegexpFuncers = []expressions.Funcer{
+var RegexpFuncers = []shapes.Funcer{
 	// for Str findAll(for Str <A Null|Obj<start: Num, 0: Str, Any>>) Arr<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"reFindAll",
 		[]*params.Param{
@@ -72,7 +72,7 @@ var RegexpFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Str replaceFirst(for Str Null|Obj<start: Num, 0: Str, Any>, Str) Str
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"reReplaceFirst",
 		[]*params.Param{
@@ -135,7 +135,7 @@ var RegexpFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Str replaceAll(for Str Null|Obj<start: Num, 0: Str, Any>, Str) Str
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"reReplaceAll",
 		[]*params.Param{
@@ -203,7 +203,7 @@ var RegexpFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Str split(for Str Null|Obj<start: Num, 0: Str, Any>) Arr<Str>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"reSplit",
 		[]*params.Param{
@@ -232,7 +232,7 @@ var RegexpFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Str split(for Str Null|Obj<start: Num, 0: Str, Any>, Num) Arr<Str>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"reSplit",
 		[]*params.Param{

@@ -5,10 +5,10 @@ import (
 	"os"
 
 	"github.com/texttheater/bach/builtin"
-	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/shapes"
 )
 
-var FuncersByCategory = map[string][]expressions.Funcer{
+var FuncersByCategory = map[string][]shapes.Funcer{
 	"null":    builtin.NullFuncers,
 	"io":      builtin.IOFuncers,
 	"logic":   builtin.LogicFuncers,

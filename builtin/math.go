@@ -8,15 +8,15 @@ import (
 	"strconv"
 
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 	"github.com/texttheater/golang-variadic-hypot/varhypot"
 )
 
-var MathFuncers = []expressions.Funcer{
-	expressions.SimpleFuncer(
+var MathFuncers = []shapes.Funcer{
+	shapes.SimpleFuncer(
 		types.Num{},
 		"+",
 		[]*params.Param{
@@ -29,7 +29,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(inputNum + argumentNum), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"-",
 		[]*params.Param{
@@ -42,7 +42,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(inputNum - argumentNum), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"-",
 		[]*params.Param{
@@ -58,7 +58,7 @@ var MathFuncers = []expressions.Funcer{
 			}
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"*",
 		[]*params.Param{
@@ -71,7 +71,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(inputNum * argumentNum), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"/",
 		[]*params.Param{
@@ -84,7 +84,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(inputNum / argumentNum), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"%",
 		[]*params.Param{
@@ -97,7 +97,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(math.Mod(float64(inputNum), float64(argumentNum))), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"<",
 		[]*params.Param{
@@ -110,7 +110,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.BoolValue(inputNum < argumentNum), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		">",
 		[]*params.Param{
@@ -123,7 +123,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.BoolValue(inputNum > argumentNum), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"<=",
 		[]*params.Param{
@@ -136,7 +136,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.BoolValue(inputNum <= argumentNum), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		">=",
 		[]*params.Param{
@@ -150,7 +150,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Arr<Num> sum Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.NewArr(types.Num{}),
 		"sum",
 		nil,
@@ -171,7 +171,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Arr<Num> mean Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.NewArr(types.Num{}),
 		"mean",
 		nil,
@@ -194,7 +194,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any inf Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"inf",
 		nil,
@@ -204,7 +204,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any nan Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"nan",
 		nil,
@@ -214,7 +214,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num isFinite Bool
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"isFinite",
 		nil,
@@ -225,7 +225,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num isNaN Bool
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"isNaN",
 		nil,
@@ -236,7 +236,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any epsilon Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"epsilon",
 		nil,
@@ -246,7 +246,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any largestSafeInteger Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"largestSafeInteger",
 		nil,
@@ -256,7 +256,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any largestNum Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"largestNum",
 		nil,
@@ -266,7 +266,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any smallestSafeInteger Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"smallestSafeInteger",
 		nil,
@@ -276,7 +276,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any smallestPositiveNum Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"smallestPositiveNum",
 		nil,
@@ -286,7 +286,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num isInteger Bool
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"isInteger",
 		nil,
@@ -297,7 +297,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num isSafeInteger Bool
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"isSafeInteger",
 		nil,
@@ -307,7 +307,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.BoolValue(x >= -9007199254740991 && x <= 9007199254740991), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"toBase",
 		[]*params.Param{
@@ -337,7 +337,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num toExponential Str
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"toExponential",
 		nil,
@@ -347,7 +347,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.StrValue(fmt.Sprintf("%e", x)), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"toExponential",
 		[]*params.Param{
@@ -361,7 +361,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.StrValue(fmt.Sprintf(format, x)), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"toFixed",
 		[]*params.Param{
@@ -376,7 +376,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any e Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"e",
 		nil,
@@ -386,7 +386,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any ln2 Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"ln2",
 		nil,
@@ -396,7 +396,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any ln10 Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"ln10",
 		nil,
@@ -406,7 +406,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any log2e Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"log2e",
 		nil,
@@ -416,7 +416,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any log10e Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"log10e",
 		nil,
@@ -426,7 +426,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any pi Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"pi",
 		nil,
@@ -436,7 +436,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any sqrt1_2 Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"sqrt1_2",
 		nil,
@@ -446,7 +446,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any sqrt2 Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"sqrt2",
 		nil,
@@ -456,7 +456,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num abs Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"abs",
 		nil,
@@ -467,7 +467,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num acos Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"acos",
 		nil,
@@ -478,7 +478,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num acosh Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"acosh",
 		nil,
@@ -489,7 +489,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num asin Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"asin",
 		nil,
@@ -500,7 +500,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num asinh Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"asinh",
 		nil,
@@ -511,7 +511,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num atan Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"atan",
 		nil,
@@ -522,7 +522,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num atanh Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"atanh",
 		nil,
@@ -532,7 +532,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(math.Atanh(x)), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"atan2",
 		[]*params.Param{
@@ -546,7 +546,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num cbrt Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"cbrt",
 		nil,
@@ -557,7 +557,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num ceil Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"ceil",
 		nil,
@@ -568,7 +568,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num clz32 Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"clz32",
 		nil,
@@ -579,7 +579,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num cos Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"cos",
 		nil,
@@ -590,7 +590,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num cosh Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"cosh",
 		nil,
@@ -601,7 +601,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num exp Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"exp",
 		nil,
@@ -612,7 +612,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num expm1 Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"expm1",
 		nil,
@@ -623,7 +623,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num floor Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"floor",
 		nil,
@@ -634,7 +634,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num fround Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"fround",
 		nil,
@@ -645,7 +645,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Arr<Num> hypot Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.NewArr(types.Num{}),
 		"hypot",
 		nil,
@@ -665,7 +665,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(float64(hypot)), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"imul",
 		[]*params.Param{
@@ -679,7 +679,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num log Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"log",
 		nil,
@@ -690,7 +690,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num log1p Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"log1p",
 		nil,
@@ -701,7 +701,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num log10 Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"log10",
 		nil,
@@ -712,7 +712,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num log2 Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"log2",
 		nil,
@@ -722,7 +722,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(math.Log2(x)), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.NewArr(types.Num{}),
 		"max",
 		nil,
@@ -741,7 +741,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(max), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.NewArr(types.Num{}),
 		"min",
 		nil,
@@ -760,7 +760,7 @@ var MathFuncers = []expressions.Funcer{
 			return states.NumValue(min), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"**",
 		[]*params.Param{
@@ -774,7 +774,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any random Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"random", // TODO integer, choice
 		nil,
@@ -784,7 +784,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num round Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"round",
 		nil,
@@ -795,7 +795,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num sign Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"sign",
 		nil,
@@ -818,7 +818,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num sin Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"sin",
 		nil,
@@ -829,7 +829,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num sinh Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"sinh",
 		nil,
@@ -840,7 +840,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num sqrt Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"sqrt",
 		nil,
@@ -851,7 +851,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num tan Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"tan",
 		nil,
@@ -862,7 +862,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num tanh Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"tanh",
 		nil,
@@ -873,7 +873,7 @@ var MathFuncers = []expressions.Funcer{
 		},
 	),
 	// for Num trunc Num
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Num{},
 		"trunc",
 		nil,

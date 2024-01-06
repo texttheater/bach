@@ -3,6 +3,7 @@ package expressions
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -11,7 +12,7 @@ import (
 
 type Pattern interface {
 	Position() lexer.Position
-	Typecheck(inputShape Shape) (outputShape Shape, restType types.Type, matcher Matcher, err error)
+	Typecheck(inputShape shapes.Shape) (outputShape shapes.Shape, restType types.Type, matcher Matcher, err error)
 }
 
 type Matcher func(states.State) (*states.VariableStack, bool, error)
@@ -73,12 +74,12 @@ func spreadInputType(inputType types.Type, elementTypes []types.Type) (restType 
 	}
 }
 
-func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, error) {
+func (p ArrPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type, Matcher, error) {
 	// compute element and rest input types
 	elementInputTypes := make([]types.Type, len(p.ElementPatterns))
 	restInputType, ok := spreadInputType(inputShape.Type, elementInputTypes)
 	if !ok {
-		return Shape{}, nil, nil, errors.TypeError(
+		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ImpossibleMatch),
 			errors.Pos(p.Pos),
 		)
@@ -88,24 +89,24 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	elementTypes := make([]types.Type, len(p.ElementPatterns))
 	elementMatchers := make([]Matcher, len(p.ElementPatterns))
 	for i, elPattern := range p.ElementPatterns {
-		elShape, _, elMatcher, err := elPattern.Typecheck(Shape{
+		elShape, _, elMatcher, err := elPattern.Typecheck(shapes.Shape{
 			Type:  elementInputTypes[i],
 			Stack: funcerStack,
 		})
 		if err != nil {
-			return Shape{}, nil, nil, err
+			return shapes.Shape{}, nil, nil, err
 		}
 		funcerStack = elShape.Stack
 		elementTypes[i] = elShape.Type
 		elementMatchers[i] = elMatcher
 	}
 	// process rest pattern
-	restShape, _, restMatcher, err := p.RestPattern.Typecheck(Shape{
+	restShape, _, restMatcher, err := p.RestPattern.Typecheck(shapes.Shape{
 		Type:  restInputType,
 		Stack: funcerStack,
 	})
 	if err != nil {
-		return Shape{}, nil, nil, err
+		return shapes.Shape{}, nil, nil, err
 	}
 	funcerStack = restShape.Stack
 	// determine the type of values this pattern will match
@@ -113,7 +114,7 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	// partition the input type and check for impossible match
 	intersection, complement := inputShape.Type.Partition(pType)
 	if (types.Void{}).Subsumes(intersection) {
-		return Shape{}, nil, nil, errors.TypeError(
+		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ImpossibleMatch),
 			errors.Pos(p.Pos),
 			errors.WantType(inputShape.Type),
@@ -121,7 +122,7 @@ func (p ArrPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 		)
 	}
 	// build output shape
-	outputShape := Shape{
+	outputShape := shapes.Shape{
 		Type:  intersection,
 		Stack: funcerStack,
 	}
@@ -174,7 +175,7 @@ func (p ObjPattern) Position() lexer.Position {
 	return p.Pos
 }
 
-func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, error) {
+func (p ObjPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type, Matcher, error) {
 	// compute value input types
 	propInputTypeMap := make(map[string]types.Type)
 	switch t := inputShape.Type.(type) {
@@ -219,12 +220,12 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	propTypeMap := make(map[string]types.Type)
 	propMatcherMap := make(map[string]Matcher)
 	for prop, valPattern := range p.PropPatternMap {
-		valShape, _, valMatcher, err := valPattern.Typecheck(Shape{
+		valShape, _, valMatcher, err := valPattern.Typecheck(shapes.Shape{
 			Type:  propInputTypeMap[prop],
 			Stack: funcerStack,
 		})
 		if err != nil {
-			return Shape{}, nil, nil, err
+			return shapes.Shape{}, nil, nil, err
 		}
 		funcerStack = valShape.Stack
 		propTypeMap[prop] = valShape.Type
@@ -238,7 +239,7 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 	// partition the input type and check for impossible match
 	intersection, complement := inputShape.Type.Partition(pType)
 	if (types.Void{}).Subsumes(intersection) {
-		return Shape{}, nil, nil, errors.TypeError(
+		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ImpossibleMatch),
 			errors.Pos(p.Pos),
 			errors.WantType(inputShape.Type),
@@ -246,7 +247,7 @@ func (p ObjPattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, err
 		)
 	}
 	// build output shape
-	outputShape := Shape{
+	outputShape := shapes.Shape{
 		Type:  intersection,
 		Stack: funcerStack,
 	}
@@ -292,11 +293,11 @@ func (p TypePattern) Position() lexer.Position {
 	return p.Pos
 }
 
-func (p TypePattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, error) {
+func (p TypePattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type, Matcher, error) {
 	// partition the input type and check for impossible match
 	intersection, complement := inputShape.Type.Partition(p.Type)
 	if (types.Void{}).Subsumes(intersection) {
-		return Shape{}, nil, nil, errors.TypeError(
+		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ImpossibleMatch),
 			errors.Pos(p.Pos),
 			errors.WantType(inputShape.Type),
@@ -304,13 +305,13 @@ func (p TypePattern) Typecheck(inputShape Shape) (Shape, types.Type, Matcher, er
 		)
 	}
 	// build output shape
-	outputShape := Shape{
+	outputShape := shapes.Shape{
 		Type:  intersection,
 		Stack: inputShape.Stack,
 	}
 	if p.Name != nil {
 		outputShape.Stack = outputShape.Stack.Push(
-			VariableFuncer(p, *p.Name, outputShape.Type),
+			shapes.VariableFuncer(p, *p.Name, outputShape.Type),
 		)
 	}
 	// build matcher

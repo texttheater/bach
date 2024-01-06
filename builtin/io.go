@@ -8,15 +8,15 @@ import (
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
-var IOFuncers = []expressions.Funcer{
+var IOFuncers = []shapes.Funcer{
 	// for Arr<Str> blocks Arr<Arr<Str>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.Str{}),
 		"blocks",
 		nil,
@@ -63,7 +63,7 @@ var IOFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for <A> err <A>
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.NewVar("A", types.Any{}),
 		"err",
 		nil,
@@ -78,7 +78,7 @@ var IOFuncers = []expressions.Funcer{
 		},
 	),
 	// for <A> err(Str) <A>
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.NewVar("A", types.Any{}),
 		"err",
 		[]*params.Param{
@@ -97,7 +97,7 @@ var IOFuncers = []expressions.Funcer{
 		},
 	),
 	// for Any in Reader
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"in",
 		nil,
@@ -107,7 +107,7 @@ var IOFuncers = []expressions.Funcer{
 		},
 	),
 	// for Reader json Any
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Reader{},
 		"json",
 		nil,
@@ -139,7 +139,7 @@ var IOFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Reader lines Arr<Str>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Reader{},
 		"lines",
 		nil,
@@ -159,7 +159,7 @@ var IOFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for <A> out <A>
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.NewVar("A", types.Any{}),
 		"out",
 		nil,
@@ -174,7 +174,7 @@ var IOFuncers = []expressions.Funcer{
 		},
 	),
 	// for <A> out(Str) <A>
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.NewVar("A", types.Any{}),
 		"out",
 		[]*params.Param{

@@ -7,6 +7,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -20,15 +21,15 @@ func (x RegexpExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x RegexpExpression) Typecheck(inputShape Shape, params []*params.Param) (Shape, states.Action, *states.IDStack, error) {
+func (x RegexpExpression) Typecheck(inputShape shapes.Shape, params []*params.Param) (shapes.Shape, states.Action, *states.IDStack, error) {
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.TypeError(
+		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
 	}
 	if !(types.Str{}).Subsumes(inputShape.Type) {
-		return Shape{}, nil, nil, errors.TypeError(
+		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.RegexpWantsString),
 			errors.Pos(x.Pos),
 			errors.WantType(types.Str{}),
@@ -51,7 +52,7 @@ func (x RegexpExpression) Typecheck(inputShape Shape, params []*params.Param) (S
 		Props: propTypeMap,
 		Rest:  types.Void{},
 	}
-	outputShape := Shape{
+	outputShape := shapes.Shape{
 		Type:  types.NewUnion(types.Null{}, matchType),
 		Stack: inputShape.Stack,
 	}

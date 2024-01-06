@@ -4,6 +4,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -24,10 +25,10 @@ func (x ConditionalExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x ConditionalExpression) Typecheck(inputShape Shape, params []*params.Param) (Shape, states.Action, *states.IDStack, error) {
+func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*params.Param) (shapes.Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.TypeError(
+		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
@@ -35,10 +36,10 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*params.Para
 	// typecheck pattern
 	patternOutputShape, restType, matcher, err := x.Pattern.Typecheck(inputShape)
 	if err != nil {
-		return Shape{}, nil, nil, err
+		return shapes.Shape{}, nil, nil, err
 	}
 	// typecheck guard
-	var guardOutputShape Shape
+	var guardOutputShape shapes.Shape
 	var guardAction states.Action
 	var guardIDs *states.IDStack
 	if x.Guard == nil {
@@ -47,10 +48,10 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*params.Para
 	} else {
 		guardOutputShape, guardAction, guardIDs, err = x.Guard.Typecheck(patternOutputShape, nil)
 		if err != nil {
-			return Shape{}, nil, nil, err
+			return shapes.Shape{}, nil, nil, err
 		}
 		if !(types.Bool{}).Subsumes(guardOutputShape.Type) {
-			return Shape{}, nil, nil, errors.TypeError(
+			return shapes.Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.ConditionMustBeBool),
 				errors.Pos(x.Guard.Position()),
 				errors.WantType(types.Bool{}),
@@ -60,21 +61,21 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*params.Para
 	}
 	ids := guardIDs
 	// build consequent input shape
-	consequentInputShape := Shape{
+	consequentInputShape := shapes.Shape{
 		Type:  patternOutputShape.Type,
 		Stack: guardOutputShape.Stack,
 	}
 	// typecheck consequent
 	consequentOutputShape, consequentAction, consequentIDs, err := x.Consequent.Typecheck(consequentInputShape, nil)
 	if err != nil {
-		return Shape{}, nil, nil, err
+		return shapes.Shape{}, nil, nil, err
 	}
 	ids = ids.AddAll(consequentIDs)
 	// update input shape
 	if x.Guard != nil {
 		restType = inputShape.Type
 	}
-	inputShape = Shape{
+	inputShape = shapes.Shape{
 		Type:  restType,
 		Stack: inputShape.Stack,
 	}
@@ -87,7 +88,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*params.Para
 	for i := range x.AlternativePatterns {
 		// reachability check
 		if (types.Void{}).Subsumes(inputShape.Type) {
-			return Shape{}, nil, nil, errors.TypeError(
+			return shapes.Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.UnreachableElisClause),
 				errors.Pos(x.Pattern.Position()),
 			)
@@ -95,20 +96,20 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*params.Para
 		// typecheck pattern
 		patternOutputShape, restType, elisMatchers[i], err = x.AlternativePatterns[i].Typecheck(inputShape)
 		if err != nil {
-			return Shape{}, nil, nil, err
+			return shapes.Shape{}, nil, nil, err
 		}
 		// typecheck guard
-		var guardOutputShape Shape
+		var guardOutputShape shapes.Shape
 		if x.AlternativeGuards[i] == nil {
 			guardOutputShape = patternOutputShape
 			elisGuardActions[i] = states.SimpleAction(states.BoolValue(true))
 		} else {
 			guardOutputShape, elisGuardActions[i], guardIDs, err = x.AlternativeGuards[i].Typecheck(patternOutputShape, nil)
 			if err != nil {
-				return Shape{}, nil, nil, err
+				return shapes.Shape{}, nil, nil, err
 			}
 			if !(types.Bool{}).Subsumes(guardOutputShape.Type) {
-				return Shape{}, nil, nil, errors.TypeError(
+				return shapes.Shape{}, nil, nil, errors.TypeError(
 					errors.Code(errors.ConditionMustBeBool),
 					errors.Pos(x.AlternativeGuards[i].Position()),
 					errors.WantType(types.Bool{}),
@@ -118,14 +119,14 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*params.Para
 			ids = ids.AddAll(guardIDs)
 		}
 		// build consequent input shape
-		consequentInputShape := Shape{
+		consequentInputShape := shapes.Shape{
 			Type:  patternOutputShape.Type,
 			Stack: guardOutputShape.Stack,
 		}
 		// typecheck consequent
 		consequentOutputShape, consequentAction, consequentIDs, err := x.AlternativeConsequents[i].Typecheck(consequentInputShape, nil)
 		if err != nil {
-			return Shape{}, nil, nil, err
+			return shapes.Shape{}, nil, nil, err
 		}
 		elisConsequentActions[i] = consequentAction
 		ids = ids.AddAll(consequentIDs)
@@ -133,7 +134,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*params.Para
 		if x.AlternativeGuards[i] != nil {
 			restType = inputShape.Type
 		}
-		inputShape = Shape{
+		inputShape = shapes.Shape{
 			Type:  restType,
 			Stack: inputShape.Stack,
 		}
@@ -146,7 +147,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*params.Para
 	if x.Alternative == nil {
 		// exhaustivity check
 		//if !(types.VoidType{}).Subsumes(inputShape.Type) {
-		//	return Shape{}, nil, nil, errors.TypeError(
+		//	return shapes.Shape{}, nil, nil, errors.TypeError(
 		//		errors.Code(errors.NonExhaustiveMatch),
 		//		errors.Pos(x.Pos),
 		//		errors.WantType(types.VoidType{}),
@@ -156,16 +157,16 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*params.Para
 	} else {
 		// reachability check
 		if !x.UnreachableAlternativeAllowed && (types.Void{}).Subsumes(inputShape.Type) {
-			return Shape{}, nil, nil, errors.TypeError(
+			return shapes.Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.UnreachableElseClause),
 				errors.Pos(x.Alternative.Position()),
 			)
 		}
 		// alternative
-		var alternativeOutputShape Shape
+		var alternativeOutputShape shapes.Shape
 		alternativeOutputShape, alternativeAction, alternativeIDs, err = x.Alternative.Typecheck(inputShape, nil)
 		if err != nil {
-			return Shape{}, nil, nil, err
+			return shapes.Shape{}, nil, nil, err
 		}
 		ids = ids.AddAll(alternativeIDs)
 		// update output type
@@ -234,7 +235,7 @@ func (x ConditionalExpression) Typecheck(inputShape Shape, params []*params.Para
 		return alternativeAction(inputState, nil)
 	}
 	// return
-	outputShape := Shape{
+	outputShape := shapes.Shape{
 		outputType,
 		inputShape.Stack,
 	}

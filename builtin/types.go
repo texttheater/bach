@@ -2,13 +2,13 @@ package builtin
 
 import (
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
-var TypeFuncers = []expressions.Funcer{
-	expressions.RegularFuncer(
+var TypeFuncers = []shapes.Funcer{
+	shapes.RegularFuncer(
 		types.NewVar("A", types.Any{}),
 		"type",
 		nil,

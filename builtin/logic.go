@@ -1,14 +1,14 @@
 package builtin
 
 import (
-	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
-var LogicFuncers = []expressions.Funcer{
-	expressions.SimpleFuncer(
+var LogicFuncers = []shapes.Funcer{
+	shapes.SimpleFuncer(
 		types.Any{},
 		"true",
 		nil,
@@ -17,7 +17,7 @@ var LogicFuncers = []expressions.Funcer{
 			return states.BoolValue(true), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Any{},
 		"false",
 		nil,
@@ -26,7 +26,7 @@ var LogicFuncers = []expressions.Funcer{
 			return states.BoolValue(false), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Bool{},
 		"and",
 		[]*params.Param{
@@ -39,7 +39,7 @@ var LogicFuncers = []expressions.Funcer{
 			return states.BoolValue(inputBool && argumentBool), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Bool{},
 		"or",
 		[]*params.Param{
@@ -52,7 +52,7 @@ var LogicFuncers = []expressions.Funcer{
 			return states.BoolValue(inputBool || argumentBool), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Bool{},
 		"not",
 		nil,
@@ -62,7 +62,7 @@ var LogicFuncers = []expressions.Funcer{
 			return states.BoolValue(!inputBool), nil
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Bool{},
 		"==",
 		[]*params.Param{

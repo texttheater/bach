@@ -6,14 +6,14 @@ import (
 	"unicode"
 
 	"github.com/alecthomas/participle/lexer"
-	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
-var TextFuncers = []expressions.Funcer{
-	expressions.SimpleFuncer(
+var TextFuncers = []shapes.Funcer{
+	shapes.SimpleFuncer(
 		types.Str{},
 		"<",
 		[]*params.Param{
@@ -25,7 +25,7 @@ var TextFuncers = []expressions.Funcer{
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 < str2), nil
 		}),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		">",
 		[]*params.Param{
@@ -37,7 +37,7 @@ var TextFuncers = []expressions.Funcer{
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 > str2), nil
 		}),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		"<=",
 		[]*params.Param{
@@ -49,7 +49,7 @@ var TextFuncers = []expressions.Funcer{
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 <= str2), nil
 		}),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		">=",
 		[]*params.Param{
@@ -61,7 +61,7 @@ var TextFuncers = []expressions.Funcer{
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 >= str2), nil
 		}),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		"+",
 		[]*params.Param{
@@ -74,7 +74,7 @@ var TextFuncers = []expressions.Funcer{
 			return states.StrValue(str1 + str2), nil
 		}),
 	// for Str bytes Arr<Num>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"bytes",
 		nil,
@@ -97,7 +97,7 @@ var TextFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<Num> bytesToStr Str
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.Num{}),
 		"bytesToStr",
 		nil,
@@ -120,7 +120,7 @@ var TextFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Str codePoints Arr<Num>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"codePoints",
 		nil,
@@ -142,7 +142,7 @@ var TextFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<Num> codePointsToStr Str
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.Num{}),
 		"codePointsToStr",
 		nil,
@@ -165,7 +165,7 @@ var TextFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Str fields Arr<Str>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"fields",
 		nil,
@@ -187,7 +187,7 @@ var TextFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Str indexOf(Str) Num
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"indexOf",
 		[]*params.Param{
@@ -206,7 +206,7 @@ var TextFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<Str> join Str
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.NewArr(types.Str{}),
 		"join",
 		nil,
@@ -226,7 +226,7 @@ var TextFuncers = []expressions.Funcer{
 			}
 		},
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.NewArr(types.Str{}),
 		"join",
 		[]*params.Param{
@@ -253,7 +253,7 @@ var TextFuncers = []expressions.Funcer{
 				firstWritten = true
 			}
 		}),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		"padEnd",
 		[]*params.Param{
@@ -280,7 +280,7 @@ var TextFuncers = []expressions.Funcer{
 			}
 			return states.StrValue(builder.String()), nil
 		}),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		"padStart",
 		[]*params.Param{
@@ -308,7 +308,7 @@ var TextFuncers = []expressions.Funcer{
 			return states.StrValue(builder.String()), nil
 		}),
 	// for Str replaceFirst(Str, Str) Str
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"replaceFirst",
 		[]*params.Param{
@@ -332,7 +332,7 @@ var TextFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Str replaceAll(Str, Str) Str
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"replaceAll",
 		[]*params.Param{
@@ -355,7 +355,7 @@ var TextFuncers = []expressions.Funcer{
 		},
 		nil,
 	),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		"startsWith",
 		[]*params.Param{
@@ -367,7 +367,7 @@ var TextFuncers = []expressions.Funcer{
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(strings.HasPrefix(str1, str2)), nil
 		}),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		"endsWith",
 		[]*params.Param{
@@ -379,7 +379,7 @@ var TextFuncers = []expressions.Funcer{
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(strings.HasSuffix(str1, str2)), nil
 		}),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		"slice",
 		[]*params.Param{
@@ -397,7 +397,7 @@ var TextFuncers = []expressions.Funcer{
 			}
 			return states.StrValue(str[start:]), nil
 		}),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		"slice",
 		[]*params.Param{
@@ -423,7 +423,7 @@ var TextFuncers = []expressions.Funcer{
 			}
 			return states.StrValue(str[start:end]), nil
 		}),
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		"repeat",
 		[]*params.Param{
@@ -439,7 +439,7 @@ var TextFuncers = []expressions.Funcer{
 			return states.StrValue(strings.Repeat(str, n)), nil
 		}),
 	// for Str trim Str
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		"trim",
 		nil,
@@ -450,7 +450,7 @@ var TextFuncers = []expressions.Funcer{
 		},
 	),
 	// for Str trimStart Str
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		"trimStart",
 		nil,
@@ -461,7 +461,7 @@ var TextFuncers = []expressions.Funcer{
 		},
 	),
 	// for Str trimEnd Str
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.Str{},
 		"trimEnd",
 		nil,

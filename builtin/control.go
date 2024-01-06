@@ -3,13 +3,13 @@ package builtin
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
-var ControlFuncers = []expressions.Funcer{
-	expressions.RegularFuncer(
+var ControlFuncers = []shapes.Funcer{
+	shapes.RegularFuncer(
 		types.Any{},
 		"fatal",
 		nil,
@@ -25,7 +25,7 @@ var ControlFuncers = []expressions.Funcer{
 		},
 		nil,
 	),
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewUnion(
 			types.Null{},
 			types.NewVar("A", types.Any{}),

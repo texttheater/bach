@@ -6,15 +6,15 @@ import (
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
-var ValueFuncers = []expressions.Funcer{
+var ValueFuncers = []shapes.Funcer{
 	// for Any ==(Any) Bool
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Any{},
 		"==",
 		[]*params.Param{
@@ -36,7 +36,7 @@ var ValueFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for <A> id <A>
-	expressions.SimpleFuncer(
+	shapes.SimpleFuncer(
 		types.NewVar("A", types.Any{}),
 		"id",
 		nil,
@@ -46,7 +46,7 @@ var ValueFuncers = []expressions.Funcer{
 		},
 	),
 	// for Str parseFloat Num
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"parseFloat",
 		nil,
@@ -66,7 +66,7 @@ var ValueFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Str parseInt(Num) Num
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"parseInt",
 		[]*params.Param{
@@ -92,7 +92,7 @@ var ValueFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Str parseInt Num
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"parseInt",
 		nil,
@@ -113,7 +113,7 @@ var ValueFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Str parseJSON Any
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Str{},
 		"parseJSON",
 		nil,
@@ -134,7 +134,7 @@ var ValueFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Any toJSON Str
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Any{},
 		"toJSON",
 		nil,
@@ -157,7 +157,7 @@ var ValueFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Arr<Tup<Str, <A>>> toObj Obj<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.NewArr(types.NewTup([]types.Type{
 			types.Str{},
 			types.NewVar("A", types.Any{}),
@@ -193,7 +193,7 @@ var ValueFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Any toStr Str
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Any{},
 		"toStr",
 		nil,

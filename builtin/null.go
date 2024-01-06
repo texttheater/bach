@@ -1,13 +1,13 @@
 package builtin
 
 import (
-	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
-var NullFuncers = []expressions.Funcer{
-	expressions.SimpleFuncer(
+var NullFuncers = []shapes.Funcer{
+	shapes.SimpleFuncer(
 		types.Any{},
 		"null",
 		nil,

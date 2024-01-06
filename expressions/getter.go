@@ -6,6 +6,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -19,7 +20,7 @@ func (x GetterExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x GetterExpression) Typecheck(inputShape Shape, params []*params.Param) (Shape, states.Action, *states.IDStack, error) {
+func (x GetterExpression) Typecheck(inputShape shapes.Shape, params []*params.Param) (shapes.Shape, states.Action, *states.IDStack, error) {
 	switch t := inputShape.Type.(type) {
 	case types.Obj:
 		wantType := types.Obj{
@@ -29,7 +30,7 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*params.Param) (S
 			Rest: types.Any{},
 		}
 		if !wantType.Subsumes(inputShape.Type) {
-			return Shape{}, nil, nil, errors.TypeError(
+			return shapes.Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.NoSuchProperty),
 				errors.Pos(x.Pos),
 				errors.WantType(wantType),
@@ -37,7 +38,7 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*params.Param) (S
 			)
 		}
 		outputType := inputShape.Type.(types.Obj).Props[x.Name]
-		outputShape := Shape{
+		outputShape := shapes.Shape{
 			Type:  outputType,
 			Stack: inputShape.Stack,
 		}
@@ -57,7 +58,7 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*params.Param) (S
 	case *types.Nearr:
 		index, err := strconv.Atoi(x.Name)
 		if err != nil || index < 0 {
-			return Shape{}, nil, nil, errors.TypeError(
+			return shapes.Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.BadIndex),
 				errors.Pos(x.Pos),
 			)
@@ -66,7 +67,7 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*params.Param) (S
 		restType := t
 		for i := 0; i < index; i++ {
 			if types.VoidArr.Subsumes(restType.Tail) {
-				return Shape{}, nil, nil, errors.TypeError(
+				return shapes.Shape{}, nil, nil, errors.TypeError(
 					errors.Pos(x.Pos),
 					errors.Code(errors.NoSuchIndex),
 				)
@@ -74,7 +75,7 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*params.Param) (S
 			restType = restType.Tail.(*types.Nearr)
 		}
 		outputType = restType.Head
-		outputShape := Shape{
+		outputShape := shapes.Shape{
 			Type:  outputType,
 			Stack: inputShape.Stack,
 		}
@@ -96,7 +97,7 @@ func (x GetterExpression) Typecheck(inputShape Shape, params []*params.Param) (S
 		}
 		return outputShape, action, nil, nil
 	default:
-		return Shape{}, nil, nil, errors.TypeError(
+		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.NoGetterAllowed),
 			errors.Pos(x.Pos),
 			errors.GotType(inputShape.Type),

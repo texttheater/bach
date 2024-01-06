@@ -4,6 +4,7 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -22,10 +23,10 @@ func (x DefinitionExpression) Position() lexer.Position {
 	return x.Pos
 }
 
-func (x DefinitionExpression) Typecheck(inputShape Shape, params []*params.Param) (Shape, states.Action, *states.IDStack, error) {
+func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*params.Param) (shapes.Shape, states.Action, *states.IDStack, error) {
 	// make sure we got no parameters
 	if len(params) > 0 {
-		return Shape{}, nil, nil, errors.TypeError(
+		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ParamsNotAllowed),
 			errors.Pos(x.Pos),
 		)
@@ -53,7 +54,7 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*params.Param
 		return bodyAction(bodyInputState, nil)
 	}
 	// make a funcer for the defined function, add it to the function stack
-	funFuncer := RegularFuncer(x.InputType, x.Name, x.Params, x.OutputType, funKernel, nil)
+	funFuncer := shapes.RegularFuncer(x.InputType, x.Name, x.Params, x.OutputType, funKernel, nil)
 	functionStack := inputShape.Stack.Push(funFuncer)
 	// add parameter funcers for use in the body
 	bodyStack := functionStack
@@ -69,25 +70,25 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*params.Param
 			}
 			panic("action not found")
 		}
-		paramFuncer := RegularFuncer(param.InputType, x.ParamNames[i], param.Params, param.OutputType, paramKernel, &states.IDStack{
+		paramFuncer := shapes.RegularFuncer(param.InputType, x.ParamNames[i], param.Params, param.OutputType, paramKernel, &states.IDStack{
 			Head: id,
 		})
 		bodyStack = bodyStack.Push(paramFuncer)
 	}
 	// define body input context
-	bodyInputShape := Shape{
+	bodyInputShape := shapes.Shape{
 		Type:  x.InputType,
 		Stack: bodyStack,
 	}
 	// typecheck body (crucially, setting body action)
 	bodyOutputShape, bodyAction, bodyIDs, err := x.Body.Typecheck(bodyInputShape, nil)
 	if err != nil {
-		return Shape{}, nil, nil, err
+		return shapes.Shape{}, nil, nil, err
 	}
 	ids := bodyIDs
 	// check body output type
 	if !x.OutputType.Subsumes(bodyOutputShape.Type) {
-		return Shape{}, nil, nil, errors.TypeError(
+		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.FunctionBodyHasWrongOutputType),
 			errors.Pos(x.Pos),
 			errors.WantType(x.OutputType),
@@ -95,7 +96,7 @@ func (x DefinitionExpression) Typecheck(inputShape Shape, params []*params.Param
 		)
 	}
 	// define output context
-	outputShape := Shape{
+	outputShape := shapes.Shape{
 		Type:  inputShape.Type,
 		Stack: functionStack,
 	}

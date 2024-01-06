@@ -3,15 +3,15 @@ package builtin
 import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
-var ObjFuncers = []expressions.Funcer{
+var ObjFuncers = []shapes.Funcer{
 	// for Obj<Any> +(Obj<Any>) Obj<Any>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.AnyObj,
 		"+",
 		[]*params.Param{
@@ -35,7 +35,7 @@ var ObjFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Obj<<A>> get(Str|Str) <A>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Obj{
 			Props: map[string]types.Type{},
 			Rest:  types.NewVar("A", types.Any{}),
@@ -71,7 +71,7 @@ var ObjFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Obj<<A>> has(Str|Num) Bool
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Obj{
 			Props: map[string]types.Type{},
 			Rest:  types.NewVar("A", types.Any{}),
@@ -97,7 +97,7 @@ var ObjFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Obj<<A>> items Arr<Tup<Str, <A>>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Obj{
 			Props: map[string]types.Type{},
 			Rest:  types.NewVar("A", types.Any{}),
@@ -133,7 +133,7 @@ var ObjFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Obj<<A>> props Arr<Str>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Obj{
 			Props: map[string]types.Type{},
 			Rest:  types.NewVar("A", types.Any{}),
@@ -157,7 +157,7 @@ var ObjFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Obj<<A>> values Arr<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Obj{
 			Props: map[string]types.Type{},
 			Rest:  types.NewVar("A", types.Any{}),
@@ -179,7 +179,7 @@ var ObjFuncers = []expressions.Funcer{
 		nil,
 	),
 	// for Obj<<A>> without(Str) Obj<<A>>
-	expressions.RegularFuncer(
+	shapes.RegularFuncer(
 		types.Obj{
 			Props: map[string]types.Type{},
 			Rest:  types.NewVar("A", types.Any{}),
