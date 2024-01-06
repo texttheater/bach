@@ -7,17 +7,15 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-func initTypes() {
-	InitialShape.Stack = InitialShape.Stack.PushAll([]expressions.Funcer{
-		expressions.RegularFuncer(
-			types.NewVar("A", types.Any{}),
-			"type",
-			nil,
-			types.Str{},
-			func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-				return states.ThunkFromValue(states.StrValue(bindings["A"].String()))
-			},
-			nil,
-		),
-	})
+var TypeFuncers = []expressions.Funcer{
+	expressions.RegularFuncer(
+		types.NewVar("A", types.Any{}),
+		"type",
+		nil,
+		types.Str{},
+		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			return states.ThunkFromValue(states.StrValue(bindings["A"].String()))
+		},
+		nil,
+	),
 }
