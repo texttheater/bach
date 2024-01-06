@@ -88,6 +88,7 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType: types.NewVar("A", types.Any{}),
+				Name:      "test",
 				Params:    nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -138,6 +139,7 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType:  types.NewVar("A", types.Any{}),
+				Name:       "f",
 				Params:     nil,
 				OutputType: types.NewVar("B", types.Any{}),
 			},
@@ -261,6 +263,7 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType: types.NewVar("A", types.Any{}),
+				Name:      "test",
 				Params:    nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -326,6 +329,7 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType: types.NewVar("A", types.Any{}),
+				Name:      "test",
 				Params:    nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -396,6 +400,7 @@ var ArrFuncers = []expressions.Funcer{
 			params.SimpleParam("start", types.NewVar("B", types.Any{})),
 			{
 				InputType: types.NewVar("B", types.Any{}),
+				Name:      "combine",
 				Params: []*params.Param{
 					params.SimpleParam("next", types.NewVar("A", types.Any{})),
 				},
@@ -523,6 +528,7 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType: types.NewVar("A", types.Any{}),
+				Name:      "test",
 				Params:    nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -599,6 +605,7 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType: types.NewVar("A", types.Any{}),
+				Name:      "less",
 				Params: []*params.Param{
 					params.SimpleParam("other", types.NewVar("A", types.Any{})),
 				},
@@ -619,11 +626,13 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType:  types.NewVar("A", types.Any{}),
+				Name:       "sortKey",
 				Params:     nil,
 				OutputType: types.NewVar("B", types.Any{}),
 			},
 			{
 				InputType: types.NewVar("B", types.Any{}),
+				Name:      "less",
 				Params: []*params.Param{
 					params.SimpleParam("other", types.NewVar("B", types.Any{})),
 				},
@@ -644,6 +653,7 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType: types.NewVar("A", types.Any{}),
+				Name:      "less",
 				Params: []*params.Param{
 					params.SimpleParam("other", types.NewVar("A", types.Any{})),
 				},
@@ -664,11 +674,13 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType:  types.NewVar("A", types.Any{}),
+				Name:       "sortKey",
 				Params:     nil,
 				OutputType: types.NewVar("B", types.Any{}),
 			},
 			{
 				InputType: types.NewVar("B", types.Any{}),
+				Name:      "less",
 				Params: []*params.Param{
 					params.SimpleParam("other", types.NewVar("B", types.Any{})),
 				},
@@ -836,6 +848,7 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType: types.NewVar("A", types.Any{}),
+				Name:      "less",
 				Params: []*params.Param{
 					params.SimpleParam("other", types.NewVar("A", types.Any{})),
 				},
@@ -855,6 +868,7 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType:  types.NewVar("A", types.Any{}),
+				Name:       "sortKey",
 				Params:     nil,
 				OutputType: types.Num{},
 			},
@@ -872,6 +886,7 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType:  types.NewVar("A", types.Any{}),
+				Name:       "sortKey",
 				Params:     nil,
 				OutputType: types.Str{},
 			},
@@ -889,11 +904,13 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType:  types.NewVar("A", types.Any{}),
+				Name:       "sortKey",
 				Params:     nil,
 				OutputType: types.NewVar("B", types.Any{}),
 			},
 			{
 				InputType: types.NewVar("B", types.Any{}),
+				Name:      "less",
 				Params: []*params.Param{
 					params.SimpleParam("other", types.NewVar("B", types.Any{})),
 				},
@@ -953,6 +970,7 @@ var ArrFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType: types.NewVar("A", types.Any{}),
+				Name:      "test",
 				Params:    nil,
 				OutputType: types.NewUnion(
 					types.Obj{

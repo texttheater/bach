@@ -19,6 +19,8 @@ var RegexpFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType: types.Str{},
+				Name:      "pattern",
+				Params:    nil,
 				OutputType: types.NewVar("A", types.NewUnion(
 					types.Null{},
 					types.Obj{
@@ -76,6 +78,8 @@ var RegexpFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType: types.Str{},
+				Name:      "pattern",
+				Params:    nil,
 				OutputType: types.NewUnion(
 					types.Null{},
 					types.Obj{
@@ -137,6 +141,8 @@ var RegexpFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType: types.Str{},
+				Name:      "pattern",
+				Params:    nil,
 				OutputType: types.NewVar("A", types.NewUnion(
 					types.Null{},
 					types.Obj{
@@ -203,6 +209,8 @@ var RegexpFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType: types.Str{},
+				Name:      "pattern",
+				Params:    nil,
 				OutputType: types.NewUnion(
 					types.Null{},
 					types.Obj{
@@ -230,6 +238,8 @@ var RegexpFuncers = []expressions.Funcer{
 		[]*params.Param{
 			{
 				InputType: types.Str{},
+				Name:      "pattern",
+				Params:    nil,
 				OutputType: types.NewUnion(
 					types.Null{},
 					types.Obj{
