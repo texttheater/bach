@@ -1,13 +1,14 @@
-package tests
+package tests_test
 
 import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
+	"github.com/texttheater/bach/tests"
 )
 
 func TestObjects(t *testing.T) {
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{} get"a"`,
 		`Void`,
 		``,
@@ -16,91 +17,91 @@ func TestObjects(t *testing.T) {
 		),
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{a: 1} get"a"`,
 		`Num`,
 		`1`,
 		nil,
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{a: 1, b: "hey"} get"a"`,
 		`Num|Str`,
 		`1`,
 		nil,
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{a: 1, b: "hey", c: false} get"a"`,
 		`Num|Str|Bool`,
 		`1`,
 		nil,
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{1: "a"} get(1)`,
 		`Str`,
 		`"a"`,
 		nil,
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{1.5: "a"} get(1.5)`,
 		`Str`,
 		`"a"`,
 		nil,
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{a: 1, b: 2} props sort`,
 		`Arr<Str>`,
 		`["a", "b"]`,
 		nil,
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{} props`,
 		`Arr<Str>`,
 		`[]`,
 		nil,
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{a: 1, b: 2} values sort`,
 		`Arr<Num>`,
 		`[1, 2]`,
 		nil,
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{} values`,
 		`Tup<>`,
 		`[]`,
 		nil,
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{a: 1, b: 2} values sort`,
 		`Arr<Num>`,
 		`[1, 2]`,
 		nil,
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{} values`,
 		`Tup<>`,
 		`[]`,
 		nil,
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{a: 1, b: 2} items sortByStr(@0)`,
 		`Arr<Tup<Str, Num>>`,
 		`[["a", 1], ["b", 2]]`,
 		nil,
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`{} items`,
 		`Arr<Tup<Str, Void>>`,
 		`[]`,

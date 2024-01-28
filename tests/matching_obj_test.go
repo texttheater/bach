@@ -1,29 +1,30 @@
-package tests
+package tests_test
 
 import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
+	"github.com/texttheater/bach/tests"
 	"github.com/texttheater/bach/types"
 )
 
 func TestMatchingObj(t *testing.T) {
-	TestProgram(
+	tests.TestProgram(
 		`{a: 1} is {a: Num a} then a ok`,
 		types.Num{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
-	TestProgram(
+	tests.TestProgram(
 		`{a: 1, b: 2} is {a: Num a} then a ok`,
 		types.Num{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
-	TestProgram(
+	tests.TestProgram(
 		`if true then {a: 1} else {b: 2} ok is {a: Num} then true elis {a: Num, b: Num} then false ok`,
 		nil,
 		nil,
@@ -32,14 +33,14 @@ func TestMatchingObj(t *testing.T) {
 		),
 		t,
 	)
-	TestProgram(
+	tests.TestProgram(
 		`if true then {a: 1} else {b: 2} ok is {a: Num a} then a elis {b: Num b} then b ok`,
 		types.Num{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
-	TestProgram(
+	tests.TestProgram(
 		`if true then {a: 1} else {b: "s"} ok is {a: Num a} then a elis {b: Num b} then b ok`,
 		nil,
 		nil,
@@ -48,7 +49,7 @@ func TestMatchingObj(t *testing.T) {
 		),
 		t,
 	)
-	//TestProgram(
+	//tests.TestProgram(
 	//	`if true then {a: 1} elif true then {b: "s"} else {c: true} ok is {a: Num a} then a elis {b: Num b} then b ok`,
 	//	nil,
 	//	nil,
@@ -57,7 +58,7 @@ func TestMatchingObj(t *testing.T) {
 	//	),
 	//	t,
 	//)
-	TestProgram(
+	tests.TestProgram(
 		`if true then {a: 1} else {b: 2} ok`,
 		types.NewUnion(
 			types.Obj{
@@ -83,7 +84,7 @@ func TestMatchingObj(t *testing.T) {
 	// each pattern but isn't. Is this a problem? It is because our object
 	// types currently cannot represent the *absence* of attributes, so any
 	// attribute not present in the type has Any type by default.
-	TestProgram(
+	tests.TestProgram(
 		`if true then {a: 1} else {b: 2} ok is {a: Num x} with x ==1 then true elif false then false elis {a: Num x} then x elis {b: Num x} then x ok`,
 		types.NewUnion(types.Bool{}, types.Num{}),
 		states.BoolValue(true),

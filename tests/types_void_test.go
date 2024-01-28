@@ -1,4 +1,4 @@
-package tests
+package tests_test
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 )
 
 func TestVoidType(t *testing.T) {
-	//TestProgram(
+	//tests.TestProgram(
 	//	`[] each drop 0 all`,
 	//	nil,
 	//	nil,

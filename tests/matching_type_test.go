@@ -1,22 +1,23 @@
-package tests
+package tests_test
 
 import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/states"
+	"github.com/texttheater/bach/tests"
 	"github.com/texttheater/bach/types"
 )
 
 func TestMatchingType(t *testing.T) {
-	TestProgram(
+	tests.TestProgram(
 		`if true then 2 else "two" ok is Num then true else false ok`,
 		types.Bool{},
 		states.BoolValue(true),
 		nil,
 		t,
 	)
-	//TestProgram(
+	//tests.TestProgram(
 	//	`if true then 2 else "two" ok is Num then true ok`,
 	//	nil,
 	//	nil,
@@ -27,14 +28,14 @@ func TestMatchingType(t *testing.T) {
 	//	),
 	//	t,
 	//)
-	TestProgram(
+	tests.TestProgram(
 		`if true then 2 else "two" ok is Num then true elis Str then false ok`,
 		types.Bool{},
 		states.BoolValue(true),
 		nil,
 		t,
 	)
-	TestProgram(
+	tests.TestProgram(
 		`if true then 2 else "two" ok is Num then true elis Str then false else false ok`,
 		nil,
 		nil,
@@ -43,14 +44,14 @@ func TestMatchingType(t *testing.T) {
 		),
 		t,
 	)
-	TestProgramStr(
+	tests.TestProgramStr(
 		`[1, 2, 3] is Arr<Num> then each(+1) ok`,
 		`Arr<Num>`,
 		`[2, 3, 4]`,
 		nil,
 		t,
 	)
-	TestProgramStr( // Intersective matching: pattern says Arr<Any> but Bach knows it got Arr<Num>
+	tests.TestProgramStr( // Intersective matching: pattern says Arr<Any> but Bach knows it got Arr<Num>
 		`[1, 2, 3] is Arr<Any> then each(+1) ok`,
 		`Arr<Num>`,
 		`[2, 3, 4]`,

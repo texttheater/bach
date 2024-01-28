@@ -1,42 +1,43 @@
-package tests
+package tests_test
 
 import (
 	"testing"
 
 	"github.com/texttheater/bach/states"
+	"github.com/texttheater/bach/tests"
 	"github.com/texttheater/bach/types"
 )
 
 func TestArrayTypes(t *testing.T) {
-	TestProgram(
+	tests.TestProgram(
 		`[] type`,
 		types.Str{},
 		states.StrValue("Tup<>"),
 		nil,
 		t,
 	)
-	TestProgram(
+	tests.TestProgram(
 		`["dog", "cat"] type`,
 		types.Str{},
 		states.StrValue("Tup<Str, Str>"),
 		nil,
 		t,
 	)
-	TestProgram(
+	tests.TestProgram(
 		`["dog", 1] type`,
 		types.Str{},
 		states.StrValue("Tup<Str, Num>"),
 		nil,
 		t,
 	)
-	TestProgram(
+	tests.TestProgram(
 		`["dog", 1, {}] type`,
 		types.Str{},
 		states.StrValue("Tup<Str, Num, Obj<Void>>"),
 		nil,
 		t,
 	)
-	TestProgram(
+	tests.TestProgram(
 		`["dog", 1, {}, 2] type`,
 		types.Str{},
 		states.StrValue("Tup<Str, Num, Obj<Void>, Num>"),
