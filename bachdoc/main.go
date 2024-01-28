@@ -36,7 +36,7 @@ func main() {
 	for _, funcer := range funcers {
 		fmt.Printf("## %s\n\n", funcer.SignatureAsMarkdown())
 		fmt.Printf("%s\n\n", funcer.Summary)
-		fmt.Printf("|  | Type | Value |\n")
+		fmt.Printf("| | Type | Value |\n")
 		fmt.Printf("|---|---|---|\n")
 		fmt.Printf("| Input | %s | %s |\n", funcer.InputType, funcer.InputDescription)
 		for i, param := range funcer.Params {
@@ -44,5 +44,28 @@ func main() {
 		}
 		fmt.Printf("|Output | %s | %s |\n\n", funcer.OutputType, funcer.OutputDescription)
 		fmt.Printf("%s\n\n", funcer.Notes)
+		fmt.Printf("### Examples\n\n")
+		fmt.Printf("| Program | Type | Value | Error |\n")
+		fmt.Printf("|---|---|---|---|\n")
+		for _, example := range funcer.Examples {
+			var typ, val, err string
+			if example.OutputType == "" {
+				typ = ""
+			} else {
+				typ = fmt.Sprintf("`%s`", example.OutputType)
+			}
+			if example.OutputValue == "" {
+				val = ""
+			} else {
+				val = fmt.Sprintf("`%s`", example.OutputValue)
+			}
+			if example.Error == nil {
+				err = ""
+			} else {
+				err = fmt.Sprintf("```\n%s\n```", example.Error)
+			}
+			fmt.Printf("| `%s` | %s | %s | %s |\n", example.Program, typ, val, err)
+		}
+		fmt.Printf("\n")
 	}
 }

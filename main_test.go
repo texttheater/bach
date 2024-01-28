@@ -36,4 +36,5 @@ func TestInterp(t *testing.T) {
 	tests.TestValues(t)
 	tests.TestRegexp(t)
 	tests.TestGetters(t)
+	tests.TestExamples(t)
 }

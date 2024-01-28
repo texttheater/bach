@@ -19,5 +19,9 @@ var NullFuncers = []shapes.Funcer{
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			return states.ThunkFromValue(states.NullValue{})
 		},
+		Examples: []shapes.Example{
+			{"null", "Null", "null", nil},
+			{"1 null", "Null", "null", nil},
+		},
 	},
 }

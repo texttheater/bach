@@ -21,6 +21,7 @@ type Funcer struct {
 	Notes             string
 	Kernel            RegularKernel
 	IDs               *states.IDStack
+	Examples          []Example
 }
 
 func (f Funcer) SignatureAsMarkdown() string {
@@ -102,3 +103,10 @@ func VariableFuncer(id any, name string, varType types.Type) Funcer {
 }
 
 type RegularKernel func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk
+
+type Example struct {
+	Program     string
+	OutputType  string
+	OutputValue string
+	Error       error
+}
