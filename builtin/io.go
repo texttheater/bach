@@ -15,53 +15,47 @@ import (
 )
 
 var IOFuncers = []shapes.Funcer{
-	// for Arr<Str> blocks Arr<Arr<Str>>
-	shapes.RegularFuncer(
-		types.NewArr(types.Str{}),
-		"blocks",
-		nil,
-		types.NewArr(types.NewArr(types.Str{})),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			var nextBlock func(lines *states.ArrValue) (*states.ArrValue, *states.ArrValue, error)
-			nextBlock = func(lines *states.ArrValue) (*states.ArrValue, *states.ArrValue, error) {
-				if lines == nil {
-					return nil, nil, nil
-				}
-				head := lines.Head.(states.StrValue)
-				val, err := lines.Tail.Eval()
-				if err != nil {
-					return nil, nil, err
-				}
-				tail := val.(*states.ArrValue)
-				if head == "" {
-					return nil, tail, nil
-				}
-				next, rest, err := nextBlock(tail)
-				if err != nil {
-					return nil, nil, err
-				}
-				return &states.ArrValue{
-					Head: head,
-					Tail: states.ThunkFromValue(next),
-				}, rest, nil
+
+	shapes.Funcer{InputType: types.NewArr(types.Str{}), Name: "blocks", Params: nil, OutputType: types.NewArr(types.NewArr(types.Str{})), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		var nextBlock func(lines *states.ArrValue) (*states.ArrValue, *states.ArrValue, error)
+		nextBlock = func(lines *states.ArrValue) (*states.ArrValue, *states.ArrValue, error) {
+			if lines == nil {
+				return nil, nil, nil
 			}
-			lines := inputState.Value.(*states.ArrValue)
-			iter := func() (states.Value, bool, error) {
-				if lines == nil {
-					return nil, false, nil
-				}
-				var next *states.ArrValue
-				var err error
-				next, lines, err = nextBlock(lines)
-				if err != nil {
-					return nil, false, err
-				}
-				return next, true, nil
+			head := lines.Head.(states.StrValue)
+			val, err := lines.Tail.Eval()
+			if err != nil {
+				return nil, nil, err
 			}
-			return states.ThunkFromIter(iter)
-		},
-		nil,
-	),
+			tail := val.(*states.ArrValue)
+			if head == "" {
+				return nil, tail, nil
+			}
+			next, rest, err := nextBlock(tail)
+			if err != nil {
+				return nil, nil, err
+			}
+			return &states.ArrValue{
+				Head: head,
+				Tail: states.ThunkFromValue(next),
+			}, rest, nil
+		}
+		lines := inputState.Value.(*states.ArrValue)
+		iter := func() (states.Value, bool, error) {
+			if lines == nil {
+				return nil, false, nil
+			}
+			var next *states.ArrValue
+			var err error
+			next, lines, err = nextBlock(lines)
+			if err != nil {
+				return nil, false, err
+			}
+			return next, true, nil
+		}
+		return states.ThunkFromIter(iter)
+	}, IDs: nil},
+
 	// for <A> err <A>
 	shapes.SimpleFuncer(
 		types.NewVar("A", types.Any{}),
@@ -106,58 +100,45 @@ var IOFuncers = []shapes.Funcer{
 			return states.ReaderValue{Reader: os.Stdin}, nil
 		},
 	),
-	// for Reader json Any
-	shapes.RegularFuncer(
-		types.Reader{},
-		"json",
-		nil,
-		types.Any{},
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			reader := inputState.Value.(states.ReaderValue).Reader
-			dec := json.NewDecoder(reader)
-			output := func() (states.Value, bool, error) {
-				if !dec.More() {
-					return nil, false, nil
-				}
-				var o any
-				err := dec.Decode(&o)
-				if err != nil {
-					return nil, false, errors.ValueError(
-						errors.Pos(pos),
-						errors.Code(errors.UnexpectedValue),
-						errors.Message(err.Error()),
-					)
-				}
-				val, err := thunkFromData(o, pos).Eval()
-				if err != nil {
-					return nil, false, err
-				}
-				return val, true, nil
+
+	shapes.Funcer{InputType: types.Reader{}, Name: "json", Params: nil, OutputType: types.Any{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		reader := inputState.Value.(states.ReaderValue).Reader
+		dec := json.NewDecoder(reader)
+		output := func() (states.Value, bool, error) {
+			if !dec.More() {
+				return nil, false, nil
 			}
-			return states.ThunkFromIter(output)
-		},
-		nil,
-	),
-	// for Reader lines Arr<Str>
-	shapes.RegularFuncer(
-		types.Reader{},
-		"lines",
-		nil,
-		types.NewArr(types.Str{}),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			reader := inputState.Value.(states.ReaderValue)
-			scanner := bufio.NewScanner(reader.Reader)
-			iter := func() (states.Value, bool, error) {
-				ok := scanner.Scan()
-				if !ok {
-					return nil, false, nil
-				}
-				return states.StrValue(scanner.Text()), true, nil
+			var o any
+			err := dec.Decode(&o)
+			if err != nil {
+				return nil, false, errors.ValueError(
+					errors.Pos(pos),
+					errors.Code(errors.UnexpectedValue),
+					errors.Message(err.Error()),
+				)
 			}
-			return states.ThunkFromIter(iter)
-		},
-		nil,
-	),
+			val, err := thunkFromData(o, pos).Eval()
+			if err != nil {
+				return nil, false, err
+			}
+			return val, true, nil
+		}
+		return states.ThunkFromIter(output)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.Reader{}, Name: "lines", Params: nil, OutputType: types.NewArr(types.Str{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		reader := inputState.Value.(states.ReaderValue)
+		scanner := bufio.NewScanner(reader.Reader)
+		iter := func() (states.Value, bool, error) {
+			ok := scanner.Scan()
+			if !ok {
+				return nil, false, nil
+			}
+			return states.StrValue(scanner.Text()), true, nil
+		}
+		return states.ThunkFromIter(iter)
+	}, IDs: nil},
+
 	// for <A> out <A>
 	shapes.SimpleFuncer(
 		types.NewVar("A", types.Any{}),

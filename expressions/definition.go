@@ -54,7 +54,7 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*param
 		return bodyAction(bodyInputState, nil)
 	}
 	// make a funcer for the defined function, add it to the function stack
-	funFuncer := shapes.RegularFuncer(x.InputType, x.Name, x.Params, x.OutputType, funKernel, nil)
+	funFuncer := shapes.Funcer{InputType: x.InputType, Name: x.Name, Params: x.Params, OutputType: x.OutputType, Kernel: funKernel, IDs: nil}
 	functionStack := inputShape.Stack.Push(funFuncer)
 	// add parameter funcers for use in the body
 	bodyStack := functionStack
@@ -70,9 +70,10 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*param
 			}
 			panic("action not found")
 		}
-		paramFuncer := shapes.RegularFuncer(param.InputType, x.ParamNames[i], param.Params, param.OutputType, paramKernel, &states.IDStack{
+		paramFuncer := shapes.Funcer{InputType: param.InputType, Name: x.ParamNames[i], Params: param.Params, OutputType: param.OutputType, Kernel: paramKernel, IDs: &states.IDStack{
 			Head: id,
-		})
+		}}
+
 		bodyStack = bodyStack.Push(paramFuncer)
 	}
 	// define body input context

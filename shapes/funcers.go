@@ -72,7 +72,7 @@ func SimpleFuncer(wantInputType types.Type, wantName string, pars []*params.Para
 
 	}
 	// return
-	return RegularFuncer(wantInputType, wantName, pars, outputType, regularKernel, nil)
+	return Funcer{InputType: wantInputType, Name: wantName, Params: pars, OutputType: outputType, Kernel: regularKernel, IDs: nil}
 }
 
 func VariableFuncer(id any, name string, varType types.Type) Funcer {
@@ -95,20 +95,10 @@ func VariableFuncer(id any, name string, varType types.Type) Funcer {
 		}
 		panic(fmt.Sprintf("variable %s not found", name))
 	}
-	return RegularFuncer(types.Any{}, name, nil, varType, kernel, &states.IDStack{
+	return Funcer{InputType: types.Any{}, Name: name, Params: nil, OutputType: varType, Kernel: kernel, IDs: &states.IDStack{
 		Head: id,
-	})
+	}}
+
 }
 
 type RegularKernel func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk
-
-func RegularFuncer(wantInputType types.Type, wantName string, pars []*params.Param, outputType types.Type, kernel RegularKernel, ids *states.IDStack) Funcer {
-	return Funcer{
-		InputType:  wantInputType,
-		Name:       wantName,
-		Params:     pars,
-		OutputType: outputType,
-		Kernel:     kernel,
-		IDs:        ids,
-	}
-}

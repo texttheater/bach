@@ -78,138 +78,97 @@ var TextFuncers = []shapes.Funcer{
 			return states.StrValue(str1 + str2), nil
 		},
 	),
-	// for Str bytes Arr<Num>
-	shapes.RegularFuncer(
-		types.Str{},
-		"bytes",
-		nil,
-		types.NewArr(types.Num{}),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			str := inputState.Value.(states.StrValue)
-			bytes := []byte(str)
-			var output func() (states.Value, bool, error)
-			i := 0
-			output = func() (states.Value, bool, error) {
-				if i >= len(bytes) {
-					return nil, false, nil
-				}
-				v := states.NumValue(bytes[i])
-				i++
-				return v, true, nil
+
+	shapes.Funcer{InputType: types.Str{}, Name: "bytes", Params: nil, OutputType: types.NewArr(types.Num{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		str := inputState.Value.(states.StrValue)
+		bytes := []byte(str)
+		var output func() (states.Value, bool, error)
+		i := 0
+		output = func() (states.Value, bool, error) {
+			if i >= len(bytes) {
+				return nil, false, nil
 			}
-			return states.ThunkFromIter(output)
-		},
-		nil,
-	),
-	// for Arr<Num> bytesToStr Str
-	shapes.RegularFuncer(
-		types.NewArr(types.Num{}),
-		"bytesToStr",
-		nil,
-		types.Str{},
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := states.IterFromValue(inputState.Value)
-			var output strings.Builder
-			for {
-				v, ok, err := input()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				if !ok {
-					break
-				}
-				output.WriteByte(byte(v.(states.NumValue)))
-			}
-			return states.ThunkFromValue(states.StrValue(output.String()))
-		},
-		nil,
-	),
-	// for Str codePoints Arr<Num>
-	shapes.RegularFuncer(
-		types.Str{},
-		"codePoints",
-		nil,
-		types.NewArr(types.Num{}),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			str := inputState.Value.(states.StrValue)
-			runes := []rune(str)
-			i := 0
-			output := func() (states.Value, bool, error) {
-				if i >= len(runes) {
-					return nil, false, nil
-				}
-				v := states.NumValue(runes[i])
-				i++
-				return v, true, nil
-			}
-			return states.ThunkFromIter(output)
-		},
-		nil,
-	),
-	// for Arr<Num> codePointsToStr Str
-	shapes.RegularFuncer(
-		types.NewArr(types.Num{}),
-		"codePointsToStr",
-		nil,
-		types.Str{},
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := states.IterFromValue(inputState.Value)
-			var output strings.Builder
-			for {
-				v, ok, err := input()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				if !ok {
-					break
-				}
-				output.WriteRune(rune(v.(states.NumValue)))
-			}
-			return states.ThunkFromValue(states.StrValue(output.String()))
-		},
-		nil,
-	),
-	// for Str fields Arr<Str>
-	shapes.RegularFuncer(
-		types.Str{},
-		"fields",
-		nil,
-		types.NewArr(types.Str{}),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			str := string(inputState.Value.(states.StrValue))
-			fields := strings.Fields(str)
-			i := 0
-			iter := func() (states.Value, bool, error) {
-				if i >= len(fields) {
-					return nil, false, nil
-				}
-				v := states.StrValue(fields[i])
-				i++
-				return v, true, nil
-			}
-			return states.ThunkFromIter(iter)
-		},
-		nil,
-	),
-	// for Str indexOf(Str) Num
-	shapes.RegularFuncer(
-		types.Str{},
-		"indexOf",
-		[]*params.Param{
-			params.SimpleParam("needle", types.Str{}),
-		},
-		types.Num{},
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			haystack := string(inputState.Value.(states.StrValue))
-			needle, err := args[0](inputState.Clear(), nil).EvalStr()
+			v := states.NumValue(bytes[i])
+			i++
+			return v, true, nil
+		}
+		return states.ThunkFromIter(output)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.Num{}), Name: "bytesToStr", Params: nil, OutputType: types.Str{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input := states.IterFromValue(inputState.Value)
+		var output strings.Builder
+		for {
+			v, ok, err := input()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			result := states.NumValue(strings.Index(haystack, needle))
-			return states.ThunkFromValue(result)
-		},
-		nil,
-	),
+			if !ok {
+				break
+			}
+			output.WriteByte(byte(v.(states.NumValue)))
+		}
+		return states.ThunkFromValue(states.StrValue(output.String()))
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.Str{}, Name: "codePoints", Params: nil, OutputType: types.NewArr(types.Num{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		str := inputState.Value.(states.StrValue)
+		runes := []rune(str)
+		i := 0
+		output := func() (states.Value, bool, error) {
+			if i >= len(runes) {
+				return nil, false, nil
+			}
+			v := states.NumValue(runes[i])
+			i++
+			return v, true, nil
+		}
+		return states.ThunkFromIter(output)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.Num{}), Name: "codePointsToStr", Params: nil, OutputType: types.Str{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input := states.IterFromValue(inputState.Value)
+		var output strings.Builder
+		for {
+			v, ok, err := input()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			if !ok {
+				break
+			}
+			output.WriteRune(rune(v.(states.NumValue)))
+		}
+		return states.ThunkFromValue(states.StrValue(output.String()))
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.Str{}, Name: "fields", Params: nil, OutputType: types.NewArr(types.Str{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		str := string(inputState.Value.(states.StrValue))
+		fields := strings.Fields(str)
+		i := 0
+		iter := func() (states.Value, bool, error) {
+			if i >= len(fields) {
+				return nil, false, nil
+			}
+			v := states.StrValue(fields[i])
+			i++
+			return v, true, nil
+		}
+		return states.ThunkFromIter(iter)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.Str{}, Name: "indexOf", Params: []*params.Param{
+		params.SimpleParam("needle", types.Str{}),
+	}, OutputType: types.Num{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		haystack := string(inputState.Value.(states.StrValue))
+		needle, err := args[0](inputState.Clear(), nil).EvalStr()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		result := states.NumValue(strings.Index(haystack, needle))
+		return states.ThunkFromValue(result)
+	}, IDs: nil},
+
 	// for Arr<Str> join Str
 	shapes.SimpleFuncer(
 		types.NewArr(types.Str{}),
@@ -315,54 +274,41 @@ var TextFuncers = []shapes.Funcer{
 			return states.StrValue(builder.String()), nil
 		},
 	),
-	// for Str replaceFirst(Str, Str) Str
-	shapes.RegularFuncer(
-		types.Str{},
-		"replaceFirst",
-		[]*params.Param{
-			params.SimpleParam("needle", types.Str{}),
-			params.SimpleParam("replacement", types.Str{}),
-		},
-		types.Str{},
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			haystack := inputState.Value.(states.StrValue)
-			needle, err := args[0](inputState.Clear(), nil).EvalStr()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			replacement, err := args[1](inputState.Clear(), nil).EvalStr()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			result := strings.Replace(string(haystack), string(needle), string(replacement), 1)
-			return states.ThunkFromValue(states.StrValue(result))
-		},
-		nil,
-	),
-	// for Str replaceAll(Str, Str) Str
-	shapes.RegularFuncer(
-		types.Str{},
-		"replaceAll",
-		[]*params.Param{
-			params.SimpleParam("needle", types.Str{}),
-			params.SimpleParam("replacement", types.Str{}),
-		},
-		types.Str{},
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			haystack := inputState.Value.(states.StrValue)
-			needle, err := args[0](inputState.Clear(), nil).EvalStr()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			replacement, err := args[1](inputState.Clear(), nil).EvalStr()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			result := strings.ReplaceAll(string(haystack), string(needle), string(replacement))
-			return states.ThunkFromValue(states.StrValue(result))
-		},
-		nil,
-	),
+
+	shapes.Funcer{InputType: types.Str{}, Name: "replaceFirst", Params: []*params.Param{
+		params.SimpleParam("needle", types.Str{}),
+		params.SimpleParam("replacement", types.Str{}),
+	}, OutputType: types.Str{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		haystack := inputState.Value.(states.StrValue)
+		needle, err := args[0](inputState.Clear(), nil).EvalStr()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		replacement, err := args[1](inputState.Clear(), nil).EvalStr()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		result := strings.Replace(string(haystack), string(needle), string(replacement), 1)
+		return states.ThunkFromValue(states.StrValue(result))
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.Str{}, Name: "replaceAll", Params: []*params.Param{
+		params.SimpleParam("needle", types.Str{}),
+		params.SimpleParam("replacement", types.Str{}),
+	}, OutputType: types.Str{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		haystack := inputState.Value.(states.StrValue)
+		needle, err := args[0](inputState.Clear(), nil).EvalStr()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		replacement, err := args[1](inputState.Clear(), nil).EvalStr()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		result := strings.ReplaceAll(string(haystack), string(needle), string(replacement))
+		return states.ThunkFromValue(states.StrValue(result))
+	}, IDs: nil},
+
 	shapes.SimpleFuncer(
 		types.Str{},
 		"startsWith",

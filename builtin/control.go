@@ -9,12 +9,22 @@ import (
 )
 
 var ControlFuncers = []shapes.Funcer{
-	shapes.RegularFuncer(
-		types.Any{},
-		"fatal",
-		nil,
-		types.Void{},
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+	shapes.Funcer{InputType: types.Any{}, Name: "fatal", Params: nil, OutputType: types.Void{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		return states.ThunkFromError(
+			errors.ValueError(
+				errors.Code(errors.UnexpectedValue),
+				errors.Pos(pos),
+				errors.GotValue(inputState.Value),
+			),
+		)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewUnion(
+		types.Null{},
+		types.NewVar("A", types.Any{}),
+	), Name: "must", Params: nil, OutputType: types.NewVar("A", types.Any{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		switch inputState.Value.(type) {
+		case states.NullValue:
 			return states.ThunkFromError(
 				errors.ValueError(
 					errors.Code(errors.UnexpectedValue),
@@ -22,31 +32,8 @@ var ControlFuncers = []shapes.Funcer{
 					errors.GotValue(inputState.Value),
 				),
 			)
-		},
-		nil,
-	),
-	shapes.RegularFuncer(
-		types.NewUnion(
-			types.Null{},
-			types.NewVar("A", types.Any{}),
-		),
-		"must",
-		nil,
-		types.NewVar("A", types.Any{}),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			switch inputState.Value.(type) {
-			case states.NullValue:
-				return states.ThunkFromError(
-					errors.ValueError(
-						errors.Code(errors.UnexpectedValue),
-						errors.Pos(pos),
-						errors.GotValue(inputState.Value),
-					),
-				)
-			default:
-				return states.ThunkFromValue(inputState.Value)
-			}
-		},
-		nil,
-	),
+		default:
+			return states.ThunkFromValue(inputState.Value)
+		}
+	}, IDs: nil},
 }

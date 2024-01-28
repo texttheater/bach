@@ -12,468 +12,381 @@ import (
 )
 
 var ArrFuncers = []shapes.Funcer{
-	// for Arr<<A>> +(Arr<<B>>) Arr<<A|B>>
-	shapes.RegularFuncer(
-		types.NewArr(
-			types.NewVar("A", types.Any{}),
-		),
-		"+",
-		[]*params.Param{
-			params.SimpleParam("other", types.NewArr(
-				types.NewVar("B", types.Any{}),
-			)),
-		},
-		types.NewArr(types.NewUnion(
-			types.NewVar("A", types.Any{}),
+
+	shapes.Funcer{InputType: types.NewArr(
+		types.NewVar("A", types.Any{}),
+	), Name: "+", Params: []*params.Param{
+		params.SimpleParam("other", types.NewArr(
 			types.NewVar("B", types.Any{}),
 		)),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input1 := states.IterFromValue(inputState.Value)
-			input2 := states.IterFromAction(inputState.Clear(), args[0])
-			output := func() (states.Value, bool, error) {
-				el, ok, err := input1()
-				if err != nil {
-					return nil, false, err
-				}
-				if ok {
-					return el, true, nil
-				}
-				el, ok, err = input2()
-				if err != nil {
-					return nil, false, err
-				}
-				if ok {
-					return el, true, nil
-				}
+	}, OutputType: types.NewArr(types.NewUnion(
+		types.NewVar("A", types.Any{}),
+		types.NewVar("B", types.Any{}),
+	)), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input1 := states.IterFromValue(inputState.Value)
+		input2 := states.IterFromAction(inputState.Clear(), args[0])
+		output := func() (states.Value, bool, error) {
+			el, ok, err := input1()
+			if err != nil {
+				return nil, false, err
+			}
+			if ok {
+				return el, true, nil
+			}
+			el, ok, err = input2()
+			if err != nil {
+				return nil, false, err
+			}
+			if ok {
+				return el, true, nil
+			}
+			return nil, false, nil
+		}
+		return states.ThunkFromIter(output)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(
+		types.NewVar("A", types.Any{}),
+	), Name: "drop", Params: []*params.Param{
+		params.SimpleParam("n", types.Num{}),
+	}, OutputType: types.NewArr(
+		types.NewVar("A", types.Any{}),
+	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		arr := inputState.Value.(*states.ArrValue)
+		start, err := args[0](inputState.Clear(), nil).EvalInt()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		for i := 0; i < start && arr != nil; i++ {
+			arr, err = arr.Tail.EvalArr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+		}
+		return states.ThunkFromValue(arr)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(
+		types.NewVar("A", types.Any{}),
+	), Name: "dropWhile", Params: []*params.Param{
+		{
+			InputType: types.NewVar("A", types.Any{}),
+			Name:      "test",
+			Params:    nil,
+			OutputType: types.NewUnion(
+				types.Obj{
+					Props: map[string]types.Type{
+						"yes": types.NewVar("B", types.Any{}),
+					},
+					Rest: types.Any{},
+				},
+				types.Obj{
+					Props: map[string]types.Type{
+						"no": types.NewVar("C", types.Any{}),
+					},
+					Rest: types.Any{},
+				},
+			),
+		},
+	}, OutputType: types.NewArr(
+		types.NewVar("A", types.Any{}),
+	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		arr := inputState.Value.(*states.ArrValue)
+		for {
+			if arr == nil {
+				return states.ThunkFromValue(nil)
+			}
+			argInputState := inputState.Replace(arr.Head)
+			obj, err := args[0](argInputState, nil).EvalObj()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			_, ok := obj["yes"]
+			if !ok {
+				return states.ThunkFromValue(arr)
+			}
+			arr, err = arr.Tail.EvalArr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+		}
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "each", Params: []*params.Param{
+		{
+			InputType:  types.NewVar("A", types.Any{}),
+			Name:       "f",
+			Params:     nil,
+			OutputType: types.NewVar("B", types.Any{}),
+		},
+	}, OutputType: types.NewArr(types.NewVar("B", types.Any{})), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input := states.IterFromValue(inputState.Value)
+		output := func() (states.Value, bool, error) {
+			val, ok, err := input()
+			if err != nil {
+				return nil, false, err
+			}
+			if !ok {
 				return nil, false, nil
 			}
-			return states.ThunkFromIter(output)
-		},
-		nil,
-	),
-	// for Arr<<A>> drop(Num) Arr<<A>>
-	shapes.RegularFuncer(
-		types.NewArr(
-			types.NewVar("A", types.Any{}),
-		),
-		"drop",
-		[]*params.Param{
-			params.SimpleParam("n", types.Num{}),
-		},
-		types.NewArr(
-			types.NewVar("A", types.Any{}),
-		),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			arr := inputState.Value.(*states.ArrValue)
-			start, err := args[0](inputState.Clear(), nil).EvalInt()
+			argInputState := inputState.Replace(val)
+			val, err = args[0](argInputState, nil).Eval()
+			if err != nil {
+				return nil, false, err
+			}
+			return val, true, nil
+		}
+		return states.ThunkFromIter(output)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "enum", Params: []*params.Param{
+		params.SimpleParam("start", types.Num{}),
+	}, OutputType: types.NewArr(types.NewTup([]types.Type{
+		types.Num{},
+		types.NewVar("A", types.Any{}),
+	})), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input := states.IterFromValue(inputState.Value)
+		i, err := args[0](inputState.Clear(), nil).EvalNum()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		output := func() (states.Value, bool, error) {
+			val, ok, err := input()
+			if err != nil {
+				return nil, false, err
+			}
+			if !ok {
+				return nil, false, nil
+			}
+			num := states.NumValue(i)
+			i++
+			return states.NewArrValue([]states.Value{
+				num,
+				val,
+			}), true, nil
+		}
+		return states.ThunkFromIter(output)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "enum", Params: nil, OutputType: types.NewArr(types.NewTup([]types.Type{
+		types.Num{},
+		types.NewVar("A", types.Any{}),
+	})), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input := states.IterFromValue(inputState.Value)
+		i := 0
+		output := func() (states.Value, bool, error) {
+			val, ok, err := input()
+			if err != nil {
+				return nil, false, err
+			}
+			if !ok {
+				return nil, false, nil
+			}
+			num := states.NumValue(i)
+			i++
+			return states.NewArrValue([]states.Value{
+				num,
+				val,
+			}), true, nil
+		}
+		return states.ThunkFromIter(output)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.Bool{}), Name: "every", Params: nil, OutputType: types.Bool{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input := states.IterFromValue(inputState.Value)
+		for {
+			val, ok, err := input()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			for i := 0; i < start && arr != nil; i++ {
-				arr, err = arr.Tail.EvalArr()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
+			if !ok {
+				return states.ThunkFromValue(states.BoolValue(true))
 			}
-			return states.ThunkFromValue(arr)
-		},
-		nil,
-	),
-	// for Arr<<A>> dropWhile(for <<A>> Obj<yes: B>|Obj<no: C>) Arr<<A>>
-	shapes.RegularFuncer(
-		types.NewArr(
-			types.NewVar("A", types.Any{}),
-		),
-		"dropWhile",
-		[]*params.Param{
-			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "test",
-				Params:    nil,
-				OutputType: types.NewUnion(
-					types.Obj{
-						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
-						},
-						Rest: types.Any{},
+			if !val.(states.BoolValue) {
+				return states.ThunkFromValue(states.BoolValue(false))
+			}
+		}
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "find", Params: []*params.Param{
+		{
+			InputType: types.NewVar("A", types.Any{}),
+			Name:      "test",
+			Params:    nil,
+			OutputType: types.NewUnion(
+				types.Obj{
+					Props: map[string]types.Type{
+						"yes": types.NewVar("B", types.Any{}),
 					},
-					types.Obj{
-						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
-						},
-						Rest: types.Any{},
-					},
-				),
-			},
-		},
-		types.NewArr(
-			types.NewVar("A", types.Any{}),
-		),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			arr := inputState.Value.(*states.ArrValue)
-			for {
-				if arr == nil {
-					return states.ThunkFromValue(nil)
-				}
-				argInputState := inputState.Replace(arr.Head)
-				obj, err := args[0](argInputState, nil).EvalObj()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				_, ok := obj["yes"]
-				if !ok {
-					return states.ThunkFromValue(arr)
-				}
-				arr, err = arr.Tail.EvalArr()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-			}
-		},
-		nil,
-	),
-	// for Arr<<A>> each(for <<A>> <<B>>) Arr<<B>>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"each",
-		[]*params.Param{
-			{
-				InputType:  types.NewVar("A", types.Any{}),
-				Name:       "f",
-				Params:     nil,
-				OutputType: types.NewVar("B", types.Any{}),
-			},
-		},
-		types.NewArr(types.NewVar("B", types.Any{})),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := states.IterFromValue(inputState.Value)
-			output := func() (states.Value, bool, error) {
-				val, ok, err := input()
-				if err != nil {
-					return nil, false, err
-				}
-				if !ok {
-					return nil, false, nil
-				}
-				argInputState := inputState.Replace(val)
-				val, err = args[0](argInputState, nil).Eval()
-				if err != nil {
-					return nil, false, err
-				}
-				return val, true, nil
-			}
-			return states.ThunkFromIter(output)
-		},
-		nil,
-	),
-	// for Arr<<A>> enum(Num) Arr<Tup<Num, <A>>>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"enum",
-		[]*params.Param{
-			params.SimpleParam("start", types.Num{}),
-		},
-		types.NewArr(types.NewTup([]types.Type{
-			types.Num{},
-			types.NewVar("A", types.Any{}),
-		})),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := states.IterFromValue(inputState.Value)
-			i, err := args[0](inputState.Clear(), nil).EvalNum()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			output := func() (states.Value, bool, error) {
-				val, ok, err := input()
-				if err != nil {
-					return nil, false, err
-				}
-				if !ok {
-					return nil, false, nil
-				}
-				num := states.NumValue(i)
-				i++
-				return states.NewArrValue([]states.Value{
-					num,
-					val,
-				}), true, nil
-			}
-			return states.ThunkFromIter(output)
-		},
-		nil,
-	),
-	// for Arr<<A>> enum Arr<Tup<Num, <A>>>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"enum",
-		nil,
-		types.NewArr(types.NewTup([]types.Type{
-			types.Num{},
-			types.NewVar("A", types.Any{}),
-		})),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := states.IterFromValue(inputState.Value)
-			i := 0
-			output := func() (states.Value, bool, error) {
-				val, ok, err := input()
-				if err != nil {
-					return nil, false, err
-				}
-				if !ok {
-					return nil, false, nil
-				}
-				num := states.NumValue(i)
-				i++
-				return states.NewArrValue([]states.Value{
-					num,
-					val,
-				}), true, nil
-			}
-			return states.ThunkFromIter(output)
-		},
-		nil,
-	),
-	// for Arr<Bool> every Bool
-	shapes.RegularFuncer(
-		types.NewArr(types.Bool{}),
-		"every",
-		nil,
-		types.Bool{},
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := states.IterFromValue(inputState.Value)
-			for {
-				val, ok, err := input()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				if !ok {
-					return states.ThunkFromValue(states.BoolValue(true))
-				}
-				if !val.(states.BoolValue) {
-					return states.ThunkFromValue(states.BoolValue(false))
-				}
-			}
-		},
-		nil,
-	),
-	// for Arr<<A>> find(for <A> Obj<yes: <B>|Obj<no: C>) Null|Tup<Num, <B>>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"find",
-		[]*params.Param{
-			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "test",
-				Params:    nil,
-				OutputType: types.NewUnion(
-					types.Obj{
-						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
-						},
-						Rest: types.Any{},
-					},
-					types.Obj{
-						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
-						},
-						Rest: types.Any{},
-					},
-				),
-			},
-		},
-		types.NewUnion(
-			types.Null{},
-			types.NewNearr(
-				[]types.Type{
-					types.Num{},
-					types.NewVar("A", types.Any{}),
+					Rest: types.Any{},
 				},
-				types.VoidArr,
-			),
-		),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			arr := inputState.Value.(*states.ArrValue)
-			i := 0
-			for {
-				if arr == nil {
-					return states.ThunkFromValue(states.NullValue{})
-				}
-				argInputState := inputState.Replace(arr.Head)
-				obj, err := args[0](argInputState, nil).EvalObj()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				if thunk, ok := obj["yes"]; ok {
-					val, err := thunk.Eval()
-					if err != nil {
-						return states.ThunkFromError(err)
-					}
-					return states.ThunkFromSlice([]states.Value{
-						states.NumValue(i),
-						val,
-					})
-				}
-				i += 1
-				arr, err = arr.Tail.EvalArr()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-			}
-		},
-		nil,
-	),
-	// for Arr<<A>> findLast(for <A> Obj<yes: <B>|Obj<no: C>) Null|Tup<Num, <B>>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"findLast",
-		[]*params.Param{
-			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "test",
-				Params:    nil,
-				OutputType: types.NewUnion(
-					types.Obj{
-						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
-						},
-						Rest: types.Any{},
+				types.Obj{
+					Props: map[string]types.Type{
+						"no": types.NewVar("C", types.Any{}),
 					},
-					types.Obj{
-						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
-						},
-						Rest: types.Any{},
-					},
-				),
-			},
-		},
-		types.NewUnion(
-			types.Null{},
-			types.NewNearr(
-				[]types.Type{
-					types.Num{},
-					types.NewVar("A", types.Any{}),
+					Rest: types.Any{},
 				},
-				types.VoidArr,
 			),
+		},
+	}, OutputType: types.NewUnion(
+		types.Null{},
+		types.NewNearr(
+			[]types.Type{
+				types.Num{},
+				types.NewVar("A", types.Any{}),
+			},
+			types.VoidArr,
 		),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			arr := inputState.Value.(*states.ArrValue)
-			i := -1
-			var val states.Value
-			for {
-				if arr == nil {
-					break
-				}
-				argInputState := inputState.Replace(arr.Head)
-				obj, err := args[0](argInputState, nil).EvalObj()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				if thunk, ok := obj["yes"]; ok {
-					val, err = thunk.Eval()
-					if err != nil {
-						return states.ThunkFromError(err)
-					}
-				}
-				i += 1
-				arr, err = arr.Tail.EvalArr()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-			}
-			if val == nil {
+	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		arr := inputState.Value.(*states.ArrValue)
+		i := 0
+		for {
+			if arr == nil {
 				return states.ThunkFromValue(states.NullValue{})
 			}
-			return states.ThunkFromSlice([]states.Value{
-				states.NumValue(i),
-				val,
-			})
-		},
-		nil,
-	),
-	// for Arr<<A>> fold(<B>, for <B> (<A>) <B>) <B>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"fold",
-		[]*params.Param{
-			params.SimpleParam("start", types.NewVar("B", types.Any{})),
-			{
-				InputType: types.NewVar("B", types.Any{}),
-				Name:      "combine",
-				Params: []*params.Param{
-					params.SimpleParam("next", types.NewVar("A", types.Any{})),
+			argInputState := inputState.Replace(arr.Head)
+			obj, err := args[0](argInputState, nil).EvalObj()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			if thunk, ok := obj["yes"]; ok {
+				val, err := thunk.Eval()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				return states.ThunkFromSlice([]states.Value{
+					states.NumValue(i),
+					val,
+				})
+			}
+			i += 1
+			arr, err = arr.Tail.EvalArr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+		}
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "findLast", Params: []*params.Param{
+		{
+			InputType: types.NewVar("A", types.Any{}),
+			Name:      "test",
+			Params:    nil,
+			OutputType: types.NewUnion(
+				types.Obj{
+					Props: map[string]types.Type{
+						"yes": types.NewVar("B", types.Any{}),
+					},
+					Rest: types.Any{},
 				},
-				OutputType: types.NewVar("B", types.Any{}),
+				types.Obj{
+					Props: map[string]types.Type{
+						"no": types.NewVar("C", types.Any{}),
+					},
+					Rest: types.Any{},
+				},
+			),
+		},
+	}, OutputType: types.NewUnion(
+		types.Null{},
+		types.NewNearr(
+			[]types.Type{
+				types.Num{},
+				types.NewVar("A", types.Any{}),
 			},
-		},
-		types.NewVar("B", types.Any{}),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			acc, err := args[0].Eval(inputState.Clear(), nil)
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			opInputState := states.State{
-				Value: nil,
-				Stack: inputState.Stack,
-			}
-			input := states.IterFromValue(inputState.Value)
-			for {
-				el, ok, err := input()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				if !ok {
-					return states.ThunkFromValue(acc)
-				}
-				opInputState.Value = acc
-				acc, err = args[1].Eval(
-					opInputState,
-					[]states.Action{states.SimpleAction(el)},
-				)
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-			}
-		},
-		nil,
-	),
-	// for Arr<<A>> get(Num) <A>
-	shapes.RegularFuncer(
-		types.NewArr(
-			types.NewVar("A", types.Any{}),
+			types.VoidArr,
 		),
-		"get",
-		[]*params.Param{
-			params.SimpleParam("index", types.Num{}),
-		},
-		types.NewVar("A", types.Any{}),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			arr := inputState.Value.(*states.ArrValue)
-			index, err := args[0](inputState.Clear(), nil).EvalInt()
+	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		arr := inputState.Value.(*states.ArrValue)
+		i := -1
+		var val states.Value
+		for {
+			if arr == nil {
+				break
+			}
+			argInputState := inputState.Replace(arr.Head)
+			obj, err := args[0](argInputState, nil).EvalObj()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			if index < 0 {
-				return states.ThunkFromError(errors.ValueError(
-					errors.Code(errors.BadIndex),
-					errors.GotValue(states.NumValue(index)),
-					errors.Pos(pos),
-				))
-			}
-			for i := 0; i < index; i++ {
-				if arr == nil {
-					return states.ThunkFromError(errors.ValueError(
-						errors.Code(errors.NoSuchIndex),
-						errors.GotValue(states.NumValue(index)),
-						errors.Pos(pos),
-					))
-				}
-				arr, err = arr.Tail.EvalArr()
+			if thunk, ok := obj["yes"]; ok {
+				val, err = thunk.Eval()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
 			}
+			i += 1
+			arr, err = arr.Tail.EvalArr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+		}
+		if val == nil {
+			return states.ThunkFromValue(states.NullValue{})
+		}
+		return states.ThunkFromSlice([]states.Value{
+			states.NumValue(i),
+			val,
+		})
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "fold", Params: []*params.Param{
+		params.SimpleParam("start", types.NewVar("B", types.Any{})),
+		{
+			InputType: types.NewVar("B", types.Any{}),
+			Name:      "combine",
+			Params: []*params.Param{
+				params.SimpleParam("next", types.NewVar("A", types.Any{})),
+			},
+			OutputType: types.NewVar("B", types.Any{}),
+		},
+	}, OutputType: types.NewVar("B", types.Any{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		acc, err := args[0].Eval(inputState.Clear(), nil)
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		opInputState := states.State{
+			Value: nil,
+			Stack: inputState.Stack,
+		}
+		input := states.IterFromValue(inputState.Value)
+		for {
+			el, ok, err := input()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			if !ok {
+				return states.ThunkFromValue(acc)
+			}
+			opInputState.Value = acc
+			acc, err = args[1].Eval(
+				opInputState,
+				[]states.Action{states.SimpleAction(el)},
+			)
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+		}
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(
+		types.NewVar("A", types.Any{}),
+	), Name: "get", Params: []*params.Param{
+		params.SimpleParam("index", types.Num{}),
+	}, OutputType: types.NewVar("A", types.Any{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		arr := inputState.Value.(*states.ArrValue)
+		index, err := args[0](inputState.Clear(), nil).EvalInt()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		if index < 0 {
+			return states.ThunkFromError(errors.ValueError(
+				errors.Code(errors.BadIndex),
+				errors.GotValue(states.NumValue(index)),
+				errors.Pos(pos),
+			))
+		}
+		for i := 0; i < index; i++ {
 			if arr == nil {
 				return states.ThunkFromError(errors.ValueError(
 					errors.Code(errors.NoSuchIndex),
@@ -481,519 +394,74 @@ var ArrFuncers = []shapes.Funcer{
 					errors.Pos(pos),
 				))
 			}
-			return states.ThunkFromValue(arr.Head)
-		},
-		nil,
-	),
-	// for Arr<Arr<<A>>> join Arr<<A>>
-	shapes.RegularFuncer(
-		types.NewArr(
-			types.NewArr(types.NewVar("A", types.Any{})),
-		),
-		"join",
-		nil,
-		types.NewArr(types.NewVar("A", types.Any{})),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := states.IterFromValue(inputState.Value)
-			var arrIter func() (states.Value, bool, error)
-			output := func() (states.Value, bool, error) {
-				for {
-					if arrIter != nil {
-						val, ok, err := arrIter()
-						if err != nil {
-							return nil, false, nil
-						}
-						if ok {
-							return val, true, nil
-						}
-					}
-					arrVal, ok, err := input()
-					if err != nil {
-						return nil, false, err
-					}
-					if !ok {
-						return nil, false, nil
-					}
-					arrIter = states.IterFromValue(arrVal)
-				}
+			arr, err = arr.Tail.EvalArr()
+			if err != nil {
+				return states.ThunkFromError(err)
 			}
-			return states.ThunkFromIter(output)
-		},
-		nil,
-	),
-	// for Arr<<A>> keep(for <A> Obj<yes: <B>>|Obj<no: <C>>) Arr<B>
-	shapes.RegularFuncer(
+		}
+		if arr == nil {
+			return states.ThunkFromError(errors.ValueError(
+				errors.Code(errors.NoSuchIndex),
+				errors.GotValue(states.NumValue(index)),
+				errors.Pos(pos),
+			))
+		}
+		return states.ThunkFromValue(arr.Head)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(
 		types.NewArr(types.NewVar("A", types.Any{})),
-		"keep",
-		[]*params.Param{
-			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "test",
-				Params:    nil,
-				OutputType: types.NewUnion(
-					types.Obj{
-						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
-						},
-						Rest: types.Any{},
-					},
-					types.Obj{
-						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
-						},
-						Rest: types.Any{},
-					},
-				),
-			},
-		},
-		types.NewArr(types.NewVar("B", types.Any{})),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := states.IterFromValue(inputState.Value)
-			output := func() (states.Value, bool, error) {
-				for {
-					val, ok, err := input()
+	), Name: "join", Params: nil, OutputType: types.NewArr(types.NewVar("A", types.Any{})), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input := states.IterFromValue(inputState.Value)
+		var arrIter func() (states.Value, bool, error)
+		output := func() (states.Value, bool, error) {
+			for {
+				if arrIter != nil {
+					val, ok, err := arrIter()
 					if err != nil {
-						return nil, false, err
-					}
-					if !ok {
 						return nil, false, nil
 					}
-					argInputState := inputState.Replace(val)
-					obj, err := args[0](argInputState, nil).EvalObj()
-					if err != nil {
-						return nil, false, err
-					}
-					if thunk, ok := obj["yes"]; ok {
-						val, err = thunk.Eval()
-						if err != nil {
-							return nil, false, err
-						}
+					if ok {
 						return val, true, nil
 					}
 				}
-			}
-			return states.ThunkFromIter(output)
-		},
-		nil,
-	),
-	// for Arr<<A>> len Num
-	shapes.RegularFuncer(
-		types.AnyArr,
-		"len",
-		nil,
-		types.Num{},
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			length := 0
-			iter := states.IterFromValue(inputState.Value)
-			for {
-				_, ok, err := iter()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				if !ok {
-					return states.ThunkFromValue(states.NumValue(length))
-				}
-				length += 1
-			}
-		},
-		nil,
-	),
-	// for Arr<<A>> max(for <A> (<A>) Bool, <A>) <A>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"max",
-		[]*params.Param{
-			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "less",
-				Params: []*params.Param{
-					params.SimpleParam("other", types.NewVar("A", types.Any{})),
-				},
-				OutputType: types.Bool{},
-			},
-			params.SimpleParam("default", types.NewVar("A", types.Any{})),
-		},
-		types.NewVar("A", types.Any{}),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			return max(inputState, id, args[0], args[1])
-		},
-		nil,
-	),
-	// for Arr<<A>> max(for <A> <B>, for <B> (<B>) Bool, <A>) <A>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"max",
-		[]*params.Param{
-			{
-				InputType:  types.NewVar("A", types.Any{}),
-				Name:       "sortKey",
-				Params:     nil,
-				OutputType: types.NewVar("B", types.Any{}),
-			},
-			{
-				InputType: types.NewVar("B", types.Any{}),
-				Name:      "less",
-				Params: []*params.Param{
-					params.SimpleParam("other", types.NewVar("B", types.Any{})),
-				},
-				OutputType: types.Bool{},
-			},
-			params.SimpleParam("default", types.NewVar("A", types.Any{})),
-		},
-		types.NewVar("A", types.Any{}),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			return max(inputState, args[0], args[1], args[2])
-		},
-		nil,
-	),
-	// for Arr<<A>> min(for <A> (<A>) Bool, <A>) <A>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"min",
-		[]*params.Param{
-			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "less",
-				Params: []*params.Param{
-					params.SimpleParam("other", types.NewVar("A", types.Any{})),
-				},
-				OutputType: types.Bool{},
-			},
-			params.SimpleParam("default", types.NewVar("A", types.Any{})),
-		},
-		types.NewVar("A", types.Any{}),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			return min(inputState, id, args[0], args[1])
-		},
-		nil,
-	),
-	// for Arr<<A>> max(for <A> <B>, for <B> (<B>) Bool, <A>) <A>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"min",
-		[]*params.Param{
-			{
-				InputType:  types.NewVar("A", types.Any{}),
-				Name:       "sortKey",
-				Params:     nil,
-				OutputType: types.NewVar("B", types.Any{}),
-			},
-			{
-				InputType: types.NewVar("B", types.Any{}),
-				Name:      "less",
-				Params: []*params.Param{
-					params.SimpleParam("other", types.NewVar("B", types.Any{})),
-				},
-				OutputType: types.Bool{},
-			},
-			params.SimpleParam("default", types.NewVar("A", types.Any{})),
-		},
-		types.NewVar("A", types.Any{}),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			return min(inputState, args[0], args[1], args[2])
-		},
-		nil,
-	),
-	// for Any range(Num, Num) Arr<Num>
-	shapes.RegularFuncer(
-		types.Any{},
-		"range",
-		[]*params.Param{
-			params.SimpleParam("from", types.Num{}),
-			params.SimpleParam("to", types.Num{}),
-		},
-		types.NewArr(
-			types.Num{},
-		),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			argInputState := inputState.Clear()
-			from, err := args[0](argInputState, nil).EvalNum()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			to, err := args[1](argInputState, nil).EvalNum()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			i := from
-			iter := func() (states.Value, bool, error) {
-				if i >= to {
-					return nil, false, nil
-				}
-				v := states.NumValue(i)
-				i++
-				return v, true, nil
-			}
-			return states.ThunkFromIter(iter)
-		},
-		nil,
-	),
-	// for Arr<<A>> repeat(Num) Arr<<A>>
-	shapes.RegularFuncer(
-		types.NewArr(
-			types.NewVar("A", types.Any{}),
-		),
-		"repeat",
-		[]*params.Param{
-			params.SimpleParam("times", types.Num{}),
-		},
-		types.NewArr(
-			types.NewVar("A", types.Any{}),
-		),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := inputState.Value.(*states.ArrValue)
-			n, err := args[0](inputState.Clear(), nil).EvalNum()
-			nInt := int(n)
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			c := make(chan *states.Thunk)
-			go func() {
-				for i := 0; i < nInt; i++ {
-					arr := input
-					for arr != nil {
-						c <- states.ThunkFromValue(arr.Head)
-						arr, err = arr.Tail.EvalArr()
-						if err != nil {
-							c <- states.ThunkFromError(err)
-							return
-						}
-					}
-				}
-				c <- states.ThunkFromValue(nil)
-			}()
-			return states.ThunkFromChannel(c)
-		},
-		nil,
-	),
-	// for Arr<<A>> rev Arr<<A>>
-	shapes.RegularFuncer(
-		types.NewArr(
-			types.NewVar("A", types.Any{}),
-		),
-		"rev",
-		nil,
-		types.NewArr(
-			types.NewVar("A", types.Any{}),
-		),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := states.IterFromValue(inputState.Value)
-			var outputArr *states.ArrValue
-			for {
-				el, ok, err := input()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				if !ok {
-					break
-				}
-				outputArr = &states.ArrValue{
-					Head: el,
-					Tail: states.ThunkFromValue(outputArr),
-				}
-			}
-			return states.ThunkFromValue(outputArr)
-		},
-		nil,
-	),
-	// for Arr<Bool> some Bool
-	shapes.RegularFuncer(
-		types.NewArr(types.Bool{}),
-		"some",
-		nil,
-		types.Bool{},
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := states.IterFromValue(inputState.Value)
-			for {
-				val, ok, err := input()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				if !ok {
-					return states.ThunkFromValue(states.BoolValue(false))
-				}
-				if val.(states.BoolValue) {
-					return states.ThunkFromValue(states.BoolValue(true))
-				}
-			}
-		},
-		nil,
-	),
-	// for Arr<Num> sort Arr<Num>
-	shapes.RegularFuncer(
-		types.NewArr(types.Num{}),
-		"sort",
-		nil,
-		types.NewArr(types.Num{}),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			return mySort(inputState, id, numLess)
-		},
-		nil,
-	),
-	// for Arr<Str> sort Arr<Str>
-	shapes.RegularFuncer(
-		types.NewArr(types.Str{}),
-		"sort",
-		nil,
-		types.NewArr(types.Str{}),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			return mySort(inputState, id, strLess)
-		},
-		nil,
-	),
-	// for Arr<<A>> sort(for <A> (<A>) Bool) Arr<<A>>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"sort",
-		[]*params.Param{
-			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "less",
-				Params: []*params.Param{
-					params.SimpleParam("other", types.NewVar("A", types.Any{})),
-				},
-				OutputType: types.Bool{},
-			},
-		},
-		types.NewArr(types.NewVar("A", types.Any{})),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			return mySort(inputState, id, args[0])
-		},
-		nil,
-	),
-	// for Arr<<A>> sortByNum(for <A> Num) Arr<<A>>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"sortByNum",
-		[]*params.Param{
-			{
-				InputType:  types.NewVar("A", types.Any{}),
-				Name:       "sortKey",
-				Params:     nil,
-				OutputType: types.Num{},
-			},
-		},
-		types.NewArr(types.NewVar("A", types.Any{})),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			return mySort(inputState, args[0], numLess)
-		},
-		nil,
-	),
-	// for Arr<<A>> sortByStr(for <A> Str) Arr<<A>>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"sortByStr",
-		[]*params.Param{
-			{
-				InputType:  types.NewVar("A", types.Any{}),
-				Name:       "sortKey",
-				Params:     nil,
-				OutputType: types.Str{},
-			},
-		},
-		types.NewArr(types.NewVar("A", types.Any{})),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			return mySort(inputState, args[0], strLess)
-		},
-		nil,
-	),
-	// for Arr<<A>> sortBy(for <A> <B>, for <B> (<B>) Bool) Arr<<A>>
-	shapes.RegularFuncer(
-		types.NewArr(types.NewVar("A", types.Any{})),
-		"sortBy",
-		[]*params.Param{
-			{
-				InputType:  types.NewVar("A", types.Any{}),
-				Name:       "sortKey",
-				Params:     nil,
-				OutputType: types.NewVar("B", types.Any{}),
-			},
-			{
-				InputType: types.NewVar("B", types.Any{}),
-				Name:      "less",
-				Params: []*params.Param{
-					params.SimpleParam("other", types.NewVar("B", types.Any{})),
-				},
-				OutputType: types.Bool{},
-			},
-		},
-		types.NewArr(types.NewVar("A", types.Any{})),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			return mySort(inputState, args[0], args[1])
-		},
-		nil,
-	),
-	// for Arr<<A>> take(Num) Arr<<A>>
-	shapes.RegularFuncer(
-		types.NewArr(
-			types.NewVar("A", types.Any{}),
-		),
-		"take",
-		[]*params.Param{
-			params.SimpleParam("n", types.Num{}),
-		},
-		types.NewArr(
-			types.NewVar("A", types.Any{}),
-		),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			arr := inputState.Value.(*states.ArrValue)
-			stop, err := args[0](inputState.Clear(), nil).EvalInt()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			i := 0
-			output := func() (states.Value, bool, error) {
-				if i >= stop {
-					return nil, false, nil
-				}
-				if arr == nil {
-					return nil, false, nil
-				}
-				el := arr.Head
-				i += 1
-				arr, err = arr.Tail.EvalArr()
+				arrVal, ok, err := input()
 				if err != nil {
 					return nil, false, err
 				}
-				return el, true, nil
+				if !ok {
+					return nil, false, nil
+				}
+				arrIter = states.IterFromValue(arrVal)
 			}
-			return states.ThunkFromIter(output)
-		},
-		nil,
-	),
-	// for Arr<<A>> takeWhile(for <<A>> Obj<yes: B>|Obj<no: C>) Arr<<A>>
-	shapes.RegularFuncer(
-		types.NewArr(
-			types.NewVar("A", types.Any{}),
-		),
-		"takeWhile",
-		[]*params.Param{
-			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "test",
-				Params:    nil,
-				OutputType: types.NewUnion(
-					types.Obj{
-						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
-						},
-						Rest: types.Any{},
+		}
+		return states.ThunkFromIter(output)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "keep", Params: []*params.Param{
+		{
+			InputType: types.NewVar("A", types.Any{}),
+			Name:      "test",
+			Params:    nil,
+			OutputType: types.NewUnion(
+				types.Obj{
+					Props: map[string]types.Type{
+						"yes": types.NewVar("B", types.Any{}),
 					},
-					types.Obj{
-						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
-						},
-						Rest: types.Any{},
+					Rest: types.Any{},
+				},
+				types.Obj{
+					Props: map[string]types.Type{
+						"no": types.NewVar("C", types.Any{}),
 					},
-				),
-			},
+					Rest: types.Any{},
+				},
+			),
 		},
-		types.NewArr(
-			types.NewVar("B", types.Any{}),
-		),
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := states.IterFromValue(inputState.Value)
-			output := func() (states.Value, bool, error) {
+	}, OutputType: types.NewArr(types.NewVar("B", types.Any{})), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input := states.IterFromValue(inputState.Value)
+		output := func() (states.Value, bool, error) {
+			for {
 				val, ok, err := input()
 				if err != nil {
 					return nil, false, err
@@ -1013,12 +481,334 @@ var ArrFuncers = []shapes.Funcer{
 					}
 					return val, true, nil
 				}
+			}
+		}
+		return states.ThunkFromIter(output)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.AnyArr, Name: "len", Params: nil, OutputType: types.Num{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		length := 0
+		iter := states.IterFromValue(inputState.Value)
+		for {
+			_, ok, err := iter()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			if !ok {
+				return states.ThunkFromValue(states.NumValue(length))
+			}
+			length += 1
+		}
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "max", Params: []*params.Param{
+		{
+			InputType: types.NewVar("A", types.Any{}),
+			Name:      "less",
+			Params: []*params.Param{
+				params.SimpleParam("other", types.NewVar("A", types.Any{})),
+			},
+			OutputType: types.Bool{},
+		},
+		params.SimpleParam("default", types.NewVar("A", types.Any{})),
+	}, OutputType: types.NewVar("A", types.Any{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		return max(inputState, id, args[0], args[1])
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "max", Params: []*params.Param{
+		{
+			InputType:  types.NewVar("A", types.Any{}),
+			Name:       "sortKey",
+			Params:     nil,
+			OutputType: types.NewVar("B", types.Any{}),
+		},
+		{
+			InputType: types.NewVar("B", types.Any{}),
+			Name:      "less",
+			Params: []*params.Param{
+				params.SimpleParam("other", types.NewVar("B", types.Any{})),
+			},
+			OutputType: types.Bool{},
+		},
+		params.SimpleParam("default", types.NewVar("A", types.Any{})),
+	}, OutputType: types.NewVar("A", types.Any{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		return max(inputState, args[0], args[1], args[2])
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "min", Params: []*params.Param{
+		{
+			InputType: types.NewVar("A", types.Any{}),
+			Name:      "less",
+			Params: []*params.Param{
+				params.SimpleParam("other", types.NewVar("A", types.Any{})),
+			},
+			OutputType: types.Bool{},
+		},
+		params.SimpleParam("default", types.NewVar("A", types.Any{})),
+	}, OutputType: types.NewVar("A", types.Any{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		return min(inputState, id, args[0], args[1])
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "min", Params: []*params.Param{
+		{
+			InputType:  types.NewVar("A", types.Any{}),
+			Name:       "sortKey",
+			Params:     nil,
+			OutputType: types.NewVar("B", types.Any{}),
+		},
+		{
+			InputType: types.NewVar("B", types.Any{}),
+			Name:      "less",
+			Params: []*params.Param{
+				params.SimpleParam("other", types.NewVar("B", types.Any{})),
+			},
+			OutputType: types.Bool{},
+		},
+		params.SimpleParam("default", types.NewVar("A", types.Any{})),
+	}, OutputType: types.NewVar("A", types.Any{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		return min(inputState, args[0], args[1], args[2])
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.Any{}, Name: "range", Params: []*params.Param{
+		params.SimpleParam("from", types.Num{}),
+		params.SimpleParam("to", types.Num{}),
+	}, OutputType: types.NewArr(
+		types.Num{},
+	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		argInputState := inputState.Clear()
+		from, err := args[0](argInputState, nil).EvalNum()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		to, err := args[1](argInputState, nil).EvalNum()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		i := from
+		iter := func() (states.Value, bool, error) {
+			if i >= to {
 				return nil, false, nil
 			}
-			return states.ThunkFromIter(output)
+			v := states.NumValue(i)
+			i++
+			return v, true, nil
+		}
+		return states.ThunkFromIter(iter)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(
+		types.NewVar("A", types.Any{}),
+	), Name: "repeat", Params: []*params.Param{
+		params.SimpleParam("times", types.Num{}),
+	}, OutputType: types.NewArr(
+		types.NewVar("A", types.Any{}),
+	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input := inputState.Value.(*states.ArrValue)
+		n, err := args[0](inputState.Clear(), nil).EvalNum()
+		nInt := int(n)
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		c := make(chan *states.Thunk)
+		go func() {
+			for i := 0; i < nInt; i++ {
+				arr := input
+				for arr != nil {
+					c <- states.ThunkFromValue(arr.Head)
+					arr, err = arr.Tail.EvalArr()
+					if err != nil {
+						c <- states.ThunkFromError(err)
+						return
+					}
+				}
+			}
+			c <- states.ThunkFromValue(nil)
+		}()
+		return states.ThunkFromChannel(c)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(
+		types.NewVar("A", types.Any{}),
+	), Name: "rev", Params: nil, OutputType: types.NewArr(
+		types.NewVar("A", types.Any{}),
+	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input := states.IterFromValue(inputState.Value)
+		var outputArr *states.ArrValue
+		for {
+			el, ok, err := input()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			if !ok {
+				break
+			}
+			outputArr = &states.ArrValue{
+				Head: el,
+				Tail: states.ThunkFromValue(outputArr),
+			}
+		}
+		return states.ThunkFromValue(outputArr)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.Bool{}), Name: "some", Params: nil, OutputType: types.Bool{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input := states.IterFromValue(inputState.Value)
+		for {
+			val, ok, err := input()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			if !ok {
+				return states.ThunkFromValue(states.BoolValue(false))
+			}
+			if val.(states.BoolValue) {
+				return states.ThunkFromValue(states.BoolValue(true))
+			}
+		}
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.Num{}), Name: "sort", Params: nil, OutputType: types.NewArr(types.Num{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		return mySort(inputState, id, numLess)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.Str{}), Name: "sort", Params: nil, OutputType: types.NewArr(types.Str{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		return mySort(inputState, id, strLess)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "sort", Params: []*params.Param{
+		{
+			InputType: types.NewVar("A", types.Any{}),
+			Name:      "less",
+			Params: []*params.Param{
+				params.SimpleParam("other", types.NewVar("A", types.Any{})),
+			},
+			OutputType: types.Bool{},
 		},
-		nil,
-	),
+	}, OutputType: types.NewArr(types.NewVar("A", types.Any{})), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		return mySort(inputState, id, args[0])
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "sortByNum", Params: []*params.Param{
+		{
+			InputType:  types.NewVar("A", types.Any{}),
+			Name:       "sortKey",
+			Params:     nil,
+			OutputType: types.Num{},
+		},
+	}, OutputType: types.NewArr(types.NewVar("A", types.Any{})), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		return mySort(inputState, args[0], numLess)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "sortByStr", Params: []*params.Param{
+		{
+			InputType:  types.NewVar("A", types.Any{}),
+			Name:       "sortKey",
+			Params:     nil,
+			OutputType: types.Str{},
+		},
+	}, OutputType: types.NewArr(types.NewVar("A", types.Any{})), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		return mySort(inputState, args[0], strLess)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "sortBy", Params: []*params.Param{
+		{
+			InputType:  types.NewVar("A", types.Any{}),
+			Name:       "sortKey",
+			Params:     nil,
+			OutputType: types.NewVar("B", types.Any{}),
+		},
+		{
+			InputType: types.NewVar("B", types.Any{}),
+			Name:      "less",
+			Params: []*params.Param{
+				params.SimpleParam("other", types.NewVar("B", types.Any{})),
+			},
+			OutputType: types.Bool{},
+		},
+	}, OutputType: types.NewArr(types.NewVar("A", types.Any{})), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		return mySort(inputState, args[0], args[1])
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(
+		types.NewVar("A", types.Any{}),
+	), Name: "take", Params: []*params.Param{
+		params.SimpleParam("n", types.Num{}),
+	}, OutputType: types.NewArr(
+		types.NewVar("A", types.Any{}),
+	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		arr := inputState.Value.(*states.ArrValue)
+		stop, err := args[0](inputState.Clear(), nil).EvalInt()
+		if err != nil {
+			return states.ThunkFromError(err)
+		}
+		i := 0
+		output := func() (states.Value, bool, error) {
+			if i >= stop {
+				return nil, false, nil
+			}
+			if arr == nil {
+				return nil, false, nil
+			}
+			el := arr.Head
+			i += 1
+			arr, err = arr.Tail.EvalArr()
+			if err != nil {
+				return nil, false, err
+			}
+			return el, true, nil
+		}
+		return states.ThunkFromIter(output)
+	}, IDs: nil},
+
+	shapes.Funcer{InputType: types.NewArr(
+		types.NewVar("A", types.Any{}),
+	), Name: "takeWhile", Params: []*params.Param{
+		{
+			InputType: types.NewVar("A", types.Any{}),
+			Name:      "test",
+			Params:    nil,
+			OutputType: types.NewUnion(
+				types.Obj{
+					Props: map[string]types.Type{
+						"yes": types.NewVar("B", types.Any{}),
+					},
+					Rest: types.Any{},
+				},
+				types.Obj{
+					Props: map[string]types.Type{
+						"no": types.NewVar("C", types.Any{}),
+					},
+					Rest: types.Any{},
+				},
+			),
+		},
+	}, OutputType: types.NewArr(
+		types.NewVar("B", types.Any{}),
+	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input := states.IterFromValue(inputState.Value)
+		output := func() (states.Value, bool, error) {
+			val, ok, err := input()
+			if err != nil {
+				return nil, false, err
+			}
+			if !ok {
+				return nil, false, nil
+			}
+			argInputState := inputState.Replace(val)
+			obj, err := args[0](argInputState, nil).EvalObj()
+			if err != nil {
+				return nil, false, err
+			}
+			if thunk, ok := obj["yes"]; ok {
+				val, err = thunk.Eval()
+				if err != nil {
+					return nil, false, err
+				}
+				return val, true, nil
+			}
+			return nil, false, nil
+		}
+		return states.ThunkFromIter(output)
+	}, IDs: nil},
 }
 
 func id(inputState states.State, args []states.Action) *states.Thunk {

@@ -8,14 +8,7 @@ import (
 )
 
 var TypeFuncers = []shapes.Funcer{
-	shapes.RegularFuncer(
-		types.NewVar("A", types.Any{}),
-		"type",
-		nil,
-		types.Str{},
-		func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			return states.ThunkFromValue(states.StrValue(bindings["A"].String()))
-		},
-		nil,
-	),
+	shapes.Funcer{InputType: types.NewVar("A", types.Any{}), Name: "type", Params: nil, OutputType: types.Str{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		return states.ThunkFromValue(states.StrValue(bindings["A"].String()))
+	}, IDs: nil},
 }
