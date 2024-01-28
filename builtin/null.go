@@ -1,19 +1,20 @@
 package builtin
 
 import (
+	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
 
 var NullFuncers = []shapes.Funcer{
-	shapes.SimpleFuncer(
-		types.Any{},
-		"null",
-		nil,
-		types.Null{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NullValue{}, nil
+	shapes.Funcer{
+		InputType:  types.Any{},
+		Name:       "null",
+		Params:     nil,
+		OutputType: types.Null{},
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			return states.ThunkFromValue(states.NullValue{})
 		},
-	),
+	},
 }
