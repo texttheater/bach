@@ -35,5 +35,14 @@ func main() {
 	}
 	for _, funcer := range funcers {
 		fmt.Printf("## %s\n\n", funcer.SignatureAsMarkdown())
+		fmt.Printf("%s\n\n", funcer.Summary)
+		fmt.Printf("|  | Type | Value |\n")
+		fmt.Printf("|---|---|---|\n")
+		fmt.Printf("| Input | %s | %s |\n", funcer.InputType, funcer.InputDescription)
+		for i, param := range funcer.Params {
+			fmt.Printf("| `%s` (param #%d) | %s | %s |\n", param.Name, i+1, param, param.Description)
+		}
+		fmt.Printf("|Output | %s | %s |\n\n", funcer.OutputType, funcer.InputDescription)
+		fmt.Printf("%s\n\n", funcer.Notes)
 	}
 }
