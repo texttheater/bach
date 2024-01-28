@@ -16,14 +16,26 @@ import (
 )
 
 var MathFuncers = []shapes.Funcer{
-	shapes.SimpleFuncer("", types.Num{}, "", "+", []*params.Param{
-		params.SimpleParam("b", "", types.Num{}),
-	}, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		inputNum := inputValue.(states.NumValue)
-		argumentNum := argumentValues[0].(states.NumValue)
-		return states.NumValue(inputNum + argumentNum), nil
-	}, nil),
-
+	shapes.SimpleFuncer(
+		"Adds two numbers.",
+		types.Num{},
+		"the first summand",
+		"+",
+		[]*params.Param{
+			params.SimpleParam("b", "the second summand", types.Num{}),
+		},
+		types.Num{},
+		"the sum",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			inputNum := inputValue.(states.NumValue)
+			argumentNum := argumentValues[0].(states.NumValue)
+			return states.NumValue(inputNum + argumentNum), nil
+		},
+		[]shapes.Example{
+			{"1 +1", "Num", "2", nil},
+		},
+	),
 	shapes.SimpleFuncer("", types.Num{}, "", "-", []*params.Param{
 		params.SimpleParam("b", "", types.Num{}),
 	}, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
