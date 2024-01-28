@@ -13,71 +13,45 @@ import (
 )
 
 var TextFuncers = []shapes.Funcer{
-	shapes.SimpleFuncer(
-		types.Str{},
-		"<",
-		[]*params.Param{
-			params.SimpleParam("other", "", types.Str{}),
-		},
-		types.Bool{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.BoolValue(str1 < str2), nil
-		},
-	),
-	shapes.SimpleFuncer(
-		types.Str{},
-		">",
-		[]*params.Param{
-			params.SimpleParam("other", "", types.Str{}),
-		},
-		types.Bool{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.BoolValue(str1 > str2), nil
-		},
-	),
-	shapes.SimpleFuncer(
-		types.Str{},
-		"<=",
-		[]*params.Param{
-			params.SimpleParam("other", "", types.Str{}),
-		},
-		types.Bool{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.BoolValue(str1 <= str2), nil
-		},
-	),
-	shapes.SimpleFuncer(
-		types.Str{},
-		">=",
-		[]*params.Param{
-			params.SimpleParam("other", "", types.Str{}),
-		},
-		types.Bool{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.BoolValue(str1 >= str2), nil
-		},
-	),
-	shapes.SimpleFuncer(
-		types.Str{},
-		"+",
-		[]*params.Param{
-			params.SimpleParam("b", "", types.Str{}),
-		},
-		types.Str{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.StrValue(str1 + str2), nil
-		},
-	),
+	shapes.SimpleFuncer("", types.Str{}, "", "<", []*params.Param{
+		params.SimpleParam("other", "", types.Str{}),
+	}, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str1 := string(inputValue.(states.StrValue))
+		str2 := string(argumentValues[0].(states.StrValue))
+		return states.BoolValue(str1 < str2), nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Str{}, "", ">", []*params.Param{
+		params.SimpleParam("other", "", types.Str{}),
+	}, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str1 := string(inputValue.(states.StrValue))
+		str2 := string(argumentValues[0].(states.StrValue))
+		return states.BoolValue(str1 > str2), nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Str{}, "", "<=", []*params.Param{
+		params.SimpleParam("other", "", types.Str{}),
+	}, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str1 := string(inputValue.(states.StrValue))
+		str2 := string(argumentValues[0].(states.StrValue))
+		return states.BoolValue(str1 <= str2), nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Str{}, "", ">=", []*params.Param{
+		params.SimpleParam("other", "", types.Str{}),
+	}, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str1 := string(inputValue.(states.StrValue))
+		str2 := string(argumentValues[0].(states.StrValue))
+		return states.BoolValue(str1 >= str2), nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Str{}, "", "+", []*params.Param{
+		params.SimpleParam("b", "", types.Str{}),
+	}, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str1 := string(inputValue.(states.StrValue))
+		str2 := string(argumentValues[0].(states.StrValue))
+		return states.StrValue(str1 + str2), nil
+	}, nil),
 
 	shapes.Funcer{InputType: types.Str{}, Name: "bytes", Params: nil, OutputType: types.NewArr(types.Num{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		str := inputState.Value.(states.StrValue)
@@ -169,111 +143,89 @@ var TextFuncers = []shapes.Funcer{
 		return states.ThunkFromValue(result)
 	}, IDs: nil},
 
-	// for Arr<Str> join Str
-	shapes.SimpleFuncer(
-		types.NewArr(types.Str{}),
-		"join",
-		nil,
-		types.Str{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			iter := states.IterFromValue(inputValue)
-			buffer := bytes.Buffer{}
-			for {
-				value, ok, err := iter()
-				if err != nil {
-					return nil, err
-				}
-				if !ok {
-					return states.StrValue(buffer.String()), nil
-				}
-				buffer.WriteString(string(value.(states.StrValue)))
+	shapes.SimpleFuncer("", types.NewArr(types.Str{}), "", "join", nil, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		iter := states.IterFromValue(inputValue)
+		buffer := bytes.Buffer{}
+		for {
+			value, ok, err := iter()
+			if err != nil {
+				return nil, err
 			}
-		},
-	),
-	shapes.SimpleFuncer(
-		types.NewArr(types.Str{}),
-		"join",
-		[]*params.Param{
-			params.SimpleParam("glue", "", types.Str{}),
-		},
-		types.Str{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			iter := states.IterFromValue(inputValue)
-			sep := string(argumentValues[0].(states.StrValue))
-			buffer := bytes.Buffer{}
-			firstWritten := false
-			for {
-				value, ok, err := iter()
-				if err != nil {
-					return nil, err
-				}
-				if !ok {
-					return states.StrValue(buffer.String()), nil
-				}
-				if firstWritten {
-					buffer.WriteString(sep)
-				}
-				buffer.WriteString(string(value.(states.StrValue)))
-				firstWritten = true
+			if !ok {
+				return states.StrValue(buffer.String()), nil
 			}
-		},
-	),
-	shapes.SimpleFuncer(
-		types.Str{},
-		"padEnd",
-		[]*params.Param{
-			params.SimpleParam("targetLength", "", types.Num{}),
-			params.SimpleParam("padString", "", types.Str{}),
-		},
-		types.Str{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			length := int(argumentValues[0].(states.NumValue))
-			padding := string(argumentValues[1].(states.StrValue))
-			var builder strings.Builder
-			builder.WriteString(str)
-			for {
-				delta := length - builder.Len()
-				if delta <= 0 {
-					break
-				}
-				if delta < len(padding) {
-					builder.WriteString(padding[:delta])
-					break
-				}
-				builder.WriteString(padding)
+			buffer.WriteString(string(value.(states.StrValue)))
+		}
+	}, nil),
+
+	shapes.SimpleFuncer("", types.NewArr(types.Str{}), "", "join", []*params.Param{
+		params.SimpleParam("glue", "", types.Str{}),
+	}, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		iter := states.IterFromValue(inputValue)
+		sep := string(argumentValues[0].(states.StrValue))
+		buffer := bytes.Buffer{}
+		firstWritten := false
+		for {
+			value, ok, err := iter()
+			if err != nil {
+				return nil, err
 			}
-			return states.StrValue(builder.String()), nil
-		},
-	),
-	shapes.SimpleFuncer(
-		types.Str{},
-		"padStart",
-		[]*params.Param{
-			params.SimpleParam("targetLength", "", types.Num{}),
-			params.SimpleParam("padString", "", types.Str{}),
-		},
-		types.Str{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			length := int(argumentValues[0].(states.NumValue))
-			padding := string(argumentValues[1].(states.StrValue))
-			var builder strings.Builder
-			for {
-				delta := length - len(str) - builder.Len()
-				if delta <= 0 {
-					break
-				}
-				if delta < len(padding) {
-					builder.WriteString(padding[:delta])
-					break
-				}
-				builder.WriteString(padding)
+			if !ok {
+				return states.StrValue(buffer.String()), nil
 			}
-			builder.WriteString(str)
-			return states.StrValue(builder.String()), nil
-		},
-	),
+			if firstWritten {
+				buffer.WriteString(sep)
+			}
+			buffer.WriteString(string(value.(states.StrValue)))
+			firstWritten = true
+		}
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Str{}, "", "padEnd", []*params.Param{
+		params.SimpleParam("targetLength", "", types.Num{}),
+		params.SimpleParam("padString", "", types.Str{}),
+	}, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str := string(inputValue.(states.StrValue))
+		length := int(argumentValues[0].(states.NumValue))
+		padding := string(argumentValues[1].(states.StrValue))
+		var builder strings.Builder
+		builder.WriteString(str)
+		for {
+			delta := length - builder.Len()
+			if delta <= 0 {
+				break
+			}
+			if delta < len(padding) {
+				builder.WriteString(padding[:delta])
+				break
+			}
+			builder.WriteString(padding)
+		}
+		return states.StrValue(builder.String()), nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Str{}, "", "padStart", []*params.Param{
+		params.SimpleParam("targetLength", "", types.Num{}),
+		params.SimpleParam("padString", "", types.Str{}),
+	}, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str := string(inputValue.(states.StrValue))
+		length := int(argumentValues[0].(states.NumValue))
+		padding := string(argumentValues[1].(states.StrValue))
+		var builder strings.Builder
+		for {
+			delta := length - len(str) - builder.Len()
+			if delta <= 0 {
+				break
+			}
+			if delta < len(padding) {
+				builder.WriteString(padding[:delta])
+				break
+			}
+			builder.WriteString(padding)
+		}
+		builder.WriteString(str)
+		return states.StrValue(builder.String()), nil
+	}, nil),
 
 	shapes.Funcer{InputType: types.Str{}, Name: "replaceFirst", Params: []*params.Param{
 		params.SimpleParam("needle", "", types.Str{}),
@@ -309,125 +261,81 @@ var TextFuncers = []shapes.Funcer{
 		return states.ThunkFromValue(states.StrValue(result))
 	}, IDs: nil},
 
-	shapes.SimpleFuncer(
-		types.Str{},
-		"startsWith",
-		[]*params.Param{
-			params.SimpleParam("needle", "", types.Str{}),
-		},
-		types.Bool{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.BoolValue(strings.HasPrefix(str1, str2)), nil
-		},
-	),
-	shapes.SimpleFuncer(
-		types.Str{},
-		"endsWith",
-		[]*params.Param{
-			params.SimpleParam("needle", "", types.Str{}),
-		},
-		types.Bool{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.BoolValue(strings.HasSuffix(str1, str2)), nil
-		},
-	),
-	shapes.SimpleFuncer(
-		types.Str{},
-		"slice",
-		[]*params.Param{
-			params.SimpleParam("start", "", types.Num{}),
-		},
-		types.Str{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			start := int(argumentValues[0].(states.NumValue))
-			if start < 0 {
-				start = len(str) + start
-				if start < 0 {
-					start = 0
-				}
-			}
-			return states.StrValue(str[start:]), nil
-		},
-	),
-	shapes.SimpleFuncer(
-		types.Str{},
-		"slice",
-		[]*params.Param{
-			params.SimpleParam("start", "", types.Num{}),
-			params.SimpleParam("end", "", types.Num{}),
-		},
-		types.Str{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			start := int(argumentValues[0].(states.NumValue))
-			end := int(argumentValues[1].(states.NumValue))
-			if start < 0 {
-				start = len(str) + start
-			}
+	shapes.SimpleFuncer("", types.Str{}, "", "startsWith", []*params.Param{
+		params.SimpleParam("needle", "", types.Str{}),
+	}, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str1 := string(inputValue.(states.StrValue))
+		str2 := string(argumentValues[0].(states.StrValue))
+		return states.BoolValue(strings.HasPrefix(str1, str2)), nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Str{}, "", "endsWith", []*params.Param{
+		params.SimpleParam("needle", "", types.Str{}),
+	}, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str1 := string(inputValue.(states.StrValue))
+		str2 := string(argumentValues[0].(states.StrValue))
+		return states.BoolValue(strings.HasSuffix(str1, str2)), nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Str{}, "", "slice", []*params.Param{
+		params.SimpleParam("start", "", types.Num{}),
+	}, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str := string(inputValue.(states.StrValue))
+		start := int(argumentValues[0].(states.NumValue))
+		if start < 0 {
+			start = len(str) + start
 			if start < 0 {
 				start = 0
 			}
-			if end < 0 {
-				end = len(str) + end
-			}
-			if end < start {
-				end = start
-			}
-			return states.StrValue(str[start:end]), nil
-		},
-	),
-	shapes.SimpleFuncer(
-		types.Str{},
-		"repeat",
-		[]*params.Param{
-			params.SimpleParam("times", "", types.Num{}),
-		},
-		types.Str{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			n := int(argumentValues[0].(states.NumValue))
-			if n < 0 {
-				n = 0
-			}
-			return states.StrValue(strings.Repeat(str, n)), nil
-		},
-	),
-	// for Str trim Str
-	shapes.SimpleFuncer(
-		types.Str{},
-		"trim",
-		nil,
-		types.Str{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			return states.StrValue(strings.TrimSpace(str)), nil
-		},
-	),
-	// for Str trimStart Str
-	shapes.SimpleFuncer(
-		types.Str{},
-		"trimStart",
-		nil,
-		types.Str{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			return states.StrValue(strings.TrimLeftFunc(str, unicode.IsSpace)), nil
-		},
-	),
-	// for Str trimEnd Str
-	shapes.SimpleFuncer(
-		types.Str{},
-		"trimEnd",
-		nil,
-		types.Str{},
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			return states.StrValue(strings.TrimRightFunc(str, unicode.IsSpace)), nil
-		},
-	),
+		}
+		return states.StrValue(str[start:]), nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Str{}, "", "slice", []*params.Param{
+		params.SimpleParam("start", "", types.Num{}),
+		params.SimpleParam("end", "", types.Num{}),
+	}, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str := string(inputValue.(states.StrValue))
+		start := int(argumentValues[0].(states.NumValue))
+		end := int(argumentValues[1].(states.NumValue))
+		if start < 0 {
+			start = len(str) + start
+		}
+		if start < 0 {
+			start = 0
+		}
+		if end < 0 {
+			end = len(str) + end
+		}
+		if end < start {
+			end = start
+		}
+		return states.StrValue(str[start:end]), nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Str{}, "", "repeat", []*params.Param{
+		params.SimpleParam("times", "", types.Num{}),
+	}, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str := string(inputValue.(states.StrValue))
+		n := int(argumentValues[0].(states.NumValue))
+		if n < 0 {
+			n = 0
+		}
+		return states.StrValue(strings.Repeat(str, n)), nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Str{}, "", "trim", nil, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str := string(inputValue.(states.StrValue))
+		return states.StrValue(strings.TrimSpace(str)), nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Str{}, "", "trimStart", nil, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str := string(inputValue.(states.StrValue))
+		return states.StrValue(strings.TrimLeftFunc(str, unicode.IsSpace)), nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Str{}, "", "trimEnd", nil, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+		str := string(inputValue.(states.StrValue))
+		return states.StrValue(strings.TrimRightFunc(str, unicode.IsSpace)), nil
+	}, nil),
 }

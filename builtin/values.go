@@ -29,16 +29,9 @@ var ValueFuncers = []shapes.Funcer{
 		return states.ThunkFromValue(states.BoolValue(equal))
 	}, IDs: nil},
 
-	// for <A> id <A>
-	shapes.SimpleFuncer(
-		types.NewVar("A", types.Any{}),
-		"id",
-		nil,
-		types.NewVar("A", types.Any{}),
-		func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
-			return inputValue, nil
-		},
-	),
+	shapes.SimpleFuncer("", types.NewVar("A", types.Any{}), "", "id", nil, types.NewVar("A", types.Any{}), "", "", func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
+		return inputValue, nil
+	}, nil),
 
 	shapes.Funcer{InputType: types.Str{}, Name: "parseFloat", Params: nil, OutputType: types.Num{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		s := string(inputState.Value.(states.StrValue))

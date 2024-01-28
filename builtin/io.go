@@ -56,50 +56,31 @@ var IOFuncers = []shapes.Funcer{
 		return states.ThunkFromIter(iter)
 	}, IDs: nil},
 
-	// for <A> err <A>
-	shapes.SimpleFuncer(
-		types.NewVar("A", types.Any{}),
-		"err",
-		nil,
-		types.NewVar("A", types.Any{}),
-		func(inputValue states.Value, args []states.Value) (states.Value, error) {
-			str, err := inputValue.Str()
-			if err != nil {
-				return nil, err
-			}
-			fmt.Fprintln(os.Stderr, str)
-			return inputValue, nil
-		},
-	),
-	// for <A> err(Str) <A>
-	shapes.SimpleFuncer(
-		types.NewVar("A", types.Any{}),
-		"err",
-		[]*params.Param{
-			params.SimpleParam("message", "", types.Str{}),
-		},
-		types.NewVar("A", types.Any{}),
-		func(inputValue states.Value, args []states.Value) (states.Value, error) {
-			str, err := inputValue.Str()
-			if err != nil {
-				return nil, err
-			}
-			end := string(args[0].(states.StrValue))
-			fmt.Fprint(os.Stderr, str)
-			fmt.Fprint(os.Stderr, end)
-			return inputValue, nil
-		},
-	),
-	// for Any in Reader
-	shapes.SimpleFuncer(
-		types.Any{},
-		"in",
-		nil,
-		types.Reader{},
-		func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
-			return states.ReaderValue{Reader: os.Stdin}, nil
-		},
-	),
+	shapes.SimpleFuncer("", types.NewVar("A", types.Any{}), "", "err", nil, types.NewVar("A", types.Any{}), "", "", func(inputValue states.Value, args []states.Value) (states.Value, error) {
+		str, err := inputValue.Str()
+		if err != nil {
+			return nil, err
+		}
+		fmt.Fprintln(os.Stderr, str)
+		return inputValue, nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.NewVar("A", types.Any{}), "", "err", []*params.Param{
+		params.SimpleParam("message", "", types.Str{}),
+	}, types.NewVar("A", types.Any{}), "", "", func(inputValue states.Value, args []states.Value) (states.Value, error) {
+		str, err := inputValue.Str()
+		if err != nil {
+			return nil, err
+		}
+		end := string(args[0].(states.StrValue))
+		fmt.Fprint(os.Stderr, str)
+		fmt.Fprint(os.Stderr, end)
+		return inputValue, nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.Any{}, "", "in", nil, types.Reader{}, "", "", func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
+		return states.ReaderValue{Reader: os.Stdin}, nil
+	}, nil),
 
 	shapes.Funcer{InputType: types.Reader{}, Name: "json", Params: nil, OutputType: types.Any{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		reader := inputState.Value.(states.ReaderValue).Reader
@@ -139,38 +120,25 @@ var IOFuncers = []shapes.Funcer{
 		return states.ThunkFromIter(iter)
 	}, IDs: nil},
 
-	// for <A> out <A>
-	shapes.SimpleFuncer(
-		types.NewVar("A", types.Any{}),
-		"out",
-		nil,
-		types.NewVar("A", types.Any{}),
-		func(inputValue states.Value, args []states.Value) (states.Value, error) {
-			str, err := inputValue.Str()
-			if err != nil {
-				return nil, err
-			}
-			fmt.Println(str)
-			return inputValue, nil
-		},
-	),
-	// for <A> out(Str) <A>
-	shapes.SimpleFuncer(
-		types.NewVar("A", types.Any{}),
-		"out",
-		[]*params.Param{
-			params.SimpleParam("message", "", types.Str{}),
-		},
-		types.NewVar("A", types.Any{}),
-		func(inputValue states.Value, args []states.Value) (states.Value, error) {
-			str, err := inputValue.Str()
-			if err != nil {
-				return nil, err
-			}
-			end := string(args[0].(states.StrValue))
-			fmt.Print(str)
-			fmt.Print(end)
-			return inputValue, nil
-		},
-	),
+	shapes.SimpleFuncer("", types.NewVar("A", types.Any{}), "", "out", nil, types.NewVar("A", types.Any{}), "", "", func(inputValue states.Value, args []states.Value) (states.Value, error) {
+		str, err := inputValue.Str()
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println(str)
+		return inputValue, nil
+	}, nil),
+
+	shapes.SimpleFuncer("", types.NewVar("A", types.Any{}), "", "out", []*params.Param{
+		params.SimpleParam("message", "", types.Str{}),
+	}, types.NewVar("A", types.Any{}), "", "", func(inputValue states.Value, args []states.Value) (states.Value, error) {
+		str, err := inputValue.Str()
+		if err != nil {
+			return nil, err
+		}
+		end := string(args[0].(states.StrValue))
+		fmt.Print(str)
+		fmt.Print(end)
+		return inputValue, nil
+	}, nil),
 }
