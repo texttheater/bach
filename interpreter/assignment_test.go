@@ -1,49 +1,49 @@
-package tests_test
+package interpreter_test
 
 import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/tests"
+	"github.com/texttheater/bach/interpreter"
 )
 
 func TestAssignment(t *testing.T) {
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`1 +1 =a 3 *2 +a`,
 		`Num`,
 		`8`,
 		nil,
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`1 +1 ==2 =p 1 +1 ==1 =q p ==q not`,
 		`Bool`,
 		`true`,
 		nil,
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`[1, 2, 3] =[a, b, c] a`,
 		`Num`,
 		`1`,
 		nil,
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`[1, 2, 3] =[a, b, c] c`,
 		`Num`,
 		`3`,
 		nil,
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`[1, 2, 3] =[a;r] r`,
 		`Tup<Num, Num>`,
 		`[2, 3]`,
 		nil,
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`[1, 2, 3] =[a, b]`,
 		``,
 		``,
@@ -52,7 +52,7 @@ func TestAssignment(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`for Arr<Num> def f Num as =[a, b] a ok`,
 		``,
 		``,
@@ -61,28 +61,28 @@ func TestAssignment(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`{a: 1, b: 2, c: 3} ={a: d, b: e, c: f} d`,
 		`Num`,
 		`1`,
 		nil,
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`{a: 1, b: 2, c: 3} ={a: d, b: e, c: f} f`,
 		`Num`,
 		`3`,
 		nil,
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`{a: 1, b: 2, c: 3} ={a: d, b: e} e`,
 		`Num`,
 		`2`,
 		nil,
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`{a: 1, b: 2, c: 3} =[a, b]`,
 		``,
 		``,
@@ -91,7 +91,7 @@ func TestAssignment(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`{a: 1, b: 2, c: 3} ={g: h}`,
 		``,
 		``,
@@ -100,7 +100,7 @@ func TestAssignment(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`for Obj<a: Num, Num> def f Num as ={a: a, b: b} a +b ok`,
 		``,
 		``,
@@ -109,7 +109,7 @@ func TestAssignment(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`for Obj<a: Num, Num> def f Num as ={b: b} b ok`,
 		``,
 		``,

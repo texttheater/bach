@@ -1,15 +1,15 @@
-package tests_test
+package interpreter_test
 
 import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
-	"github.com/texttheater/bach/tests"
+	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/types"
 )
 
 func TestTypeErrors(t *testing.T) {
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`3 <2 +1`,
 		``,
 		``,
@@ -21,7 +21,7 @@ func TestTypeErrors(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`+`,
 		``,
 		``,
@@ -33,7 +33,7 @@ func TestTypeErrors(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`hurz`,
 		``,
 		``,

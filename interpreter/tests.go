@@ -1,4 +1,4 @@
-package tests
+package interpreter
 
 import (
 	//"log"
@@ -6,7 +6,6 @@ import (
 
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/grammar"
-	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -24,7 +23,7 @@ func TestProgramStr(program string, wantTypeString string, wantValueString strin
 	}
 	var wantValue states.Value
 	if wantValueString != "" {
-		_, wantValue, err = interpreter.InterpretString(wantValueString)
+		_, wantValue, err = InterpretString(wantValueString)
 		if err != nil {
 			t.Log("ERROR: Could not interpret expected value")
 			errors.Explain(err, wantValueString)
@@ -40,7 +39,7 @@ func TestProgram(program string, wantType types.Type, wantValue states.Value, wa
 	if wantValue != nil {
 		wantValueStr, _ = wantValue.Repr()
 	}
-	gotType, gotValue, gotErr := interpreter.InterpretString(program)
+	gotType, gotValue, gotErr := InterpretString(program)
 	var gotValueStr string
 	if gotValue != nil {
 		var err error

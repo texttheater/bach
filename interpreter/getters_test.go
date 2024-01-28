@@ -1,28 +1,28 @@
-package tests_test
+package interpreter_test
 
 import (
 	"testing"
 
 	"github.com/texttheater/bach/errors"
+	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/states"
-	"github.com/texttheater/bach/tests"
 	"github.com/texttheater/bach/types"
 )
 
 func TestGetters(t *testing.T) {
-	tests.TestProgram(`{a: 1, b: 2} @a`,
+	interpreter.TestProgram(`{a: 1, b: 2} @a`,
 		types.Num{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
-	tests.TestProgram(`{a: 1, b: 2} @b`,
+	interpreter.TestProgram(`{a: 1, b: 2} @b`,
 		types.Num{},
 		states.NumValue(2),
 		nil,
 		t,
 	)
-	tests.TestProgram(`{a: 1, b: 2} @c`,
+	interpreter.TestProgram(`{a: 1, b: 2} @c`,
 		nil,
 		nil,
 		errors.TypeError(
@@ -43,25 +43,25 @@ func TestGetters(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgram(`["a", "b", "c"] @0`,
+	interpreter.TestProgram(`["a", "b", "c"] @0`,
 		types.Str{},
 		states.StrValue("a"),
 		nil,
 		t,
 	)
-	tests.TestProgram(`["a", "b", "c"] @1`,
+	interpreter.TestProgram(`["a", "b", "c"] @1`,
 		types.Str{},
 		states.StrValue("b"),
 		nil,
 		t,
 	)
-	tests.TestProgram(`["a", "b", "c"] @2`,
+	interpreter.TestProgram(`["a", "b", "c"] @2`,
 		types.Str{},
 		states.StrValue("c"),
 		nil,
 		t,
 	)
-	tests.TestProgram(`["a", "b", "c"] @3`,
+	interpreter.TestProgram(`["a", "b", "c"] @3`,
 		nil,
 		nil,
 		errors.TypeError(
@@ -69,7 +69,7 @@ func TestGetters(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgramStr(
+	interpreter.TestProgramStr(
 		`["a", "b", "c"] @-1`,
 		``,
 		``,
@@ -78,7 +78,7 @@ func TestGetters(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgram(`["a", "b", "c"] @1.5`,
+	interpreter.TestProgram(`["a", "b", "c"] @1.5`,
 		nil,
 		nil,
 		errors.TypeError(
@@ -86,7 +86,7 @@ func TestGetters(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgram(`"abc" @1`,
+	interpreter.TestProgram(`"abc" @1`,
 		nil,
 		nil,
 		errors.TypeError(
@@ -94,7 +94,7 @@ func TestGetters(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgram(`24 @1`,
+	interpreter.TestProgram(`24 @1`,
 		nil,
 		nil,
 		errors.TypeError(
@@ -102,7 +102,7 @@ func TestGetters(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgram(`for Any def f Arr<Any> as [] ok f @1`,
+	interpreter.TestProgram(`for Any def f Arr<Any> as [] ok f @1`,
 		nil,
 		nil,
 		errors.TypeError(
@@ -110,7 +110,7 @@ func TestGetters(t *testing.T) {
 		),
 		t,
 	)
-	tests.TestProgram(`for Any def f Arr<Any> as ["a", "b", "c"] ok f @1`,
+	interpreter.TestProgram(`for Any def f Arr<Any> as ["a", "b", "c"] ok f @1`,
 		nil,
 		nil,
 		errors.TypeError(

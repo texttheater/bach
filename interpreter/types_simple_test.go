@@ -1,33 +1,33 @@
-package tests_test
+package interpreter_test
 
 import (
 	"testing"
 
+	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/states"
-	"github.com/texttheater/bach/tests"
 	"github.com/texttheater/bach/types"
 )
 
 func TestSimpleTypes(t *testing.T) {
-	tests.TestProgram(`null type`,
+	interpreter.TestProgram(`null type`,
 		types.Str{},
 		states.StrValue("Null"),
 		nil,
 		t,
 	)
-	tests.TestProgram(`true type`,
+	interpreter.TestProgram(`true type`,
 		types.Str{},
 		states.StrValue("Bool"),
 		nil,
 		t,
 	)
-	tests.TestProgram(`1 type`,
+	interpreter.TestProgram(`1 type`,
 		types.Str{},
 		states.StrValue("Num"),
 		nil,
 		t,
 	)
-	tests.TestProgram(`"abc" type`,
+	interpreter.TestProgram(`"abc" type`,
 		types.Str{},
 		states.StrValue("Str"),
 		nil,
