@@ -76,7 +76,7 @@ var IOFuncers = []shapes.Funcer{
 		types.NewVar("A", types.Any{}),
 		"err",
 		[]*params.Param{
-			params.SimpleParam("message", types.Str{}),
+			params.SimpleParam("message", "", types.Str{}),
 		},
 		types.NewVar("A", types.Any{}),
 		func(inputValue states.Value, args []states.Value) (states.Value, error) {
@@ -159,7 +159,7 @@ var IOFuncers = []shapes.Funcer{
 		types.NewVar("A", types.Any{}),
 		"out",
 		[]*params.Param{
-			params.SimpleParam("message", types.Str{}),
+			params.SimpleParam("message", "", types.Str{}),
 		},
 		types.NewVar("A", types.Any{}),
 		func(inputValue states.Value, args []states.Value) (states.Value, error) {

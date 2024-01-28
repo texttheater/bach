@@ -12,7 +12,7 @@ import (
 var ObjFuncers = []shapes.Funcer{
 
 	shapes.Funcer{InputType: types.AnyObj, Name: "+", Params: []*params.Param{
-		params.SimpleParam("other", types.AnyObj),
+		params.SimpleParam("other", "", types.AnyObj),
 	}, OutputType: types.AnyObj, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		res := states.ObjValue{}
 		for k, v := range inputState.Value.(states.ObjValue) {
@@ -32,7 +32,7 @@ var ObjFuncers = []shapes.Funcer{
 		Props: map[string]types.Type{},
 		Rest:  types.NewVar("A", types.Any{}),
 	}, Name: "get", Params: []*params.Param{
-		params.SimpleParam("key", types.NewUnion(types.Str{}, types.Num{})),
+		params.SimpleParam("key", "", types.NewUnion(types.Str{}, types.Num{})),
 	}, OutputType: types.NewVar("A", types.Any{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		inputValue := inputState.Value.(states.ObjValue)
 		val, err := args[0](inputState.Clear(), nil).Eval()
@@ -61,7 +61,7 @@ var ObjFuncers = []shapes.Funcer{
 		Props: map[string]types.Type{},
 		Rest:  types.NewVar("A", types.Any{}),
 	}, Name: "has", Params: []*params.Param{
-		params.SimpleParam("key", types.NewUnion(types.Str{}, types.Num{})),
+		params.SimpleParam("key", "", types.NewUnion(types.Str{}, types.Num{})),
 	}, OutputType: types.Bool{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		inputValue := inputState.Value.(states.ObjValue)
 		val, err := args[0](inputState.Clear(), nil).Eval()
@@ -141,7 +141,7 @@ var ObjFuncers = []shapes.Funcer{
 		Props: map[string]types.Type{},
 		Rest:  types.NewVar("A", types.Any{}),
 	}, Name: "without", Params: []*params.Param{
-		params.SimpleParam("key", types.Str{}),
+		params.SimpleParam("key", "", types.Str{}),
 	}, OutputType: types.Obj{
 		Props: map[string]types.Type{},
 		Rest:  types.NewVar("A", types.Any{}),

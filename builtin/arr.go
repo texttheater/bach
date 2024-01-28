@@ -16,7 +16,7 @@ var ArrFuncers = []shapes.Funcer{
 	shapes.Funcer{InputType: types.NewArr(
 		types.NewVar("A", types.Any{}),
 	), Name: "+", Params: []*params.Param{
-		params.SimpleParam("other", types.NewArr(
+		params.SimpleParam("other", "", types.NewArr(
 			types.NewVar("B", types.Any{}),
 		)),
 	}, OutputType: types.NewArr(types.NewUnion(
@@ -48,7 +48,7 @@ var ArrFuncers = []shapes.Funcer{
 	shapes.Funcer{InputType: types.NewArr(
 		types.NewVar("A", types.Any{}),
 	), Name: "drop", Params: []*params.Param{
-		params.SimpleParam("n", types.Num{}),
+		params.SimpleParam("n", "", types.Num{}),
 	}, OutputType: types.NewArr(
 		types.NewVar("A", types.Any{}),
 	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -140,7 +140,7 @@ var ArrFuncers = []shapes.Funcer{
 	}, IDs: nil},
 
 	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "enum", Params: []*params.Param{
-		params.SimpleParam("start", types.Num{}),
+		params.SimpleParam("start", "", types.Num{}),
 	}, OutputType: types.NewArr(types.NewTup([]types.Type{
 		types.Num{},
 		types.NewVar("A", types.Any{}),
@@ -331,12 +331,12 @@ var ArrFuncers = []shapes.Funcer{
 	}, IDs: nil},
 
 	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "fold", Params: []*params.Param{
-		params.SimpleParam("start", types.NewVar("B", types.Any{})),
+		params.SimpleParam("start", "", types.NewVar("B", types.Any{})),
 		{
 			InputType: types.NewVar("B", types.Any{}),
 			Name:      "combine",
 			Params: []*params.Param{
-				params.SimpleParam("next", types.NewVar("A", types.Any{})),
+				params.SimpleParam("next", "", types.NewVar("A", types.Any{})),
 			},
 			OutputType: types.NewVar("B", types.Any{}),
 		},
@@ -372,7 +372,7 @@ var ArrFuncers = []shapes.Funcer{
 	shapes.Funcer{InputType: types.NewArr(
 		types.NewVar("A", types.Any{}),
 	), Name: "get", Params: []*params.Param{
-		params.SimpleParam("index", types.Num{}),
+		params.SimpleParam("index", "", types.Num{}),
 	}, OutputType: types.NewVar("A", types.Any{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		arr := inputState.Value.(*states.ArrValue)
 		index, err := args[0](inputState.Clear(), nil).EvalInt()
@@ -506,11 +506,11 @@ var ArrFuncers = []shapes.Funcer{
 			InputType: types.NewVar("A", types.Any{}),
 			Name:      "less",
 			Params: []*params.Param{
-				params.SimpleParam("other", types.NewVar("A", types.Any{})),
+				params.SimpleParam("other", "", types.NewVar("A", types.Any{})),
 			},
 			OutputType: types.Bool{},
 		},
-		params.SimpleParam("default", types.NewVar("A", types.Any{})),
+		params.SimpleParam("default", "", types.NewVar("A", types.Any{})),
 	}, OutputType: types.NewVar("A", types.Any{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		return max(inputState, id, args[0], args[1])
 	}, IDs: nil},
@@ -526,11 +526,11 @@ var ArrFuncers = []shapes.Funcer{
 			InputType: types.NewVar("B", types.Any{}),
 			Name:      "less",
 			Params: []*params.Param{
-				params.SimpleParam("other", types.NewVar("B", types.Any{})),
+				params.SimpleParam("other", "", types.NewVar("B", types.Any{})),
 			},
 			OutputType: types.Bool{},
 		},
-		params.SimpleParam("default", types.NewVar("A", types.Any{})),
+		params.SimpleParam("default", "", types.NewVar("A", types.Any{})),
 	}, OutputType: types.NewVar("A", types.Any{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		return max(inputState, args[0], args[1], args[2])
 	}, IDs: nil},
@@ -540,11 +540,11 @@ var ArrFuncers = []shapes.Funcer{
 			InputType: types.NewVar("A", types.Any{}),
 			Name:      "less",
 			Params: []*params.Param{
-				params.SimpleParam("other", types.NewVar("A", types.Any{})),
+				params.SimpleParam("other", "", types.NewVar("A", types.Any{})),
 			},
 			OutputType: types.Bool{},
 		},
-		params.SimpleParam("default", types.NewVar("A", types.Any{})),
+		params.SimpleParam("default", "", types.NewVar("A", types.Any{})),
 	}, OutputType: types.NewVar("A", types.Any{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		return min(inputState, id, args[0], args[1])
 	}, IDs: nil},
@@ -560,18 +560,18 @@ var ArrFuncers = []shapes.Funcer{
 			InputType: types.NewVar("B", types.Any{}),
 			Name:      "less",
 			Params: []*params.Param{
-				params.SimpleParam("other", types.NewVar("B", types.Any{})),
+				params.SimpleParam("other", "", types.NewVar("B", types.Any{})),
 			},
 			OutputType: types.Bool{},
 		},
-		params.SimpleParam("default", types.NewVar("A", types.Any{})),
+		params.SimpleParam("default", "", types.NewVar("A", types.Any{})),
 	}, OutputType: types.NewVar("A", types.Any{}), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		return min(inputState, args[0], args[1], args[2])
 	}, IDs: nil},
 
 	shapes.Funcer{InputType: types.Any{}, Name: "range", Params: []*params.Param{
-		params.SimpleParam("from", types.Num{}),
-		params.SimpleParam("to", types.Num{}),
+		params.SimpleParam("from", "", types.Num{}),
+		params.SimpleParam("to", "", types.Num{}),
 	}, OutputType: types.NewArr(
 		types.Num{},
 	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -599,7 +599,7 @@ var ArrFuncers = []shapes.Funcer{
 	shapes.Funcer{InputType: types.NewArr(
 		types.NewVar("A", types.Any{}),
 	), Name: "repeat", Params: []*params.Param{
-		params.SimpleParam("times", types.Num{}),
+		params.SimpleParam("times", "", types.Num{}),
 	}, OutputType: types.NewArr(
 		types.NewVar("A", types.Any{}),
 	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -679,7 +679,7 @@ var ArrFuncers = []shapes.Funcer{
 			InputType: types.NewVar("A", types.Any{}),
 			Name:      "less",
 			Params: []*params.Param{
-				params.SimpleParam("other", types.NewVar("A", types.Any{})),
+				params.SimpleParam("other", "", types.NewVar("A", types.Any{})),
 			},
 			OutputType: types.Bool{},
 		},
@@ -720,7 +720,7 @@ var ArrFuncers = []shapes.Funcer{
 			InputType: types.NewVar("B", types.Any{}),
 			Name:      "less",
 			Params: []*params.Param{
-				params.SimpleParam("other", types.NewVar("B", types.Any{})),
+				params.SimpleParam("other", "", types.NewVar("B", types.Any{})),
 			},
 			OutputType: types.Bool{},
 		},
@@ -731,7 +731,7 @@ var ArrFuncers = []shapes.Funcer{
 	shapes.Funcer{InputType: types.NewArr(
 		types.NewVar("A", types.Any{}),
 	), Name: "take", Params: []*params.Param{
-		params.SimpleParam("n", types.Num{}),
+		params.SimpleParam("n", "", types.Num{}),
 	}, OutputType: types.NewArr(
 		types.NewVar("A", types.Any{}),
 	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {

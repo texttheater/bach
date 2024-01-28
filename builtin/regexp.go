@@ -220,7 +220,7 @@ var RegexpFuncers = []shapes.Funcer{
 				},
 			),
 		},
-		params.SimpleParam("maxSplit", types.Num{}),
+		params.SimpleParam("maxSplit", "", types.Num{}),
 	}, OutputType: types.NewArr(
 		types.Str{},
 	), Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {

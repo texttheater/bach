@@ -20,7 +20,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"+",
 		[]*params.Param{
-			params.SimpleParam("b", types.Num{}),
+			params.SimpleParam("b", "", types.Num{}),
 		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -33,7 +33,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"-",
 		[]*params.Param{
-			params.SimpleParam("b", types.Num{}),
+			params.SimpleParam("b", "", types.Num{}),
 		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -46,7 +46,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Any{},
 		"-",
 		[]*params.Param{
-			params.SimpleParam("n", types.Num{}),
+			params.SimpleParam("n", "", types.Num{}),
 		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -62,7 +62,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"*",
 		[]*params.Param{
-			params.SimpleParam("b", types.Num{}),
+			params.SimpleParam("b", "", types.Num{}),
 		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -75,7 +75,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"/",
 		[]*params.Param{
-			params.SimpleParam("b", types.Num{}),
+			params.SimpleParam("b", "", types.Num{}),
 		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -88,7 +88,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"%",
 		[]*params.Param{
-			params.SimpleParam("b", types.Num{}),
+			params.SimpleParam("b", "", types.Num{}),
 		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -101,7 +101,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"<",
 		[]*params.Param{
-			params.SimpleParam("other", types.Num{}),
+			params.SimpleParam("other", "", types.Num{}),
 		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -114,7 +114,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		">",
 		[]*params.Param{
-			params.SimpleParam("other", types.Num{}),
+			params.SimpleParam("other", "", types.Num{}),
 		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -127,7 +127,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"<=",
 		[]*params.Param{
-			params.SimpleParam("other", types.Num{}),
+			params.SimpleParam("other", "", types.Num{}),
 		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -140,7 +140,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		">=",
 		[]*params.Param{
-			params.SimpleParam("other", types.Num{}),
+			params.SimpleParam("other", "", types.Num{}),
 		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -311,7 +311,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"toBase",
 		[]*params.Param{
-			params.SimpleParam("base", types.Num{}),
+			params.SimpleParam("base", "", types.Num{}),
 		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -351,7 +351,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"toExponential",
 		[]*params.Param{
-			params.SimpleParam("precision", types.Num{}),
+			params.SimpleParam("precision", "", types.Num{}),
 		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -365,7 +365,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"toFixed",
 		[]*params.Param{
-			params.SimpleParam("precision", types.Num{}),
+			params.SimpleParam("precision", "", types.Num{}),
 		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -536,7 +536,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"atan2",
 		[]*params.Param{
-			params.SimpleParam("x", types.Num{}),
+			params.SimpleParam("x", "", types.Num{}),
 		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -669,7 +669,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"imul",
 		[]*params.Param{
-			params.SimpleParam("y", types.Num{}),
+			params.SimpleParam("y", "", types.Num{}),
 		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -764,7 +764,7 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"**",
 		[]*params.Param{
-			params.SimpleParam("y", types.Num{}),
+			params.SimpleParam("y", "", types.Num{}),
 		},
 		types.Num{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {

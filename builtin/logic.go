@@ -30,7 +30,7 @@ var LogicFuncers = []shapes.Funcer{
 		types.Bool{},
 		"and",
 		[]*params.Param{
-			params.SimpleParam("q", types.Bool{}),
+			params.SimpleParam("q", "", types.Bool{}),
 		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -43,7 +43,7 @@ var LogicFuncers = []shapes.Funcer{
 		types.Bool{},
 		"or",
 		[]*params.Param{
-			params.SimpleParam("q", types.Bool{}),
+			params.SimpleParam("q", "", types.Bool{}),
 		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -66,7 +66,7 @@ var LogicFuncers = []shapes.Funcer{
 		types.Bool{},
 		"==",
 		[]*params.Param{
-			params.SimpleParam("q", types.Bool{}),
+			params.SimpleParam("q", "", types.Bool{}),
 		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {

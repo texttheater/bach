@@ -17,7 +17,7 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"<",
 		[]*params.Param{
-			params.SimpleParam("other", types.Str{}),
+			params.SimpleParam("other", "", types.Str{}),
 		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -30,7 +30,7 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		">",
 		[]*params.Param{
-			params.SimpleParam("other", types.Str{}),
+			params.SimpleParam("other", "", types.Str{}),
 		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -43,7 +43,7 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"<=",
 		[]*params.Param{
-			params.SimpleParam("other", types.Str{}),
+			params.SimpleParam("other", "", types.Str{}),
 		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -56,7 +56,7 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		">=",
 		[]*params.Param{
-			params.SimpleParam("other", types.Str{}),
+			params.SimpleParam("other", "", types.Str{}),
 		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -69,7 +69,7 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"+",
 		[]*params.Param{
-			params.SimpleParam("b", types.Str{}),
+			params.SimpleParam("b", "", types.Str{}),
 		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -158,7 +158,7 @@ var TextFuncers = []shapes.Funcer{
 	}, IDs: nil},
 
 	shapes.Funcer{InputType: types.Str{}, Name: "indexOf", Params: []*params.Param{
-		params.SimpleParam("needle", types.Str{}),
+		params.SimpleParam("needle", "", types.Str{}),
 	}, OutputType: types.Num{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		haystack := string(inputState.Value.(states.StrValue))
 		needle, err := args[0](inputState.Clear(), nil).EvalStr()
@@ -194,7 +194,7 @@ var TextFuncers = []shapes.Funcer{
 		types.NewArr(types.Str{}),
 		"join",
 		[]*params.Param{
-			params.SimpleParam("glue", types.Str{}),
+			params.SimpleParam("glue", "", types.Str{}),
 		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -222,8 +222,8 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"padEnd",
 		[]*params.Param{
-			params.SimpleParam("targetLength", types.Num{}),
-			params.SimpleParam("padString", types.Str{}),
+			params.SimpleParam("targetLength", "", types.Num{}),
+			params.SimpleParam("padString", "", types.Str{}),
 		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -250,8 +250,8 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"padStart",
 		[]*params.Param{
-			params.SimpleParam("targetLength", types.Num{}),
-			params.SimpleParam("padString", types.Str{}),
+			params.SimpleParam("targetLength", "", types.Num{}),
+			params.SimpleParam("padString", "", types.Str{}),
 		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -276,8 +276,8 @@ var TextFuncers = []shapes.Funcer{
 	),
 
 	shapes.Funcer{InputType: types.Str{}, Name: "replaceFirst", Params: []*params.Param{
-		params.SimpleParam("needle", types.Str{}),
-		params.SimpleParam("replacement", types.Str{}),
+		params.SimpleParam("needle", "", types.Str{}),
+		params.SimpleParam("replacement", "", types.Str{}),
 	}, OutputType: types.Str{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		haystack := inputState.Value.(states.StrValue)
 		needle, err := args[0](inputState.Clear(), nil).EvalStr()
@@ -293,8 +293,8 @@ var TextFuncers = []shapes.Funcer{
 	}, IDs: nil},
 
 	shapes.Funcer{InputType: types.Str{}, Name: "replaceAll", Params: []*params.Param{
-		params.SimpleParam("needle", types.Str{}),
-		params.SimpleParam("replacement", types.Str{}),
+		params.SimpleParam("needle", "", types.Str{}),
+		params.SimpleParam("replacement", "", types.Str{}),
 	}, OutputType: types.Str{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		haystack := inputState.Value.(states.StrValue)
 		needle, err := args[0](inputState.Clear(), nil).EvalStr()
@@ -313,7 +313,7 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"startsWith",
 		[]*params.Param{
-			params.SimpleParam("needle", types.Str{}),
+			params.SimpleParam("needle", "", types.Str{}),
 		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -326,7 +326,7 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"endsWith",
 		[]*params.Param{
-			params.SimpleParam("needle", types.Str{}),
+			params.SimpleParam("needle", "", types.Str{}),
 		},
 		types.Bool{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -339,7 +339,7 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"slice",
 		[]*params.Param{
-			params.SimpleParam("start", types.Num{}),
+			params.SimpleParam("start", "", types.Num{}),
 		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -358,8 +358,8 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"slice",
 		[]*params.Param{
-			params.SimpleParam("start", types.Num{}),
-			params.SimpleParam("end", types.Num{}),
+			params.SimpleParam("start", "", types.Num{}),
+			params.SimpleParam("end", "", types.Num{}),
 		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -385,7 +385,7 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"repeat",
 		[]*params.Param{
-			params.SimpleParam("times", types.Num{}),
+			params.SimpleParam("times", "", types.Num{}),
 		},
 		types.Str{},
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {

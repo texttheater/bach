@@ -15,7 +15,7 @@ import (
 var ValueFuncers = []shapes.Funcer{
 
 	shapes.Funcer{InputType: types.Any{}, Name: "==", Params: []*params.Param{
-		params.SimpleParam("other", (types.Any{})),
+		params.SimpleParam("other", "", (types.Any{})),
 	}, OutputType: types.Bool{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		a := inputState.Value
 		b, err := args[0](inputState.Clear(), nil).Eval()
@@ -54,7 +54,7 @@ var ValueFuncers = []shapes.Funcer{
 	}, IDs: nil},
 
 	shapes.Funcer{InputType: types.Str{}, Name: "parseInt", Params: []*params.Param{
-		params.SimpleParam("base", types.Num{}),
+		params.SimpleParam("base", "", types.Num{}),
 	}, OutputType: types.Num{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		s := string(inputState.Value.(states.StrValue))
 		b, err := args[0](inputState.Clear(), nil).EvalNum()

@@ -14,12 +14,13 @@ type Param struct {
 	OutputType  types.Type
 }
 
-func SimpleParam(Name string, outputType types.Type) *Param {
+func SimpleParam(Name string, Description string, outputType types.Type) *Param {
 	return &Param{
-		InputType:  types.Any{},
-		Name:       Name,
-		Params:     nil,
-		OutputType: outputType,
+		InputType:   types.Any{},
+		Name:        Name,
+		Description: Description,
+		Params:      nil,
+		OutputType:  outputType,
 	}
 }
 
