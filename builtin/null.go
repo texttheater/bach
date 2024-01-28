@@ -9,10 +9,13 @@ import (
 
 var NullFuncers = []shapes.Funcer{
 	shapes.Funcer{
-		InputType:  types.Any{},
-		Name:       "null",
-		Params:     nil,
-		OutputType: types.Null{},
+		Summary:           "Returns the null value.",
+		InputType:         types.Any{},
+		InputDescription:  "any value (is ignored)",
+		Name:              "null",
+		Params:            nil,
+		OutputType:        types.Null{},
+		OutputDescription: "the null value (the only value of this type)",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			return states.ThunkFromValue(states.NullValue{})
 		},
