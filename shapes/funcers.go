@@ -11,12 +11,16 @@ import (
 )
 
 type Funcer struct {
-	InputType  types.Type
-	Name       string
-	Params     []*params.Param // TODO does this need to be a slice of pointers?
-	OutputType types.Type
-	Kernel     RegularKernel
-	IDs        *states.IDStack
+	Summary           string
+	InputType         types.Type
+	InputDescription  string
+	Name              string
+	Params            []*params.Param // TODO does this need to be a slice of pointers?
+	OutputType        types.Type
+	OutputDescription string
+	Notes             string
+	Kernel            RegularKernel
+	IDs               *states.IDStack
 }
 
 func (f Funcer) SignatureAsMarkdown() string {

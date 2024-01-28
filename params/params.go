@@ -7,10 +7,11 @@ import (
 )
 
 type Param struct {
-	InputType  types.Type
-	Name       string
-	Params     []*Param
-	OutputType types.Type
+	InputType   types.Type
+	Name        string
+	Description string
+	Params      []*Param
+	OutputType  types.Type
 }
 
 func SimpleParam(Name string, outputType types.Type) *Param {
