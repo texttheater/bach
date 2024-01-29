@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	//"log"
+	"math"
 	"testing"
 
 	"github.com/texttheater/bach/errors"
@@ -79,7 +80,7 @@ func TestProgram(program string, wantType types.Type, wantValue states.Value, wa
 			t.Logf("Got type:       %s", gotType)
 			t.Logf("Got value:      %s", gotValueStr)
 			t.Fail()
-		} else if ok, _ := wantValue.Equal(gotValue); !ok {
+		} else if ok, _ := match(wantValue, gotValue); !ok {
 			t.Log("ERROR: Program has unexpected output value.")
 			t.Logf("Program:        %s", program)
 			t.Logf("Expected type:  %s", wantType)
@@ -89,4 +90,17 @@ func TestProgram(program string, wantType types.Type, wantValue states.Value, wa
 			t.Fail()
 		}
 	}
+}
+
+func match(want states.Value, got states.Value) (bool, error) {
+	w, ok := want.(states.NumValue)
+	if ok {
+		g, ok := got.(states.NumValue)
+		if ok {
+			if math.IsNaN(float64(w)) && math.IsNaN(float64(g)) {
+				return true, nil
+			}
+		}
+	}
+	return want.Equal(got)
 }
