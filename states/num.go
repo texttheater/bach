@@ -1,6 +1,7 @@
 package states
 
 import (
+	"math"
 	"strconv"
 
 	"github.com/texttheater/bach/types"
@@ -9,7 +10,17 @@ import (
 type NumValue float64
 
 func (v NumValue) Repr() (string, error) {
-	return strconv.FormatFloat(float64(v), 'g', -1, 64), nil
+	f := float64(v)
+	if math.IsInf(f, 1) {
+		return "inf", nil
+	}
+	if math.IsInf(f, -1) {
+		return "-inf", nil
+	}
+	if math.IsNaN(f) {
+		return "nan", nil
+	}
+	return strconv.FormatFloat(f, 'g', -1, 64), nil
 }
 
 func (v NumValue) Str() (string, error) {
