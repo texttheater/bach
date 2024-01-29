@@ -36,41 +36,92 @@ var MathFuncers = []shapes.Funcer{
 			{"1 +1", "Num", "2", nil},
 		},
 	),
-	shapes.SimpleFuncer("", types.Num{}, "", "-", []*params.Param{
-		params.SimpleParam("b", "", types.Num{}),
-	}, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		inputNum := inputValue.(states.NumValue)
-		argumentNum := argumentValues[0].(states.NumValue)
-		return states.NumValue(inputNum - argumentNum), nil
-	}, nil),
+	shapes.SimpleFuncer(
+		"Subtracts a number from another.",
+		types.Num{},
+		"the minuend",
+		"-",
+		[]*params.Param{
+			params.SimpleParam("b", "the subtrahend", types.Num{}),
+		}, types.Num{},
+		"the difference",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			inputNum := inputValue.(states.NumValue)
+			argumentNum := argumentValues[0].(states.NumValue)
+			return states.NumValue(inputNum - argumentNum), nil
+		},
+		[]shapes.Example{
+			{"5 -3", "Num", "2", nil},
+		},
+	),
 
-	shapes.SimpleFuncer("", types.Any{}, "", "-", []*params.Param{
-		params.SimpleParam("n", "", types.Num{}),
-	}, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(argumentValues[0].(states.NumValue))
-		if math.Signbit(x) {
-			return states.NumValue(math.Copysign(x, 1)), nil
-		} else {
-			return states.NumValue(math.Copysign(x, -1)), nil
-		}
-	}, nil),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "*", []*params.Param{
-		params.SimpleParam("b", "", types.Num{}),
-	}, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		inputNum := inputValue.(states.NumValue)
-		argumentNum := argumentValues[0].(states.NumValue)
-		return states.NumValue(inputNum * argumentNum), nil
-	}, nil),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "/", []*params.Param{
-		params.SimpleParam("b", "", types.Num{}),
-	}, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		inputNum := inputValue.(states.NumValue)
-		argumentNum := argumentValues[0].(states.NumValue)
-		return states.NumValue(inputNum / argumentNum), nil
-	}, nil),
-
+	shapes.SimpleFuncer(
+		"Returns the additive inverse of a number.",
+		types.Any{},
+		"any value (is ignored)",
+		"-",
+		[]*params.Param{
+			params.SimpleParam("n", "a number", types.Num{}),
+		},
+		types.Num{},
+		"the additive inverse (opposite number) of n",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(argumentValues[0].(states.NumValue))
+			if math.Signbit(x) {
+				return states.NumValue(math.Copysign(x, 1)), nil
+			} else {
+				return states.NumValue(math.Copysign(x, -1)), nil
+			}
+		},
+		[]shapes.Example{
+			{"-1", "Num", "-1", nil},
+			{"-(-2.0)", "Num", "2", nil},
+			{"-inf", "Num", "-inf", nil},
+			{"-nan", "Num", "nan", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Multiplies two numbers.",
+		types.Num{},
+		"the first factor",
+		"*",
+		[]*params.Param{
+			params.SimpleParam("b", "the second factor", types.Num{}),
+		},
+		types.Num{},
+		"the product",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			inputNum := inputValue.(states.NumValue)
+			argumentNum := argumentValues[0].(states.NumValue)
+			return states.NumValue(inputNum * argumentNum), nil
+		},
+		[]shapes.Example{
+			{"2 *3", "Num", "6", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Divides a number by another.",
+		types.Num{},
+		"the dividend",
+		"/",
+		[]*params.Param{
+			params.SimpleParam("b", "the divisor", types.Num{}),
+		},
+		types.Num{},
+		"the quotient",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			inputNum := inputValue.(states.NumValue)
+			argumentNum := argumentValues[0].(states.NumValue)
+			return states.NumValue(inputNum / argumentNum), nil
+		},
+		[]shapes.Example{
+			{"3 /2", "Num", "1.5", nil},
+		},
+	),
 	shapes.SimpleFuncer("", types.Num{}, "", "%", []*params.Param{
 		params.SimpleParam("b", "", types.Num{}),
 	}, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
