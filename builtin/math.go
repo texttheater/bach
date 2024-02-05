@@ -122,14 +122,27 @@ var MathFuncers = []shapes.Funcer{
 			{"3 /2", "Num", "1.5", nil},
 		},
 	),
-	shapes.SimpleFuncer("", types.Num{}, "", "%", []*params.Param{
-		params.SimpleParam("b", "", types.Num{}),
-	}, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		inputNum := inputValue.(states.NumValue)
-		argumentNum := argumentValues[0].(states.NumValue)
-		return states.NumValue(math.Mod(float64(inputNum), float64(argumentNum))), nil
-	}, nil),
-
+	shapes.SimpleFuncer(
+		"Remainder",
+		types.Num{},
+		"the dividend",
+		"%",
+		[]*params.Param{
+			params.SimpleParam("b", "the divisor", types.Num{}),
+		},
+		types.Num{},
+		"the remainder of integer division (rounded towards zero)",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			inputNum := inputValue.(states.NumValue)
+			argumentNum := argumentValues[0].(states.NumValue)
+			return states.NumValue(math.Mod(float64(inputNum), float64(argumentNum))), nil
+		},
+		[]shapes.Example{
+			{"3 %2", "Num", "1", nil},
+			{"-8.5 %3", "Num", "-2.5", nil},
+		},
+	),
 	shapes.SimpleFuncer("", types.Num{}, "", "<", []*params.Param{
 		params.SimpleParam("other", "", types.Num{}),
 	}, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
