@@ -143,37 +143,94 @@ var MathFuncers = []shapes.Funcer{
 			{"-8.5 %3", "Num", "-2.5", nil},
 		},
 	),
-	shapes.SimpleFuncer("", types.Num{}, "", "<", []*params.Param{
-		params.SimpleParam("other", "", types.Num{}),
-	}, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		inputNum := inputValue.(states.NumValue)
-		argumentNum := argumentValues[0].(states.NumValue)
-		return states.BoolValue(inputNum < argumentNum), nil
-	}, nil),
-
-	shapes.SimpleFuncer("", types.Num{}, "", ">", []*params.Param{
-		params.SimpleParam("other", "", types.Num{}),
-	}, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		inputNum := inputValue.(states.NumValue)
-		argumentNum := argumentValues[0].(states.NumValue)
-		return states.BoolValue(inputNum > argumentNum), nil
-	}, nil),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "<=", []*params.Param{
-		params.SimpleParam("other", "", types.Num{}),
-	}, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		inputNum := inputValue.(states.NumValue)
-		argumentNum := argumentValues[0].(states.NumValue)
-		return states.BoolValue(inputNum <= argumentNum), nil
-	}, nil),
-
-	shapes.SimpleFuncer("", types.Num{}, "", ">=", []*params.Param{
-		params.SimpleParam("other", "", types.Num{}),
-	}, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		inputNum := inputValue.(states.NumValue)
-		argumentNum := argumentValues[0].(states.NumValue)
-		return states.BoolValue(inputNum >= argumentNum), nil
-	}, nil),
+	shapes.SimpleFuncer(
+		"Less than",
+		types.Num{},
+		"a number",
+		"<",
+		[]*params.Param{
+			params.SimpleParam("b", "another number", types.Num{}),
+		},
+		types.Bool{},
+		"true iff the input is smaller than b",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			inputNum := inputValue.(states.NumValue)
+			argumentNum := argumentValues[0].(states.NumValue)
+			return states.BoolValue(inputNum < argumentNum), nil
+		},
+		[]shapes.Example{
+			{"2 <1", "Bool", "false", nil},
+			{"-inf <inf", "Bool", "true", nil},
+			{"0 <0", "Bool", "false", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Greater than",
+		types.Num{},
+		"a number",
+		">",
+		[]*params.Param{
+			params.SimpleParam("b", "another number", types.Num{}),
+		},
+		types.Bool{},
+		"true iff the input is greater than b",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			inputNum := inputValue.(states.NumValue)
+			argumentNum := argumentValues[0].(states.NumValue)
+			return states.BoolValue(inputNum > argumentNum), nil
+		},
+		[]shapes.Example{
+			{"2 >1", "Bool", "true", nil},
+			{"-inf >inf", "Bool", "false", nil},
+			{"0 >0", "Bool", "false", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Less than or equal to",
+		types.Num{},
+		"a number",
+		"<=",
+		[]*params.Param{
+			params.SimpleParam("b", "another number", types.Num{}),
+		},
+		types.Bool{},
+		"true iff the input is less than or equal to b",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			inputNum := inputValue.(states.NumValue)
+			argumentNum := argumentValues[0].(states.NumValue)
+			return states.BoolValue(inputNum <= argumentNum), nil
+		},
+		[]shapes.Example{
+			{"2 <=1", "Bool", "false", nil},
+			{"-inf <=inf", "Bool", "true", nil},
+			{"0 <=0", "Bool", "true", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Greater than or equal to",
+		types.Num{},
+		"a number",
+		">=",
+		[]*params.Param{
+			params.SimpleParam("b", "another number", types.Num{}),
+		},
+		types.Bool{},
+		"true iff the input is greater than or equal to b",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			inputNum := inputValue.(states.NumValue)
+			argumentNum := argumentValues[0].(states.NumValue)
+			return states.BoolValue(inputNum >= argumentNum), nil
+		},
+		[]shapes.Example{
+			{"2 >=1", "Bool", "true", nil},
+			{"-inf >=inf", "Bool", "false", nil},
+			{"0 >=0", "Bool", "true", nil},
+		},
+	),
 
 	shapes.SimpleFuncer("", types.NewArr(types.Num{}), "", "sum", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 		iter := states.IterFromValue(inputValue)
