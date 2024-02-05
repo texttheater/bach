@@ -40,7 +40,7 @@ func main() {
 		fmt.Printf("|---|---|---|\n")
 		fmt.Printf("| Input | %s | %s |\n", funcer.InputType, funcer.InputDescription)
 		for i, param := range funcer.Params {
-			fmt.Printf("| `%s` (param #%d) | %s | %s |\n", param.Name, i+1, param, param.Description)
+			fmt.Printf("| %s (param #%d) | %s | %s |\n", param.Name, i+1, param, param.Description)
 		}
 		fmt.Printf("|Output | %s | %s |\n\n", funcer.OutputType, funcer.OutputDescription)
 		fmt.Printf("%s\n\n", funcer.Notes)
