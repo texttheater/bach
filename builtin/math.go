@@ -259,23 +259,37 @@ var MathFuncers = []shapes.Funcer{
 			{"[] sum", "Num", "0", nil},
 		},
 	),
-
-	shapes.SimpleFuncer("", types.NewArr(types.Num{}), "", "mean", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		iter := states.IterFromValue(inputValue)
-		sum := 0.0
-		count := 0.0
-		for {
-			value, ok, err := iter()
-			if err != nil {
-				return nil, err
+	shapes.SimpleFuncer(
+		"Computes the arithmetic mean (average) of several numbers.",
+		types.NewArr(types.Num{}),
+		"an array of numbers",
+		"mean",
+		nil,
+		types.Num{},
+		"their mean",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			iter := states.IterFromValue(inputValue)
+			sum := 0.0
+			count := 0.0
+			for {
+				value, ok, err := iter()
+				if err != nil {
+					return nil, err
+				}
+				if !ok {
+					return states.NumValue(sum / count), nil
+				}
+				sum += float64(value.(states.NumValue))
+				count += 1.0
 			}
-			if !ok {
-				return states.NumValue(sum / count), nil
-			}
-			sum += float64(value.(states.NumValue))
-			count += 1.0
-		}
-	}, nil),
+		},
+		[]shapes.Example{
+			{"[2, 3, 5, 7] mean", "Num", "4.25", nil},
+			{"[1.25] mean", "Num", "1.25", nil},
+			{"[] mean", "Num", "nan", nil},
+		},
+	),
 
 	shapes.SimpleFuncer("", types.Any{}, "", "inf", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 		return states.NumValue(math.Inf(1)), nil
