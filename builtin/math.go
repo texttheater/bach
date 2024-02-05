@@ -291,13 +291,13 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"Returns the special number value representing positive infinity.",
+		"Returns infinity.",
 		types.Any{},
 		"any value (is ignored)",
 		"inf",
 		nil,
 		types.Num{},
-		"positive infinity",
+		"the special number value representing positive infinity",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			return states.NumValue(math.Inf(1)), nil
@@ -310,13 +310,13 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"Retuns the special number value representing “not a number”.",
+		"Provides NaN.",
 		types.Any{},
 		"any value (is ignored)",
 		"nan",
 		nil,
 		types.Num{},
-		"not a number",
+		"the special number value representing “not a number”",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			return states.NumValue(math.NaN()), nil
@@ -328,16 +328,46 @@ var MathFuncers = []shapes.Funcer{
 			{"-nan", "Num", "nan", nil},
 		},
 	),
+	shapes.SimpleFuncer(
+		"Checks whether a number is finite.",
+		types.Num{},
+		"a number",
+		"isFinite",
+		nil,
+		types.Bool{},
+		"true unless the input is positive or negative infinity",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.BoolValue(!math.IsInf(x, 0)), nil
+		},
+		[]shapes.Example{
+			{"1024 isFinite", "Bool", "true", nil},
+			{"-1024 isFinite", "Bool", "true", nil},
+			{"inf isFinite", "Bool", "false", nil},
+			{"-inf isFinite", "Bool", "false", nil},
+			{"nan isFinite", "Bool", "true", nil},
+		},
+	),
 
-	shapes.SimpleFuncer("", types.Num{}, "", "isFinite", nil, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.BoolValue(!math.IsInf(x, 0)), nil
-	}, nil),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "isNaN", nil, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.BoolValue(math.IsNaN(x)), nil
-	}, nil),
+	shapes.SimpleFuncer(
+		"Checks whether a number is NaN.",
+		types.Num{},
+		"a number",
+		"isNaN",
+		nil,
+		types.Bool{},
+		"true iff the input is NaN",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.BoolValue(math.IsNaN(x)), nil
+		},
+		[]shapes.Example{
+			{"1024 isNaN", "Bool", "false", nil},
+			{"nan isNaN", "Bool", "true", nil},
+		},
+	),
 
 	shapes.SimpleFuncer("", types.Any{}, "", "epsilon", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 		return states.NumValue(math.Nextafter(1, 2) - 1), nil
