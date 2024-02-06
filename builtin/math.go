@@ -368,26 +368,91 @@ var MathFuncers = []shapes.Funcer{
 			{"nan isNaN", "Bool", "true", nil},
 		},
 	),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "epsilon", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(math.Nextafter(1, 2) - 1), nil
-	}, nil),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "largestSafeInteger", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(9007199254740991), nil
-	}, nil),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "largestNum", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(math.MaxFloat64), nil
-	}, nil),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "smallestSafeInteger", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(-9007199254740991), nil
-	}, nil),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "smallestPositiveNum", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(math.SmallestNonzeroFloat64), nil
-	}, nil),
+	shapes.SimpleFuncer(
+		"Returns the floating point epsilon.",
+		types.Any{},
+		"any value (is ignored)",
+		"epsilon",
+		nil,
+		types.Num{},
+		"the difference between 1 and the smallest floating point number greater than 1",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(math.Nextafter(1, 2) - 1), nil
+		},
+		[]shapes.Example{
+			{"epsilon", "Num", "2.220446049250313e-16", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the largest safe integer.",
+		types.Any{},
+		"any value (is ignored)",
+		"largestSafeInteger",
+		nil,
+		types.Num{},
+		"the largest safe integer",
+		"Integer values larger than this cannot be represented exactly and compared correctly in double-precision floating point format. For example, `largestSafeInteger +1` and `largestSafeInteger +2` compare as equal.",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(9007199254740991), nil
+		},
+		[]shapes.Example{
+			{"largestSafeInteger +0", "Num", "9007199254740991", nil},
+			{"largestSafeInteger +1", "Num", "9007199254740992", nil},
+			{"largestSafeInteger +2", "Num", "9007199254740992", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the largest representable number.",
+		types.Any{},
+		"any value (is ignored)",
+		"largestNum",
+		nil,
+		types.Num{},
+		"the largest representable number",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(math.MaxFloat64), nil
+		},
+		[]shapes.Example{
+			{"largestNum", "Num", "1.7976931348623157e+308", nil},
+			{"largestNum +largestNum", "Num", "inf", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the smallest safe integer.",
+		types.Any{},
+		"any value (is ignored)",
+		"smallestSafeInteger",
+		nil,
+		types.Num{},
+		"the smallest safe integer",
+		"Integer values smaller than this cannot be represented exactly and compared correctly in double-precision floating point format. For example, `smallestSafeInteger -1` and `smallestSafeInteger -2` compare as equal.",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(-9007199254740991), nil
+		},
+		[]shapes.Example{
+			{"smallestSafeInteger -0", "Num", "-9007199254740991", nil},
+			{"smallestSafeInteger -1", "Num", "-9007199254740992", nil},
+			{"smallestSafeInteger -2", "Num", "-9007199254740992", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the smallest representable positive number.",
+		types.Any{},
+		"any value (is ignored)",
+		"smallestPositiveNum",
+		nil,
+		types.Num{},
+		"the smallest representable positive number",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(math.SmallestNonzeroFloat64), nil
+		},
+		[]shapes.Example{
+			{"smallestPositiveNum", "Num", "5e-324", nil},
+		},
+	),
 
 	shapes.SimpleFuncer("", types.Num{}, "", "isInteger", nil, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 		x := float64(inputValue.(states.NumValue))
