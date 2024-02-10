@@ -391,8 +391,8 @@ var MathFuncers = []shapes.Funcer{
 		"largestSafeInteger",
 		nil,
 		types.Num{},
-		"the largest safe integer",
-		"Integer values larger than this cannot be represented exactly and compared correctly in double-precision floating point format. For example, `largestSafeInteger +1` and `largestSafeInteger +2` compare as equal.",
+		"the largest integer that can be represented as an IEEE-754 double precision number and cannot be the result of rounding another number to fit IEEE-754",
+		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			return states.NumValue(9007199254740991), nil
 		},
@@ -409,7 +409,7 @@ var MathFuncers = []shapes.Funcer{
 		"largestNum",
 		nil,
 		types.Num{},
-		"the largest representable number",
+		"the largest number representable as an IEEE-754 double precision number",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			return states.NumValue(math.MaxFloat64), nil
@@ -426,8 +426,8 @@ var MathFuncers = []shapes.Funcer{
 		"smallestSafeInteger",
 		nil,
 		types.Num{},
-		"the smallest safe integer",
-		"Integer values smaller than this cannot be represented exactly and compared correctly in double-precision floating point format. For example, `smallestSafeInteger -1` and `smallestSafeInteger -2` compare as equal.",
+		"the smallest integer that can be represented as an IEEE-754 double precision number and cannot be the result of rounding another integer to fit the IEEE-754 double precision representation",
+		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			return states.NumValue(-9007199254740991), nil
 		},
@@ -453,40 +453,83 @@ var MathFuncers = []shapes.Funcer{
 			{"smallestPositiveNum", "Num", "5e-324", nil},
 		},
 	),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "isInteger", nil, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.BoolValue(x == float64(int(x))), nil
-	}, nil),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "isSafeInteger", nil, types.Bool{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.BoolValue(x >= -9007199254740991 && x <= 9007199254740991), nil
-	}, nil),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "toBase", []*params.Param{
-		params.SimpleParam("base", "", types.Num{}),
-	}, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		xInt := int64(x)
-		if x != float64(xInt) {
-			return nil, errors.ValueError(
-				errors.Code(errors.UnexpectedValue),
-				errors.GotValue(inputValue),
-				errors.Message("base conversion for non-integers not yet supported"),
-			)
-		}
-		radix := float64(argumentValues[0].(states.NumValue))
-		radixInt := int(radix)
-		if radix != float64(radixInt) || radixInt < 2 || radixInt > 36 {
-			return nil, errors.ValueError(
-				errors.Code(errors.UnexpectedValue),
-				errors.GotValue(argumentValues[0]),
-				errors.Message("radix must be an integer between 2 and 36 (inclusive)"),
-			)
-		}
-		return states.StrValue(strconv.FormatInt(xInt, radixInt)), nil
-	}, nil),
+	shapes.SimpleFuncer(
+		"Checks whether a number is integer.",
+		types.Num{},
+		"a number",
+		"isInteger",
+		nil,
+		types.Bool{},
+		"true iff the input represents a whole number",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.BoolValue(x == float64(int(x))), nil
+		},
+		[]shapes.Example{
+			{"1.0 isInteger", "Bool", "true", nil},
+			{"1.1 isInteger", "Bool", "false", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Checks whether a number is a safe integer.",
+		types.Num{},
+		"a number",
+		"isSafeInteger",
+		nil,
+		types.Bool{},
+		"true iff the input is an integer and cannot be the result of rounding another integer to fit the IEEE-754 double precision representation",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.BoolValue(x == float64(int(x)) && x >= -9007199254740991 && x <= 9007199254740991), nil
+		},
+		[]shapes.Example{
+			{"-9007199254740992 isSafeInteger", "Bool", "false", nil},
+			{"-9007199254740991 isSafeInteger", "Bool", "true", nil},
+			{"0 isSafeInteger", "Bool", "true", nil},
+			{"0.1 isSafeInteger", "Bool", "false", nil},
+			{"9007199254740991 isSafeInteger", "Bool", "true", nil},
+			{"9007199254740992 isSafeInteger", "Bool", "false", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Converts an integer to a specified base.",
+		types.Num{},
+		"an integer",
+		"toBase",
+		[]*params.Param{
+			params.SimpleParam("base", "an integer between 2 and 36 (inclusive)", types.Num{}),
+		},
+		types.Str{},
+		"a string representation of the input in the specified base",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			xInt := int64(x)
+			if x != float64(xInt) {
+				return nil, errors.ValueError(
+					errors.Code(errors.UnexpectedValue),
+					errors.GotValue(inputValue),
+					errors.Message("base conversion for non-integers not yet supported"),
+				)
+			}
+			radix := float64(argumentValues[0].(states.NumValue))
+			radixInt := int(radix)
+			if radix != float64(radixInt) || radixInt < 2 || radixInt > 36 {
+				return nil, errors.ValueError(
+					errors.Code(errors.UnexpectedValue),
+					errors.GotValue(argumentValues[0]),
+					errors.Message("radix must be an integer between 2 and 36 (inclusive)"),
+				)
+			}
+			return states.StrValue(strconv.FormatInt(xInt, radixInt)), nil
+		},
+		[]shapes.Example{
+			{"233 toBase(16)", "Str", `"e9"`, nil},
+			{"11 toBase(16)", "Str", `"b"`, nil},
+		},
+	),
 
 	shapes.SimpleFuncer("", types.Num{}, "", "toExponential", nil, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 		x := float64(inputValue.(states.NumValue))
