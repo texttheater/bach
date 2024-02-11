@@ -722,11 +722,25 @@ var MathFuncers = []shapes.Funcer{
 			{"sqrt2", "Num", "1.4142135623730951", nil},
 		},
 	),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "abs", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Abs(x)), nil
-	}, []shapes.Example{}),
+	shapes.SimpleFuncer(
+		"Returns the absolute value of a number.",
+		types.Num{},
+		"a number",
+		"abs",
+		nil,
+		types.Num{},
+		"the absolute value of the input",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Abs(x)), nil
+		},
+		[]shapes.Example{
+			{"3 -5 abs", "Num", "2", nil},
+			{"5 -3 abs", "Num", "2", nil},
+			{"1.23456 -7.89012 abs", "Num", "6.6555599999999995", nil},
+		},
+	),
 
 	shapes.SimpleFuncer("", types.Num{}, "", "acos", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 		x := float64(inputValue.(states.NumValue))
