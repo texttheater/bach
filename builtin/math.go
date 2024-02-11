@@ -537,7 +537,7 @@ var MathFuncers = []shapes.Funcer{
 		"toExponential",
 		nil,
 		types.Str{},
-		"a string representation of the input in exponential notation with 6 decimal digits",
+		"a string representation of the input in exponential notation with 6 digits after the decimal point",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
@@ -554,10 +554,10 @@ var MathFuncers = []shapes.Funcer{
 		"a number",
 		"toExponential",
 		[]*params.Param{
-			params.SimpleParam("precision", "the number of decimal digits", types.Num{}),
+			params.SimpleParam("precision", "the number digits after the decimal point", types.Num{}),
 		},
 		types.Str{},
-		"a string representation of the input in exponential notation with the specified number of decimal digits",
+		"a string representation of the input in exponential notation with the specified number of digits after the decimal point",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
@@ -570,47 +570,158 @@ var MathFuncers = []shapes.Funcer{
 			{"77.1234 toExponential(2)", "Str", `"7.71e+01"`, nil},
 		},
 	),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "toFixed", []*params.Param{
-		params.SimpleParam("precision", "", types.Num{}),
-	}, types.Str{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		f := int(argumentValues[0].(states.NumValue))
-		format := "%." + strconv.Itoa(f) + "f"
-		return states.StrValue(fmt.Sprintf(format, x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "e", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(math.E), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "ln2", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(math.Ln2), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "ln10", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(math.Ln10), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "log2e", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(math.Log2E), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "log10e", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(math.Log10E), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "pi", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(math.Pi), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "sqrt1_2", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(0.7071067811865476), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "sqrt2", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(math.Sqrt2), nil
-	}, []shapes.Example{}),
+	shapes.SimpleFuncer(
+		"Converts a number to fixed-point notation.",
+		types.Num{},
+		"a number",
+		"toFixed",
+		[]*params.Param{
+			params.SimpleParam("precision", "the number digits after the decimal point", types.Num{}),
+		},
+		types.Str{},
+		"a rounded string representation of the input with the specified number of digits after the decimal point",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			f := int(argumentValues[0].(states.NumValue))
+			format := "%." + strconv.Itoa(f) + "f"
+			return states.StrValue(fmt.Sprintf(format, x)), nil
+		},
+		[]shapes.Example{
+			{"123.456 toFixed(2)", "Str", `"123.46"`, nil},
+			{"0.004 toFixed(2)", "Str", `"0.00"`, nil},
+			{"1.23e+5 toFixed(2)", "Str", `"123000.00"`, nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns Euler's number.",
+		types.Any{},
+		"any value (is ignored)",
+		"e",
+		nil,
+		types.Num{},
+		"an approximation of Euler's number",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(math.E), nil
+		},
+		[]shapes.Example{
+			{"e", "Num", "2.718281828459045", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the natural logarithm of 2.",
+		types.Any{},
+		"any value (is ignored)",
+		"ln2",
+		nil,
+		types.Num{},
+		"the approximate natural logarithm of 2",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(math.Ln2), nil
+		},
+		[]shapes.Example{
+			{"ln2", "Num", "0.6931471805599453", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the natural logarithm of 10.",
+		types.Any{},
+		"any value (is ignored)",
+		"ln10",
+		nil,
+		types.Num{},
+		"the approximate natural logarithm of 10",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(math.Ln10), nil
+		},
+		[]shapes.Example{
+			{"ln10", "Num", "2.302585092994046", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the base-2 logarithm of e",
+		types.Any{},
+		"any value (is ignored)",
+		"log2e",
+		nil,
+		types.Num{},
+		"the approximate base-2 logarithm of Euler's number",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(math.Log2E), nil
+		},
+		[]shapes.Example{
+			{"log2e", "Num", "1.4426950408889634", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the base-10 logarithm of e",
+		types.Any{},
+		"any value (is ignored)",
+		"log10e",
+		nil,
+		types.Num{},
+		"the approximate base-10 logarithm of Euler's number",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(math.Log10E), nil
+		},
+		[]shapes.Example{
+			{"log10e", "Num", "0.4342944819032518", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns pi.",
+		types.Any{},
+		"any value (is ignored)",
+		"pi",
+		nil,
+		types.Num{},
+		"an approximation of pi",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(math.Pi), nil
+		},
+		[]shapes.Example{
+			{"pi", "Num", "3.141592653589793", nil},
+			{"for Num def radiusToCircumference Num as *2 *pi ok 10 radiusToCircumference", "Num", "62.83185307179586", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the square root of 1/2.",
+		types.Any{},
+		"any value (is ignored)",
+		"sqrt1_2",
+		nil,
+		types.Num{},
+		"the approximate square root of 1/2",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(0.7071067811865476), nil
+		},
+		[]shapes.Example{
+			{"sqrt1_2", "Num", "0.7071067811865476", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the square root of 2.",
+		types.Any{},
+		"any value (is ignored)",
+		"sqrt2",
+		nil,
+		types.Num{},
+		"the approximate square root of 2",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(math.Sqrt2), nil
+		},
+		[]shapes.Example{
+			{"sqrt2", "Num", "1.4142135623730951", nil},
+		},
+	),
 
 	shapes.SimpleFuncer("", types.Num{}, "", "abs", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 		x := float64(inputValue.(states.NumValue))
