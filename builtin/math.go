@@ -885,21 +885,73 @@ var MathFuncers = []shapes.Funcer{
 			{"1 atanh", "Num", "inf", nil},
 		},
 	),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "cbrt", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Cbrt(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "ceil", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Ceil(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "clz32", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := uint32(inputValue.(states.NumValue))
-		return states.NumValue(bits.LeadingZeros32(x)), nil
-	}, []shapes.Example{}),
+	shapes.SimpleFuncer(
+		"Returns the cube root of a number",
+		types.Num{},
+		"a number",
+		"cbrt",
+		nil,
+		types.Num{},
+		"the cube root of the input",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Cbrt(x)), nil
+		},
+		[]shapes.Example{
+			{"-1 cbrt", "Num", "-1", nil},
+			{"1 cbrt", "Num", "1", nil},
+			{"inf cbrt", "Num", "inf", nil},
+			{"64 cbrt", "Num", "4", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Rounds a number up.",
+		types.Num{},
+		"a number",
+		"ceil",
+		nil,
+		types.Num{},
+		"the smallest integer greater than or equal to the input",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Ceil(x)), nil
+		},
+		[]shapes.Example{
+			{".95 ceil", "Num", "1", nil},
+			{"4 ceil", "Num", "4", nil},
+			{"7.004 ceil", "Num", "8", nil},
+			{"-7.004 ceil", "Num", "-7", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the number of leading zero bits in the 32-bit binary representation of a number.",
+		types.Num{},
+		"a number (is truncated to integer)",
+		"clz32",
+		nil,
+		types.Num{},
+		"the number of leading zero bits in the 32-bit binary representation of the input",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := uint32(inputValue.(states.NumValue))
+			return states.NumValue(bits.LeadingZeros32(x)), nil
+		},
+		[]shapes.Example{
+			{"-inf clz32", "Num", "32", nil},
+			{"-4 clz32", "Num", "0", nil},
+			{"-1 clz32", "Num", "0", nil},
+			{"0 clz32", "Num", "32", nil},
+			{"0.5 clz32", "Num", "32", nil},
+			{"1 clz32", "Num", "31", nil},
+			{"1.1 clz32", "Num", "31", nil},
+			{"4 clz32", "Num", "29", nil},
+			{"4.7 clz32", "Num", "29", nil},
+			{"1000 clz32", "Num", "22", nil},
+			{"inf clz32", "Num", "32", nil},
+		},
+	),
 
 	shapes.SimpleFuncer("", types.Num{}, "", "cos", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 		x := float64(inputValue.(states.NumValue))
