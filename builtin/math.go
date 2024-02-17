@@ -741,44 +741,150 @@ var MathFuncers = []shapes.Funcer{
 			{"1.23456 -7.89012 abs", "Num", "6.6555599999999995", nil},
 		},
 	),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "acos", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Acos(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "acosh", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Acosh(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "asin", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Asin(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "asinh", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Asinh(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "atan", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Atan(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "atanh", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Atanh(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "atan2", []*params.Param{
-		params.SimpleParam("x", "", types.Num{}),
-	}, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		y := float64(inputValue.(states.NumValue))
-		x := float64(argumentValues[0].(states.NumValue))
-		return states.NumValue(math.Atan2(y, x)), nil
-	}, []shapes.Example{}),
+	shapes.SimpleFuncer(
+		"Returns the inverse cosine of a number.",
+		types.Num{},
+		"a number in the interval [-1, 1]",
+		"acos",
+		nil,
+		types.Num{},
+		"the inverse cosine (in radians) of the input, or `nan` if the input is invalid",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Acos(x)), nil
+		},
+		[]shapes.Example{
+			{"-2 acos", "Num", "nan", nil},
+			{"-1 acos", "Num", "3.141592653589793", nil},
+			{"0 acos", "Num", "1.5707963267948966", nil},
+			{"1 acos", "Num", "0", nil},
+			{"1.1 acos", "Num", "nan", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the inverse hyperbolic cosine of a number.",
+		types.Num{},
+		"a number greater than or equal to 1",
+		"acosh",
+		nil,
+		types.Num{},
+		"the inverse hyperoblic cosine of the input, or `nan` if the input is invalid",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Acosh(x)), nil
+		},
+		[]shapes.Example{
+			{"0.9 acosh", "Num", "nan", nil},
+			{"1 acosh", "Num", "0", nil},
+			{"10 acosh", "Num", "2.993222846126381", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the inverse sine of a number.",
+		types.Num{},
+		"a number in the interval [-1, 1]",
+		"asin",
+		nil,
+		types.Num{},
+		"the inverse sine (in radians) of the input, of nan if the input is invalid",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Asin(x)), nil
+		},
+		[]shapes.Example{
+			{"-2 asin", "Num", "nan", nil},
+			{"-1 asin", "Num", "-1.5707963267948966", nil},
+			{"0 asin", "Num", "0", nil},
+			{"1 asin", "Num", "1.5707963267948966", nil},
+			{"1.1 asin", "Num", "nan", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the inverse hyperbolic sine of a number.",
+		types.Num{},
+		"a number",
+		"asinh",
+		nil,
+		types.Num{},
+		"the inverse hyperbolic sine of the input",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Asinh(x)), nil
+		},
+		[]shapes.Example{
+			{"-1 asinh", "Num", "-0.881373587019543", nil},
+			{"0 asinh", "Num", "0", nil},
+			{"1 asinh", "Num", "0.881373587019543", nil},
+			{"2 asinh", "Num", "1.4436354751788103", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the inverse tangent of a number.",
+		types.Num{},
+		"a number",
+		"atan",
+		nil,
+		types.Num{},
+		"the inverse tangent (in radians) of the input",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Atan(x)), nil
+		},
+		[]shapes.Example{
+			{"-10 atan", "Num", "-1.4711276743037345", nil},
+			{"-1 atan", "Num", "-0.7853981633974483", nil},
+			{"0 atan", "Num", "0", nil},
+			{"1 atan", "Num", "0.7853981633974483", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the angle in the plane.",
+		types.Num{},
+		"a number y (y-coordinate)",
+		"atan2",
+		[]*params.Param{
+			params.SimpleParam("x", "a number (x-coordinate)", types.Num{}),
+		},
+		types.Num{},
+		"the angle in the plane (in radians) between the positive x-axis and the ray from (0, 0) to (x, y)",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			y := float64(inputValue.(states.NumValue))
+			x := float64(argumentValues[0].(states.NumValue))
+			return states.NumValue(math.Atan2(y, x)), nil
+		},
+		[]shapes.Example{
+			{"5 atan2(5)", "Num", "0.7853981633974483", nil},
+			{"10 atan2(10)", "Num", "0.7853981633974483", nil},
+			{"10 atan2(0)", "Num", "1.5707963267948966", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Returns the inverse hyperbolic tangent of a number.",
+		types.Num{},
+		"a number in the interval [-1, 1]",
+		"atanh",
+		nil,
+		types.Num{},
+		"the inverse hyperbolic tangent of the input, or `nan` if the input is invalid",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Atanh(x)), nil
+		},
+		[]shapes.Example{
+			{"-2 atanh", "Num", "nan", nil},
+			{"-1 atanh", "Num", "-inf", nil},
+			{"0 atanh", "Num", "0", nil},
+			{"0.5 atanh", "Num", "0.5493061443340548", nil},
+			{"1 atanh", "Num", "inf", nil},
+		},
+	),
 
 	shapes.SimpleFuncer("", types.Num{}, "", "cbrt", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 		x := float64(inputValue.(states.NumValue))
