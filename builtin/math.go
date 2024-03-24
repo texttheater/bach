@@ -310,7 +310,7 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"Provides NaN.",
+		"Returns NaN.",
 		types.Any{},
 		"any value (is ignored)",
 		"nan",
@@ -723,7 +723,7 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"Returns the absolute value of a number.",
+		"Computes the absolute value.",
 		types.Num{},
 		"a number",
 		"abs",
@@ -742,7 +742,7 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"Returns the inverse cosine of a number.",
+		"Computes the inverse cosine.",
 		types.Num{},
 		"a number in the interval [-1, 1]",
 		"acos",
@@ -763,7 +763,7 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"Returns the inverse hyperbolic cosine of a number.",
+		"Computes the inverse hyperbolic cosine.",
 		types.Num{},
 		"a number greater than or equal to 1",
 		"acosh",
@@ -782,7 +782,7 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"Returns the inverse sine of a number.",
+		"Computes the inverse sine.",
 		types.Num{},
 		"a number in the interval [-1, 1]",
 		"asin",
@@ -803,7 +803,7 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"Returns the inverse hyperbolic sine of a number.",
+		"Computes the inverse hyperbolic sine.",
 		types.Num{},
 		"a number",
 		"asinh",
@@ -823,7 +823,7 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"Returns the inverse tangent of a number.",
+		"Computes the inverse tangent.",
 		types.Num{},
 		"a number",
 		"atan",
@@ -843,7 +843,7 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"Returns the angle in the plane.",
+		"Computes the angle in the plane.",
 		types.Num{},
 		"a number y (y-coordinate)",
 		"atan2",
@@ -865,7 +865,7 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"Returns the inverse hyperbolic tangent of a number.",
+		"Computes the inverse hyperbolic tangent.",
 		types.Num{},
 		"a number in the interval [-1, 1]",
 		"atanh",
@@ -886,7 +886,7 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"Returns the cube root of a number",
+		"Computes the cube root.",
 		types.Num{},
 		"a number",
 		"cbrt",
@@ -926,7 +926,7 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"Returns the number of leading zero bits in the 32-bit binary representation of a number.",
+		"Count leading zeros.",
 		types.Num{},
 		"a number (is truncated to integer)",
 		"clz32",
