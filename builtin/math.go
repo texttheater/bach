@@ -999,11 +999,11 @@ var MathFuncers = []shapes.Funcer{
 	shapes.SimpleFuncer(
 		"Computes the exponential function.",
 		types.Num{},
-		"a number",
+		"the exponent",
 		"exp",
 		nil,
 		types.Num{},
-		"e (Euler's number) raised to the input's power",
+		"e (Euler's number) raised to the exponent",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
@@ -1020,12 +1020,12 @@ var MathFuncers = []shapes.Funcer{
 	shapes.SimpleFuncer(
 		"Computes the exponential function, subtracted by one.",
 		types.Num{},
-		"a number",
+		"the exponent",
 		"expm1",
 		nil,
 		types.Num{},
 		"",
-		"the approximate result of exp -1",
+		"e (Euler's number) raised to the exponent, minus 1",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
 			return states.NumValue(math.Expm1(x)), nil
@@ -1040,59 +1040,53 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Rounds down.",
 		types.Num{},
-		"",
+		"a number",
 		"floor",
 		nil,
 		types.Num{},
-		"",
+		"the largest integer less than or equal to the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
 			return states.NumValue(math.Floor(x)), nil
 		},
 		[]shapes.Example{
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
+			{"5.95 floor", "Num", "5", nil},
+			{"5.05 floor", "Num", "5", nil},
+			{"5 floor", "Num", "5", nil},
+			{"-5.05 floor", "Num", "-6", nil},
 		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Rounds to 32-bit precision.",
 		types.Num{},
-		"",
+		"a number",
 		"fround",
 		nil,
 		types.Num{},
-		"",
+		"the nearest 32-bit single precision float representation",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
 			return states.NumValue(float32(x)), nil
 		},
 		[]shapes.Example{
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
+			{"5.5 fround", "Num", "5.5", nil},
+			{"5.05 fround", "Num", "5.050000190734863", nil},
+			{"5 fround", "Num", "5", nil},
+			{"-5.05 fround", "Num", "-5.050000190734863", nil},
 		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Computes the square root of the sum of squares",
 		types.NewArr(types.Num{}),
-		"",
+		"an array of numbers",
 		"hypot",
 		nil,
 		types.Num{},
-		"",
+		"the square root of the sum of the squares of the input numbers",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			v := inputValue.(*states.ArrValue)
@@ -1109,107 +1103,96 @@ var MathFuncers = []shapes.Funcer{
 			return states.NumValue(float64(hypot)), nil
 		},
 		[]shapes.Example{
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
+			{"[3, 4] hypot", "Num", "5", nil},
+			{"[5, 12] hypot", "Num", "13", nil},
+			{"[3, 4, 5] hypot", "Num", "7.0710678118654755", nil},
+			{"[-5] hypot", "Num", "5", nil},
 		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"32-bit multiplication",
 		types.Num{},
-		"",
+		"the first factor",
 		"imul",
 		[]*params.Param{
-			params.SimpleParam("y", "", types.Num{}),
+			params.SimpleParam("y", "the second factor", types.Num{}),
 		},
 		types.Num{},
-		"",
+		"the product of the 32-bit versions (cf. fround) of the factors",
 		"", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := int32(int64(inputValue.(states.NumValue)))
 			y := int32(int64(argumentValues[0].(states.NumValue)))
 			return states.NumValue(x * y), nil
 		},
 		[]shapes.Example{
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
+			{"3 imul(4)", "Num", "12", nil},
+			{"-5 imul(12)", "Num", "-60", nil},
+			{`"ffffffff" parseInt(16) imul(5)`, "Num", "-5", nil},
+			{`"fffffffe" parseInt(16) imul(5)`, "Num", "-10", nil},
 		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Computes the natural logarithm.",
 		types.Num{},
-		"",
+		"a number",
 		"log",
 		nil,
 		types.Num{},
-		"",
+		"the natural (base e) logarithm of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
 			return states.NumValue(math.Log(x)), nil
 		},
 		[]shapes.Example{
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
+			{"-1 log", "Num", "nan", nil},
+			{"-0 log", "Num", "-inf", nil},
+			{"0 log", "Num", "-inf", nil},
+			{"1 log", "Num", "0", nil},
+			{"10 log", "Num", "2.302585092994046", nil},
+			{"inf", "Num", "inf", nil},
+			{"8 log /(2 log)", "Num", "3", nil},
+			{"625 log /(5 log)", "Num", "4", nil},
 		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Computes the base 2 logarithm.",
 		types.Num{},
-		"",
-		"log1p",
-		nil,
-		types.Num{},
-		"",
-		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Log1p(x)), nil
-		},
-		[]shapes.Example{
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-		},
-	),
-	shapes.SimpleFuncer(
-		"",
-		types.Num{},
-		"",
+		"a number",
 		"log10",
 		nil,
 		types.Num{},
-		"",
+		"the base 2 logarithm of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
 			return states.NumValue(math.Log10(x)), nil
 		},
 		[]shapes.Example{
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
-			{"0", "Num", "0", nil},
+			{"3 log2", "Num", "1.5849625007211563", nil},
+			{"2 log2", "Num", "1", nil},
+			{"1 log2", "Num", "0", nil},
+			{"0 log2", "Num", "-inf", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Computes the natural logarithm of x + 1.",
+		types.Num{},
+		"a number (x)",
+		"log1p",
+		nil,
+		types.Num{},
+		"",
+		"the natural (base e) logarithm of (x + 1)",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Log1p(x)), nil
+		},
+		[]shapes.Example{
+			{"1 log1p", "Num", "0.6931471805599453", nil},
+			{"0 log1p", "Num", "0", nil},
+			{"-1 log1p", "Num", "-inf", nil},
+			{"-2 log1p", "Num", "nan", nil},
 		},
 	),
 	shapes.SimpleFuncer(
