@@ -349,7 +349,6 @@ var MathFuncers = []shapes.Funcer{
 			{"nan isFinite", "Bool", "true", nil},
 		},
 	),
-
 	shapes.SimpleFuncer(
 		"Checks whether a number is NaN.",
 		types.Num{},
