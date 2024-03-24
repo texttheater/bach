@@ -45,6 +45,22 @@ var ArrFuncers = []shapes.Funcer{
 		return states.ThunkFromIter(output)
 	}, IDs: nil},
 
+	shapes.Funcer{InputType: types.NewArr(types.Bool{}), Name: "all", Params: nil, OutputType: types.Bool{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+		input := states.IterFromValue(inputState.Value)
+		for {
+			val, ok, err := input()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			if !ok {
+				return states.ThunkFromValue(states.BoolValue(true))
+			}
+			if !val.(states.BoolValue) {
+				return states.ThunkFromValue(states.BoolValue(false))
+			}
+		}
+	}, IDs: nil},
+
 	shapes.Funcer{InputType: types.NewArr(
 		types.NewVar("A", types.Any{}),
 	), Name: "drop", Params: []*params.Param{
@@ -190,22 +206,6 @@ var ArrFuncers = []shapes.Funcer{
 			}), true, nil
 		}
 		return states.ThunkFromIter(output)
-	}, IDs: nil},
-
-	shapes.Funcer{InputType: types.NewArr(types.Bool{}), Name: "every", Params: nil, OutputType: types.Bool{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		input := states.IterFromValue(inputState.Value)
-		for {
-			val, ok, err := input()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			if !ok {
-				return states.ThunkFromValue(states.BoolValue(true))
-			}
-			if !val.(states.BoolValue) {
-				return states.ThunkFromValue(states.BoolValue(false))
-			}
-		}
 	}, IDs: nil},
 
 	shapes.Funcer{InputType: types.NewArr(types.NewVar("A", types.Any{})), Name: "find", Params: []*params.Param{

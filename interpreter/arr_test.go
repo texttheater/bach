@@ -421,28 +421,28 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgramStr(
-		`[] every`,
+		`[] all`,
 		`Bool`,
 		`true`,
 		nil,
 		t,
 	)
 	interpreter.TestProgramStr(
-		`[true] every`,
+		`[true] all`,
 		`Bool`,
 		`true`,
 		nil,
 		t,
 	)
 	interpreter.TestProgramStr(
-		`[true, true] every`,
+		`[true, true] all`,
 		`Bool`,
 		`true`,
 		nil,
 		t,
 	)
 	interpreter.TestProgramStr(
-		`[true, false, true] every`,
+		`[true, false, true] all`,
 		`Bool`,
 		`false`,
 		nil,
