@@ -952,61 +952,92 @@ var MathFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Computes the cosine.",
 		types.Num{},
-		"",
+		"an angle in radians",
 		"cos",
 		nil,
 		types.Num{},
-		"",
+		"the cosine of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
 			return states.NumValue(math.Cos(x)), nil
 		},
-		[]shapes.Example{},
+		[]shapes.Example{
+			{"-inf cos", "Num", "nan", nil},
+			{"-0 cos", "Num", "1", nil},
+			{"0 cos", "Num", "1", nil},
+			{"1 cos", "Num", "0.5403023058681398", nil},
+			{"pi cos", "Num", "-1", nil},
+			{"pi *2 cos", "Num", "1", nil},
+			{"inf cos", "Num", "nan", nil},
+		},
 	),
-	shapes.SimpleFuncer("",
+	shapes.SimpleFuncer(
+		"Computes the hyperbolic cosine.",
 		types.Num{},
-		"",
+		"a number",
 		"cosh",
 		nil,
 		types.Num{},
-		"",
+		"the hyperbolic cosine of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Cos(x)), nil
+			return states.NumValue(math.Cosh(x)), nil
 		},
-		[]shapes.Example{},
+		[]shapes.Example{
+			{"-inf cosh", "Num", "inf", nil},
+			{"-1 cosh", "Num", "1.5430806348152437", nil},
+			{"-0 cosh", "Num", "1", nil},
+			{"0 cosh", "Num", "1", nil},
+			{"1 cosh", "Num", "1.5430806348152437", nil},
+			{"inf cosh", "Num", "inf", nil},
+		},
 	),
-	shapes.SimpleFuncer("",
+	shapes.SimpleFuncer(
+		"Computes the exponential function.",
 		types.Num{},
-		"",
+		"a number",
 		"exp",
 		nil,
 		types.Num{},
-		"",
+		"e (Euler's number) raised to the input's power",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
 			return states.NumValue(math.Exp(x)), nil
 		},
-		[]shapes.Example{},
+		[]shapes.Example{
+			{"-inf exp", "Num", "0", nil},
+			{"-1 exp", "Num", "0.36787944117144233", nil},
+			{"0 exp", "Num", "1", nil},
+			{"1 exp", "Num", "2.718281828459045", nil},
+			{"inf", "Num", "inf", nil},
+		},
 	),
-	shapes.SimpleFuncer("",
+	shapes.SimpleFuncer(
+		"Computes the exponential function, subtracted by one.",
 		types.Num{},
-		"",
+		"a number",
 		"expm1",
 		nil,
 		types.Num{},
 		"",
-		"",
+		"the approximate result of exp -1",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := float64(inputValue.(states.NumValue))
 			return states.NumValue(math.Expm1(x)), nil
 		},
-		[]shapes.Example{},
+		[]shapes.Example{
+			{"-inf expm1", "Num", "-1", nil},
+			{"-1 expm1", "Num", "-0.6321205588285577", nil},
+			{"-0 expm1", "Num", "-0", nil},
+			{"0 expm1", "Num", "0", nil},
+			{"1 expm1", "Num", "1.718281828459045", nil},
+			{"inf expm1", "Num", "inf", nil},
+		},
 	),
 	shapes.SimpleFuncer("",
 		types.Num{},
