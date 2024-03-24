@@ -952,169 +952,385 @@ var MathFuncers = []shapes.Funcer{
 			{"inf clz32", "Num", "32", nil},
 		},
 	),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "cos", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Cos(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "cosh", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Cos(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "exp", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Exp(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "expm1", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Expm1(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "floor", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Floor(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "fround", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(float32(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.NewArr(types.Num{}), "", "hypot", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		v := inputValue.(*states.ArrValue)
-		x := make([]float64, 0)
-		for v != nil {
-			x = append(x, float64(v.Head.(states.NumValue)))
-			var err error
-			v, err = v.Tail.EvalArr()
-			if err != nil {
-				return nil, err
+	shapes.SimpleFuncer(
+		"",
+		types.Num{},
+		"",
+		"cos",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Cos(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"cosh",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Cos(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"exp",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Exp(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"expm1",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Expm1(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"floor",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Floor(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"fround",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(float32(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.NewArr(types.Num{}),
+		"",
+		"hypot",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			v := inputValue.(*states.ArrValue)
+			x := make([]float64, 0)
+			for v != nil {
+				x = append(x, float64(v.Head.(states.NumValue)))
+				var err error
+				v, err = v.Tail.EvalArr()
+				if err != nil {
+					return nil, err
+				}
 			}
-		}
-		hypot := varhypot.Hypot(x...)
-		return states.NumValue(float64(hypot)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "imul", []*params.Param{
-		params.SimpleParam("y", "", types.Num{}),
-	}, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := int32(int64(inputValue.(states.NumValue)))
-		y := int32(int64(argumentValues[0].(states.NumValue)))
-		return states.NumValue(x * y), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "log", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Log(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "log1p", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Log1p(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "log10", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Log10(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "log2", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Log2(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.NewArr(types.Num{}), "", "max", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		v := inputValue.(*states.ArrValue)
-		max := math.Inf(-1)
-		for v != nil {
-			max = math.Max(max, float64(v.Head.(states.NumValue)))
-			var err error
-			v, err = v.Tail.EvalArr()
-			if err != nil {
-				return nil, err
+			hypot := varhypot.Hypot(x...)
+			return states.NumValue(float64(hypot)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"imul",
+		[]*params.Param{
+			params.SimpleParam("y", "", types.Num{}),
+		},
+		types.Num{},
+		"",
+		"", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := int32(int64(inputValue.(states.NumValue)))
+			y := int32(int64(argumentValues[0].(states.NumValue)))
+			return states.NumValue(x * y), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"log",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Log(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"log1p",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Log1p(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"log10",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Log10(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"log2",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Log2(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.NewArr(types.Num{}),
+		"",
+		"max",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			v := inputValue.(*states.ArrValue)
+			max := math.Inf(-1)
+			for v != nil {
+				max = math.Max(max, float64(v.Head.(states.NumValue)))
+				var err error
+				v, err = v.Tail.EvalArr()
+				if err != nil {
+					return nil, err
+				}
 			}
-		}
-		return states.NumValue(max), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.NewArr(types.Num{}), "", "min", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		v := inputValue.(*states.ArrValue)
-		min := math.Inf(1)
-		for v != nil {
-			min = math.Min(min, float64(v.Head.(states.NumValue)))
-			var err error
-			v, err = v.Tail.EvalArr()
-			if err != nil {
-				return nil, err
+			return states.NumValue(max), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.NewArr(types.Num{}),
+		"",
+		"min",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			v := inputValue.(*states.ArrValue)
+			min := math.Inf(1)
+			for v != nil {
+				min = math.Min(min, float64(v.Head.(states.NumValue)))
+				var err error
+				v, err = v.Tail.EvalArr()
+				if err != nil {
+					return nil, err
+				}
 			}
-		}
-		return states.NumValue(min), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "**", []*params.Param{
-		params.SimpleParam("y", "", types.Num{}),
-	}, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		y := float64(argumentValues[0].(states.NumValue))
-		return states.NumValue(math.Pow(x, y)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Any{}, "", "random", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		return states.NumValue(rand.Float64()), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "round", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Round(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "sign", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		if math.Signbit(x) {
-			if x == 0 {
-				return states.NumValue(math.Copysign(0, -1)), nil
+			return states.NumValue(min), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"**",
+		[]*params.Param{
+			params.SimpleParam("y", "", types.Num{}),
+		},
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			y := float64(argumentValues[0].(states.NumValue))
+			return states.NumValue(math.Pow(x, y)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Any{},
+		"",
+		"random",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			return states.NumValue(rand.Float64()), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"round",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Round(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"sign",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			if math.Signbit(x) {
+				if x == 0 {
+					return states.NumValue(math.Copysign(0, -1)), nil
+				} else {
+					return states.NumValue(-1), nil
+				}
 			} else {
-				return states.NumValue(-1), nil
+				if x == 0 {
+					return states.NumValue(0), nil
+				} else {
+					return states.NumValue(1), nil
+				}
 			}
-		} else {
-			if x == 0 {
-				return states.NumValue(0), nil
-			} else {
-				return states.NumValue(1), nil
-			}
-		}
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "sin", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Sin(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "sinh", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Sinh(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "sqrt", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Sqrt(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "tan", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Tan(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "tanh", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Tanh(x)), nil
-	}, []shapes.Example{}),
-
-	shapes.SimpleFuncer("", types.Num{}, "", "trunc", nil, types.Num{}, "", "", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-		x := float64(inputValue.(states.NumValue))
-		return states.NumValue(math.Trunc(x)), nil
-	}, []shapes.Example{}),
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"sin",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Sin(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"sinh",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Sinh(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"sqrt",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Sqrt(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"tan",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Tan(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"tanh",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Tanh(x)), nil
+		},
+		[]shapes.Example{},
+	),
+	shapes.SimpleFuncer("",
+		types.Num{},
+		"",
+		"trunc",
+		nil,
+		types.Num{},
+		"",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			x := float64(inputValue.(states.NumValue))
+			return states.NumValue(math.Trunc(x)), nil
+		},
+		[]shapes.Example{},
+	),
 }
