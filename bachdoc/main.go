@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"html"
 	"os"
+	"strings"
 
 	"github.com/texttheater/bach/builtin"
 	"github.com/texttheater/bach/shapes"
@@ -22,6 +24,10 @@ var FuncersByCategory = map[string][]shapes.Funcer{
 	"control": builtin.ControlFuncers,
 }
 
+func paramToMarkdown(s string) string {
+	return fmt.Sprintf("<code>%s</code>", strings.ReplaceAll(html.EscapeString(s), "|", "&#124;"))
+}
+
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Fprintln(os.Stderr, "USAGE: bachdoc CATEGORY")
@@ -38,11 +44,11 @@ func main() {
 		fmt.Printf("%s\n\n", funcer.Summary)
 		fmt.Printf("| | Type | Value |\n")
 		fmt.Printf("|---|---|---|\n")
-		fmt.Printf("| Input | %s | %s |\n", funcer.InputType, funcer.InputDescription)
+		fmt.Printf("| Input | %s | %s |\n", paramToMarkdown(funcer.InputType.String()), funcer.InputDescription)
 		for i, param := range funcer.Params {
-			fmt.Printf("| %s (param #%d) | %s | %s |\n", param.Name, i+1, param, param.Description)
+			fmt.Printf("| %s (param #%d) | %s | %s |\n", param.Name, i+1, paramToMarkdown(param.String()), param.Description)
 		}
-		fmt.Printf("|Output | %s | %s |\n\n", funcer.OutputType, funcer.OutputDescription)
+		fmt.Printf("|Output | %s | %s |\n\n", paramToMarkdown(funcer.OutputType.String()), funcer.OutputDescription)
 		fmt.Printf("%s\n\n", funcer.Notes)
 		fmt.Printf("### Examples\n\n")
 		fmt.Printf("| Program | Type | Value | Error |\n")
@@ -52,7 +58,7 @@ func main() {
 			if example.OutputType == "" {
 				typ = ""
 			} else {
-				typ = fmt.Sprintf("`%s`", example.OutputType)
+				typ = paramToMarkdown(example.OutputType)
 			}
 			if example.OutputValue == "" {
 				val = ""
