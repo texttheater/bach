@@ -89,7 +89,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary: "Remove the first n elements from the beginning of an array.",
+		Summary: "Removes the first n elements from the beginning of an array.",
 		InputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
@@ -127,7 +127,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary: "Remove elements satisfying a condition from the beginning of an array.",
+		Summary: "Removes elements satisfying a condition from the beginning of an array.",
 		InputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
@@ -186,87 +186,127 @@ var ArrFuncers = []shapes.Funcer{
 			{`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] dropWhile(is {a: _})`, `Arr<Obj<b: Num, Void>|Obj<a: Num, Void>>`, `[{b: 3}, {a: 4}]`, nil},
 		},
 	},
-
-	shapes.Funcer{Summary: "", InputType: types.NewArr(types.NewVar("A", types.Any{})), InputDescription: "", Name: "each", Params: []*params.Param{
-		{
-			InputType:  types.NewVar("A", types.Any{}),
-			Name:       "f",
-			Params:     nil,
-			OutputType: types.NewVar("B", types.Any{}),
+	shapes.Funcer{
+		Summary:          "Applies a function to every element.",
+		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputDescription: "an array",
+		Name:             "each",
+		Params: []*params.Param{
+			{
+				InputType:   types.NewVar("A", types.Any{}),
+				Name:        "f",
+				Description: "a function to apply to each element of the input",
+				Params:      nil,
+				OutputType:  types.NewVar("B", types.Any{}),
+			},
 		},
-	}, OutputType: types.NewArr(types.NewVar("B", types.Any{})), OutputDescription: "", Notes: "", Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		input := states.IterFromValue(inputState.Value)
-		output := func() (states.Value, bool, error) {
-			val, ok, err := input()
+		OutputType:        types.NewArr(types.NewVar("B", types.Any{})),
+		OutputDescription: "a list with the outputs of f applied to each element of the input",
+		Notes:             "",
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			input := states.IterFromValue(inputState.Value)
+			output := func() (states.Value, bool, error) {
+				val, ok, err := input()
+				if err != nil {
+					return nil, false, err
+				}
+				if !ok {
+					return nil, false, nil
+				}
+				argInputState := inputState.Replace(val)
+				val, err = args[0](argInputState, nil).Eval()
+				if err != nil {
+					return nil, false, err
+				}
+				return val, true, nil
+			}
+			return states.ThunkFromIter(output)
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[1, 2, 3] each(*2)`, `Arr<Num>`, `[2, 4, 6]`, nil},
+			{`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] takeWhile(is {a: _}) each(@a)`, `Arr<Num>`, `[1, 2]`, nil},
+		},
+	},
+	shapes.Funcer{
+		Summary:          "Pairs each element with a 0-based index.",
+		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputDescription: "",
+		Name:             "enum",
+		Params:           nil,
+		OutputType: types.NewArr(types.NewTup([]types.Type{
+			types.Num{},
+			types.NewVar("A", types.Any{}),
+		})),
+		OutputDescription: "the input with each element replaced with a 2-element array, the second element of which is the original element and the first is its index in the array, counting from 0",
+		Notes:             "",
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			input := states.IterFromValue(inputState.Value)
+			i := 0
+			output := func() (states.Value, bool, error) {
+				val, ok, err := input()
+				if err != nil {
+					return nil, false, err
+				}
+				if !ok {
+					return nil, false, nil
+				}
+				num := states.NumValue(i)
+				i++
+				return states.NewArrValue([]states.Value{
+					num,
+					val,
+				}), true, nil
+			}
+			return states.ThunkFromIter(output)
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`["a", "b", "c"] enum`, `Arr<Tup<Num, Str>>`, `[[0, "a"], [1, "b"], [2, "c"]]`, nil},
+		},
+	},
+	shapes.Funcer{
+		Summary:          "Pairs each element with an index.",
+		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputDescription: "an array",
+		Name:             "enum",
+		Params: []*params.Param{
+			params.SimpleParam("start", "at which number to start counting", types.Num{}),
+		},
+		OutputType: types.NewArr(types.NewTup([]types.Type{
+			types.Num{},
+			types.NewVar("A", types.Any{}),
+		})),
+		OutputDescription: "the input with each element replaced with a 2-element array, the second element of which is the original element and the first is its index in the array, counting from start",
+		Notes:             "",
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			input := states.IterFromValue(inputState.Value)
+			i, err := args[0](inputState.Clear(), nil).EvalNum()
 			if err != nil {
-				return nil, false, err
+				return states.ThunkFromError(err)
 			}
-			if !ok {
-				return nil, false, nil
+			output := func() (states.Value, bool, error) {
+				val, ok, err := input()
+				if err != nil {
+					return nil, false, err
+				}
+				if !ok {
+					return nil, false, nil
+				}
+				num := states.NumValue(i)
+				i++
+				return states.NewArrValue([]states.Value{
+					num,
+					val,
+				}), true, nil
 			}
-			argInputState := inputState.Replace(val)
-			val, err = args[0](argInputState, nil).Eval()
-			if err != nil {
-				return nil, false, err
-			}
-			return val, true, nil
-		}
-		return states.ThunkFromIter(output)
-	}, IDs: nil, Examples: []shapes.Example{}},
-
-	shapes.Funcer{Summary: "", InputType: types.NewArr(types.NewVar("A", types.Any{})), InputDescription: "", Name: "enum", Params: []*params.Param{
-		params.SimpleParam("start", "", types.Num{}),
-	}, OutputType: types.NewArr(types.NewTup([]types.Type{
-		types.Num{},
-		types.NewVar("A", types.Any{}),
-	})), OutputDescription: "", Notes: "", Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		input := states.IterFromValue(inputState.Value)
-		i, err := args[0](inputState.Clear(), nil).EvalNum()
-		if err != nil {
-			return states.ThunkFromError(err)
-		}
-		output := func() (states.Value, bool, error) {
-			val, ok, err := input()
-			if err != nil {
-				return nil, false, err
-			}
-			if !ok {
-				return nil, false, nil
-			}
-			num := states.NumValue(i)
-			i++
-			return states.NewArrValue([]states.Value{
-				num,
-				val,
-			}), true, nil
-		}
-		return states.ThunkFromIter(output)
-	}, IDs: nil, Examples: []shapes.Example{}},
-
-	shapes.Funcer{Summary: "", InputType: types.NewArr(types.NewVar("A", types.Any{})), InputDescription: "", Name: "enum", Params: nil, OutputType: types.NewArr(types.NewTup([]types.Type{
-		types.Num{},
-		types.NewVar("A", types.Any{}),
-	})), OutputDescription: "", Notes: "", Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		input := states.IterFromValue(inputState.Value)
-		i := 0
-		output := func() (states.Value, bool, error) {
-			val, ok, err := input()
-			if err != nil {
-				return nil, false, err
-			}
-			if !ok {
-				return nil, false, nil
-			}
-			num := states.NumValue(i)
-			i++
-			return states.NewArrValue([]states.Value{
-				num,
-				val,
-			}), true, nil
-		}
-		return states.ThunkFromIter(output)
-	}, IDs: nil, Examples: []shapes.Example{}},
-
+			return states.ThunkFromIter(output)
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`["a", "b", "c"] enum(1)`, `Arr<Tup<Num, Str>>`, `[[1, "a"], [2, "b"], [3, "c"]]`, nil},
+		},
+	},
 	shapes.Funcer{Summary: "", InputType: types.NewArr(types.NewVar("A", types.Any{})), InputDescription: "", Name: "find", Params: []*params.Param{
 		{
 			InputType: types.NewVar("A", types.Any{}),
