@@ -366,15 +366,16 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "",
+		Summary:          "Find the index and last element satisfying a condition.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		InputDescription: "",
+		InputDescription: "an array",
 		Name:             "findLast",
 		Params: []*params.Param{
 			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "test",
-				Params:    nil,
+				InputType:   types.NewVar("A", types.Any{}),
+				Name:        "test",
+				Description: "a test to apply to elements of the input",
+				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
 						Props: map[string]types.Type{
@@ -401,44 +402,27 @@ var ArrFuncers = []shapes.Funcer{
 				types.VoidArr,
 			),
 		),
-		OutputDescription: "",
+		OutputDescription: "the last element of the input passing the test, paired with its index, or Null if none",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			arr := inputState.Value.(*states.ArrValue)
-			i := -1
-			var val states.Value
-			for {
-				if arr == nil {
-					break
-				}
-				argInputState := inputState.Replace(arr.Head)
-				obj, err := args[0](argInputState, nil).EvalObj()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				if thunk, ok := obj["yes"]; ok {
-					val, err = thunk.Eval()
-					if err != nil {
-						return states.ThunkFromError(err)
-					}
-				}
-				i += 1
-				arr, err = arr.Tail.EvalArr()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
+			idx, val, err := findLast(inputState, args[0])
+			if err != nil {
+				return states.ThunkFromError(err)
 			}
-			if val == nil {
+			if idx == -1 {
 				return states.ThunkFromValue(states.NullValue{})
 			}
 			return states.ThunkFromSlice([]states.Value{
-				states.NumValue(i),
+				states.NumValue(idx),
 				val,
 			})
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[1, 2, 3, 4] findLast(is Num with %2 ==0)`, `Null|Tup<Num, Num>`, `[3, 4]`, nil},
+			{`[1, 2, 3, 4] findLast(is Num with %8 ==0)`, `Null|Tup<Num, Num>`, `null`, nil},
+		},
+	},
 	shapes.Funcer{
 		Summary:          "",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
@@ -1297,6 +1281,32 @@ func findFirst(inputState states.State, test states.Action) (index int, value st
 		_, ok := obj["yes"]
 		if ok {
 			return i, arr.Head, nil
+		}
+		i++
+		arr, err = arr.Tail.EvalArr()
+		if err != nil {
+			return -1, nil, err
+		}
+	}
+}
+
+func findLast(inputState states.State, test states.Action) (index int, value states.Value, err error) {
+	lastIndex := -1
+	var lastValue states.Value = nil
+	arr := inputState.Value.(*states.ArrValue)
+	i := 0
+	for {
+		if arr == nil {
+			return lastIndex, lastValue, nil
+		}
+		obj, err := test(inputState.Replace(arr.Head), nil).EvalObj()
+		if err != nil {
+			return -1, nil, err
+		}
+		_, ok := obj["yes"]
+		if ok {
+			lastIndex = i
+			lastValue = arr.Head
 		}
 		i++
 		arr, err = arr.Tail.EvalArr()
