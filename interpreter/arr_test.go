@@ -558,14 +558,14 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgramStr(
-		`[1, 2, 3] find(is Num with %2 ==0)`,
+		`[1, 2, 3] findFirst(is Num with %2 ==0)`,
 		`Null|Tup<Num, Num>`,
 		`[1, 2]`,
 		nil,
 		t,
 	)
 	interpreter.TestProgramStr(
-		`[1, 2, 3] find(is Num with %4 ==0)`,
+		`[1, 2, 3] findFirst(is Num with %4 ==0)`,
 		`Null|Tup<Num, Num>`,
 		`null`,
 		nil,

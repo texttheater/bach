@@ -308,15 +308,16 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "",
+		Summary:          "Find the index and first element satisfying a condition.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		InputDescription: "",
-		Name:             "find",
+		InputDescription: "an array",
+		Name:             "findFirst",
 		Params: []*params.Param{
 			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "test",
-				Params:    nil,
+				InputType:   types.NewVar("A", types.Any{}),
+				Name:        "test",
+				Description: "a test to apply to elements of the input",
+				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
 						Props: map[string]types.Type{
@@ -343,40 +344,27 @@ var ArrFuncers = []shapes.Funcer{
 				types.VoidArr,
 			),
 		),
-		OutputDescription: "",
+		OutputDescription: "the first element of the input passing the test, paired with its index, or Null if none",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			arr := inputState.Value.(*states.ArrValue)
-			i := 0
-			for {
-				if arr == nil {
-					return states.ThunkFromValue(states.NullValue{})
-				}
-				argInputState := inputState.Replace(arr.Head)
-				obj, err := args[0](argInputState, nil).EvalObj()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				if thunk, ok := obj["yes"]; ok {
-					val, err := thunk.Eval()
-					if err != nil {
-						return states.ThunkFromError(err)
-					}
-					return states.ThunkFromSlice([]states.Value{
-						states.NumValue(i),
-						val,
-					})
-				}
-				i += 1
-				arr, err = arr.Tail.EvalArr()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
+			idx, val, err := findFirst(inputState, args[0])
+			if err != nil {
+				return states.ThunkFromError(err)
 			}
+			if idx == -1 {
+				return states.ThunkFromValue(states.NullValue{})
+			}
+			return states.ThunkFromSlice([]states.Value{
+				states.NumValue(idx),
+				val,
+			})
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[1, 2, 3] findFirst(is Num with %2 ==0)`, `Null|Tup<Num, Num>`, `[1, 2]`, nil},
+			{`[1, 2, 3] findFirst(is Num with %4 ==0)`, `Null|Tup<Num, Num>`, `null`, nil},
+		},
+	},
 	shapes.Funcer{
 		Summary:          "",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
@@ -1291,6 +1279,29 @@ func min(inputState states.State, key states.Action, less states.Action, def sta
 		if l {
 			record = val
 			recordHolder = arr.Head
+		}
+	}
+}
+
+func findFirst(inputState states.State, test states.Action) (index int, value states.Value, err error) {
+	arr := inputState.Value.(*states.ArrValue)
+	i := 0
+	for {
+		if arr == nil {
+			return -1, nil, nil
+		}
+		obj, err := test(inputState.Replace(arr.Head), nil).EvalObj()
+		if err != nil {
+			return -1, nil, err
+		}
+		_, ok := obj["yes"]
+		if ok {
+			return i, arr.Head, nil
+		}
+		i++
+		arr, err = arr.Tail.EvalArr()
+		if err != nil {
+			return -1, nil, err
 		}
 	}
 }
