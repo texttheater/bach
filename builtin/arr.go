@@ -308,7 +308,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Find the index and first element satisfying a condition.",
+		Summary:          "Finds the index and first element satisfying a condition.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findFirst",
@@ -366,7 +366,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Find the index and last element satisfying a condition.",
+		Summary:          "Finds the index and last element satisfying a condition.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findLast",
@@ -424,23 +424,24 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "",
+		Summary:          "Aggregates an array recursively.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		InputDescription: "",
+		InputDescription: "an array",
 		Name:             "fold",
 		Params: []*params.Param{
-			params.SimpleParam("start", "", types.NewVar("B", types.Any{})),
+			params.SimpleParam("start", "initial accumulator", types.NewVar("B", types.Any{})),
 			{
-				InputType: types.NewVar("B", types.Any{}),
-				Name:      "combine",
+				InputType:   types.NewVar("B", types.Any{}),
+				Name:        "combine",
+				Description: "a function that combines the current accumulator with the next element to produce a new accumulator",
 				Params: []*params.Param{
-					params.SimpleParam("next", "", types.NewVar("A", types.Any{})),
+					params.SimpleParam("next", "the next element", types.NewVar("A", types.Any{})),
 				},
 				OutputType: types.NewVar("B", types.Any{}),
 			},
 		},
 		OutputType:        types.NewVar("B", types.Any{}),
-		OutputDescription: "",
+		OutputDescription: "the accumulator after processing all elements",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			acc, err := args[0].Eval(inputState.Clear(), nil)
@@ -470,9 +471,12 @@ var ArrFuncers = []shapes.Funcer{
 				}
 			}
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[1, 2, 3] fold(0, +)`, `Num`, `6`, nil},
+			{`[2, 3, 4] fold(1, *)`, `Num`, `24`, nil},
+		},
+	},
 	shapes.Funcer{
 		Summary: "",
 		InputType: types.NewArr(
