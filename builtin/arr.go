@@ -1120,18 +1120,18 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "",
+		Summary:          "Builds a range of numbers",
 		InputType:        types.Any{},
-		InputDescription: "",
+		InputDescription: "any value (is ignored)",
 		Name:             "range",
 		Params: []*params.Param{
-			params.SimpleParam("from", "", types.Num{}),
-			params.SimpleParam("to", "", types.Num{}),
+			params.SimpleParam("from", "lower limit (inclusive)", types.Num{}),
+			params.SimpleParam("to", "upper limit (inclusive)", types.Num{}),
 		},
 		OutputType: types.NewArr(
 			types.Num{},
 		),
-		OutputDescription: "",
+		OutputDescription: "an array with the integers in the specified interval",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			argInputState := inputState.Clear()
@@ -1154,9 +1154,13 @@ var ArrFuncers = []shapes.Funcer{
 			}
 			return states.ThunkFromIter(iter)
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`range(0, 4)`, `Arr<Num>`, `[0, 1, 2, 3]`, nil},
+			{`range(-1, 2)`, `Arr<Num>`, `[-1, 0, 1]`, nil},
+			{`range(3, 2)`, `Arr<Num>`, `[]`, nil},
+		},
+	},
 	shapes.Funcer{
 		Summary: "",
 		InputType: types.NewArr(
