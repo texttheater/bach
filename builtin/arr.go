@@ -737,6 +737,10 @@ var ArrFuncers = []shapes.Funcer{
 				errors.Code(errors.BadIndex),
 				errors.GotValue(states.NumValue(-1)),
 			)},
+			{`["a", "b", "c"] get(3)`, `Str`, ``, errors.ValueError(
+				errors.Code(errors.NoSuchIndex),
+				errors.GotValue(states.NumValue(3)),
+			)},
 		},
 	},
 	// TODO with default value?
