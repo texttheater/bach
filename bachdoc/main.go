@@ -24,7 +24,7 @@ var FuncersByCategory = map[string][]shapes.Funcer{
 	"control": builtin.ControlFuncers,
 }
 
-func paramToMarkdown(s string) string {
+func inlineCode(s string) string {
 	return fmt.Sprintf("<code>%s</code>", strings.ReplaceAll(html.EscapeString(s), "|", "&#124;"))
 }
 
@@ -44,11 +44,11 @@ func main() {
 		fmt.Printf("%s\n\n", funcer.Summary)
 		fmt.Printf("| | Type | Value |\n")
 		fmt.Printf("|---|---|---|\n")
-		fmt.Printf("| Input | %s | %s |\n", paramToMarkdown(funcer.InputType.String()), funcer.InputDescription)
+		fmt.Printf("| Input | %s | %s |\n", inlineCode(funcer.InputType.String()), funcer.InputDescription)
 		for i, param := range funcer.Params {
-			fmt.Printf("| %s (param #%d) | %s | %s |\n", param.Name, i+1, paramToMarkdown(param.String()), param.Description)
+			fmt.Printf("| %s (param #%d) | %s | %s |\n", param.Name, i+1, inlineCode(param.String()), param.Description)
 		}
-		fmt.Printf("|Output | %s | %s |\n\n", paramToMarkdown(funcer.OutputType.String()), funcer.OutputDescription)
+		fmt.Printf("|Output | %s | %s |\n\n", inlineCode(funcer.OutputType.String()), funcer.OutputDescription)
 		fmt.Printf("%s\n\n", funcer.Notes)
 		fmt.Printf("### Examples\n\n")
 		fmt.Printf("| Program | Type | Value | Error |\n")
@@ -58,7 +58,7 @@ func main() {
 			if example.OutputType == "" {
 				typ = ""
 			} else {
-				typ = paramToMarkdown(example.OutputType)
+				typ = inlineCode(example.OutputType)
 			}
 			if example.OutputValue == "" {
 				val = ""
@@ -68,7 +68,7 @@ func main() {
 			if example.Error == nil {
 				err = ""
 			} else {
-				err = fmt.Sprintf("```\n%s\n```", example.Error)
+				err = inlineCode(fmt.Sprintf("%s", example.Error))
 			}
 			fmt.Printf("| `%s` | %s | %s | %s |\n", example.Program, typ, val, err)
 		}
