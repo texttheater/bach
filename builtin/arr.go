@@ -680,18 +680,18 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary: "",
+		Summary: "Returns the element at a given index.",
 		InputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
-		InputDescription: "",
+		InputDescription: "an array",
 		Name:             "get",
 		Params: []*params.Param{
-			params.SimpleParam("index", "", types.Num{}),
+			params.SimpleParam("index", "a 0-based index into the input", types.Num{}),
 		},
 		OutputType:        types.NewVar("A", types.Any{}),
-		OutputDescription: "",
-		Notes:             "",
+		OutputDescription: "the element at the given index",
+		Notes:             "Throws BadIndex if there is no element at the given index.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			arr := inputState.Value.(*states.ArrValue)
 			index, err := args[0](inputState.Clear(), nil).EvalInt()
@@ -727,9 +727,19 @@ var ArrFuncers = []shapes.Funcer{
 			}
 			return states.ThunkFromValue(arr.Head)
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[] get(0)`, `Void`, ``, errors.TypeError(
+				errors.Code(errors.VoidProgram),
+			)},
+			{`["a", "b", "c"] get(0)`, `Str`, `"a"`, nil},
+			{`["a", "b", "c"] get(-1)`, `Str`, ``, errors.ValueError(
+				errors.Code(errors.BadIndex),
+				errors.GotValue(states.NumValue(-1)),
+			)},
+		},
+	},
+	// TODO with default value?
 	shapes.Funcer{
 		Summary: "",
 		InputType: types.NewArr(
