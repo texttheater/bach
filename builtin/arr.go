@@ -691,7 +691,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		OutputType:        types.NewVar("A", types.Any{}),
 		OutputDescription: "the element at the given index",
-		Notes:             "Throws BadIndex if there is no element at the given index.",
+		Notes:             "Throws BadIndex if the index is invalid or NoSuchIndex if there is not element at the give index.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			arr := inputState.Value.(*states.ArrValue)
 			index, err := args[0](inputState.Clear(), nil).EvalInt()
