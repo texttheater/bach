@@ -366,6 +366,104 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
+		Summary:          "Finds the index of the first element satisfying a condition.",
+		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputDescription: "an array",
+		Name:             "findFirstIndex",
+		Params: []*params.Param{
+			{
+				InputType:   types.NewVar("A", types.Any{}),
+				Name:        "test",
+				Description: "a test to apply to elements of the input",
+				Params:      nil,
+				OutputType: types.NewUnion(
+					types.Obj{
+						Props: map[string]types.Type{
+							"yes": types.NewVar("B", types.Any{}),
+						},
+						Rest: types.Any{},
+					},
+					types.Obj{
+						Props: map[string]types.Type{
+							"no": types.NewVar("C", types.Any{}),
+						},
+						Rest: types.Any{},
+					},
+				),
+			},
+		},
+		OutputType: types.NewUnion(
+			types.Null{},
+			types.Num{},
+		),
+		OutputDescription: "the index of the first element of the input passing the test, or Null if none",
+		Notes:             "",
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			idx, _, err := findFirst(inputState, args[0])
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			if idx == -1 {
+				return states.ThunkFromValue(states.NullValue{})
+			}
+			return states.ThunkFromValue(states.NumValue(idx))
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[1, 2, 3] findFirstIndex(is Num with %2 ==0)`, `Null|Num`, `1`, nil},
+			{`[1, 2, 3] findFirstIndex(is Num with %4 ==0)`, `Null|Num`, `null`, nil},
+		},
+	},
+	shapes.Funcer{
+		Summary:          "Finds the first element satisfying a condition.",
+		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputDescription: "an array",
+		Name:             "findFirstValue",
+		Params: []*params.Param{
+			{
+				InputType:   types.NewVar("A", types.Any{}),
+				Name:        "test",
+				Description: "a test to apply to elements of the input",
+				Params:      nil,
+				OutputType: types.NewUnion(
+					types.Obj{
+						Props: map[string]types.Type{
+							"yes": types.NewVar("B", types.Any{}),
+						},
+						Rest: types.Any{},
+					},
+					types.Obj{
+						Props: map[string]types.Type{
+							"no": types.NewVar("C", types.Any{}),
+						},
+						Rest: types.Any{},
+					},
+				),
+			},
+		},
+		OutputType: types.NewUnion(
+			types.Null{},
+			types.NewVar("A", types.Any{}),
+		),
+		OutputDescription: "the first element of the input passing the test, or Null if none",
+		Notes:             "",
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			idx, val, err := findFirst(inputState, args[0])
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			if idx == -1 {
+				return states.ThunkFromValue(states.NullValue{})
+			}
+			return states.ThunkFromValue(val)
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[1, 2, 3] findFirstValue(is Num with %2 ==0)`, `Null|Num`, `2`, nil},
+			{`[1, 2, 3] findFirstValue(is Num with %4 ==0)`, `Null|Num`, `null`, nil},
+		},
+	},
+	shapes.Funcer{
 		Summary:          "Finds the index and last element satisfying a condition.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
@@ -421,6 +519,104 @@ var ArrFuncers = []shapes.Funcer{
 		Examples: []shapes.Example{
 			{`[1, 2, 3, 4] findLast(is Num with %2 ==0)`, `Null|Tup<Num, Num>`, `[3, 4]`, nil},
 			{`[1, 2, 3, 4] findLast(is Num with %8 ==0)`, `Null|Tup<Num, Num>`, `null`, nil},
+		},
+	},
+	shapes.Funcer{
+		Summary:          "Finds the index of the last element satisfying a condition.",
+		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputDescription: "an array",
+		Name:             "findLastIndex",
+		Params: []*params.Param{
+			{
+				InputType:   types.NewVar("A", types.Any{}),
+				Name:        "test",
+				Description: "a test to apply to elements of the input",
+				Params:      nil,
+				OutputType: types.NewUnion(
+					types.Obj{
+						Props: map[string]types.Type{
+							"yes": types.NewVar("B", types.Any{}),
+						},
+						Rest: types.Any{},
+					},
+					types.Obj{
+						Props: map[string]types.Type{
+							"no": types.NewVar("C", types.Any{}),
+						},
+						Rest: types.Any{},
+					},
+				),
+			},
+		},
+		OutputType: types.NewUnion(
+			types.Null{},
+			types.Num{},
+		),
+		OutputDescription: "the index of the last element of the input passing the test, or Null if none",
+		Notes:             "",
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			idx, _, err := findLast(inputState, args[0])
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			if idx == -1 {
+				return states.ThunkFromValue(states.NullValue{})
+			}
+			return states.ThunkFromValue(states.NumValue(idx))
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[1, 2, 3, 4] findLastIndex(is Num with %2 ==0)`, `Null|Num`, `3`, nil},
+			{`[1, 2, 3, 4] findLastIndex(is Num with %8 ==0)`, `Null|Num`, `null`, nil},
+		},
+	},
+	shapes.Funcer{
+		Summary:          "Finds the last element satisfying a condition.",
+		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputDescription: "an array",
+		Name:             "findLastValue",
+		Params: []*params.Param{
+			{
+				InputType:   types.NewVar("A", types.Any{}),
+				Name:        "test",
+				Description: "a test to apply to elements of the input",
+				Params:      nil,
+				OutputType: types.NewUnion(
+					types.Obj{
+						Props: map[string]types.Type{
+							"yes": types.NewVar("B", types.Any{}),
+						},
+						Rest: types.Any{},
+					},
+					types.Obj{
+						Props: map[string]types.Type{
+							"no": types.NewVar("C", types.Any{}),
+						},
+						Rest: types.Any{},
+					},
+				),
+			},
+		},
+		OutputType: types.NewUnion(
+			types.Null{},
+			types.NewVar("A", types.Any{}),
+		),
+		OutputDescription: "the last element of the input passing the test, or Null if none",
+		Notes:             "",
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			idx, val, err := findLast(inputState, args[0])
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			if idx == -1 {
+				return states.ThunkFromValue(states.NullValue{})
+			}
+			return states.ThunkFromValue(val)
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[1, 2, 3, 4] findLastValue(is Num with %2 ==0)`, `Null|Num`, `4`, nil},
+			{`[1, 2, 3, 4] findLastValue(is Num with %8 ==0)`, `Null|Num`, `null`, nil},
 		},
 	},
 	shapes.Funcer{
