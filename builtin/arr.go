@@ -1013,38 +1013,44 @@ var ArrFuncers = []shapes.Funcer{
 			{`for Any def f Arr<Num> as [] ok f max(<, 0)`, `Num`, `0`, nil},
 		},
 	},
-
 	shapes.Funcer{
-		Summary:          "",
+		Summary:          "Finds the maximum element according to a sorting key.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		InputDescription: "",
+		InputDescription: "an array",
 		Name:             "max",
 		Params: []*params.Param{
 			{
-				InputType:  types.NewVar("A", types.Any{}),
-				Name:       "sortKey",
-				Params:     nil,
-				OutputType: types.NewVar("B", types.Any{}),
+				InputType:   types.NewVar("A", types.Any{}),
+				Name:        "sortKey",
+				Description: `funcer that maps input elements to values by which they will be compared`,
+				Params:      nil,
+				OutputType:  types.NewVar("B", types.Any{}),
 			},
 			{
-				InputType: types.NewVar("B", types.Any{}),
-				Name:      "less",
+				InputType:   types.NewVar("B", types.Any{}),
+				Name:        "less",
+				Description: `funcer that tests whether its input is "less than" its first argument`,
 				Params: []*params.Param{
 					params.SimpleParam("other", "", types.NewVar("B", types.Any{})),
 				},
 				OutputType: types.Bool{},
 			},
-			params.SimpleParam("default", "", types.NewVar("A", types.Any{})),
+			params.SimpleParam("default", "", types.NewVar("C", types.Any{})),
 		},
-		OutputType:        types.NewVar("A", types.Any{}),
-		OutputDescription: "",
+		OutputType: types.NewUnion(
+			types.NewVar("A", types.Any{}),
+			types.NewVar("C", types.Any{}),
+		),
+		OutputDescription: "the maximum element, or default if the input is empty",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			return max(inputState, args[0], args[1], args[2])
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`["abc", "b", "ab"] max(bytes len, <, "")`, `Str`, `"abc"`, nil},
+		},
+	},
 	shapes.Funcer{
 		Summary:          "",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
