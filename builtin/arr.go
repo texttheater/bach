@@ -1277,44 +1277,54 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:           "",
+		Summary:           "Sorts numbers.",
 		InputType:         types.NewArr(types.Num{}),
-		InputDescription:  "",
+		InputDescription:  "an array of numbers",
 		Name:              "sort",
 		Params:            nil,
 		OutputType:        types.NewArr(types.Num{}),
-		OutputDescription: "",
+		OutputDescription: "the input sorted from smallest to greatest",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			return mySort(inputState, id, numLess)
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[7, 3, 2, 5, 2] sort`, `Arr<Num>`, `[2, 2, 3, 5, 7]`, nil},
+		},
+	},
 	shapes.Funcer{
-		Summary:           "",
+		Summary:           "Sorts strings.",
 		InputType:         types.NewArr(types.Str{}),
-		InputDescription:  "",
+		InputDescription:  "an array of strings",
 		Name:              "sort",
 		Params:            nil,
 		OutputType:        types.NewArr(types.Str{}),
-		OutputDescription: "",
+		OutputDescription: "the input sorted lexicographically",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			return mySort(inputState, id, strLess)
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{
+				`"Zwölf Boxkämpfer jagen Victor quer über den großen Sylter Deich . Voilà !" fields sort`,
+				`Arr<Str>`,
+				`["!", ".", "Boxkämpfer", "Deich", "Sylter", "Victor", "Voilà", "Zwölf", "den", "großen", "jagen", "quer", "über"]`,
+				nil,
+			},
+		},
+	},
 	shapes.Funcer{
-		Summary:          "",
+		Summary:          "Sorts values.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		InputDescription: "",
+		InputDescription: "an array",
 		Name:             "sort",
 		Params: []*params.Param{
 			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "less",
+				InputType:   types.NewVar("A", types.Any{}),
+				Name:        "less",
+				Description: `funcer that tests whether its input is "less than" its first argument`,
 				Params: []*params.Param{
 					params.SimpleParam("other", "", types.NewVar("A", types.Any{})),
 				},
@@ -1322,73 +1332,51 @@ var ArrFuncers = []shapes.Funcer{
 			},
 		},
 		OutputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		OutputDescription: "",
+		OutputDescription: "the input sorted by the given ordering function",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			return mySort(inputState, id, args[0])
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
-	shapes.Funcer{
-		Summary:          "",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		InputDescription: "",
-		Name:             "sortByNum",
-		Params: []*params.Param{
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[7, 3, 2, 5] sort(>)`, `Arr<Num>`, `[7, 5, 3, 2]`, nil},
 			{
-				InputType:  types.NewVar("A", types.Any{}),
-				Name:       "sortKey",
-				Params:     nil,
-				OutputType: types.Num{},
+				`"Zwölf Boxkämpfer jagen Victor quer über den großen Sylter Deich . Voilà !" fields sort(>)`,
+				`Arr<Str>`,
+				`["über", "quer", "jagen", "großen", "den", "Zwölf", "Voilà", "Victor", "Sylter", "Deich", "Boxkämpfer", ".", "!"]`,
+				nil,
+			},
+			{
+				`[{a: 7}, {a: 3}, {a: 2}, {a: 5}] for Obj<a: Num, Void> def <(other Obj<a: Num, Void>) Bool as @a <(other @a) ok sort(<)`,
+				`Arr<Obj<a: Num, Void>>`,
+				`[{a: 2}, {a: 3}, {a: 5}, {a: 7}]`,
+				nil,
+			},
+			{
+				`[{a: 7, b: 2}, {a: 3, b: 1}, {a: 2, b: 2}, {a: 5, b: 2}] for Obj<a: Num, b: Num, Void> def <(other Obj<a: Num, b: Num, Void>) Bool as @b <(other @b) ok sort(<)`,
+				`Arr<Obj<a: Num, b: Num, Void>>`,
+				`[{a: 3, b: 1}, {a: 7, b: 2}, {a: 2, b: 2}, {a: 5, b: 2}]`,
+				nil,
 			},
 		},
-		OutputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		OutputDescription: "",
-		Notes:             "",
-		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			return mySort(inputState, args[0], numLess)
-		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+	},
 	shapes.Funcer{
-		Summary:          "",
+		Summary:          "Sorts an array with a sorting key.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		InputDescription: "",
-		Name:             "sortByStr",
-		Params: []*params.Param{
-			{
-				InputType:  types.NewVar("A", types.Any{}),
-				Name:       "sortKey",
-				Params:     nil,
-				OutputType: types.Str{},
-			},
-		},
-		OutputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		OutputDescription: "",
-		Notes:             "",
-		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			return mySort(inputState, args[0], strLess)
-		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
-	shapes.Funcer{
-		Summary:          "",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		InputDescription: "",
+		InputDescription: "an array",
 		Name:             "sortBy",
 		Params: []*params.Param{
 			{
-				InputType:  types.NewVar("A", types.Any{}),
-				Name:       "sortKey",
-				Params:     nil,
-				OutputType: types.NewVar("B", types.Any{}),
+				InputType:   types.NewVar("A", types.Any{}),
+				Name:        "sortKey",
+				Description: `funcer that maps input elements to values by which they will be compared`,
+				Params:      nil,
+				OutputType:  types.NewVar("B", types.Any{}),
 			},
 			{
-				InputType: types.NewVar("B", types.Any{}),
-				Name:      "less",
+				InputType:   types.NewVar("B", types.Any{}),
+				Name:        "less",
+				Description: `funcer that tests whether its input is "less than" its first argument`,
 				Params: []*params.Param{
 					params.SimpleParam("other", "", types.NewVar("B", types.Any{})),
 				},
@@ -1396,14 +1384,27 @@ var ArrFuncers = []shapes.Funcer{
 			},
 		},
 		OutputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		OutputDescription: "",
+		OutputDescription: "the input sorting according to the given sorting key and ordering function",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			return mySort(inputState, args[0], args[1])
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{
+				`[{a: 7}, {a: 3}, {a: 2}, {a: 5}] sortBy(@a, <)`,
+				`Arr<Obj<a: Num, Void>>`,
+				`[{a: 2}, {a: 3}, {a: 5}, {a: 7}]`,
+				nil,
+			},
+			{
+				`[{a: 7, b: 2}, {a: 3, b: 1}, {a: 2, b: 2}, {a: 5, b: 2}] sortBy(@b, <)`,
+				`Arr<Obj<a: Num, b: Num, Void>>`,
+				`[{a: 3, b: 1}, {a: 7, b: 2}, {a: 2, b: 2}, {a: 5, b: 2}]`,
+				nil,
+			},
+		},
+	},
 	shapes.Funcer{
 		Summary: "",
 		InputType: types.NewArr(
