@@ -951,13 +951,13 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:           "",
+		Summary:           "Computes the length of an array.",
 		InputType:         types.AnyArr,
-		InputDescription:  "",
+		InputDescription:  "an array",
 		Name:              "len",
 		Params:            nil,
 		OutputType:        types.Num{},
-		OutputDescription: "",
+		OutputDescription: "how many elements the input has",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			length := 0
@@ -973,9 +973,12 @@ var ArrFuncers = []shapes.Funcer{
 				length += 1
 			}
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[] len`, `Num`, `0`, nil},
+			{`["a", 2, []] len`, `Num`, `3`, nil},
+		},
+	},
 	shapes.Funcer{
 		Summary:          "",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
