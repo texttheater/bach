@@ -235,34 +235,6 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgramStr(
-		`[] some`,
-		`Bool`,
-		`false`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[false] some`,
-		`Bool`,
-		`false`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[false, false] some`,
-		`Bool`,
-		`false`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[false, true, false] some`,
-		`Bool`,
-		`true`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
 		`[1, 3, 5, 2, 4, 7] takeWhile(if %2 ==1)`,
 		`Arr<Num>`,
 		`[1, 3, 5]`,

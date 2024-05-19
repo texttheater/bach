@@ -1245,13 +1245,13 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:           "",
+		Summary:           "Checks if some element is true.",
 		InputType:         types.NewArr(types.Bool{}),
-		InputDescription:  "",
+		InputDescription:  "an array of boolean values",
 		Name:              "some",
 		Params:            nil,
 		OutputType:        types.Bool{},
-		OutputDescription: "",
+		OutputDescription: "true iff at least one element of the input is true",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromValue(inputState.Value)
@@ -1268,9 +1268,14 @@ var ArrFuncers = []shapes.Funcer{
 				}
 			}
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[] some`, `Bool`, `false`, nil},
+			{`[false] some`, `Bool`, `false`, nil},
+			{`[false, false] some`, `Bool`, `false`, nil},
+			{`[false, true, false] some`, `Bool`, `true`, nil},
+		},
+	},
 	shapes.Funcer{
 		Summary:           "",
 		InputType:         types.NewArr(types.Num{}),
