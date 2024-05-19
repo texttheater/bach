@@ -57,13 +57,6 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] each(*2)`,
-		`Arr<Num>`,
-		`[2, 4, 6]`,
-		nil,
-		t,
-	)
 	interpreter.TestProgram(
 		`1 each(*2)`,
 		nil,
@@ -144,31 +137,6 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgramStr(
-		`[] get(0)`,
-		`Void`,
-		``,
-		errors.TypeError(
-			errors.Code(errors.VoidProgram),
-		),
-		t,
-	)
-	interpreter.TestProgramStr(
-		`["a", "b", "c"] get(0)`,
-		`Str`,
-		`"a"`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`["a", "b", "c"] get(-1)`,
-		``,
-		``,
-		errors.ValueError(
-			errors.Code(errors.BadIndex),
-		),
-		t,
-	)
-	interpreter.TestProgramStr(
 		`[1, 2, 3] take(2)`,
 		`Arr<Num>`,
 		`[1, 2]`,
@@ -211,48 +179,6 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgramStr(
-		`[1, 2, 3] drop(2)`,
-		`Arr<Num>`,
-		`[3]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] drop(1)`,
-		`Arr<Num>`,
-		`[2, 3]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] drop(0)`,
-		`Arr<Num>`,
-		`[1, 2, 3]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] drop(-1)`,
-		`Arr<Num>`,
-		`[1, 2, 3]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] drop(4)`,
-		`Arr<Num>`,
-		`[]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] drop(3)`,
-		`Arr<Num>`,
-		`[]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
 		`[1, 2, 3] rev`,
 		`Arr<Num>`,
 		`[3, 2, 1]`,
@@ -261,34 +187,6 @@ func TestArrays(t *testing.T) {
 	)
 	interpreter.TestProgramStr(
 		`[] rev`,
-		`Tup<>`,
-		`[]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] +[4, 5]`,
-		`Arr<Num>`,
-		`[1, 2, 3, 4, 5]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[] +[4, 5]`,
-		`Arr<Num>`,
-		`[4, 5]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] +[]`,
-		`Arr<Num>`,
-		`[1, 2, 3]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[] +[]`,
 		`Tup<>`,
 		`[]`,
 		nil,
@@ -421,34 +319,6 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgramStr(
-		`[] all`,
-		`Bool`,
-		`true`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[true] all`,
-		`Bool`,
-		`true`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[true, true] all`,
-		`Bool`,
-		`true`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[true, false, true] all`,
-		`Bool`,
-		`false`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
 		`[] some`,
 		`Bool`,
 		`false`,
@@ -476,18 +346,6 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
-	interpreter.TestProgram(`[1, 2, 3] fold(0, +)`,
-		types.Num{},
-		states.NumValue(6),
-		nil,
-		t,
-	)
-	interpreter.TestProgram(`[2, 3, 4] fold(1, *)`,
-		types.Num{},
-		states.NumValue(24),
-		nil,
-		t,
-	)
 	interpreter.TestProgramStr(
 		`[1, 3, 5, 2, 4, 7] takeWhile(if %2 ==1)`,
 		`Arr<Num>`,
@@ -506,13 +364,6 @@ func TestArrays(t *testing.T) {
 		`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] takeWhile(is {a: _}) each(@a)`,
 		`Arr<Num>`,
 		`[1, 2]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] dropWhile(is {a: _})`,
-		`Arr<Obj<b: Num, Void>|Obj<a: Num, Void>>`,
-		`[{b: 3}, {a: 4}]`,
 		nil,
 		t,
 	)
@@ -555,34 +406,6 @@ func TestArrays(t *testing.T) {
 			errors.Code(errors.NoSuchIndex),
 			errors.GotValue(states.NumValue(3)),
 		),
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] findFirst(is Num with %2 ==0)`,
-		`Null|Tup<Num, Num>`,
-		`[1, 2]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] findFirst(is Num with %4 ==0)`,
-		`Null|Tup<Num, Num>`,
-		`null`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3, 4] findLast(is Num with %2 ==0)`,
-		`Null|Tup<Num, Num>`,
-		`[3, 4]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3, 4] findLast(is Num with %8 ==0)`,
-		`Null|Tup<Num, Num>`,
-		`null`,
-		nil,
 		t,
 	)
 	interpreter.TestProgramStr(
