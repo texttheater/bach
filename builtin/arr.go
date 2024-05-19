@@ -1162,19 +1162,19 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary: "",
+		Summary: "Concatenates an array with copies of itself.",
 		InputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
-		InputDescription: "",
+		InputDescription: "an array",
 		Name:             "repeat",
 		Params: []*params.Param{
-			params.SimpleParam("times", "", types.Num{}),
+			params.SimpleParam("times", "how many times to repeat the input", types.Num{}),
 		},
 		OutputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
-		OutputDescription: "",
+		OutputDescription: "the elements of the input repeated times times in a single array",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := inputState.Value.(*states.ArrValue)
@@ -1200,9 +1200,13 @@ var ArrFuncers = []shapes.Funcer{
 			}()
 			return states.ThunkFromChannel(c)
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[1, 2, 3] repeat(3)`, `Arr<Num>`, `[1, 2, 3, 1, 2, 3, 1, 2, 3]`, nil},
+			{`[1, 2, 3] repeat(0)`, `Arr<Num>`, `[]`, nil},
+			{`[1, 2, 3] repeat(1)`, `Arr<Num>`, `[1, 2, 3]`, nil},
+		},
+	},
 	shapes.Funcer{
 		Summary: "",
 		InputType: types.NewArr(
