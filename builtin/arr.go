@@ -848,15 +848,16 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "",
+		Summary:          "Keep only elements satisfying a condition.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		InputDescription: "",
+		InputDescription: "an array",
 		Name:             "keep",
 		Params: []*params.Param{
 			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "test",
-				Params:    nil,
+				InputType:   types.NewVar("A", types.Any{}),
+				Name:        "test",
+				Description: "a test to apply to elements of the input",
+				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
 						Props: map[string]types.Type{
@@ -874,7 +875,7 @@ var ArrFuncers = []shapes.Funcer{
 			},
 		},
 		OutputType:        types.NewArr(types.NewVar("B", types.Any{})),
-		OutputDescription: "",
+		OutputDescription: "The input with all elements not passing the test removed.",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromValue(inputState.Value)
@@ -903,9 +904,52 @@ var ArrFuncers = []shapes.Funcer{
 			}
 			return states.ThunkFromIter(output)
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{
+				`["a", 1, "b", 2, "c", 3] keep(is Num with %2 >0 elis Str)`,
+				`Arr<Num|Str>`,
+				`["a", 1, "b", "c", 3]`,
+				nil,
+			},
+			{
+				`[{n: 1}, {n: 2}, {n: 3}] keep(is {n: n} with n %2 >0)`,
+				`Arr<Obj<n: Num, Void>>`,
+				`[{n: 1}, {n: 3}]`,
+				nil,
+			},
+			{
+				`[1, 2, 3, 4, 5, 6] keep(if %2 ==0) each(*2)`,
+				`Arr<Num>`,
+				`[4, 8, 12]`,
+				nil,
+			},
+			{
+				`[1, 2, 3, 4, 5, 6] keep(if %2 ==0 not) each(id)`,
+				`Arr<Num>`,
+				`[1, 3, 5]`,
+				nil,
+			},
+			{
+				`[1, 2, 3] keep(if %2 ==0 not) each(+1)`,
+				`Arr<Num>`,
+				`[2, 4]`,
+				nil,
+			},
+			{
+				`[1, 2, 3] keep(if false)`,
+				`Arr<Num>`,
+				`[]`,
+				nil,
+			},
+			{
+				`[{n: 1}, 2, {n: 3}] keep(is {n: n}) each(@n)`,
+				`Arr<Num>`,
+				`[1, 3]`,
+				nil,
+			},
+		},
+	},
 	shapes.Funcer{
 		Summary:           "",
 		InputType:         types.AnyArr,
