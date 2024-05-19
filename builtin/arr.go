@@ -743,7 +743,61 @@ var ArrFuncers = []shapes.Funcer{
 			)},
 		},
 	},
-	// TODO with default value?
+	shapes.Funcer{
+		Summary: "Returns the element at a given index, or a default value.",
+		InputType: types.NewArr(
+			types.NewVar("A", types.Any{}),
+		),
+		InputDescription: "an array",
+		Name:             "get",
+		Params: []*params.Param{
+			params.SimpleParam("index", "a 0-based index into the input", types.Num{}),
+			params.SimpleParam("default", "default value to retur if there is no element at the given index", types.NewVar("B", types.Any{})),
+		},
+		OutputType: types.NewUnion(
+			types.NewVar("A", types.Any{}),
+			types.NewVar("B", types.Any{}),
+		),
+		OutputDescription: "the element at the given index, or default if there isn't one.",
+		Notes:             "Throws BadIndex if the index is invalid.",
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			arr := inputState.Value.(*states.ArrValue)
+			index, err := args[0](inputState.Clear(), nil).EvalInt()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			if index < 0 {
+				return states.ThunkFromError(errors.ValueError(
+					errors.Code(errors.BadIndex),
+					errors.GotValue(states.NumValue(index)),
+					errors.Pos(pos),
+				))
+			}
+			for i := 0; i < index; i++ {
+				if arr == nil {
+					return args[1](inputState.Clear(), nil)
+				}
+				arr, err = arr.Tail.EvalArr()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+			}
+			if arr == nil {
+				return args[1](inputState.Clear(), nil)
+			}
+			return states.ThunkFromValue(arr.Head)
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[] get(0, null)`, `Null`, `null`, nil},
+			{`["a", "b", "c"] get(0, null)`, `Str|Null`, `"a"`, nil},
+			{`["a", "b", "c"] get(-1, null)`, `Str|Null`, ``, errors.ValueError(
+				errors.Code(errors.BadIndex),
+				errors.GotValue(states.NumValue(-1)),
+			)},
+			{`["a", "b", "c"] get(3, null)`, `Str|Null`, `null`, nil},
+		},
+	},
 	shapes.Funcer{
 		Summary: "",
 		InputType: types.NewArr(
