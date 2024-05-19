@@ -137,48 +137,6 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgramStr(
-		`[1, 2, 3] take(2)`,
-		`Arr<Num>`,
-		`[1, 2]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] take(1)`,
-		`Arr<Num>`,
-		`[1]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] take(0)`,
-		`Arr<Num>`,
-		`[]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] take(-1)`,
-		`Arr<Num>`,
-		`[]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] take(4)`,
-		`Arr<Num>`,
-		`[1, 2, 3]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[1, 2, 3] take(3)`,
-		`Arr<Num>`,
-		`[1, 2, 3]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
 		`[1, 3, 5, 2, 4, 7] takeWhile(if %2 ==1)`,
 		`Arr<Num>`,
 		`[1, 3, 5]`,

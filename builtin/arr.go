@@ -1410,15 +1410,15 @@ var ArrFuncers = []shapes.Funcer{
 		InputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
-		InputDescription: "",
+		InputDescription: "Takes the first n elements from an array.",
 		Name:             "take",
 		Params: []*params.Param{
-			params.SimpleParam("n", "", types.Num{}),
+			params.SimpleParam("n", "number of elements to take", types.Num{}),
 		},
 		OutputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
-		OutputDescription: "",
+		OutputDescription: "array with the first n elements from the input",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			arr := inputState.Value.(*states.ArrValue)
@@ -1444,9 +1444,46 @@ var ArrFuncers = []shapes.Funcer{
 			}
 			return states.ThunkFromIter(output)
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{
+				`[1, 2, 3] take(2)`,
+				`Arr<Num>`,
+				`[1, 2]`,
+				nil,
+			},
+			{
+				`[1, 2, 3] take(1)`,
+				`Arr<Num>`,
+				`[1]`,
+				nil,
+			},
+			{
+				`[1, 2, 3] take(0)`,
+				`Arr<Num>`,
+				`[]`,
+				nil,
+			},
+			{
+				`[1, 2, 3] take(-1)`,
+				`Arr<Num>`,
+				`[]`,
+				nil,
+			},
+			{
+				`[1, 2, 3] take(4)`,
+				`Arr<Num>`,
+				`[1, 2, 3]`,
+				nil,
+			},
+			{
+				`[1, 2, 3] take(3)`,
+				`Arr<Num>`,
+				`[1, 2, 3]`,
+				nil,
+			},
+		},
+	},
 	shapes.Funcer{
 		Summary: "",
 		InputType: types.NewArr(
