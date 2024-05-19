@@ -179,20 +179,6 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgramStr(
-		`[1, 2, 3] rev`,
-		`Arr<Num>`,
-		`[3, 2, 1]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`[] rev`,
-		`Tup<>`,
-		`[]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
 		`[7, 3, 2, 5, 2] sort`,
 		`Arr<Num>`,
 		`[2, 2, 3, 5, 7]`,

@@ -1208,17 +1208,17 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary: "",
+		Summary: "Reverses an array.",
 		InputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
-		InputDescription: "",
+		InputDescription: "an array",
 		Name:             "rev",
 		Params:           nil,
 		OutputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
-		OutputDescription: "",
+		OutputDescription: "the input in reverse order",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromValue(inputState.Value)
@@ -1238,9 +1238,12 @@ var ArrFuncers = []shapes.Funcer{
 			}
 			return states.ThunkFromValue(outputArr)
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[1, 2, 3] rev`, `Arr<Num>`, `[3, 2, 1]`, nil},
+			{`[] rev`, `Tup<>`, `[]`, nil},
+		},
+	},
 	shapes.Funcer{
 		Summary:           "",
 		InputType:         types.NewArr(types.Bool{}),
