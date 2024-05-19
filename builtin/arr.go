@@ -53,6 +53,10 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
+			{`[1, 2, 3] +[4, 5]`, `Arr<Num>`, `[1, 2, 3, 4, 5]`, nil},
+			{`[] +[4, 5]`, `Arr<Num>`, `[4, 5]`, nil},
+			{`[1, 2, 3] +[]`, `Arr<Num>`, `[1, 2, 3]`, nil},
+			{`[] +[]`, `Tup<>`, `[]`, nil},
 			{`["a", "b"] +["c", "d"]`, `Arr<Str>`, `["a", "b", "c", "d"]`, nil},
 			{`["a", "b"] +[1, 2]`, `Arr<Str|Num>`, `["a", "b", 1, 2]`, nil},
 		},
@@ -84,6 +88,7 @@ var ArrFuncers = []shapes.Funcer{
 		IDs: nil,
 		Examples: []shapes.Example{
 			{`[] all`, `Bool`, `true`, nil},
+			{`[true] all`, `Bool`, `true`, nil},
 			{`[true, true] all`, `Bool`, `true`, nil},
 			{`[true, false, true] all`, `Bool`, `false`, nil},
 		},
@@ -119,6 +124,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
+			{`[1, 2, 3] drop(-1)`, `Arr<Num>`, `[1, 2, 3]`, nil},
 			{`[1, 2, 3] drop(0)`, `Arr<Num>`, `[1, 2, 3]`, nil},
 			{`[1, 2, 3] drop(1)`, `Arr<Num>`, `[2, 3]`, nil},
 			{`[1, 2, 3] drop(2)`, `Arr<Num>`, `[3]`, nil},
