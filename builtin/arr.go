@@ -143,7 +143,7 @@ var ArrFuncers = []shapes.Funcer{
 			{
 				InputType:   types.NewVar("A", types.Any{}),
 				Name:        "test",
-				Description: "Return true for elements that should be removed.",
+				Description: "a test to apply to the elements of the input",
 				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -164,7 +164,7 @@ var ArrFuncers = []shapes.Funcer{
 		OutputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
-		OutputDescription: "",
+		OutputDescription: "The elements from the input, starting with the first one that does not pass the test.",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			arr := inputState.Value.(*states.ArrValue)
@@ -1485,17 +1485,18 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary: "",
+		Summary: "Takes elements from the beginning of an array that satisfy a certain condition.",
 		InputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
-		InputDescription: "",
+		InputDescription: "an array",
 		Name:             "takeWhile",
 		Params: []*params.Param{
 			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "test",
-				Params:    nil,
+				InputType:   types.NewVar("A", types.Any{}),
+				Name:        "test",
+				Description: "a test to apply to elements of the input",
+				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
 						Props: map[string]types.Type{
@@ -1515,7 +1516,7 @@ var ArrFuncers = []shapes.Funcer{
 		OutputType: types.NewArr(
 			types.NewVar("B", types.Any{}),
 		),
-		OutputDescription: "",
+		OutputDescription: "an array with the elements that pass the test, up to and excluding the first one that doesn't",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromValue(inputState.Value)
@@ -1543,8 +1544,28 @@ var ArrFuncers = []shapes.Funcer{
 			}
 			return states.ThunkFromIter(output)
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{
+				`[1, 3, 5, 2, 4, 7] takeWhile(if %2 ==1)`,
+				`Arr<Num>`,
+				`[1, 3, 5]`,
+				nil,
+			},
+			{
+				`[1, 3, 5, 2, 4, 7] takeWhile(if %2 ==0)`,
+				`Arr<Num>`,
+				`[]`,
+				nil,
+			},
+			{
+				`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] takeWhile(is {a: _}) each(@a)`,
+				`Arr<Num>`,
+				`[1, 2]`,
+				nil,
+			},
+		},
+	},
 }
 
 func id(inputState states.State, args []states.Action) *states.Thunk {
