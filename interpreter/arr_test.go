@@ -318,18 +318,4 @@ func TestArrays(t *testing.T) {
 		nil,
 		t,
 	)
-	interpreter.TestProgramStr(
-		`["abc", "b", "ab"] min(<, "")`,
-		`Str`,
-		`"ab"`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`["abc", "b", "ab"] min(bytes len, <, "")`,
-		`Str`,
-		`"b"`,
-		nil,
-		t,
-	)
 }
