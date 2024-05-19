@@ -981,29 +981,38 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "",
+		Summary:          "Finds the maximum element.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		InputDescription: "",
+		InputDescription: "an array",
 		Name:             "max",
 		Params: []*params.Param{
 			{
-				InputType: types.NewVar("A", types.Any{}),
-				Name:      "less",
+				InputType:   types.NewVar("A", types.Any{}),
+				Name:        "less",
+				Description: `funcer that test whether its input is "less than" its first argument`,
 				Params: []*params.Param{
 					params.SimpleParam("other", "", types.NewVar("A", types.Any{})),
 				},
 				OutputType: types.Bool{},
 			},
-			params.SimpleParam("default", "", types.NewVar("A", types.Any{})),
+			params.SimpleParam("default", "default value to return if the input is empty", types.NewVar("B", types.Any{})),
 		},
-		OutputType:        types.NewVar("A", types.Any{}),
-		OutputDescription: "",
+		OutputType: types.NewUnion(
+			types.NewVar("A", types.Any{}),
+			types.NewVar("B", types.Any{}),
+		),
+		OutputDescription: "the maximum element, or default if the input is empty",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			return max(inputState, id, args[0], args[1])
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`["abc", "b", "ab"] max(<, "")`, `Str`, `"b"`, nil},
+			{`[0, 1, 2] max(>, -100)`, `Num`, `0`, nil},
+			{`for Any def f Arr<Num> as [] ok f max(<, 0)`, `Num`, `0`, nil},
+		},
+	},
 
 	shapes.Funcer{
 		Summary:          "",

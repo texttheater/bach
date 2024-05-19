@@ -319,13 +319,6 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgramStr(
-		`["abc", "b", "ab"] max(<, "")`,
-		`Str`,
-		`"b"`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
 		`["abc", "b", "ab"] min(<, "")`,
 		`Str`,
 		`"ab"`,
@@ -333,23 +326,9 @@ func TestArrays(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgramStr(
-		`["abc", "b", "ab"] max(bytes len, <, "")`,
-		`Str`,
-		`"abc"`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
 		`["abc", "b", "ab"] min(bytes len, <, "")`,
 		`Str`,
 		`"b"`,
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`for Any def f Arr<Num> as [] ok f max(<, 0)`,
-		`Num`,
-		`0`,
 		nil,
 		t,
 	)
