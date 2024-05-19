@@ -799,15 +799,15 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary: "",
+		Summary: "Join several arrays together into one.",
 		InputType: types.NewArr(
 			types.NewArr(types.NewVar("A", types.Any{})),
 		),
-		InputDescription:  "",
+		InputDescription:  "an array of arrays",
 		Name:              "join",
 		Params:            nil,
 		OutputType:        types.NewArr(types.NewVar("A", types.Any{})),
-		OutputDescription: "",
+		OutputDescription: "All arrays in the input joined together into one.",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromValue(inputState.Value)
@@ -835,9 +835,18 @@ var ArrFuncers = []shapes.Funcer{
 			}
 			return states.ThunkFromIter(output)
 		},
-		IDs:      nil,
-		Examples: []shapes.Example{}},
-
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`[] join`, `Arr<<A>>`, `[]`, nil}, // FIXME output type should be Tup<>
+			{`[[]] join`, `Tup<>`, `[]`, nil},
+			{`[[1]] join`, `Arr<Num>`, `[1]`, nil},
+			{`[[1, 2]] join`, `Arr<Num>`, `[1, 2]`, nil},
+			{`[[], []] join`, `Tup<>`, `[]`, nil},
+			{`[[], [1]] join`, `Arr<Num>`, `[1]`, nil},
+			{`[[1], [2, 3]] join`, `Arr<Num>`, `[1, 2, 3]`, nil},
+			{`[[1], [2, [3]]] join`, `Arr<Num|Tup<Num>>`, `[1, 2, [3]]`, nil},
+		},
+	},
 	shapes.Funcer{
 		Summary:          "",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
