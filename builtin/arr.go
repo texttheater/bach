@@ -29,6 +29,7 @@ var ArrFuncers = []shapes.Funcer{
 			types.NewVar("B", types.Any{}),
 		)),
 		OutputDescription: "the concatenation of both arrays",
+		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input1 := states.IterFromValue(inputState.Value)
 			input2 := states.IterFromAction(inputState.Clear(), args[0])
