@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/errors"
@@ -227,6 +228,20 @@ var IOFuncers = []shapes.Funcer{
 			fmt.Print(str)
 			fmt.Print(end)
 			return inputValue, nil
+		},
+		nil,
+	),
+	shapes.SimpleFuncer(
+		"Creates a Reader from a Str.",
+		types.Str{},
+		"a string",
+		"reader",
+		nil,
+		types.Reader{},
+		"a Reader from which the input can be read",
+		"",
+		func(inputValue states.Value, args []states.Value) (states.Value, error) {
+			return states.ReaderValue{strings.NewReader(string(inputValue.(states.StrValue)))}, nil
 		},
 		nil,
 	),
