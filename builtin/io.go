@@ -186,8 +186,10 @@ var IOFuncers = []shapes.Funcer{
 			}
 			return states.ThunkFromIter(iter)
 		},
-		IDs:      nil,
-		Examples: nil,
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`"abc\nde\n\nf" reader lines`, `Arr<Str>`, `["abc", "de", "", "f"]`, nil},
+		},
 	},
 	shapes.SimpleFuncer(
 		"Writes to STDOUT.",
