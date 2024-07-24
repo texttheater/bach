@@ -115,13 +115,13 @@ var IOFuncers = []shapes.Funcer{
 		nil,
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Reads from STDIN.",
 		types.Any{},
-		"",
+		"any value (is ignored)",
 		"in",
 		nil,
 		types.Reader{},
-		"",
+		"a Reader representing STDIN",
 		"",
 		func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
 			return states.ReaderValue{Reader: os.Stdin}, nil
@@ -129,10 +129,14 @@ var IOFuncers = []shapes.Funcer{
 		nil,
 	),
 	shapes.Funcer{
-		InputType:  types.Reader{},
-		Name:       "json",
-		Params:     nil,
-		OutputType: types.Any{},
+		Summary:           "Reads the next JSON value from a stream",
+		InputType:         types.Reader{},
+		InputDescription:  "a Reader",
+		Name:              "json",
+		Params:            nil,
+		OutputType:        types.Any{},
+		OutputDescription: "data structure represented by the JSON input",
+		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			reader := inputState.Value.(states.ReaderValue).Reader
 			dec := json.NewDecoder(reader)
@@ -157,13 +161,18 @@ var IOFuncers = []shapes.Funcer{
 			}
 			return states.ThunkFromIter(output)
 		},
-		IDs: nil,
+		IDs:      nil,
+		Examples: nil,
 	},
 	shapes.Funcer{
-		InputType:  types.Reader{},
-		Name:       "lines",
-		Params:     nil,
-		OutputType: types.NewArr(types.Str{}),
+		Summary:           "Reads a stream line-by-line",
+		InputType:         types.Reader{},
+		InputDescription:  "a Reader",
+		Name:              "lines",
+		Params:            nil,
+		OutputType:        types.NewArr(types.Str{}),
+		OutputDescription: "an array of lines, without the line-break character",
+		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			reader := inputState.Value.(states.ReaderValue)
 			scanner := bufio.NewScanner(reader.Reader)
@@ -176,17 +185,18 @@ var IOFuncers = []shapes.Funcer{
 			}
 			return states.ThunkFromIter(iter)
 		},
-		IDs: nil,
+		IDs:      nil,
+		Examples: nil,
 	},
 	shapes.SimpleFuncer(
-		"",
+		"Writes to STDOUT.",
 		types.NewVar("A", types.Any{}),
-		"",
+		"any value",
 		"out",
 		nil,
 		types.NewVar("A", types.Any{}),
-		"",
-		"",
+		"the same value",
+		"Identity function with the side effect of writing a string representation of the value to STDERR, followed by a line break.",
 		func(inputValue states.Value, args []states.Value) (states.Value, error) {
 			str, err := inputValue.Str()
 			if err != nil {
@@ -198,13 +208,17 @@ var IOFuncers = []shapes.Funcer{
 		nil,
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Writes to STDOUT with a custom line end.",
 		types.NewVar("A", types.Any{}),
-		"",
+		"any value",
 		"out",
 		[]*params.Param{
-			params.SimpleParam("message", "", types.Str{}),
-		}, types.NewVar("A", types.Any{}), "", "", func(inputValue states.Value, args []states.Value) (states.Value, error) {
+			params.SimpleParam("end", "", types.Str{}),
+		},
+		types.NewVar("A", types.Any{}),
+		"the same value",
+		"Identity function with the side effect of writing a string representation of the value to STDOUT, followed by a line break.",
+		func(inputValue states.Value, args []states.Value) (states.Value, error) {
 			str, err := inputValue.Str()
 			if err != nil {
 				return nil, err
