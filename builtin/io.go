@@ -16,10 +16,14 @@ import (
 
 var IOFuncers = []shapes.Funcer{
 	shapes.Funcer{
-		InputType:  types.NewArr(types.Str{}),
-		Name:       "blocks",
-		Params:     nil,
-		OutputType: types.NewArr(types.NewArr(types.Str{})),
+		Summary:           "Groups lines into blocks separated by empty lines.",
+		InputType:         types.NewArr(types.Str{}),
+		InputDescription:  "an array of consecutive lines",
+		Name:              "blocks",
+		Params:            nil,
+		OutputType:        types.NewArr(types.NewArr(types.Str{})),
+		OutputDescription: "an array of arrays of lines, each representing a block",
+		Notes:             "Each empty line in the input marks the end of a block. Blocks can be empty. The empty lines themselves are not included.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			var nextBlock func(lines *states.ArrValue) (*states.ArrValue, *states.ArrValue, error)
 			nextBlock = func(lines *states.ArrValue) (*states.ArrValue, *states.ArrValue, error) {
@@ -60,16 +64,23 @@ var IOFuncers = []shapes.Funcer{
 			return states.ThunkFromIter(iter)
 		},
 		IDs: nil,
+		Examples: []shapes.Example{
+			{`["a", "b", "", "c", "d", "e", "f", ""] blocks`, `Arr<Arr<Str>>`, `[["a", "b"], ["c", "d", "e", "f"]]`, nil},
+			{`["a", ""] blocks`, `Arr<Arr<Str>>`, `[["a"]]`, nil},
+			{`["a"] blocks`, `Arr<Arr<Str>>`, `[["a"]]`, nil},
+			{`["", "a"] blocks`, `Arr<Arr<Str>>`, `[[], ["a"]]`, nil},
+			{`["a", "", "", "", "b"] blocks`, `Arr<Arr<Str>>`, `[["a"], [], [], ["b"]]`, nil},
+		},
 	},
 	shapes.SimpleFuncer(
-		"",
+		"Writes to STDERR.",
 		types.NewVar("A", types.Any{}),
-		"",
+		"any value",
 		"err",
 		nil,
 		types.NewVar("A", types.Any{}),
-		"",
-		"",
+		"the same value",
+		"Identity function with the side effect of writing a string representation of the value to STDERR, followed by a line break.",
 		func(inputValue states.Value, args []states.Value) (states.Value, error) {
 			str, err := inputValue.Str()
 			if err != nil {
@@ -81,14 +92,17 @@ var IOFuncers = []shapes.Funcer{
 		nil,
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Writes to STDERR with a custom line end.",
 		types.NewVar("A", types.Any{}),
-		"",
+		"any value",
 		"err",
 		[]*params.Param{
-			params.SimpleParam("message", "", types.Str{}),
+			params.SimpleParam("end", "the line end to use", types.Str{}),
 		},
-		types.NewVar("A", types.Any{}), "", "", func(inputValue states.Value, args []states.Value) (states.Value, error) {
+		types.NewVar("A", types.Any{}),
+		"the same value",
+		"Identity function with the side effect of writing a string representation of the value to STDERR, followed by a the specified line end.",
+		func(inputValue states.Value, args []states.Value) (states.Value, error) {
 			str, err := inputValue.Str()
 			if err != nil {
 				return nil, err
