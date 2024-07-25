@@ -372,17 +372,17 @@ var TextFuncers = []shapes.Funcer{
 		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Right-pads a string.",
 		types.Str{},
-		"",
+		"a string",
 		"padEnd",
 		[]*params.Param{
-			params.SimpleParam("targetLength", "", types.Num{}),
-			params.SimpleParam("padString", "", types.Str{}),
+			params.SimpleParam("targetLength", "minimum string length for the output", types.Num{}),
+			params.SimpleParam("padString", "string to use as padding to bring the input to the desired length", types.Str{}),
 		},
 		types.Str{},
-		"",
-		"",
+		"the input followed by as many repetitions of padString as necessary to reach targetLength",
+		"padString is usually one character but can be longer, in which case each repetition starts from the left.",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str := string(inputValue.(states.StrValue))
 			length := int(argumentValues[0].(states.NumValue))
@@ -402,20 +402,26 @@ var TextFuncers = []shapes.Funcer{
 			}
 			return states.StrValue(builder.String()), nil
 		},
-		nil,
+		[]shapes.Example{
+			{`"z" padEnd(2, " ")`, `Str`, `"z "`, nil},
+			{`"z" padEnd(3, " ")`, `Str`, `"z  "`, nil},
+			{`"zzz" padEnd(3, " ")`, `Str`, `"zzz"`, nil},
+			{`"zzzz" padEnd(3, " ")`, `Str`, `"zzzz"`, nil},
+			{`"zzzz" padEnd(7, "ab")`, `Str`, `"zzzzaba"`, nil},
+		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Left-pads a string.",
 		types.Str{},
-		"",
+		"a string",
 		"padStart",
 		[]*params.Param{
-			params.SimpleParam("targetLength", "", types.Num{}),
-			params.SimpleParam("padString", "", types.Str{}),
+			params.SimpleParam("targetLength", "minimum string length for the output", types.Num{}),
+			params.SimpleParam("padString", "string to use as padding to bring the input to the desired length", types.Str{}),
 		},
 		types.Str{},
-		"",
-		"",
+		"the input following as many repetitions of padString as necessary to reach targetLength",
+		"padString is usually one character but can be longer, in which case each repetition starts from the left.",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str := string(inputValue.(states.StrValue))
 			length := int(argumentValues[0].(states.NumValue))
@@ -435,39 +441,26 @@ var TextFuncers = []shapes.Funcer{
 			builder.WriteString(str)
 			return states.StrValue(builder.String()), nil
 		},
-		nil,
+		[]shapes.Example{
+			{`"z" padStart(2, " ")`, `Str`, `" z"`, nil},
+			{`"z" padStart(3, " ")`, `Str`, `"  z"`, nil},
+			{`"zzz" padStart(3, " ")`, `Str`, `"zzz"`, nil},
+			{`"zzzz" padStart(3, " ")`, `Str`, `"zzzz"`, nil},
+			{`"zzzz" padStart(7, "ab")`, `Str`, `"abazzzz"`, nil},
+		},
 	),
 	shapes.Funcer{
-		InputType: types.Str{},
-		Name:      "replaceFirst",
+		Summary:          "Replaces substrings.",
+		InputType:        types.Str{},
+		InputDescription: "a string",
+		Name:             "replaceAll",
 		Params: []*params.Param{
-			params.SimpleParam("needle", "", types.Str{}),
-			params.SimpleParam("replacement", "", types.Str{}),
+			params.SimpleParam("needle", "a substring to look for", types.Str{}),
+			params.SimpleParam("replacement", "a new string to replace needle with", types.Str{}),
 		},
-		OutputType: types.Str{},
-		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			haystack := inputState.Value.(states.StrValue)
-			needle, err := args[0](inputState.Clear(), nil).EvalStr()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			replacement, err := args[1](inputState.Clear(), nil).EvalStr()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			result := strings.Replace(string(haystack), string(needle), string(replacement), 1)
-			return states.ThunkFromValue(states.StrValue(result))
-		},
-		IDs: nil,
-	},
-	shapes.Funcer{
-		InputType: types.Str{},
-		Name:      "replaceAll",
-		Params: []*params.Param{
-			params.SimpleParam("needle", "", types.Str{}),
-			params.SimpleParam("replacement", "", types.Str{}),
-		},
-		OutputType: types.Str{},
+		OutputType:        types.Str{},
+		OutputDescription: "the input with all occurrences of needle replaced with replacement",
+		Notes:             "More precisely, whenever there are two or more overlapping occurrences of needle in the input, only the first one is replaced.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			haystack := inputState.Value.(states.StrValue)
 			needle, err := args[0](inputState.Clear(), nil).EvalStr()
@@ -482,109 +475,92 @@ var TextFuncers = []shapes.Funcer{
 			return states.ThunkFromValue(states.StrValue(result))
 		},
 		IDs: nil,
+		Examples: []shapes.Example{
+			{`"ababa" replaceAll("b", "c")`, `Str`, `"acaca"`, nil},
+		},
+	},
+	shapes.Funcer{
+		Summary:          "Replaces a substring.",
+		InputType:        types.Str{},
+		InputDescription: "a string",
+		Name:             "replaceFirst",
+		Params: []*params.Param{
+			params.SimpleParam("needle", "a substring to look for", types.Str{}),
+			params.SimpleParam("replacement", "a new string to replace needle with", types.Str{}),
+		},
+		OutputType:        types.Str{},
+		OutputDescription: "the input with the first ocurrence of needle replaced with replacement",
+		Notes:             "",
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			haystack := inputState.Value.(states.StrValue)
+			needle, err := args[0](inputState.Clear(), nil).EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			replacement, err := args[1](inputState.Clear(), nil).EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			result := strings.Replace(string(haystack), string(needle), string(replacement), 1)
+			return states.ThunkFromValue(states.StrValue(result))
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`"ababa" replaceFirst("b", "c")`, `Str`, `"acaba"`, nil},
+		},
 	},
 	shapes.SimpleFuncer(
-		"",
+		"Checks whether a string starts with a specific substring.",
 		types.Str{},
-		"",
+		"a string",
 		"startsWith",
 		[]*params.Param{
-			params.SimpleParam("needle", "", types.Str{}),
+			params.SimpleParam("needle", "a prefix to look for", types.Str{}),
 		},
 		types.Bool{},
-		"",
+		"true if the input starts with needle, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(strings.HasPrefix(str1, str2)), nil
 		},
-		nil,
+		[]shapes.Example{
+			{`"abc" startsWith("ab")`, `Bool`, `true`, nil},
+			{`"abc" startsWith("b")`, `Bool`, `false`, nil},
+		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Checks whether a string ends with a specific substring.",
 		types.Str{},
-		"",
+		"a string",
 		"endsWith",
 		[]*params.Param{
-			params.SimpleParam("needle", "", types.Str{}),
+			params.SimpleParam("needle", "a suffix to look for", types.Str{}),
 		},
 		types.Bool{},
-		"",
+		"true if the input ends with needle, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(strings.HasSuffix(str1, str2)), nil
 		},
-		nil,
+		[]shapes.Example{
+			{`"abc" endsWith("bc")`, `Bool`, `true`, nil},
+			{`"abc" endsWith("b")`, `Bool`, `false`, nil},
+		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Concatenates multiple repetitions of a string.",
 		types.Str{},
-		"",
-		"slice",
-		[]*params.Param{
-			params.SimpleParam("start", "", types.Num{}),
-		},
-		types.Str{},
-		"",
-		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			start := int(argumentValues[0].(states.NumValue))
-			if start < 0 {
-				start = len(str) + start
-				if start < 0 {
-					start = 0
-				}
-			}
-			return states.StrValue(str[start:]), nil
-		},
-		nil,
-	),
-	shapes.SimpleFuncer(
-		"",
-		types.Str{},
-		"",
-		"slice",
-		[]*params.Param{
-			params.SimpleParam("start", "", types.Num{}),
-			params.SimpleParam("end", "", types.Num{}),
-		},
-		types.Str{},
-		"",
-		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			start := int(argumentValues[0].(states.NumValue))
-			end := int(argumentValues[1].(states.NumValue))
-			if start < 0 {
-				start = len(str) + start
-			}
-			if start < 0 {
-				start = 0
-			}
-			if end < 0 {
-				end = len(str) + end
-			}
-			if end < start {
-				end = start
-			}
-			return states.StrValue(str[start:end]), nil
-		},
-		nil,
-	),
-	shapes.SimpleFuncer(
-		"",
-		types.Str{},
-		"",
+		"a string",
 		"repeat",
 		[]*params.Param{
-			params.SimpleParam("times", "", types.Num{}),
+			params.SimpleParam("n", "number of repetitions (will be truncated and min'd to 0)", types.Num{}),
 		},
 		types.Str{},
-		"",
+		"the input, repeated n times",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str := string(inputValue.(states.StrValue))
@@ -594,51 +570,148 @@ var TextFuncers = []shapes.Funcer{
 			}
 			return states.StrValue(strings.Repeat(str, n)), nil
 		},
-		nil,
+		[]shapes.Example{
+			{`"abc" repeat(3)`, `Str`, `"abcabcabc"`, nil},
+			{`"abc" repeat(0)`, `Str`, `""`, nil},
+			{`"abc" repeat(-1)`, `Str`, `""`, nil},
+			{`"abc" repeat(1.6)`, `Str`, `"abc"`, nil},
+		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Extracts a substring from a string.",
 		types.Str{},
+		"a string",
+		"slice",
+		[]*params.Param{
+			params.SimpleParam("start", "a positive integer", types.Num{}),
+		},
+		types.Str{},
+		"the portion of the input that is after offset start",
 		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			str := string(inputValue.(states.StrValue))
+			start := int(argumentValues[0].(states.NumValue))
+			if start < 0 {
+				start = len(str) + start
+				if start < 0 {
+					start = 0
+				}
+			} else if start > len(str) {
+				start = len(str)
+			}
+			return states.StrValue(str[start:]), nil
+		},
+		[]shapes.Example{
+			{`"abc" slice(-4)`, `Str`, `"abc"`, nil},
+			{`"abc" slice(-3)`, `Str`, `"abc"`, nil},
+			{`"abc" slice(-2)`, `Str`, `"bc"`, nil},
+			{`"abc" slice(-1)`, `Str`, `"c"`, nil},
+			{`"abc" slice(0)`, `Str`, `"abc"`, nil},
+			{`"abc" slice(1)`, `Str`, `"bc"`, nil},
+			{`"abc" slice(2)`, `Str`, `"c"`, nil},
+			{`"abc" slice(3)`, `Str`, `""`, nil},
+			{`"abc" slice(4)`, `Str`, `""`, nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Extracts a substring from a string.",
+		types.Str{},
+		"a string",
+		"slice",
+		[]*params.Param{
+			params.SimpleParam("start", "offset to start after", types.Num{}),
+			params.SimpleParam("end", "offset to end before", types.Num{}),
+		},
+		types.Str{},
+		"the portion of the input that is after offset start but before offset end",
+		"Negative offsets are counted from the end of the string.",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			str := string(inputValue.(states.StrValue))
+			start := int(argumentValues[0].(states.NumValue))
+			end := int(argumentValues[1].(states.NumValue))
+			if start < 0 {
+				start = len(str) + start
+				if start < 0 {
+					start = 0
+				}
+			} else if start > len(str) {
+				start = len(str)
+			}
+			if end < 0 {
+				end = len(str) + end
+			}
+			if end < start {
+				end = start
+			} else if end > len(str) {
+				end = len(str)
+			}
+			return states.StrValue(str[start:end]), nil
+		},
+		[]shapes.Example{
+			{`"abc" slice(1, 2)`, `Str`, `"b"`, nil},
+			{`"abc" slice(1, -1)`, `Str`, `"b"`, nil},
+			{`"abc" slice(-2, -1)`, `Str`, `"b"`, nil},
+			{`"abc" slice(-1, -2)`, `Str`, `""`, nil},
+			{`"abc" slice(2, 1)`, `Str`, `""`, nil},
+			{`"abc" slice(-5, -4)`, `Str`, `""`, nil},
+			{`"abc" slice(-5, -3)`, `Str`, `""`, nil},
+			{`"abc" slice(-5, -2)`, `Str`, `"a"`, nil},
+			{`"abc" slice(-5, -1)`, `Str`, `"ab"`, nil},
+			{`"abc" slice(-1, -5)`, `Str`, `""`, nil},
+			{`"abc" slice(2, -5)`, `Str`, `""`, nil},
+			{`"abc" slice(0, 4)`, `Str`, `"abc"`, nil},
+			{`"abc" slice(4, 4)`, `Str`, `""`, nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Removes whitespace from the start and end of a string.",
+		types.Str{},
+		"a string",
 		"trim",
 		nil,
 		types.Str{},
-		"",
+		"the input, with leading and trailing whitespace removed",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str := string(inputValue.(states.StrValue))
 			return states.StrValue(strings.TrimSpace(str)), nil
 		},
-		nil,
+		[]shapes.Example{
+			{`" abc  " trim`, `Str`, `"abc"`, nil},
+		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Removes whitespace from the start of a string.",
 		types.Str{},
-		"",
+		"a string",
 		"trimStart",
 		nil,
 		types.Str{},
-		"",
+		"the input, with leading whitespace removed",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str := string(inputValue.(states.StrValue))
 			return states.StrValue(strings.TrimLeftFunc(str, unicode.IsSpace)), nil
 		},
-		nil,
+		[]shapes.Example{
+			{`" abc  " trimStart`, `Str`, `"abc  "`, nil},
+		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Removes whitespace from the end of a string.",
 		types.Str{},
-		"",
+		"a string",
 		"trimEnd",
 		nil,
 		types.Str{},
-		"",
+		"the input, with trailing whitespace removed",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str := string(inputValue.(states.StrValue))
 			return states.StrValue(strings.TrimRightFunc(str, unicode.IsSpace)), nil
 		},
-		nil,
+		[]shapes.Example{
+			{`" abc  " trimEnd`, `Str`, `" abc"`, nil},
+		},
 	),
 }
