@@ -250,10 +250,13 @@ var TextFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		InputType:  types.Str{},
-		Name:       "fields",
-		Params:     nil,
-		OutputType: types.NewArr(types.Str{}),
+		Summary:           "Splits a string around whitespace.",
+		InputType:         types.Str{},
+		InputDescription:  "a string",
+		Name:              "fields",
+		Params:            nil,
+		OutputType:        types.NewArr(types.Str{}),
+		OutputDescription: "the result of splitting the string around any kind or amount of white space",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			str := string(inputState.Value.(states.StrValue))
 			fields := strings.Fields(str)
@@ -269,6 +272,9 @@ var TextFuncers = []shapes.Funcer{
 			return states.ThunkFromIter(iter)
 		},
 		IDs: nil,
+		Examples: []shapes.Example{
+			{`"  foo bar  baz   " fields`, `Arr<Str>`, `["foo", "bar", "baz"]`, nil},
+		},
 	},
 	shapes.Funcer{
 		InputType: types.Str{},
