@@ -277,12 +277,15 @@ var TextFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		InputType: types.Str{},
-		Name:      "indexOf",
+		Summary:          "Finds the position of a string within another.",
+		InputType:        types.Str{},
+		InputDescription: "string to search inside",
+		Name:             "indexOf",
 		Params: []*params.Param{
-			params.SimpleParam("needle", "", types.Str{}),
+			params.SimpleParam("needle", "string to search for", types.Str{}),
 		},
-		OutputType: types.Num{},
+		OutputType:        types.Num{},
+		OutputDescription: "offset of first occurrence of needle from the beginning of the input, measured in bytes, or -1 if none",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			haystack := string(inputState.Value.(states.StrValue))
 			needle, err := args[0](inputState.Clear(), nil).EvalStr()
@@ -293,15 +296,21 @@ var TextFuncers = []shapes.Funcer{
 			return states.ThunkFromValue(result)
 		},
 		IDs: nil,
+		Examples: []shapes.Example{
+			{`"abc" indexOf("bc")`, `Num`, `1`, nil},
+			{`"abc" indexOf("a")`, `Num`, `0`, nil},
+			{`"abc" indexOf("d")`, `Num`, `-1`, nil},
+			{`"Köln" indexOf("l")`, `Num`, `3`, nil},
+		},
 	},
 	shapes.SimpleFuncer(
-		"",
+		"Concatenates any number of strings.",
 		types.NewArr(types.Str{}),
-		"",
+		"an array of strings",
 		"join",
 		nil,
 		types.Str{},
-		"",
+		"the concatenation of all the strings in the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			iter := states.IterFromValue(inputValue)
@@ -317,18 +326,23 @@ var TextFuncers = []shapes.Funcer{
 				buffer.WriteString(string(value.(states.StrValue)))
 			}
 		},
-		nil,
+		[]shapes.Example{
+			{`["ab", "cd", "ef"] join`, `Str`, `"abcdef"`, nil},
+			{`["ab", "cd"] join`, `Str`, `"abcd"`, nil},
+			{`["ab"] join`, `Str`, `"ab"`, nil},
+			{`for Any def f Arr<Str> as [] ok f join`, `Str`, `""`, nil},
+		},
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Concatenates any number of strings with a custom delimiter.",
 		types.NewArr(types.Str{}),
-		"",
+		"an array of strings",
 		"join",
 		[]*params.Param{
-			params.SimpleParam("glue", "", types.Str{}),
+			params.SimpleParam("glue", "delimiter to put between strings", types.Str{}),
 		},
 		types.Str{},
-		"",
+		"the concatenation of all the strings in the input, with the glue in between",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			iter := states.IterFromValue(inputValue)
@@ -350,7 +364,12 @@ var TextFuncers = []shapes.Funcer{
 				firstWritten = true
 			}
 		},
-		nil,
+		[]shapes.Example{
+			{`["ab", "cd", "ef"] join(";")`, `Str`, `"ab;cd;ef"`, nil},
+			{`["ab", "", "cd"] join(";")`, `Str`, `"ab;;cd"`, nil},
+			{`["ab"] join(";")`, `Str`, `"ab"`, nil},
+			{`for Any def f Arr<Str> as [] ok f join(";")`, `Str`, `""`, nil},
+		},
 	),
 	shapes.SimpleFuncer(
 		"",
