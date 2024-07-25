@@ -29,7 +29,11 @@ var TextFuncers = []shapes.Funcer{
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 < str2), nil
 		},
-		nil,
+		[]shapes.Example{
+			{`"a" <"b"`, `Bool`, `true`, nil},
+			{`"Ab" <"A"`, `Bool`, `false`, nil},
+			{`"cd" <"cd"`, `Bool`, `false`, nil},
+		},
 	),
 	shapes.SimpleFuncer(
 		"Compares strings lexicographically.",
@@ -47,7 +51,11 @@ var TextFuncers = []shapes.Funcer{
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 > str2), nil
 		},
-		nil,
+		[]shapes.Example{
+			{`"a" >"b"`, `Bool`, `false`, nil},
+			{`"Ab" >"A"`, `Bool`, `true`, nil},
+			{`"cd" >"cd"`, `Bool`, `false`, nil},
+		},
 	),
 	shapes.SimpleFuncer(
 		"Compares strings lexicographically.",
@@ -65,7 +73,11 @@ var TextFuncers = []shapes.Funcer{
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 <= str2), nil
 		},
-		nil,
+		[]shapes.Example{
+			{`"a" <="b"`, `Bool`, `true`, nil},
+			{`"Ab" <="A"`, `Bool`, `false`, nil},
+			{`"cd" <="cd"`, `Bool`, `true`, nil},
+		},
 	),
 	shapes.SimpleFuncer(
 		"Compares strings lexicographically.",
@@ -83,7 +95,11 @@ var TextFuncers = []shapes.Funcer{
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.BoolValue(str1 >= str2), nil
 		},
-		nil,
+		[]shapes.Example{
+			{`"a" >="b"`, `Bool`, `false`, nil},
+			{`"Ab" >="A"`, `Bool`, `true`, nil},
+			{`"cd" >="cd"`, `Bool`, `true`, nil},
+		},
 	),
 	shapes.SimpleFuncer(
 		"Concatenates two strings.",
@@ -101,13 +117,21 @@ var TextFuncers = []shapes.Funcer{
 			str2 := string(argumentValues[0].(states.StrValue))
 			return states.StrValue(str1 + str2), nil
 		},
-		nil,
+		[]shapes.Example{
+			{`"ab" +"cd"`, `Str`, `"abcd"`, nil},
+			{`"ab" +""`, `Str`, `"ab"`, nil},
+			{`"" +"cd"`, `Str`, `"cd"`, nil},
+		},
 	),
 	shapes.Funcer{
-		InputType:  types.Str{},
-		Name:       "bytes",
-		Params:     nil,
-		OutputType: types.NewArr(types.Num{}),
+		Summary:           "Converts a string to bytes.",
+		InputType:         types.Str{},
+		InputDescription:  "a string",
+		Name:              "bytes",
+		Params:            nil,
+		OutputType:        types.NewArr(types.Num{}),
+		OutputDescription: "The UTF-8 bytes representing the string.",
+		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			str := inputState.Value.(states.StrValue)
 			bytes := []byte(str)
@@ -124,12 +148,21 @@ var TextFuncers = []shapes.Funcer{
 			return states.ThunkFromIter(output)
 		},
 		IDs: nil,
+		Examples: []shapes.Example{
+			{`"abc" bytes`, `Arr<Num>`, `[97, 98, 99]`, nil},
+			{`"Köln" bytes`, `Arr<Num>`, `[75, 195, 182, 108, 110]`, nil},
+			{`"日本語" bytes`, `Arr<Num>`, `[230, 151, 165, 230, 156, 172, 232, 170, 158]`, nil},
+			{`"\x00" bytes`, `Arr<Num>`, `[0]`, nil},
+		},
 	},
 	shapes.Funcer{
-		InputType:  types.NewArr(types.Num{}),
-		Name:       "bytesToStr",
-		Params:     nil,
-		OutputType: types.Str{},
+		Summary:           "Converts bytes to a string.",
+		InputType:         types.NewArr(types.Num{}),
+		InputDescription:  "an array of numbers (interpreted modulo 256 as UTF-8 bytes)",
+		Name:              "bytesToStr",
+		Params:            nil,
+		OutputType:        types.Str{},
+		OutputDescription: "the string represented by the input",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromValue(inputState.Value)
 			var output strings.Builder
@@ -146,12 +179,23 @@ var TextFuncers = []shapes.Funcer{
 			return states.ThunkFromValue(states.StrValue(output.String()))
 		},
 		IDs: nil,
+		Examples: []shapes.Example{
+			{`[97, 98, 99] bytesToStr`, `Str`, `"abc"`, nil},
+			{`[75, 195, 182, 108, 110] bytesToStr`, `Str`, `"Köln"`, nil},
+			{`[230, 151, 165, 230, 156, 172, 232, 170, 158] bytesToStr`, `Str`, `"日本語"`, nil},
+			{`[0] bytesToStr`, `Str`, `"\x00"`, nil},
+			{`[256] bytesToStr`, `Str`, `"\x00"`, nil},
+		},
 	},
 	shapes.Funcer{
-		InputType:  types.Str{},
-		Name:       "codePoints",
-		Params:     nil,
-		OutputType: types.NewArr(types.Num{}),
+		Summary:           "Converts a string to Unicode code points.",
+		InputType:         types.Str{},
+		InputDescription:  "a string",
+		Name:              "codePoints",
+		Params:            nil,
+		OutputType:        types.NewArr(types.Num{}),
+		OutputDescription: "the input represented as a sequence of code points",
+		Notes:             "If the input string contains invalid UTF-8 byte sequences, they will be represented by the Unicode replacement character (code point 65533).",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			str := inputState.Value.(states.StrValue)
 			runes := []rune(str)
@@ -165,12 +209,23 @@ var TextFuncers = []shapes.Funcer{
 				return v, true, nil
 			}
 			return states.ThunkFromIter(output)
-		}, IDs: nil},
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`"abc" codePoints`, `Arr<Num>`, `[97, 98, 99]`, nil},
+			{`"Köln" codePoints`, `Arr<Num>`, `[75, 246, 108, 110]`, nil},
+			{`"日本語" codePoints`, `Arr<Num>`, `[26085, 26412, 35486]`, nil},
+			{`"\x80" codePoints`, `Arr<Num>`, `[65533]`, nil},
+		},
+	},
 	shapes.Funcer{
-		InputType:  types.NewArr(types.Num{}),
-		Name:       "codePointsToStr",
-		Params:     nil,
-		OutputType: types.Str{},
+		Summary:           "Converts Unicode code points to a string.",
+		InputType:         types.NewArr(types.Num{}),
+		InputDescription:  "a sequence of numbers",
+		Name:              "codePointsToStr",
+		Params:            nil,
+		OutputType:        types.Str{},
+		OutputDescription: "UTF-8 encoded version of the input",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromValue(inputState.Value)
 			var output strings.Builder
@@ -187,6 +242,12 @@ var TextFuncers = []shapes.Funcer{
 			return states.ThunkFromValue(states.StrValue(output.String()))
 		},
 		IDs: nil,
+		Examples: []shapes.Example{
+			{`[97, 98, 99] codePointsToStr`, `Str`, `"abc"`, nil},
+			{`[75, 246, 108, 110] codePointsToStr`, `Str`, `"Köln"`, nil},
+			{`[26085, 26412, 35486] codePointsToStr`, `Str`, `"日本語"`, nil},
+			{`[65533] codePointsToStr`, `Str`, `"�"`, nil},
+		},
 	},
 	shapes.Funcer{
 		InputType:  types.Str{},
