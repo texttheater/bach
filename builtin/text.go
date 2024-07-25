@@ -14,15 +14,15 @@ import (
 
 var TextFuncers = []shapes.Funcer{
 	shapes.SimpleFuncer(
-		"",
+		"Compares strings lexicographically.",
 		types.Str{},
-		"",
+		"a string",
 		"<",
 		[]*params.Param{
-			params.SimpleParam("other", "", types.Str{}),
+			params.SimpleParam("other", "another string", types.Str{}),
 		},
 		types.Bool{},
-		"",
+		"true if the input appears before other in lexicographical order, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
@@ -32,15 +32,15 @@ var TextFuncers = []shapes.Funcer{
 		nil,
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Compares strings lexicographically.",
 		types.Str{},
-		"",
+		"a string",
 		">",
 		[]*params.Param{
-			params.SimpleParam("other", "", types.Str{}),
+			params.SimpleParam("other", "another string", types.Str{}),
 		},
 		types.Bool{},
-		"",
+		"true if the input appears after other in lexicographical order, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
@@ -50,15 +50,15 @@ var TextFuncers = []shapes.Funcer{
 		nil,
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Compares strings lexicographically.",
 		types.Str{},
-		"",
+		"a string",
 		"<=",
 		[]*params.Param{
-			params.SimpleParam("other", "", types.Str{}),
+			params.SimpleParam("other", "another string", types.Str{}),
 		},
 		types.Bool{},
-		"",
+		"true if the input appears before other in lexicographical order or is equal to it, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
@@ -68,15 +68,15 @@ var TextFuncers = []shapes.Funcer{
 		nil,
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Compares strings lexicographically.",
 		types.Str{},
-		"",
+		"a string",
 		">=",
 		[]*params.Param{
-			params.SimpleParam("other", "", types.Str{}),
+			params.SimpleParam("other", "another string", types.Str{}),
 		},
 		types.Bool{},
-		"",
+		"true if the input appears after other in lexicographical order or is equal to it, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
@@ -86,15 +86,15 @@ var TextFuncers = []shapes.Funcer{
 		nil,
 	),
 	shapes.SimpleFuncer(
-		"",
+		"Concatenates two strings.",
 		types.Str{},
-		"",
+		"a string",
 		"+",
 		[]*params.Param{
-			params.SimpleParam("b", "", types.Str{}),
+			params.SimpleParam("b", "another string", types.Str{}),
 		},
 		types.Str{},
-		"",
+		"The input and b, concatenated.",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			str1 := string(inputValue.(states.StrValue))
