@@ -676,7 +676,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`[1, 2, 3] fold(0, +)`, `Num`, `6`, nil},
+			{`[2, 3, 4] fold(0, +)`, `Num`, `9`, nil},
 			{`[2, 3, 4] fold(1, *)`, `Num`, `24`, nil},
 		},
 	},
@@ -1407,11 +1407,11 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary: "",
+		Summary: "Takes the first n elements from an array.",
 		InputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
-		InputDescription: "Takes the first n elements from an array.",
+		InputDescription: "an array",
 		Name:             "take",
 		Params: []*params.Param{
 			params.SimpleParam("n", "number of elements to take", types.Num{}),
