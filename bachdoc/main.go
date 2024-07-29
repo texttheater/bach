@@ -25,6 +25,9 @@ var FuncersByCategory = map[string][]shapes.Funcer{
 }
 
 func inlineCode(s string) string {
+	if s == "" {
+		return ""
+	}
 	return fmt.Sprintf("<code>%s</code>", strings.ReplaceAll(html.EscapeString(s), "|", "&#124;"))
 }
 
@@ -54,23 +57,19 @@ func main() {
 		fmt.Printf("| Program | Type | Value | Error |\n")
 		fmt.Printf("|---|---|---|---|\n")
 		for _, example := range funcer.Examples {
-			var typ, val, err string
-			if example.OutputType == "" {
-				typ = ""
-			} else {
-				typ = inlineCode(example.OutputType)
-			}
-			if example.OutputValue == "" {
-				val = ""
-			} else {
-				val = fmt.Sprintf("`%s`", example.OutputValue)
-			}
+			var err string
 			if example.Error == nil {
 				err = ""
 			} else {
-				err = inlineCode(fmt.Sprintf("%s", example.Error))
+				err = strings.TrimSpace(fmt.Sprintf("%s", example.Error))
 			}
-			fmt.Printf("| `%s` | %s | %s | %s |\n", example.Program, typ, val, err)
+			fmt.Printf(
+				"| %s | %s | %s | %s |\n",
+				inlineCode(example.Program),
+				inlineCode(example.OutputType),
+				inlineCode(example.OutputValue),
+				inlineCode(err),
+			)
 		}
 		fmt.Printf("\n")
 	}
