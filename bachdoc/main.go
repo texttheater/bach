@@ -24,11 +24,22 @@ var FuncersByCategory = map[string][]shapes.Funcer{
 	"control": builtin.ControlFuncers,
 }
 
+// inlineCode takes a string representing some program code and converts it to
+// a Markdown representation suitable for processing by mdbook.
 func inlineCode(s string) string {
+	// handle empty string specially: do not generate <code></code> tags
 	if s == "" {
 		return ""
 	}
-	return fmt.Sprintf("<code>%s</code>", strings.ReplaceAll(html.EscapeString(s), "|", "&#124;"))
+	// escape HTML entities
+	s = html.EscapeString(s)
+	// escape characters that mdbook treats specially
+	s = strings.ReplaceAll(s, "|", "&#124;")
+	s = strings.ReplaceAll(s, "\\", "&#92;")
+	// wrap in code tags
+	s = "<code>" + s + "</code>"
+	// return
+	return s
 }
 
 func main() {
