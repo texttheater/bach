@@ -13,71 +13,190 @@ import (
 )
 
 var ValueFuncers = []shapes.Funcer{
-
-	shapes.Funcer{InputType: types.Any{}, Name: "==", Params: []*params.Param{
-		params.SimpleParam("other", "", (types.Any{})),
-	}, OutputType: types.Bool{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		a := inputState.Value
-		b, err := args[0](inputState.Clear(), nil).Eval()
-		if err != nil {
-			return states.ThunkFromError(err)
-		}
-		equal, err := a.Equal(b)
-		if err != nil {
-			return states.ThunkFromError(err)
-		}
-		return states.ThunkFromValue(states.BoolValue(equal))
-	}, IDs: nil},
-
-	shapes.SimpleFuncer("", types.NewVar("A", types.Any{}), "", "id", nil, types.NewVar("A", types.Any{}), "", "", func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
-		return inputValue, nil
-	}, nil),
-
-	shapes.Funcer{InputType: types.Str{}, Name: "parseFloat", Params: nil, OutputType: types.Num{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		s := string(inputState.Value.(states.StrValue))
-		n, err := strconv.ParseFloat(s, 64)
-		if err != nil {
-			return states.ThunkFromError(errors.ValueError(
-				errors.Pos(pos),
+	shapes.Funcer{
+		Summary:          "Checks two values for equality.",
+		InputType:        types.Any{},
+		InputDescription: "a value",
+		Name:             "==",
+		Params: []*params.Param{
+			params.SimpleParam("other", "another value", (types.Any{})),
+		},
+		OutputType:        types.Bool{},
+		OutputDescription: "true if the input is the same as other, false otherwise",
+		Notes:             "",
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			a := inputState.Value
+			b, err := args[0](inputState.Clear(), nil).Eval()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			equal, err := a.Equal(b)
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(equal))
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`null ==null`, `Bool`, `true`, nil},
+			{`null =={}`, `Bool`, `false`, nil},
+			{`true ==true`, `Bool`, `true`, nil},
+			{`true ==false`, `Bool`, `false`, nil},
+			{`true ==[]`, `Bool`, `false`, nil},
+			{`1 ==1.0`, `Bool`, `true`, nil},
+			{`1 ==2`, `Bool`, `false`, nil},
+			{`57 =="a"`, `Bool`, `false`, nil},
+			{`"abc" =="abc"`, `Bool`, `true`, nil},
+			{`"" =="abc"`, `Bool`, `false`, nil},
+			{`"" ==null`, `Bool`, `false`, nil},
+			{`[false, 1.0, "ab"] ==[false, 1, "a" +"b"]`, `Bool`, `true`, nil},
+			{`[] ==[11]`, `Bool`, `false`, nil},
+			{`["a"] =={a: 1}`, `Bool`, `false`, nil},
+			{`{a: 1, b: 2} =={b: 2, a: 1}`, `Bool`, `true`, nil},
+			{`{a: 1, b: 2} =={a: 2, b: 1}`, `Bool`, `false`, nil},
+			{`{} ==[]`, `Bool`, `false`, nil},
+		},
+	},
+	shapes.SimpleFuncer(
+		"The identity function.",
+		types.NewVar("A", types.Any{}),
+		"any value",
+		"id",
+		nil,
+		types.NewVar("A", types.Any{}),
+		"the input value",
+		"",
+		func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
+			return inputValue, nil
+		},
+		[]shapes.Example{
+			{`123 id`, `Num`, `123`, nil},
+			{`"abc" id`, `Str`, `"abc"`, nil},
+			{`false if id then 1 else fatal ok`, `Num`, `"abc"`, errors.ValueError(
 				errors.Code(errors.UnexpectedValue),
-				errors.Message(err.Error()),
-			))
-		}
-		return states.ThunkFromValue(states.NumValue(n))
-	}, IDs: nil},
-
-	shapes.Funcer{InputType: types.Str{}, Name: "parseInt", Params: []*params.Param{
-		params.SimpleParam("base", "", types.Num{}),
-	}, OutputType: types.Num{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		s := string(inputState.Value.(states.StrValue))
-		b, err := args[0](inputState.Clear(), nil).EvalNum()
-		if err != nil {
-			return states.ThunkFromError(err)
-		}
-		n, err := strconv.ParseInt(s, int(b), 64)
-		if err != nil {
-			return states.ThunkFromError(errors.ValueError(
-				errors.Pos(pos),
+				errors.GotValue(states.BoolValue(false)),
+			)},
+		},
+	),
+	shapes.Funcer{InputType: types.Str{},
+		Summary:           "Parses the string representation of a floating-point number.",
+		Name:              "parseFloat",
+		InputDescription:  "a floating-point number in string representation",
+		Params:            nil,
+		OutputType:        types.Num{},
+		OutputDescription: "the corresponding Num value",
+		Notes:             "",
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			s := string(inputState.Value.(states.StrValue))
+			n, err := strconv.ParseFloat(s, 64)
+			if err != nil {
+				return states.ThunkFromError(errors.ValueError(
+					errors.Pos(pos),
+					errors.Code(errors.UnexpectedValue),
+					errors.GotValue(inputState.Value.(states.StrValue)),
+					errors.Message(err.Error()),
+				))
+			}
+			return states.ThunkFromValue(states.NumValue(n))
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`"4.567" parseFloat`, `Num`, `4.567`, nil},
+			{`"4.567e3" parseFloat`, `Num`, `4567`, nil},
+			{`"4.567abcdefgh" parseFloat`, `Num`, ``, errors.ValueError(
 				errors.Code(errors.UnexpectedValue),
-				errors.Message(err.Error()),
-			))
-		}
-		return states.ThunkFromValue(states.NumValue(n))
-	}, IDs: nil},
+				errors.GotValue(states.StrValue("4.567abcdefgh")),
+			)},
+		},
+	},
 
-	shapes.Funcer{InputType: types.Str{}, Name: "parseInt", Params: nil, OutputType: types.Num{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		s := string(inputState.Value.(states.StrValue))
-		b := 10
-		n, err := strconv.ParseInt(s, int(b), 64)
-		if err != nil {
-			return states.ThunkFromError(errors.ValueError(
-				errors.Pos(pos),
+	shapes.Funcer{
+		Summary:          "Parses the string representation of an integer number.",
+		InputType:        types.Str{},
+		InputDescription: "an integer number in string representation",
+		Name:             "parseInt",
+		Params: []*params.Param{
+			params.SimpleParam("base", "the base that the input is in", types.Num{}),
+		},
+		OutputType:        types.Num{},
+		OutputDescription: "the corresponding Num value",
+		Notes:             "",
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			s := string(inputState.Value.(states.StrValue))
+			b, err := args[0](inputState.Clear(), nil).EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			n, err := strconv.ParseInt(s, int(b), 64)
+			if err != nil {
+				return states.ThunkFromError(errors.ValueError(
+					errors.Pos(pos),
+					errors.Code(errors.UnexpectedValue),
+					errors.GotValue(inputState.Value.(states.StrValue)),
+					errors.Message(err.Error()),
+				))
+			}
+			return states.ThunkFromValue(states.NumValue(n))
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`"123" parseInt(10)`, `Num`, `123`, nil},
+			{`"ff" parseInt(10)`, `Num`, ``, errors.ValueError(
 				errors.Code(errors.UnexpectedValue),
-				errors.Message(err.Error()),
-			))
-		}
-		return states.ThunkFromValue(states.NumValue(n))
-	}, IDs: nil},
+				errors.GotValue(states.StrValue("ff")),
+			)},
+			{`"ff" parseInt(16)`, `Num`, `255`, nil},
+			{`"0xFF" parseInt(16)`, `Num`, `255`, errors.ValueError(
+				errors.Code(errors.UnexpectedValue),
+				errors.GotValue(states.StrValue("0xFF")),
+			)},
+		},
+	},
+	shapes.Funcer{
+		Summary:           "Parses the string representation of a base-10 integer number.",
+		InputType:         types.Str{},
+		InputDescription:  "an integer number in base-10 string representation",
+		Name:              "parseInt",
+		Params:            nil,
+		OutputType:        types.Num{},
+		OutputDescription: "the corresponding Num value",
+		Notes:             "",
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			s := string(inputState.Value.(states.StrValue))
+			b := 10
+			n, err := strconv.ParseInt(s, int(b), 64)
+			if err != nil {
+				return states.ThunkFromError(errors.ValueError(
+					errors.Pos(pos),
+					errors.Code(errors.UnexpectedValue),
+					errors.GotValue(inputState.Value.(states.StrValue)),
+					errors.Message(err.Error()),
+				))
+			}
+			return states.ThunkFromValue(states.NumValue(n))
+		},
+		IDs: nil,
+		Examples: []shapes.Example{
+			{`"123" parseInt`, `Num`, `123`, nil},
+			{`"   123 " parseInt`, `Num`, `123`, errors.ValueError(
+				errors.Code(errors.UnexpectedValue),
+				errors.GotValue(states.StrValue("   123 ")),
+			)},
+			{`"077" parseInt`, `Num`, `77`, nil},
+			{`"1.9" parseInt`, `Num`, `1`, errors.ValueError(
+				errors.Code(errors.UnexpectedValue),
+				errors.GotValue(states.StrValue("1.9")),
+			)},
+			{`"ff" parseInt`, `Num`, `16`, errors.ValueError(
+				errors.Code(errors.UnexpectedValue),
+				errors.GotValue(states.StrValue("ff")),
+			)},
+			{`"xyz" parseInt`, `Num`, `16`, errors.ValueError(
+				errors.Code(errors.UnexpectedValue),
+				errors.GotValue(states.StrValue("xyz")),
+			)},
+		},
+	},
 
 	shapes.Funcer{InputType: types.Str{}, Name: "parseJSON", Params: nil, OutputType: types.Any{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		str := inputState.Value.(states.StrValue)

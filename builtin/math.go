@@ -34,6 +34,8 @@ var MathFuncers = []shapes.Funcer{
 		},
 		[]shapes.Example{
 			{"1 +1", "Num", "2", nil},
+			{"1 +2 *3", "Num", "9", nil},
+			{"1 +(2 *3)", "Num", "7", nil},
 		},
 	),
 	shapes.SimpleFuncer(
@@ -120,6 +122,7 @@ var MathFuncers = []shapes.Funcer{
 		},
 		[]shapes.Example{
 			{"3 /2", "Num", "1.5", nil},
+			{"1 /0", "Num", "inf", nil},
 		},
 	),
 	shapes.SimpleFuncer(
