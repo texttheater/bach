@@ -11,4 +11,4 @@ book: doc/book/bachdoc/null.md doc/book/bachdoc/io.md doc/book/bachdoc/logic.md 
 
 doc/book/bachdoc/%.md : builtin/%.go bachdoc/main.go
 	mkdir -p $$(dirname $@)
-	go run bachdoc/main.go $* > $@
+	go run bachdoc/main.go builtin $* > $@
