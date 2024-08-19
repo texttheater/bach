@@ -26,6 +26,8 @@ var FuncersByCategory = map[string][]shapes.Funcer{
 	"control": builtin.ControlFuncers,
 }
 
+var ExampleSetsByName = map[string][]shapes.Example{}
+
 // inlineCode takes a string representing some program code and converts it to
 // a Markdown representation suitable for processing by mdbook.
 func inlineCode(s string) string {
@@ -44,8 +46,28 @@ func inlineCode(s string) string {
 	return s
 }
 
+func printExamplesTable(examples []shapes.Example) {
+	for _, example := range examples {
+		var err string
+		if example.Error == nil {
+			err = ""
+		} else {
+			err = strings.TrimSpace(fmt.Sprintf("%s", example.Error))
+		}
+		fmt.Printf(
+			"| %s | %s | %s | %s |\n",
+			inlineCode(example.Program),
+			inlineCode(example.OutputType),
+			inlineCode(example.OutputValue),
+			inlineCode(err),
+		)
+	}
+}
+
 func main() {
 	app := &cli.App{
+		Name: "bachdoc",
+		Usage: "generate documentation for the Bach programming language",
 		Commands: []*cli.Command{
 			{
 				Name:  "builtin",
@@ -70,25 +92,24 @@ func main() {
 						fmt.Printf("### Examples\n\n")
 						fmt.Printf("| Program | Type | Value | Error |\n")
 						fmt.Printf("|---|---|---|---|\n")
-						for _, example := range funcer.Examples {
-							var err string
-							if example.Error == nil {
-								err = ""
-							} else {
-								err = strings.TrimSpace(fmt.Sprintf("%s", example.Error))
-							}
-							fmt.Printf(
-								"| %s | %s | %s | %s |\n",
-								inlineCode(example.Program),
-								inlineCode(example.OutputType),
-								inlineCode(example.OutputValue),
-								inlineCode(err),
-							)
-						}
+						printExamplesTable(funcer.Examples)
 						fmt.Printf("\n")
 					}
 					return nil
 
+				},
+			},
+			{
+				Name:  "examples",
+				Usage: "format a given example set as a markdown table",
+				Action: func(cCtx *cli.Context) error {
+					name := cCtx.Args().First()
+					examples, ok := ExampleSetsByName[name]
+					if !ok {
+						return cli.Exit("unknown example set", 1)
+					}
+					printExamplesTable(examples)
+					return nil
 				},
 			},
 		},
