@@ -35,7 +35,7 @@ func inlineCode(s string) string {
 	if s == "" {
 		return ""
 	}
-	// escape HTML entities
+	// escape HTML special characters
 	s = html.EscapeString(s)
 	// escape characters that mdbook treats specially
 	s = strings.ReplaceAll(s, "|", "&#124;")
