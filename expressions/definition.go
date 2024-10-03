@@ -73,7 +73,6 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*param
 		paramFuncer := shapes.Funcer{InputType: param.InputType, Name: x.ParamNames[i], Params: param.Params, OutputType: param.OutputType, Kernel: paramKernel, IDs: &states.IDStack{
 			Head: id,
 		}}
-
 		bodyStack = bodyStack.Push(paramFuncer)
 	}
 	// define body input context
