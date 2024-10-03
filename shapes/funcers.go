@@ -15,7 +15,9 @@ type Funcer struct {
 	InputType         types.Type
 	InputDescription  string
 	Name              string
-	Params            []*params.Param // TODO does this need to be a slice of pointers?
+	// The elements of Params are pointers so we can share the slice with an
+	// expressions.DefinitionExpression.
+	Params            []*params.Param
 	OutputType        types.Type
 	OutputDescription string
 	Notes             string
