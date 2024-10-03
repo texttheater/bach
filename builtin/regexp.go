@@ -13,13 +13,16 @@ import (
 
 var RegexpFuncers = []shapes.Funcer{
 	shapes.Funcer{
-		InputType: types.Str{},
-		Name:      "reFindAll",
+		Summary:          "Finds all non-overlapping matches in a string.",
+		InputType:        types.Str{},
+		InputDescription: "a string",
+		Name:             "reFindAll",
 		Params: []*params.Param{
 			{
-				InputType: types.Str{},
-				Name:      "pattern",
-				Params:    nil,
+				InputType:   types.Str{},
+				Name:        "pattern",
+				Description: "a pattern",
+				Params:      nil,
 				OutputType: types.NewVar("A", types.NewUnion(
 					types.Null{},
 					types.Obj{
@@ -35,6 +38,8 @@ var RegexpFuncers = []shapes.Funcer{
 		OutputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
+		OutputDescription: "array of matches",
+		Notes:             "Matches appear in the output from leftmost to rightmost. Matches that overlap an earlier match (i.e., a match that starts at a lower offset or one that starts at the same offset but is found earlier by the pattern) are not included.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			v := inputState.Value.(states.StrValue)
 			offset := 0
@@ -69,6 +74,11 @@ var RegexpFuncers = []shapes.Funcer{
 			return states.ThunkFromIter(iter)
 		},
 		IDs: nil,
+		Examples: []shapes.Example{
+			{`"a" reFindAll~a+~`, `Arr<Null|Obj<0: Str, start: Num, Void>>`, `[{start: 0, 0: "a"}]`, nil},
+			{`"aa" reFindAll~a+~`, `Arr<Null|Obj<0: Str, start: Num, Void>>`, `[{start: 0, 0: "aa"}]`, nil},
+			{`"aba" reFindAll~a+~`, `Arr<Null|Obj<0: Str, start: Num, Void>>`, `[{start: 0, 0: "a"}, {start: 2, 0: "a"}]`, nil},
+		},
 	},
 	shapes.Funcer{
 		InputType: types.Str{},
