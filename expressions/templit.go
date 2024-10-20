@@ -52,7 +52,8 @@ func (x *TemplateLiteralExpression) Typecheck(inputShape shapes.Shape, params []
 			}
 			buffer.WriteString(out)
 		}
-		return states.ThunkFromValue(states.StrValue(buffer.String()))
+		output := states.StrValue(buffer.String())
+		return states.ThunkFromState(inputState.Replace(output))
 	}
 	return outputShape, action, nil, nil
 }
