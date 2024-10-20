@@ -66,7 +66,7 @@ func printExamplesTable(examples []shapes.Example) {
 
 func main() {
 	app := &cli.App{
-		Name: "bachdoc",
+		Name:  "bachdoc",
 		Usage: "generate documentation for the Bach programming language",
 		Commands: []*cli.Command{
 			{
