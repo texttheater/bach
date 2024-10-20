@@ -5,6 +5,7 @@ import (
 
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/interpreter"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
@@ -106,9 +107,9 @@ func TestCalls(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.Null{}),
-			errors.Name("f"),
-			errors.NumParams(1),
+			errors.InputType(types.Num{}),
+			errors.Name("g"),
+			errors.NumParams(0),
 		),
 		t,
 	)
@@ -186,9 +187,9 @@ func TestCalls(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.Null{}),
-			errors.Name("f"),
-			errors.NumParams(1),
+			errors.InputType(types.Num{}),
+			errors.Name("+"),
+			errors.NumParams(2),
 		),
 		t,
 	)
@@ -204,10 +205,10 @@ func TestCalls(t *testing.T) {
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.Null{}),
-			errors.Name("f"),
-			errors.NumParams(1),
+			errors.Code(errors.ParamDoesNotMatch),
+			errors.ParamNum(1),
+			errors.GotParam(params.SimpleParam("", "", types.Str{})),
+			errors.WantParam(params.SimpleParam("", "", types.Num{})),
 		),
 		t,
 	)
@@ -216,10 +217,13 @@ func TestCalls(t *testing.T) {
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.Null{}),
-			errors.Name("f"),
-			errors.NumParams(1),
+			errors.Code(errors.ParamDoesNotMatch),
+			errors.ParamNum(1),
+			errors.GotParam(&params.Param{
+				InputType:  types.Str{},
+				OutputType: types.Num{},
+			}),
+			errors.WantParam(params.SimpleParam("", "", types.Num{})),
 		),
 		t,
 	)
@@ -266,10 +270,10 @@ func TestCalls(t *testing.T) {
 		``,
 		``,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.Num{}),
-			errors.Name("applyWithABCAsArg"),
-			errors.NumParams(1),
+			errors.Code(errors.ParamDoesNotMatch),
+			errors.ParamNum(1),
+			errors.WantParam(params.SimpleParam("", "", types.Str{})),
+			errors.GotParam(params.SimpleParam("", "", types.Num{})),
 		),
 		t,
 	)

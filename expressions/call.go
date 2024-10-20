@@ -74,8 +74,7 @@ funcers:
 			argOutputShape, argAction, argIDs, err := x.Args[i].Typecheck(
 				argInputShape, instantiate(funcerDefinition.Params[i].Params, bindings))
 			if err != nil {
-				stack = stack.Tail
-				continue funcers
+				return argOutputShape, argAction, argIDs, err
 			}
 			if !funcerDefinition.Params[i].OutputType.Bind(argOutputShape.Type, bindings) {
 				return shapes.Shape{}, nil, nil, errors.TypeError(
