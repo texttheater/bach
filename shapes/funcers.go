@@ -11,10 +11,10 @@ import (
 )
 
 type Funcer struct {
-	Summary           string
-	InputType         types.Type
-	InputDescription  string
-	Name              string
+	Summary          string
+	InputType        types.Type
+	InputDescription string
+	Name             string
 	// The elements of Params are pointers so we can share the slice with an
 	// expressions.DefinitionExpression.
 	Params            []*params.Param
