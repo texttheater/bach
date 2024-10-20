@@ -81,13 +81,16 @@ var RegexpFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		InputType: types.Str{},
-		Name:      "reReplaceFirst",
+		Summary:          "Replaces the first match of a pattern in a string with something else.",
+		InputType:        types.Str{},
+		InputDescription: "a string",
+		Name:             "reReplaceFirst",
 		Params: []*params.Param{
 			{
-				InputType: types.Str{},
-				Name:      "pattern",
-				Params:    nil,
+				InputType:   types.Str{},
+				Name:        "pattern",
+				Description: "a pattern",
+				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Null{},
 					types.Obj{
@@ -107,10 +110,15 @@ var RegexpFuncers = []shapes.Funcer{
 					},
 					Rest: types.Any{},
 				},
-				OutputType: types.Str{},
+				Name:        "replacement",
+				Description: "takes a match and returns a string",
+				Params:      nil,
+				OutputType:  types.Str{},
 			},
 		},
-		OutputType: types.Str{},
+		OutputType:        types.Str{},
+		OutputDescription: "the input with the first match of the pattern replaced with the corresponding replacement, or unchanged if there is no match",
+		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			match, err := args[0](inputState, nil).Eval()
 			if err != nil {
@@ -141,15 +149,25 @@ var RegexpFuncers = []shapes.Funcer{
 			}
 		},
 		IDs: nil,
+		Examples: []shapes.Example{
+			{`"aba" reReplaceFirst(~a+~, "c")`, `Str`, `"cba"`, nil},
+			{`"abc" reReplaceFirst(~d~, "e")`, `Str`, `"abc"`, nil},
+			{`"b0b" reReplaceFirst(~\d+~, @0 parseInt =n "a" repeat(n))`, `Str`, `"bb"`, nil},
+			{`"b3b" reReplaceFirst(~\d+~, @0 parseInt =n "a" repeat(n))`, `Str`, `"baaab"`, nil},
+			{`" a b c " reReplaceFirst(~[abc]~, "({@0})")`, `Str`, `" (a) b c "`, nil},
+		},
 	},
 	shapes.Funcer{
-		InputType: types.Str{},
-		Name:      "reReplaceAll",
+		Summary:          "Replaces all non-overlapping matches of a pattern in a string with something else.",
+		InputType:        types.Str{},
+		InputDescription: "a string",
+		Name:             "reReplaceAll",
 		Params: []*params.Param{
 			{
-				InputType: types.Str{},
-				Name:      "pattern",
-				Params:    nil,
+				InputType:   types.Str{},
+				Name:        "pattern",
+				Description: "a pattern",
+				Params:      nil,
 				OutputType: types.NewVar("A", types.NewUnion(
 					types.Null{},
 					types.Obj{
@@ -169,10 +187,15 @@ var RegexpFuncers = []shapes.Funcer{
 					},
 					Rest: types.Any{},
 				},
-				OutputType: types.Str{},
+				Name:        "replacement",
+				Description: "takes a match and returns a string",
+				Params:      nil,
+				OutputType:  types.Str{},
 			},
 		},
-		OutputType: types.Str{},
+		OutputType:        types.Str{},
+		OutputDescription: "the input with all matches of the pattern replaced with the corresponding replacement, or unchanged if there is no match",
+		Notes:             "Matches are replaced from leftmost to rightmost. Matches that overlap an earlier match (i.e., a match that starts at a lower offset or one that starts at the same offset but is found earlier by the pattern) are not replaced.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := string(inputState.Value.(states.StrValue))
 			var output strings.Builder
@@ -208,15 +231,23 @@ var RegexpFuncers = []shapes.Funcer{
 			return states.ThunkFromValue(states.StrValue(output.String()))
 		},
 		IDs: nil,
+		Examples: []shapes.Example{
+			{`"aba" reReplaceAll(~a+~, "c")`, `Str`, `"cbc"`, nil},
+			{`"abc" reReplaceAll(~d~, "e")`, `Str`, `"abc"`, nil},
+			{`" a b c " reReplaceAll(~[abc]~, "({@0})")`, `Str`, `" (a) (b) (c) "`, nil},
+		},
 	},
 	shapes.Funcer{
-		InputType: types.Str{},
-		Name:      "reSplit",
+		Summary:          "Splits a string around a pattern.",
+		InputType:        types.Str{},
+		InputDescription: "a string",
+		Name:             "reSplit",
 		Params: []*params.Param{
 			{
-				InputType: types.Str{},
-				Name:      "pattern",
-				Params:    nil,
+				InputType:   types.Str{},
+				Name:        "separator",
+				Description: "a pattern",
+				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Null{},
 					types.Obj{
@@ -228,22 +259,36 @@ var RegexpFuncers = []shapes.Funcer{
 					},
 				),
 			},
-		}, OutputType: types.NewArr(
-			types.Str{},
-		),
+		},
+		OutputType:        types.NewArr(types.Str{}),
+		OutputDescription: "the parts of the input found in between occurrences of the separator",
+		Notes:             "If the separator pattern matches the empty string, the input is split into its individual code points. Separators are found from leftmost to rightmost. Separators that overlap an earlier separator (i.e., a separator that starts at a lower offset or one that starts at the same offset but is found earlier by the pattern) do not lead to splits.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			return split(inputState, args, bindings, pos)
 		},
 		IDs: nil,
+		Examples: []shapes.Example{
+			{`"zabacad" reSplit~a~`, `Arr<Str>`, `["z", "b", "c", "d"]`, nil},
+			{`"zabaca" reSplit~a~`, `Arr<Str>`, `["z", "b", "c", ""]`, nil},
+			{`"abacad" reSplit~a~`, `Arr<Str>`, `["", "b", "c", "d"]`, nil},
+			{`"abaca" reSplit~a~`, `Arr<Str>`, `["", "b", "c", ""]`, nil},
+			{`"abaca" reSplit~~`, `Arr<Str>`, `["a", "b", "a", "c", "a"]`, nil},
+			{`"你好" reSplit~~`, `Arr<Str>`, `["你", "好"]`, nil},
+			{`"" reSplit~a~`, `Arr<Str>`, `[""]`, nil},
+			{`"" reSplit~~`, `Arr<Str>`, `[]`, nil},
+		},
 	},
 	shapes.Funcer{
-		InputType: types.Str{},
-		Name:      "reSplit",
+		Summary:          "Splits a string around a pattern, up to a certain number of times.",
+		InputType:        types.Str{},
+		InputDescription: "a string",
+		Name:             "reSplit",
 		Params: []*params.Param{
 			{
-				InputType: types.Str{},
-				Name:      "pattern",
-				Params:    nil,
+				InputType:   types.Str{},
+				Name:        "separator",
+				Description: "a pattern",
+				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Null{},
 					types.Obj{
@@ -255,14 +300,34 @@ var RegexpFuncers = []shapes.Funcer{
 					},
 				),
 			},
-			params.SimpleParam("maxSplit", "", types.Num{}),
+			params.SimpleParam("n", "maximum number of splits to make", types.Num{}),
 		}, OutputType: types.NewArr(
 			types.Str{},
 		),
+		OutputDescription: "the parts of the input found in between occurrences of the separator",
+		Notes:             "If the separator pattern matches the empty string, the input is split into its individual code points. Separators are found from leftmost to rightmost. Separators that overlap an earlier separator (i.e., a separator that starts at a lower offset or one that starts at the same offset but is found earlier by the pattern) do not lead to splits. At most n splits are made so that the output contains at most n + 1 elements; later separator occurrences are ignored.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			return split(inputState, args, bindings, pos)
 		},
 		IDs: nil,
+		Examples: []shapes.Example{
+			{`"zabacad" reSplit(~a~, 1)`, `Arr<Str>`, `["z", "bacad"]`, nil},
+			{`"zabaca" reSplit(~a~, 1)`, `Arr<Str>`, `["z", "baca"]`, nil},
+			{`"zabaca" reSplit(~a~, 3)`, `Arr<Str>`, `["z", "b", "c", ""]`, nil},
+			{`"zabaca" reSplit(~a~, 4)`, `Arr<Str>`, `["z", "b", "c", ""]`, nil},
+			{`"abacad" reSplit(~a~, 1)`, `Arr<Str>`, `["", "bacad"]`, nil},
+			{`"abacad" reSplit(~a~, 2)`, `Arr<Str>`, `["", "b", "cad"]`, nil},
+			{`"abaca" reSplit(~a~, 1)`, `Arr<Str>`, `["", "baca"]`, nil},
+			{`"abaca" reSplit(~a~, 2)`, `Arr<Str>`, `["", "b", "ca"]`, nil},
+			{`"abaca" reSplit(~a~, 3)`, `Arr<Str>`, `["", "b", "c", ""]`, nil},
+			{`"abaca" reSplit(~~, 2)`, `Arr<Str>`, `["a", "b", "aca"]`, nil},
+			{`"abaca" reSplit(~~, 1000)`, `Arr<Str>`, `["a", "b", "a", "c", "a"]`, nil},
+			{`"你好" reSplit(~~, 0)`, `Arr<Str>`, `["你好"]`, nil},
+			{`"" reSplit(~a~, 0)`, `Arr<Str>`, `[""]`, nil},
+			{`"" reSplit(~a~, 1)`, `Arr<Str>`, `[""]`, nil},
+			{`"" reSplit(~~, 0)`, `Arr<Str>`, `[]`, nil},
+			{`"" reSplit(~~, 1)`, `Arr<Str>`, `[]`, nil},
+		},
 	},
 }
 
