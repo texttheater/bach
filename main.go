@@ -11,6 +11,42 @@ import (
 	"github.com/texttheater/bach/states"
 )
 
+func main() {
+	// parse command line
+	var e string
+	var o string
+	var h bool
+	flag.StringVar(&e, "e", "", "function to evaluate")
+	flag.StringVar(&o, "o", "", "function to evaluate, output result")
+	flag.BoolVar(&h, "h", false, "print help message and exit")
+	flag.Parse()
+	// help
+	if h {
+		help()
+		os.Exit(1)
+	}
+	// REPL
+	if e == "" && o == "" {
+		repl()
+		os.Exit(0)
+	}
+	// execute program given on command line
+	var program string
+	var displayResult bool
+	if e != "" {
+		program = e
+		displayResult = false
+	}
+	if o != "" {
+		program = o
+		displayResult = true
+	}
+	success := execute(program, displayResult)
+	if !success {
+		os.Exit(1)
+	}
+}
+
 func help() {
 	fmt.Fprintln(os.Stderr, "Usage:")
 	flag.PrintDefaults()
@@ -47,42 +83,6 @@ func execute(program string, displayResult bool) (success bool) {
 		}
 	}
 	return true
-}
-
-func main() {
-	// parse command line
-	var e string
-	var o string
-	var h bool
-	flag.StringVar(&e, "e", "", "function to evaluate")
-	flag.StringVar(&o, "o", "", "function to evaluate, output result")
-	flag.BoolVar(&h, "h", false, "print help message and exit")
-	flag.Parse()
-	// help
-	if h {
-		help()
-		os.Exit(1)
-	}
-	// REPL
-	if e == "" && o == "" {
-		repl()
-		os.Exit(0)
-	}
-	// execute program given on command line
-	var program string
-	var displayResult bool
-	if e != "" {
-		program = e
-		displayResult = false
-	}
-	if o != "" {
-		program = o
-		displayResult = true
-	}
-	success := execute(program, displayResult)
-	if !success {
-		os.Exit(1)
-	}
 }
 
 func forceEvaluation(v states.Value) error {
