@@ -12,58 +12,6 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var FuncersByCategory = map[string][]shapes.Funcer{
-	"null":    builtin.NullFuncers,
-	"io":      builtin.IOFuncers,
-	"logic":   builtin.LogicFuncers,
-	"math":    builtin.MathFuncers,
-	"text":    builtin.TextFuncers,
-	"arr":     builtin.ArrFuncers,
-	"obj":     builtin.ObjFuncers,
-	"types":   builtin.TypeFuncers,
-	"values":  builtin.ValueFuncers,
-	"regexp":  builtin.RegexpFuncers,
-	"control": builtin.ControlFuncers,
-}
-
-var ExampleSetsByName = map[string][]shapes.Example{}
-
-// inlineCode takes a string representing some program code and converts it to
-// a Markdown representation suitable for processing by mdbook.
-func inlineCode(s string) string {
-	// handle empty string specially: do not generate <code></code> tags
-	if s == "" {
-		return ""
-	}
-	// escape HTML special characters
-	s = html.EscapeString(s)
-	// escape characters that mdbook treats specially
-	s = strings.ReplaceAll(s, "|", "&#124;")
-	s = strings.ReplaceAll(s, "\\", "&#92;")
-	// wrap in code tags
-	s = "<code>" + s + "</code>"
-	// return
-	return s
-}
-
-func printExamplesTable(examples []shapes.Example) {
-	for _, example := range examples {
-		var err string
-		if example.Error == nil {
-			err = ""
-		} else {
-			err = strings.TrimSpace(fmt.Sprintf("%s", example.Error))
-		}
-		fmt.Printf(
-			"| %s | %s | %s | %s |\n",
-			inlineCode(example.Program),
-			inlineCode(example.OutputType),
-			inlineCode(example.OutputValue),
-			inlineCode(err),
-		)
-	}
-}
-
 func main() {
 	app := &cli.App{
 		Name:  "bachdoc",
@@ -116,5 +64,57 @@ func main() {
 	}
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
+	}
+}
+
+var FuncersByCategory = map[string][]shapes.Funcer{
+	"null":    builtin.NullFuncers,
+	"io":      builtin.IOFuncers,
+	"logic":   builtin.LogicFuncers,
+	"math":    builtin.MathFuncers,
+	"text":    builtin.TextFuncers,
+	"arr":     builtin.ArrFuncers,
+	"obj":     builtin.ObjFuncers,
+	"types":   builtin.TypeFuncers,
+	"values":  builtin.ValueFuncers,
+	"regexp":  builtin.RegexpFuncers,
+	"control": builtin.ControlFuncers,
+}
+
+var ExampleSetsByName = map[string][]shapes.Example{}
+
+// inlineCode takes a string representing some program code and converts it to
+// a Markdown representation suitable for processing by mdbook.
+func inlineCode(s string) string {
+	// handle empty string specially: do not generate <code></code> tags
+	if s == "" {
+		return ""
+	}
+	// escape HTML special characters
+	s = html.EscapeString(s)
+	// escape characters that mdbook treats specially
+	s = strings.ReplaceAll(s, "|", "&#124;")
+	s = strings.ReplaceAll(s, "\\", "&#92;")
+	// wrap in code tags
+	s = "<code>" + s + "</code>"
+	// return
+	return s
+}
+
+func printExamplesTable(examples []shapes.Example) {
+	for _, example := range examples {
+		var err string
+		if example.Error == nil {
+			err = ""
+		} else {
+			err = strings.TrimSpace(fmt.Sprintf("%s", example.Error))
+		}
+		fmt.Printf(
+			"| %s | %s | %s | %s |\n",
+			inlineCode(example.Program),
+			inlineCode(example.OutputType),
+			inlineCode(example.OutputValue),
+			inlineCode(err),
+		)
 	}
 }
