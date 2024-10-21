@@ -1,55 +1,38 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
+	"github.com/alecthomas/kong"
 	"github.com/c-bata/go-prompt"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/states"
 )
 
+var cli struct {
+	Program string `arg:"" optional:"" help:"Program to execute. If not provided, Bach's REPL will be started."`
+
+	Quiet bool `short:"q" help:"Do not print the output value of the program."`
+}
+
 func main() {
-	// parse command line
-	var e string
-	var o string
-	var h bool
-	flag.StringVar(&e, "e", "", "function to evaluate")
-	flag.StringVar(&o, "o", "", "function to evaluate, output result")
-	flag.BoolVar(&h, "h", false, "print help message and exit")
-	flag.Parse()
-	// help
-	if h {
-		help()
-		os.Exit(1)
-	}
+	kong.Parse(
+		&cli,
+		kong.Name("bach"),
+		kong.Description("An interpreter for the Bach programming language."),
+	)
 	// REPL
-	if e == "" && o == "" {
+	if cli.Program == "" {
 		repl()
 		os.Exit(0)
 	}
 	// execute program given on command line
-	var program string
-	var displayResult bool
-	if e != "" {
-		program = e
-		displayResult = false
-	}
-	if o != "" {
-		program = o
-		displayResult = true
-	}
-	success := execute(program, displayResult)
+	success := execute(cli.Program, !cli.Quiet)
 	if !success {
 		os.Exit(1)
 	}
-}
-
-func help() {
-	fmt.Fprintln(os.Stderr, "Usage:")
-	flag.PrintDefaults()
 }
 
 func repl() {
