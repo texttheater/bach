@@ -7,7 +7,7 @@ import (
 	"github.com/texttheater/bach/interpreter"
 )
 
-func TestExamplesArr(t *testing.T) {
+func TestBuiltinArr(t *testing.T) {
 	for _, funcer := range builtin.ArrFuncers {
 		for _, example := range funcer.Examples {
 			interpreter.TestProgramStr(
@@ -21,7 +21,7 @@ func TestExamplesArr(t *testing.T) {
 	}
 }
 
-func TestExamplesControl(t *testing.T) {
+func TestBuiltinControl(t *testing.T) {
 	for _, funcer := range builtin.ControlFuncers {
 		for _, example := range funcer.Examples {
 			interpreter.TestProgramStr(
@@ -35,7 +35,7 @@ func TestExamplesControl(t *testing.T) {
 	}
 }
 
-func TestExamplesIO(t *testing.T) {
+func TestBuiltinIO(t *testing.T) {
 	for _, funcer := range builtin.IOFuncers {
 		for _, example := range funcer.Examples {
 			interpreter.TestProgramStr(
@@ -49,7 +49,7 @@ func TestExamplesIO(t *testing.T) {
 	}
 }
 
-func TestExamplesLogic(t *testing.T) {
+func TestBuiltinLogic(t *testing.T) {
 	for _, funcer := range builtin.LogicFuncers {
 		for _, example := range funcer.Examples {
 			interpreter.TestProgramStr(
@@ -63,7 +63,7 @@ func TestExamplesLogic(t *testing.T) {
 	}
 }
 
-func TestExamplesMath(t *testing.T) {
+func TestBuiltinMath(t *testing.T) {
 	for _, funcer := range builtin.MathFuncers {
 		for _, example := range funcer.Examples {
 			interpreter.TestProgramStr(
@@ -77,7 +77,7 @@ func TestExamplesMath(t *testing.T) {
 	}
 }
 
-func TestExamplesNull(t *testing.T) {
+func TestBuiltinNull(t *testing.T) {
 	for _, funcer := range builtin.NullFuncers {
 		for _, example := range funcer.Examples {
 			interpreter.TestProgramStr(
@@ -91,7 +91,7 @@ func TestExamplesNull(t *testing.T) {
 	}
 }
 
-func TestExamplesObj(t *testing.T) {
+func TestBuiltinObj(t *testing.T) {
 	for _, funcer := range builtin.ObjFuncers {
 		for _, example := range funcer.Examples {
 			interpreter.TestProgramStr(
@@ -105,7 +105,7 @@ func TestExamplesObj(t *testing.T) {
 	}
 }
 
-func TestExamplesRegexp(t *testing.T) {
+func TestBuiltinRegexp(t *testing.T) {
 	for _, funcer := range builtin.RegexpFuncers {
 		for _, example := range funcer.Examples {
 			interpreter.TestProgramStr(
@@ -119,7 +119,7 @@ func TestExamplesRegexp(t *testing.T) {
 	}
 }
 
-func TestExamplesText(t *testing.T) {
+func TestBuiltinText(t *testing.T) {
 	for _, funcer := range builtin.TextFuncers {
 		for _, example := range funcer.Examples {
 			interpreter.TestProgramStr(
@@ -133,7 +133,7 @@ func TestExamplesText(t *testing.T) {
 	}
 }
 
-func TestExamplesTypes(t *testing.T) {
+func TestBuiltinTypes(t *testing.T) {
 	for _, funcer := range builtin.TypeFuncers {
 		for _, example := range funcer.Examples {
 			interpreter.TestProgramStr(
@@ -147,7 +147,7 @@ func TestExamplesTypes(t *testing.T) {
 	}
 }
 
-func TestExamplesValues(t *testing.T) {
+func TestBuiltinValues(t *testing.T) {
 	for _, funcer := range builtin.ValueFuncers {
 		for _, example := range funcer.Examples {
 			interpreter.TestProgramStr(
