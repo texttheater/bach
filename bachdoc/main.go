@@ -8,6 +8,7 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/texttheater/bach/builtin"
+	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/shapes"
 )
 
@@ -25,7 +26,9 @@ var FuncersByCategory = map[string][]shapes.Funcer{
 	"control": builtin.ControlFuncers,
 }
 
-var ExampleSetsByName = map[string][]shapes.Example{}
+var ExampleSetsByName = map[string][]shapes.Example{
+	"types-simple": interpreter.SimpleTypeExamples,
+}
 
 func main() {
 	ctx := kong.Parse(&cli)
