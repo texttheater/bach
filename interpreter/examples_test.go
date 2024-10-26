@@ -18,8 +18,8 @@ func TestSimpleTypeExamples(t *testing.T) {
 	}
 }
 
-func TestTupleTypeExamples(t *testing.T) {
-	for _, example := range interpreter.TupleTypeExamples {
+func TestArrayTypeExamples(t *testing.T) {
+	for _, example := range interpreter.ArrayTypeExamples {
 		interpreter.TestProgramStr(
 			example.Program,
 			example.OutputType,

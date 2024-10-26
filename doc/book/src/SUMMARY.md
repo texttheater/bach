@@ -5,7 +5,6 @@
 	- [First Steps](./first-steps.md)
 - [Types](./types.md)
 	- [Simple Types](./simple-types.md)
-	- [Tuple Types](./tuple-types.md)
 	- [Array Types](./array-types.md)
 	- [Object Types](./object-types.md)
 	- [Union Types](./union-types.md)

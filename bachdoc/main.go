@@ -28,7 +28,7 @@ var FuncersByCategory = map[string][]shapes.Funcer{
 
 var ExampleSetsByName = map[string][]shapes.Example{
 	"simple-types": interpreter.SimpleTypeExamples,
-	"tuple-types":  interpreter.TupleTypeExamples,
+	"array-types":  interpreter.ArrayTypeExamples,
 }
 
 func main() {
