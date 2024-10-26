@@ -17,3 +17,15 @@ func TestSimpleTypeExamples(t *testing.T) {
 		)
 	}
 }
+
+func TestTupleTypeExamples(t *testing.T) {
+	for _, example := range interpreter.TupleTypeExamples {
+		interpreter.TestProgramStr(
+			example.Program,
+			example.OutputType,
+			example.OutputValue,
+			example.Error,
+			t,
+		)
+	}
+}

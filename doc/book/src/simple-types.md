@@ -1,7 +1,6 @@
 # Simple Types
 
-The simple types in Bach are `Null`, `Bool`, `Num`, and `Str`. The `type`
-function can be used to get a string representation of the type of a given
-expression, as the following examples demonstrate:
+The simple types in Bach are `Null`, `Bool`, `Num`, and `Str`. The following
+table shows some examples of programs that evaluate to a value of each type.
 
 {{#include ../bachdoc/examples/simple-types.md}}

@@ -11,53 +11,6 @@ import (
 
 func TestArrays(t *testing.T) {
 	interpreter.TestProgram(
-		`[]`,
-		types.NewTup([]types.Type{}),
-		states.NewArrValue([]states.Value{}),
-		nil,
-		t,
-	)
-	interpreter.TestProgram(
-		`[1]`,
-		types.NewTup([]types.Type{types.Num{}}),
-		states.NewArrValue([]states.Value{states.NumValue(1)}),
-		nil,
-		t,
-	)
-	interpreter.TestProgram(
-		`[1, 2, 3]`,
-		types.NewTup([]types.Type{types.Num{}, types.Num{}, types.Num{}}),
-		states.NewArrValue([]states.Value{states.NumValue(1),
-			states.NumValue(2),
-			states.NumValue(3)}),
-		nil,
-		t,
-	)
-	interpreter.TestProgram(
-		`[1, "a"]`,
-		types.NewTup([]types.Type{types.Num{}, types.Str{}}),
-		states.NewArrValue([]states.Value{states.NumValue(1),
-			states.StrValue("a")}),
-		nil,
-		t,
-	)
-	interpreter.TestProgram(
-		`[[1, 2], ["a", "b"]]`,
-		types.NewTup([]types.Type{types.NewTup([]types.Type{types.Num{}, types.Num{}}), types.NewTup([]types.Type{types.Str{}, types.Str{}})}),
-		states.NewArrValue([]states.Value{states.NewArrValue([]states.Value{states.NumValue(1),
-			states.NumValue(2)}),
-			states.NewArrValue([]states.Value{states.StrValue("a"), states.StrValue("b")})}),
-		nil,
-		t,
-	)
-	interpreter.TestProgramStr(
-		`for Arr<Num> def f Arr<Num> as =x x ok [1, 2, 3] f`,
-		`Arr<Num>`,
-		`[1, 2, 3]`,
-		nil,
-		t,
-	)
-	interpreter.TestProgram(
 		`1 each(*2)`,
 		nil,
 		nil,
@@ -67,42 +20,6 @@ func TestArrays(t *testing.T) {
 			errors.Name("each"),
 			errors.NumParams(1),
 		),
-		t,
-	)
-	interpreter.TestProgram(
-		`[1;[]]`,
-		types.NewTup(
-			[]types.Type{
-				types.Num{},
-			},
-		),
-		states.NewArrValue(
-			[]states.Value{
-				states.NumValue(1),
-			},
-		),
-		nil,
-		t,
-	)
-	interpreter.TestProgram(
-		`[3, 4] =rest [1, 2;rest]`,
-		types.NewTup(
-			[]types.Type{
-				types.Num{},
-				types.Num{},
-				types.Num{},
-				types.Num{},
-			},
-		),
-		states.NewArrValue(
-			[]states.Value{
-				states.NumValue(1),
-				states.NumValue(2),
-				states.NumValue(3),
-				states.NumValue(4),
-			},
-		),
-		nil,
 		t,
 	)
 	interpreter.TestProgram(
