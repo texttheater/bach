@@ -1,3 +1,3 @@
 # Array Funcers
 
-{{#include ../bachdoc/arr.md}}
+{{#include ../bachdoc/builtin/arr.md}}

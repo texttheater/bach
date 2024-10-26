@@ -1,3 +1,3 @@
 # Type Funcers
 
-{{#include ../bachdoc/types.md}}
+{{#include ../bachdoc/builtin/types.md}}

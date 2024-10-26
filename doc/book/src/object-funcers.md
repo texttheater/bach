@@ -1,3 +1,3 @@
 # Object Funcers
 
-{{#include ../bachdoc/obj.md}}
+{{#include ../bachdoc/builtin/obj.md}}

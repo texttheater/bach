@@ -1,3 +1,3 @@
 # Text Funcers
 
-{{#include ../bachdoc/text.md}}
+{{#include ../bachdoc/builtin/text.md}}

@@ -1,3 +1,3 @@
 # Logic Funcers
 
-{{#include ../bachdoc/logic.md}}
+{{#include ../bachdoc/builtin/logic.md}}

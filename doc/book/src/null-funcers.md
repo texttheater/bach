@@ -1,3 +1,3 @@
 # Null Funcers
 
-{{#include ../bachdoc/null.md}}
+{{#include ../bachdoc/builtin/null.md}}

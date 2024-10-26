@@ -1,3 +1,3 @@
 # Control Flow Abstraction Funcers
 
-{{#include ../bachdoc/control.md}}
+{{#include ../bachdoc/builtin/control.md}}

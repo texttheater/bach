@@ -1,3 +1,3 @@
 # Value Funcers
 
-{{#include ../bachdoc/values.md}}
+{{#include ../bachdoc/builtin/values.md}}

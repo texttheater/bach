@@ -1,3 +1,3 @@
 # Regexp Funcers
 
-{{#include ../bachdoc/regexp.md}}
+{{#include ../bachdoc/builtin/regexp.md}}

@@ -1,3 +1,3 @@
 # I/O Funcers
 
-{{#include ../bachdoc/io.md}}
+{{#include ../bachdoc/builtin/io.md}}

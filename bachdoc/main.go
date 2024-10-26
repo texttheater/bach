@@ -27,7 +27,7 @@ var FuncersByCategory = map[string][]shapes.Funcer{
 }
 
 var ExampleSetsByName = map[string][]shapes.Example{
-	"types-simple": interpreter.SimpleTypeExamples,
+	"simple-types": interpreter.SimpleTypeExamples,
 }
 
 func main() {
@@ -62,8 +62,6 @@ func (b *BuiltinCmd) Run() error {
 		fmt.Printf("|Output | %s | %s |\n\n", inlineCode(funcer.OutputType.String()), funcer.OutputDescription)
 		fmt.Printf("%s\n\n", funcer.Notes)
 		fmt.Printf("### Examples\n\n")
-		fmt.Printf("| Program | Type | Value | Error |\n")
-		fmt.Printf("|---|---|---|---|\n")
 		printExamplesTable(funcer.Examples)
 		fmt.Printf("\n")
 	}
@@ -102,6 +100,8 @@ func inlineCode(s string) string {
 }
 
 func printExamplesTable(examples []shapes.Example) {
+	fmt.Printf("| Program | Type | Value | Error |\n")
+	fmt.Printf("|---|---|---|---|\n")
 	for _, example := range examples {
 		var err string
 		if example.Error == nil {

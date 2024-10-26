@@ -1,3 +1,3 @@
 # Math Funcers
 
-{{#include ../bachdoc/math.md}}
+{{#include ../bachdoc/builtin/math.md}}
