@@ -10,7 +10,7 @@ import (
 func TestFilters(t *testing.T) {
 	interpreter.TestProgramStr(
 		`[1, 2, 3] each(if ==1 then "a" elif ==2 then "b" else "c" ok)`,
-		`Arr<Str>`,
+		`Arr<Str...>`,
 		`["a", "b", "c"]`,
 		nil,
 		t,
@@ -26,7 +26,7 @@ func TestFilters(t *testing.T) {
 	)
 	interpreter.TestProgramStr(
 		`[1, 2, 3] each(+1)`,
-		`Arr<Num>`,
+		`Arr<Num...>`,
 		`[2, 3, 4]`,
 		nil,
 		t,

@@ -151,7 +151,7 @@ func TestMatchingArr(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgram(
-		`for Arr<Num> def plusOne Arr<Num> as is [head;tail] then [head +1;tail plusOne] else [] ok ok [1, 2] plusOne`,
+		`for Arr<Num...> def plusOne Arr<Num...> as is [head;tail] then [head +1;tail plusOne] else [] ok ok [1, 2] plusOne`,
 		&types.Arr{
 			El: types.Num{},
 		},

@@ -102,7 +102,7 @@ func TestGetters(t *testing.T) {
 		),
 		t,
 	)
-	interpreter.TestProgram(`for Any def f Arr<Any> as [] ok f @1`,
+	interpreter.TestProgram(`for Any def f Arr<Any...> as [] ok f @1`,
 		nil,
 		nil,
 		errors.TypeError(
@@ -110,7 +110,7 @@ func TestGetters(t *testing.T) {
 		),
 		t,
 	)
-	interpreter.TestProgram(`for Any def f Arr<Any> as ["a", "b", "c"] ok f @1`,
+	interpreter.TestProgram(`for Any def f Arr<Any...> as ["a", "b", "c"] ok f @1`,
 		nil,
 		nil,
 		errors.TypeError(

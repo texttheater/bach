@@ -54,12 +54,12 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`[1, 2, 3] +[4, 5]`, `Arr<Num>`, `[1, 2, 3, 4, 5]`, nil},
-			{`[] +[4, 5]`, `Arr<Num>`, `[4, 5]`, nil},
-			{`[1, 2, 3] +[]`, `Arr<Num>`, `[1, 2, 3]`, nil},
-			{`[] +[]`, `Tup<>`, `[]`, nil},
-			{`["a", "b"] +["c", "d"]`, `Arr<Str>`, `["a", "b", "c", "d"]`, nil},
-			{`["a", "b"] +[1, 2]`, `Arr<Str|Num>`, `["a", "b", 1, 2]`, nil},
+			{`[1, 2, 3] +[4, 5]`, `Arr<Num...>`, `[1, 2, 3, 4, 5]`, nil},
+			{`[] +[4, 5]`, `Arr<Num...>`, `[4, 5]`, nil},
+			{`[1, 2, 3] +[]`, `Arr<Num...>`, `[1, 2, 3]`, nil},
+			{`[] +[]`, `Arr<>`, `[]`, nil},
+			{`["a", "b"] +["c", "d"]`, `Arr<Str...>`, `["a", "b", "c", "d"]`, nil},
+			{`["a", "b"] +[1, 2]`, `Arr<Str|Num...>`, `["a", "b", 1, 2]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -125,12 +125,12 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`[1, 2, 3] drop(-1)`, `Arr<Num>`, `[1, 2, 3]`, nil},
-			{`[1, 2, 3] drop(0)`, `Arr<Num>`, `[1, 2, 3]`, nil},
-			{`[1, 2, 3] drop(1)`, `Arr<Num>`, `[2, 3]`, nil},
-			{`[1, 2, 3] drop(2)`, `Arr<Num>`, `[3]`, nil},
-			{`[1, 2, 3] drop(3)`, `Arr<Num>`, `[]`, nil},
-			{`[1, 2, 3] drop(4)`, `Arr<Num>`, `[]`, nil},
+			{`[1, 2, 3] drop(-1)`, `Arr<Num...>`, `[1, 2, 3]`, nil},
+			{`[1, 2, 3] drop(0)`, `Arr<Num...>`, `[1, 2, 3]`, nil},
+			{`[1, 2, 3] drop(1)`, `Arr<Num...>`, `[2, 3]`, nil},
+			{`[1, 2, 3] drop(2)`, `Arr<Num...>`, `[3]`, nil},
+			{`[1, 2, 3] drop(3)`, `Arr<Num...>`, `[]`, nil},
+			{`[1, 2, 3] drop(4)`, `Arr<Num...>`, `[]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -190,7 +190,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] dropWhile(is {a: _})`, `Arr<Obj<b: Num, Void>|Obj<a: Num, Void>>`, `[{b: 3}, {a: 4}]`, nil},
+			{`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] dropWhile(is {a: _})`, `Arr<Obj<b: Num, Void>|Obj<a: Num, Void>...>`, `[{b: 3}, {a: 4}]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -231,8 +231,8 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`[1, 2, 3] each(*2)`, `Arr<Num>`, `[2, 4, 6]`, nil},
-			{`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] takeWhile(is {a: _}) each(@a)`, `Arr<Num>`, `[1, 2]`, nil},
+			{`[1, 2, 3] each(*2)`, `Arr<Num...>`, `[2, 4, 6]`, nil},
+			{`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] takeWhile(is {a: _}) each(@a)`, `Arr<Num...>`, `[1, 2]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -269,7 +269,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`["a", "b", "c"] enum`, `Arr<Tup<Num, Str>>`, `[[0, "a"], [1, "b"], [2, "c"]]`, nil},
+			{`["a", "b", "c"] enum`, `Arr<Arr<Num, Str>...>`, `[[0, "a"], [1, "b"], [2, "c"]]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -311,7 +311,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`["a", "b", "c"] enum(1)`, `Arr<Tup<Num, Str>>`, `[[1, "a"], [2, "b"], [3, "c"]]`, nil},
+			{`["a", "b", "c"] enum(1)`, `Arr<Arr<Num, Str>...>`, `[[1, "a"], [2, "b"], [3, "c"]]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -368,8 +368,8 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`[1, 2, 3] findFirst(is Num with %2 ==0)`, `Null|Tup<Num, Num>`, `[1, 2]`, nil},
-			{`[1, 2, 3] findFirst(is Num with %4 ==0)`, `Null|Tup<Num, Num>`, `null`, nil},
+			{`[1, 2, 3] findFirst(is Num with %2 ==0)`, `Null|Arr<Num, Num>`, `[1, 2]`, nil},
+			{`[1, 2, 3] findFirst(is Num with %4 ==0)`, `Null|Arr<Num, Num>`, `null`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -524,8 +524,8 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`[1, 2, 3, 4] findLast(is Num with %2 ==0)`, `Null|Tup<Num, Num>`, `[3, 4]`, nil},
-			{`[1, 2, 3, 4] findLast(is Num with %8 ==0)`, `Null|Tup<Num, Num>`, `null`, nil},
+			{`[1, 2, 3, 4] findLast(is Num with %2 ==0)`, `Null|Arr<Num, Num>`, `[3, 4]`, nil},
+			{`[1, 2, 3, 4] findLast(is Num with %8 ==0)`, `Null|Arr<Num, Num>`, `null`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -839,14 +839,14 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`[] join`, `Arr<<A>>`, `[]`, nil}, // FIXME output type should be Tup<>
-			{`[[]] join`, `Tup<>`, `[]`, nil},
-			{`[[1]] join`, `Arr<Num>`, `[1]`, nil},
-			{`[[1, 2]] join`, `Arr<Num>`, `[1, 2]`, nil},
-			{`[[], []] join`, `Tup<>`, `[]`, nil},
-			{`[[], [1]] join`, `Arr<Num>`, `[1]`, nil},
-			{`[[1], [2, 3]] join`, `Arr<Num>`, `[1, 2, 3]`, nil},
-			{`[[1], [2, [3]]] join`, `Arr<Num|Tup<Num>>`, `[1, 2, [3]]`, nil},
+			{`[] join`, `Arr<<A>...>`, `[]`, nil}, // FIXME output type should be Arr<>
+			{`[[]] join`, `Arr<>`, `[]`, nil},
+			{`[[1]] join`, `Arr<Num...>`, `[1]`, nil},
+			{`[[1, 2]] join`, `Arr<Num...>`, `[1, 2]`, nil},
+			{`[[], []] join`, `Arr<>`, `[]`, nil},
+			{`[[], [1]] join`, `Arr<Num...>`, `[1]`, nil},
+			{`[[1], [2, 3]] join`, `Arr<Num...>`, `[1, 2, 3]`, nil},
+			{`[[1], [2, [3]]] join`, `Arr<Num|Arr<Num>...>`, `[1, 2, [3]]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -910,43 +910,43 @@ var ArrFuncers = []shapes.Funcer{
 		Examples: []shapes.Example{
 			{
 				`["a", 1, "b", 2, "c", 3] keep(is Num with %2 >0 elis Str)`,
-				`Arr<Num|Str>`,
+				`Arr<Num|Str...>`,
 				`["a", 1, "b", "c", 3]`,
 				nil,
 			},
 			{
 				`[{n: 1}, {n: 2}, {n: 3}] keep(is {n: n} with n %2 >0)`,
-				`Arr<Obj<n: Num, Void>>`,
+				`Arr<Obj<n: Num, Void>...>`,
 				`[{n: 1}, {n: 3}]`,
 				nil,
 			},
 			{
 				`[1, 2, 3, 4, 5, 6] keep(if %2 ==0) each(*2)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[4, 8, 12]`,
 				nil,
 			},
 			{
 				`[1, 2, 3, 4, 5, 6] keep(if %2 ==0 not) each(id)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[1, 3, 5]`,
 				nil,
 			},
 			{
 				`[1, 2, 3] keep(if %2 ==0 not) each(+1)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[2, 4]`,
 				nil,
 			},
 			{
 				`[1, 2, 3] keep(if false)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[]`,
 				nil,
 			},
 			{
 				`[{n: 1}, 2, {n: 3}] keep(is {n: n}) each(@n)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[1, 3]`,
 				nil,
 			},
@@ -1011,7 +1011,7 @@ var ArrFuncers = []shapes.Funcer{
 		Examples: []shapes.Example{
 			{`["abc", "b", "ab"] max(<, "")`, `Str`, `"b"`, nil},
 			{`[0, 1, 2] max(>, -100)`, `Num`, `0`, nil},
-			{`for Any def f Arr<Num> as [] ok f max(<, 0)`, `Num`, `0`, nil},
+			{`for Any def f Arr<Num...> as [] ok f max(<, 0)`, `Num`, `0`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -1157,9 +1157,9 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`range(0, 4)`, `Arr<Num>`, `[0, 1, 2, 3]`, nil},
-			{`range(-1, 2)`, `Arr<Num>`, `[-1, 0, 1]`, nil},
-			{`range(3, 2)`, `Arr<Num>`, `[]`, nil},
+			{`range(0, 4)`, `Arr<Num...>`, `[0, 1, 2, 3]`, nil},
+			{`range(-1, 2)`, `Arr<Num...>`, `[-1, 0, 1]`, nil},
+			{`range(3, 2)`, `Arr<Num...>`, `[]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -1203,9 +1203,9 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`[1, 2, 3] repeat(3)`, `Arr<Num>`, `[1, 2, 3, 1, 2, 3, 1, 2, 3]`, nil},
-			{`[1, 2, 3] repeat(0)`, `Arr<Num>`, `[]`, nil},
-			{`[1, 2, 3] repeat(1)`, `Arr<Num>`, `[1, 2, 3]`, nil},
+			{`[1, 2, 3] repeat(3)`, `Arr<Num...>`, `[1, 2, 3, 1, 2, 3, 1, 2, 3]`, nil},
+			{`[1, 2, 3] repeat(0)`, `Arr<Num...>`, `[]`, nil},
+			{`[1, 2, 3] repeat(1)`, `Arr<Num...>`, `[1, 2, 3]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -1241,8 +1241,8 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`[1, 2, 3] rev`, `Arr<Num>`, `[3, 2, 1]`, nil},
-			{`[] rev`, `Tup<>`, `[]`, nil},
+			{`[1, 2, 3] rev`, `Arr<Num...>`, `[3, 2, 1]`, nil},
+			{`[] rev`, `Arr<>`, `[]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -1291,7 +1291,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`[7, 3, 2, 5, 2] sort`, `Arr<Num>`, `[2, 2, 3, 5, 7]`, nil},
+			{`[7, 3, 2, 5, 2] sort`, `Arr<Num...>`, `[2, 2, 3, 5, 7]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -1310,7 +1310,7 @@ var ArrFuncers = []shapes.Funcer{
 		Examples: []shapes.Example{
 			{
 				`"Zwölf Boxkämpfer jagen Victor quer über den großen Sylter Deich . Voilà !" fields sort`,
-				`Arr<Str>`,
+				`Arr<Str...>`,
 				`["!", ".", "Boxkämpfer", "Deich", "Sylter", "Victor", "Voilà", "Zwölf", "den", "großen", "jagen", "quer", "über"]`,
 				nil,
 			},
@@ -1340,22 +1340,22 @@ var ArrFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`[7, 3, 2, 5] sort(>)`, `Arr<Num>`, `[7, 5, 3, 2]`, nil},
+			{`[7, 3, 2, 5] sort(>)`, `Arr<Num...>`, `[7, 5, 3, 2]`, nil},
 			{
 				`"Zwölf Boxkämpfer jagen Victor quer über den großen Sylter Deich . Voilà !" fields sort(>)`,
-				`Arr<Str>`,
+				`Arr<Str...>`,
 				`["über", "quer", "jagen", "großen", "den", "Zwölf", "Voilà", "Victor", "Sylter", "Deich", "Boxkämpfer", ".", "!"]`,
 				nil,
 			},
 			{
 				`[{a: 7}, {a: 3}, {a: 2}, {a: 5}] for Obj<a: Num, Void> def <(other Obj<a: Num, Void>) Bool as @a <(other @a) ok sort(<)`,
-				`Arr<Obj<a: Num, Void>>`,
+				`Arr<Obj<a: Num, Void>...>`,
 				`[{a: 2}, {a: 3}, {a: 5}, {a: 7}]`,
 				nil,
 			},
 			{
 				`[{a: 7, b: 2}, {a: 3, b: 1}, {a: 2, b: 2}, {a: 5, b: 2}] for Obj<a: Num, b: Num, Void> def <(other Obj<a: Num, b: Num, Void>) Bool as @b <(other @b) ok sort(<)`,
-				`Arr<Obj<a: Num, b: Num, Void>>`,
+				`Arr<Obj<a: Num, b: Num, Void>...>`,
 				`[{a: 3, b: 1}, {a: 7, b: 2}, {a: 2, b: 2}, {a: 5, b: 2}]`,
 				nil,
 			},
@@ -1394,13 +1394,13 @@ var ArrFuncers = []shapes.Funcer{
 		Examples: []shapes.Example{
 			{
 				`[{a: 7}, {a: 3}, {a: 2}, {a: 5}] sortBy(@a, <)`,
-				`Arr<Obj<a: Num, Void>>`,
+				`Arr<Obj<a: Num, Void>...>`,
 				`[{a: 2}, {a: 3}, {a: 5}, {a: 7}]`,
 				nil,
 			},
 			{
 				`[{a: 7, b: 2}, {a: 3, b: 1}, {a: 2, b: 2}, {a: 5, b: 2}] sortBy(@b, <)`,
-				`Arr<Obj<a: Num, b: Num, Void>>`,
+				`Arr<Obj<a: Num, b: Num, Void>...>`,
 				`[{a: 3, b: 1}, {a: 7, b: 2}, {a: 2, b: 2}, {a: 5, b: 2}]`,
 				nil,
 			},
@@ -1449,37 +1449,37 @@ var ArrFuncers = []shapes.Funcer{
 		Examples: []shapes.Example{
 			{
 				`[1, 2, 3] take(2)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[1, 2]`,
 				nil,
 			},
 			{
 				`[1, 2, 3] take(1)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[1]`,
 				nil,
 			},
 			{
 				`[1, 2, 3] take(0)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[]`,
 				nil,
 			},
 			{
 				`[1, 2, 3] take(-1)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[]`,
 				nil,
 			},
 			{
 				`[1, 2, 3] take(4)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[1, 2, 3]`,
 				nil,
 			},
 			{
 				`[1, 2, 3] take(3)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[1, 2, 3]`,
 				nil,
 			},
@@ -1549,19 +1549,19 @@ var ArrFuncers = []shapes.Funcer{
 		Examples: []shapes.Example{
 			{
 				`[1, 3, 5, 2, 4, 7] takeWhile(if %2 ==1)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[1, 3, 5]`,
 				nil,
 			},
 			{
 				`[1, 3, 5, 2, 4, 7] takeWhile(if %2 ==0)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[]`,
 				nil,
 			},
 			{
 				`[{a: 1}, {a: 2}, {b: 3}, {a: 4}] takeWhile(is {a: _}) each(@a)`,
-				`Arr<Num>`,
+				`Arr<Num...>`,
 				`[1, 2]`,
 				nil,
 			},

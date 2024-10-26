@@ -29,7 +29,6 @@ type NonDisjunctiveTypeTemplate struct {
 	NumType              *NumType              `| @@`
 	StrType              *StrType              `| @@`
 	ArrTypeTemplate      *ArrTypeTemplate      `| @@`
-	TupTypeTemplate      *TupTypeTemplate      `| @@`
 	ObjTypeTemplate      *ObjTypeTemplate      `| @@`
 	AnyType              *AnyType              `| @@`
 	TypeVariableTemplate *TypeVariableTemplate `| @@`
@@ -57,9 +56,6 @@ func (g *NonDisjunctiveTypeTemplate) Ast() types.Type {
 	if g.ArrTypeTemplate != nil {
 		return g.ArrTypeTemplate.Ast()
 	}
-	if g.TupTypeTemplate != nil {
-		return g.TupTypeTemplate.Ast()
-	}
 	if g.ObjTypeTemplate != nil {
 		return g.ObjTypeTemplate.Ast()
 	}
@@ -73,33 +69,39 @@ func (g *NonDisjunctiveTypeTemplate) Ast() types.Type {
 }
 
 type ArrTypeTemplate struct {
-	Pos                 lexer.Position `"Arr<"`
-	ElementTypeTemplate *TypeTemplate  `@@ ">"`
+	Pos           lexer.Position  `"Arr<"`
+	TypeTemplate  *TypeTemplate   `( @@`
+	TypeTemplates []*TypeTemplate `  ( "," @@ )*`
+	Ellipsis      *string         `  @Ellipsis? )? ">"`
 }
 
 func (g *ArrTypeTemplate) Ast() types.Type {
-	elType := g.ElementTypeTemplate.Ast()
-	return &types.Arr{elType}
-}
-
-type TupTypeTemplate struct {
-	Pos           lexer.Position  `"Tup<"`
-	TypeTemplate  *TypeTemplate   `( @@`
-	TypeTemplates []*TypeTemplate `  ( "," @@ )* )? ">"`
-}
-
-func (g *TupTypeTemplate) Ast() types.Type {
-	var elementTypes []types.Type
-	if g.TypeTemplate != nil {
-		elementTypes = make([]types.Type, len(g.TypeTemplates)+1)
-		el := g.TypeTemplate.Ast()
-		elementTypes[0] = el
-		for i, elementTypeTemplate := range g.TypeTemplates {
-			el = elementTypeTemplate.Ast()
-			elementTypes[i+1] = el
-		}
+	if g.TypeTemplate == nil {
+		return types.VoidArr
 	}
-	return types.NewTup(elementTypes)
+	if len(g.TypeTemplates) == 0 && g.Ellipsis != nil {
+		return types.NewArr(g.TypeTemplate.Ast())
+	}
+	result := &types.Nearr{
+		Head: g.TypeTemplate.Ast(),
+	}
+	current := result
+	length := len(g.TypeTemplates)
+	for i, t := range g.TypeTemplates {
+		if g.Ellipsis != nil && i == length-1 {
+			current.Tail = &types.Arr{
+				El: t.Ast(),
+			}
+			return result
+		}
+		newTail := &types.Nearr{
+			Head: t.Ast(),
+		}
+		current.Tail = newTail
+		current = newTail
+	}
+	current.Tail = types.VoidArr
+	return result
 }
 
 type ObjTypeTemplate struct {

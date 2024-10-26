@@ -66,11 +66,11 @@ var IOFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`["a", "b", "", "c", "d", "e", "f", ""] blocks`, `Arr<Arr<Str>>`, `[["a", "b"], ["c", "d", "e", "f"]]`, nil},
-			{`["a", ""] blocks`, `Arr<Arr<Str>>`, `[["a"]]`, nil},
-			{`["a"] blocks`, `Arr<Arr<Str>>`, `[["a"]]`, nil},
-			{`["", "a"] blocks`, `Arr<Arr<Str>>`, `[[], ["a"]]`, nil},
-			{`["a", "", "", "", "b"] blocks`, `Arr<Arr<Str>>`, `[["a"], [], [], ["b"]]`, nil},
+			{`["a", "b", "", "c", "d", "e", "f", ""] blocks`, `Arr<Arr<Str...>...>`, `[["a", "b"], ["c", "d", "e", "f"]]`, nil},
+			{`["a", ""] blocks`, `Arr<Arr<Str...>...>`, `[["a"]]`, nil},
+			{`["a"] blocks`, `Arr<Arr<Str...>...>`, `[["a"]]`, nil},
+			{`["", "a"] blocks`, `Arr<Arr<Str...>...>`, `[[], ["a"]]`, nil},
+			{`["a", "", "", "", "b"] blocks`, `Arr<Arr<Str...>...>`, `[["a"], [], [], ["b"]]`, nil},
 		},
 	},
 	shapes.SimpleFuncer(
@@ -188,7 +188,7 @@ var IOFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`"abc\nde\n\nf" reader lines`, `Arr<Str>`, `["abc", "de", "", "f"]`, nil},
+			{`"abc\nde\n\nf" reader lines`, `Arr<Str...>`, `["abc", "de", "", "f"]`, nil},
 		},
 	},
 	shapes.SimpleFuncer(

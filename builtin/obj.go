@@ -167,8 +167,8 @@ var ObjFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`{a: 1, b: 2} items sortBy(@0, <)`, `Arr<Tup<Str, Num>>`, `[["a", 1], ["b", 2]]`, nil},
-			{`{} items`, `Arr<Tup<Str, Void>>`, `[]`, nil},
+			{`{a: 1, b: 2} items sortBy(@0, <)`, `Arr<Arr<Str, Num>...>`, `[["a", 1], ["b", 2]]`, nil},
+			{`{} items`, `Arr<Arr<Str, Void>...>`, `[]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -198,8 +198,8 @@ var ObjFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`{a: 1, b: 2} props sort`, `Arr<Str>`, `["a", "b"]`, nil},
-			{`{} props`, `Arr<Str>`, `[]`, nil},
+			{`{a: 1, b: 2} props sort`, `Arr<Str...>`, `["a", "b"]`, nil},
+			{`{} props`, `Arr<Str...>`, `[]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -226,8 +226,8 @@ var ObjFuncers = []shapes.Funcer{
 			return states.ThunkFromChannel(c)
 		}, IDs: nil,
 		Examples: []shapes.Example{
-			{`{a: 1, b: 2} values sort`, `Arr<Num>`, `[1, 2]`, nil},
-			{`{} values`, `Tup<>`, `[]`, nil},
+			{`{a: 1, b: 2} values sort`, `Arr<Num...>`, `[1, 2]`, nil},
+			{`{} values`, `Arr<>`, `[]`, nil},
 		},
 	},
 	shapes.Funcer{

@@ -86,9 +86,9 @@ func (t *Arr) Partition(u Type) (Type, Type) {
 
 func (t *Arr) String() string {
 	if (Void{}).Subsumes(t.El) {
-		return "Tup<>"
+		return "Arr<>"
 	}
-	return fmt.Sprintf("Arr<%s>", t.El)
+	return fmt.Sprintf("Arr<%s...>", t.El)
 }
 
 func (t *Arr) ElementType() Type {

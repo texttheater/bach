@@ -38,7 +38,7 @@ func TestAssignment(t *testing.T) {
 	)
 	interpreter.TestProgramStr(
 		`[1, 2, 3] =[a;r] r`,
-		`Tup<Num, Num>`,
+		`Arr<Num, Num>`,
 		`[2, 3]`,
 		nil,
 		t,
@@ -53,7 +53,7 @@ func TestAssignment(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgramStr(
-		`for Arr<Num> def f Num as =[a, b] a ok`,
+		`for Arr<Num...> def f Num as =[a, b] a ok`,
 		``,
 		``,
 		errors.TypeError(

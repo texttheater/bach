@@ -45,15 +45,15 @@ func TestMatchingType(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgramStr(
-		`[1, 2, 3] is Arr<Num> then each(+1) ok`,
-		`Arr<Num>`,
+		`[1, 2, 3] is Arr<Num...> then each(+1) ok`,
+		`Arr<Num...>`,
 		`[2, 3, 4]`,
 		nil,
 		t,
 	)
-	interpreter.TestProgramStr( // Intersective matching: pattern says Arr<Any> but Bach knows it got Arr<Num>
-		`[1, 2, 3] is Arr<Any> then each(+1) ok`,
-		`Arr<Num>`,
+	interpreter.TestProgramStr( // Intersective matching: pattern says Arr<Any...> but Bach knows it got Arr<Num...>
+		`[1, 2, 3] is Arr<Any...> then each(+1) ok`,
+		`Arr<Num...>`,
 		`[2, 3, 4]`,
 		nil,
 		t,

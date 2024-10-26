@@ -53,14 +53,14 @@ func TestRecursion(t *testing.T) {
 		t,
 	)
 	// fold for numbers
-	interpreter.TestProgram(`for Arr<Num> def myFold(start Num, for Num op(Num) Num) Num as is [head;tail] then start op(head) =newStart tail myFold(newStart, op) else start ok ok [1, 2, 3] myFold(0, +)`,
+	interpreter.TestProgram(`for Arr<Num...> def myFold(start Num, for Num op(Num) Num) Num as is [head;tail] then start op(head) =newStart tail myFold(newStart, op) else start ok ok [1, 2, 3] myFold(0, +)`,
 		types.Num{},
 		states.NumValue(6),
 		nil,
 		t,
 	)
 	// generic fold
-	interpreter.TestProgram(`for Arr<<A>> def myFold(start <B>, for <B> op(<A>) <B>) <B> as is [head;tail] then start op(head) =newStart tail myFold(newStart, op) else start ok ok [2, 3, 4] myFold(1, *)`,
+	interpreter.TestProgram(`for Arr<<A>...> def myFold(start <B>, for <B> op(<A>) <B>) <B> as is [head;tail] then start op(head) =newStart tail myFold(newStart, op) else start ok ok [2, 3, 4] myFold(1, *)`,
 		types.Num{},
 		states.NumValue(24),
 		nil,

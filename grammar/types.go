@@ -29,7 +29,6 @@ type NonDisjunctiveType struct {
 	NumType      *NumType      `| @@`
 	StrType      *StrType      `| @@`
 	ArrType      *ArrType      `| @@`
-	TupType      *TupType      `| @@`
 	ObjType      *ObjType      `| @@`
 	AnyType      *AnyType      `| @@`
 	TypeVariable *TypeVariable `| @@`
@@ -56,9 +55,6 @@ func (g *NonDisjunctiveType) Ast() types.Type {
 	}
 	if g.ArrType != nil {
 		return g.ArrType.Ast()
-	}
-	if g.TupType != nil {
-		return g.TupType.Ast()
 	}
 	if g.ObjType != nil {
 		return g.ObjType.Ast()
@@ -121,25 +117,18 @@ func (g *StrType) Ast() types.Type {
 }
 
 type ArrType struct {
-	Pos         lexer.Position `"Arr<"`
-	ElementType *Type          `@@ ">"`
-}
-
-func (g *ArrType) Ast() types.Type {
-	elType := g.ElementType.Ast()
-	return &types.Arr{elType}
-}
-
-type TupType struct {
-	Pos      lexer.Position `"Tup<"`
+	Pos      lexer.Position `"Arr<"`
 	Type     *Type          `( @@`
 	Types    []*Type        `  ( "," @@ )*`
 	Ellipsis *string        `  @Ellipsis? )? ">"`
 }
 
-func (g *TupType) Ast() types.Type {
+func (g *ArrType) Ast() types.Type {
 	if g.Type == nil {
 		return types.VoidArr
+	}
+	if len(g.Types) == 0 && g.Ellipsis != nil {
+		return types.NewArr(g.Type.Ast())
 	}
 	result := &types.Nearr{
 		Head: g.Type.Ast(),

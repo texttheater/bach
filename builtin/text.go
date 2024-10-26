@@ -149,10 +149,10 @@ var TextFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`"abc" bytes`, `Arr<Num>`, `[97, 98, 99]`, nil},
-			{`"Köln" bytes`, `Arr<Num>`, `[75, 195, 182, 108, 110]`, nil},
-			{`"日本語" bytes`, `Arr<Num>`, `[230, 151, 165, 230, 156, 172, 232, 170, 158]`, nil},
-			{`"\x00" bytes`, `Arr<Num>`, `[0]`, nil},
+			{`"abc" bytes`, `Arr<Num...>`, `[97, 98, 99]`, nil},
+			{`"Köln" bytes`, `Arr<Num...>`, `[75, 195, 182, 108, 110]`, nil},
+			{`"日本語" bytes`, `Arr<Num...>`, `[230, 151, 165, 230, 156, 172, 232, 170, 158]`, nil},
+			{`"\x00" bytes`, `Arr<Num...>`, `[0]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -212,10 +212,10 @@ var TextFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`"abc" codePoints`, `Arr<Num>`, `[97, 98, 99]`, nil},
-			{`"Köln" codePoints`, `Arr<Num>`, `[75, 246, 108, 110]`, nil},
-			{`"日本語" codePoints`, `Arr<Num>`, `[26085, 26412, 35486]`, nil},
-			{`"\x80" codePoints`, `Arr<Num>`, `[65533]`, nil},
+			{`"abc" codePoints`, `Arr<Num...>`, `[97, 98, 99]`, nil},
+			{`"Köln" codePoints`, `Arr<Num...>`, `[75, 246, 108, 110]`, nil},
+			{`"日本語" codePoints`, `Arr<Num...>`, `[26085, 26412, 35486]`, nil},
+			{`"\x80" codePoints`, `Arr<Num...>`, `[65533]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -273,7 +273,7 @@ var TextFuncers = []shapes.Funcer{
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
-			{`"  foo bar  baz   " fields`, `Arr<Str>`, `["foo", "bar", "baz"]`, nil},
+			{`"  foo bar  baz   " fields`, `Arr<Str...>`, `["foo", "bar", "baz"]`, nil},
 		},
 	},
 	shapes.Funcer{
@@ -330,7 +330,7 @@ var TextFuncers = []shapes.Funcer{
 			{`["ab", "cd", "ef"] join`, `Str`, `"abcdef"`, nil},
 			{`["ab", "cd"] join`, `Str`, `"abcd"`, nil},
 			{`["ab"] join`, `Str`, `"ab"`, nil},
-			{`for Any def f Arr<Str> as [] ok f join`, `Str`, `""`, nil},
+			{`for Any def f Arr<Str...> as [] ok f join`, `Str`, `""`, nil},
 		},
 	),
 	shapes.SimpleFuncer(
@@ -368,7 +368,7 @@ var TextFuncers = []shapes.Funcer{
 			{`["ab", "cd", "ef"] join(";")`, `Str`, `"ab;cd;ef"`, nil},
 			{`["ab", "", "cd"] join(";")`, `Str`, `"ab;;cd"`, nil},
 			{`["ab"] join(";")`, `Str`, `"ab"`, nil},
-			{`for Any def f Arr<Str> as [] ok f join(";")`, `Str`, `""`, nil},
+			{`for Any def f Arr<Str...> as [] ok f join(";")`, `Str`, `""`, nil},
 		},
 	),
 	shapes.SimpleFuncer(

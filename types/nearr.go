@@ -110,7 +110,7 @@ func (t Nearr) ElementType() Type {
 
 func (t *Nearr) String() string {
 	buffer := bytes.Buffer{}
-	buffer.WriteString("Tup<")
+	buffer.WriteString("Arr<")
 	buffer.WriteString(t.Head.String())
 	tail := t.Tail
 Loop:

@@ -60,7 +60,7 @@ func TestDefinitions(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgram(
-		`for Any def f(a Num, b Num) Tup<Num, Num> as [a, b] ok f(2, 3)`,
+		`for Any def f(a Num, b Num) Arr<Num, Num> as [a, b] ok f(2, 3)`,
 		types.NewTup([]types.Type{types.Num{}, types.Num{}}),
 		states.NewArrValue([]states.Value{states.NumValue(2), states.NumValue(3)}),
 		nil,
@@ -152,7 +152,7 @@ func TestDefinitions(t *testing.T) {
 	)
 	// generics with bounds
 	interpreter.TestProgram(
-		`for Any def f(for Any g <A Arr<Any>>) <A> as g ok f([1, "a"])`,
+		`for Any def f(for Any g <A Arr<Any...>>) <A> as g ok f([1, "a"])`,
 		types.NewTup([]types.Type{
 			types.Num{},
 			types.Str{},
@@ -165,7 +165,7 @@ func TestDefinitions(t *testing.T) {
 		t,
 	)
 	interpreter.TestProgram(
-		`for Any def f(for Any g <A Arr<Any>>) <A> as g ok f("a")`,
+		`for Any def f(for Any g <A Arr<Any...>>) <A> as g ok f("a")`,
 		nil,
 		nil,
 		errors.TypeError(

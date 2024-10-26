@@ -14,13 +14,13 @@ var SimpleTypeExamples = []shapes.Example{
 }
 
 var TupleTypeExamples = []shapes.Example{
-	{`[]`, `Tup<>`, `[]`, nil},
-	{`[1]`, `Tup<Num>`, `[1]`, nil},
-	{`[1, 2, 3]`, `Tup<Num, Num, Num>`, `[1, 2, 3]`, nil},
-	{`[1, "a"]`, `Tup<Num, Str>`, `[1, "a"]`, nil},
-	{`[[1, 2], ["a", "b"]]`, `Tup<Tup<Num, Num>, Tup<Str, Str>>`, `[[1, 2], ["a", "b"]]`, nil},
-	{`[1;[]]`, `Tup<Num>`, `[1]`, nil},
-	{`[1, 2; [3, 4]]`, `Tup<Num, Num, Num, Num>`, `[1, 2, 3, 4]`, nil},
-	{`[3, 4] =rest [1, 2; rest]`, `Tup<Num, Num, Num, Num>`, `[1, 2, 3, 4]`, nil},
-	{`[1, 2; [1, 2] each(+2)]`, `Tup<Num, Num, Num...>`, `[1, 2, 3, 4]`, nil},
+	{`[]`, `Arr<>`, `[]`, nil},
+	{`[1]`, `Arr<Num>`, `[1]`, nil},
+	{`[1, 2, 3]`, `Arr<Num, Num, Num>`, `[1, 2, 3]`, nil},
+	{`[1, "a"]`, `Arr<Num, Str>`, `[1, "a"]`, nil},
+	{`[[1, 2], ["a", "b"]]`, `Arr<Arr<Num, Num>, Arr<Str, Str>>`, `[[1, 2], ["a", "b"]]`, nil},
+	{`[1;[]]`, `Arr<Num>`, `[1]`, nil},
+	{`[1, 2; [3, 4]]`, `Arr<Num, Num, Num, Num>`, `[1, 2, 3, 4]`, nil},
+	{`[3, 4] =rest [1, 2; rest]`, `Arr<Num, Num, Num, Num>`, `[1, 2, 3, 4]`, nil},
+	{`[1, 2; [1, 2] each(+2)]`, `Arr<Num, Num, Num...>`, `[1, 2, 3, 4]`, nil},
 }
