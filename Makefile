@@ -19,3 +19,7 @@ doc/book/bachdoc/builtin/%.md : builtin/%.go bachdoc/main.go
 doc/book/bachdoc/examples/%.md : interpreter/examples.go bachdoc/main.go
 	mkdir -p "$$(dirname $@)"
 	go run bachdoc/main.go examples $* > $@
+
+deploy : book
+	if [ -z $$DPLDEST ]; then echo DPLDEST is unset; exit 1; fi
+	rsync -Pahz doc/book/book/ $$DPLDEST/
