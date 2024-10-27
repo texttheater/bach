@@ -167,12 +167,10 @@ func (t Obj) String() string {
 			buffer.WriteString(t.Props[prop].String())
 		}
 	}
-	if !t.Rest.Subsumes(Any{}) {
-		if len(t.Props) != 0 {
-			buffer.WriteString(", ")
-		}
-		buffer.WriteString(t.Rest.String())
+	if len(t.Props) != 0 {
+		buffer.WriteString(", ")
 	}
+	buffer.WriteString(t.Rest.String())
 	buffer.WriteString(">")
 	return buffer.String()
 }
