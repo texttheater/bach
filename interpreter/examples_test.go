@@ -29,3 +29,27 @@ func TestArrayTypeExamples(t *testing.T) {
 		)
 	}
 }
+
+func TestObjectTypeExamples(t *testing.T) {
+	for _, example := range interpreter.ObjectTypeExamples {
+		interpreter.TestProgramStr(
+			example.Program,
+			example.OutputType,
+			example.OutputValue,
+			example.Error,
+			t,
+		)
+	}
+}
+
+func TestUnionTypeExamples(t *testing.T) {
+	for _, example := range interpreter.UnionTypeExamples {
+		interpreter.TestProgramStr(
+			example.Program,
+			example.OutputType,
+			example.OutputValue,
+			example.Error,
+			t,
+		)
+	}
+}
