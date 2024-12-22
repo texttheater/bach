@@ -7,3 +7,6 @@ title = "The Bach Programming Language"
 
 [output.html]
 additional-css = ["custom.css"]
+
+[preprocessor.bachdoc]
+command = "go run preproc/main.go"
