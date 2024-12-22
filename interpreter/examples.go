@@ -39,3 +39,11 @@ var UnionTypeExamples = []shapes.Example{
 	{`[1] +["a"]`, `Arr<Num|Str...>`, `[1, "a"]`, nil},
 	{`[1] +["a"] get(0)`, `Num|Str`, `1`, nil},
 }
+
+var NumLiteralExamples = []shapes.Example{}
+
+var StrLiteralExamples = []shapes.Example{}
+
+var ArrLiteralExamples = []shapes.Example{}
+
+var ObjLiteralExamples = []shapes.Example{}

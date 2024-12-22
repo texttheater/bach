@@ -31,6 +31,10 @@ var ExampleSetsByName = map[string][]shapes.Example{
 	"array-types":  interpreter.ArrayTypeExamples,
 	"object-types": interpreter.ObjectTypeExamples,
 	"union-types":  interpreter.UnionTypeExamples,
+	"num-literals": interpreter.NumLiteralExamples,
+	"str-literals": interpreter.StrLiteralExamples,
+	"arr-literals": interpreter.ArrLiteralExamples,
+	"obj-literals": interpreter.ObjLiteralExamples,
 }
 
 func main() {
