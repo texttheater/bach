@@ -41,7 +41,8 @@ func modifyBookItem(item object) {
 	chapter := item["Chapter"].(object)
 	content := chapter["content"].(string)
 	chapter["content"] = processExamples(content)
-	for _, subItem := range chapter["sub_items"].([]any) {
+	subItems := chapter["sub_items"].([]any)
+	for _, subItem := range subItems {
 		modifyBookItem(subItem.(object))
 	}
 }
