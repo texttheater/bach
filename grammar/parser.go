@@ -4,12 +4,15 @@ import (
 	"github.com/alecthomas/participle"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/types"
 )
 
 var parser *participle.Parser
 
 var typeParser *participle.Parser
+
+var paramParser *participle.Parser
 
 func init() {
 	var err error
@@ -59,4 +62,20 @@ func ParseType(input string) (types.Type, error) {
 		return nil, err
 	}
 	return t.Ast(), nil
+}
+
+func ParseParam(input string) (*params.Param, error) {
+	p := &Param{}
+	err := paramParser.ParseString(input, p)
+	if err != nil {
+		if parserError, ok := err.(participle.Error); ok {
+			return nil, errors.SyntaxError(
+				errors.Code(errors.Syntax),
+				errors.Pos(parserError.Token().Pos),
+				errors.Message(parserError.Message()),
+			)
+		}
+		return nil, err
+	}
+	return p.Ast()
 }
