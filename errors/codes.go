@@ -1,26 +1,9 @@
 package errors
 
-type ErrorKind int
-
-const (
-	SyntaxKind ErrorKind = iota
-	TypeKind
-	ValueKind
-	UnknownKind
+import (
+	"encoding/json"
+	"fmt"
 )
-
-func (kind ErrorKind) String() string {
-	switch kind {
-	case SyntaxKind:
-		return "Syntax error"
-	case TypeKind:
-		return "Type error"
-	case ValueKind:
-		return "Value error"
-	default:
-		return "Unknown error"
-	}
-}
 
 type ErrorCode int
 
@@ -149,4 +132,61 @@ func (code ErrorCode) DefaultMessage() string {
 	default:
 		return "unknown error"
 	}
+}
+
+func (code *ErrorCode) UnmarshalJSON(data []byte) error {
+	var v string
+	err := json.Unmarshal(data, v)
+	if err != nil {
+		return err
+	}
+	switch v {
+	case "Syntax":
+		*code = Syntax
+	case "ParamsNotAllowed":
+		*code = ParamsNotAllowed
+	case "NoSuchFunction":
+		*code = NoSuchFunction
+	case "ArgHasWrongOutputType":
+		*code = ArgHasWrongOutputType
+	case "ParamDoesNotMatch":
+		*code = ParamDoesNotMatch
+	case "FunctionBodyHasWrongOutputType":
+		*code = FunctionBodyHasWrongOutputType
+	case "ConditionMustBeBool":
+		*code = ConditionMustBeBool
+	case "MappingRequiresArrType":
+		*code = MappingRequiresArrType
+	case "RestRequiresArrType":
+		*code = RestRequiresArrType
+	case "ComposeWithVoid":
+		*code = ComposeWithVoid
+	case "VoidProgram":
+		*code = VoidProgram
+	case "NonExhaustiveMatch":
+		*code = NonExhaustiveMatch
+	case "ImpossibleMatch":
+		*code = ImpossibleMatch
+	case "UnreachableElisClause":
+		*code = UnreachableElisClause
+	case "UnreachableElseClause":
+		*code = UnreachableElseClause
+	case "RegexpWantsString":
+		*code = RegexpWantsString
+	case "BadRegexp":
+		*code = BadRegexp
+	case "UnexpectedValue":
+		*code = UnexpectedValue
+	case "NoSuchProperty":
+		*code = NoSuchProperty
+	case "NoSuchIndex":
+		*code = NoSuchIndex
+	case "BadIndex":
+		*code = BadIndex
+	case "NoGetterAllowed":
+		*code = NoGetterAllowed
+	default:
+		return fmt.Errorf("invalid error code")
+	}
+	return nil
 }

@@ -13,7 +13,7 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-type errorAttribute func(err *e)
+type errorAttribute func(err *E)
 
 // SyntaxError builds a syntax error value from a number of error attributes.
 // The following functions can be used to create error attributes:
@@ -96,7 +96,7 @@ func UnknownError(atts ...errorAttribute) error {
 }
 
 func makeError(kind ErrorKind, atts ...errorAttribute) error {
-	err := e{
+	err := E{
 		Kind: &kind,
 	}
 	e := &err
@@ -107,91 +107,91 @@ func makeError(kind ErrorKind, atts ...errorAttribute) error {
 }
 
 func Code(code ErrorCode) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.Code = &code
 	}
 }
 
 func Pos(pos lexer.Position) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.Pos = &pos
 	}
 }
 
 func Message(message string) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.Message = &message
 	}
 }
 
 func WantType(wantType types.Type) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.WantType = wantType
 	}
 }
 
 func GotType(gotType types.Type) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.GotType = gotType
 	}
 }
 
 func GotValue(gotValue states.Value) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.GotValue = gotValue
 	}
 }
 
 func InputType(inputType types.Type) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.InputType = inputType
 	}
 }
 
 func Name(name string) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.Name = &name
 	}
 }
 
 func ArgNum(argNum int) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.ArgNum = &argNum
 	}
 }
 
 func NumParams(numParams int) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.NumParams = &numParams
 	}
 }
 
 func ParamNum(paramNum int) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.ParamNum = &paramNum
 	}
 }
 
 func WantParam(wantParam *params.Param) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.WantParam = wantParam
 	}
 }
 
 func GotParam(gotParam *params.Param) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.GotParam = gotParam
 	}
 }
 
 func Hint(hint string) errorAttribute {
-	return func(err *e) {
+	return func(err *E) {
 		err.Hint = &hint
 	}
 }
 
-// An e represents any code of Bach error, or error template.
-type e struct {
+// An E represents any code of Bach error, or error template.
+type E struct {
 	Kind      *ErrorKind
 	Code      *ErrorCode
 	Pos       *lexer.Position
@@ -209,7 +209,7 @@ type e struct {
 	Hint      *string
 }
 
-func (err *e) Error() string {
+func (err *E) Error() string {
 	m := make(map[string]any)
 	if err.Kind != nil {
 		m["kind"] = err.Kind.String()
@@ -264,7 +264,7 @@ func (err *e) Error() string {
 }
 
 func Explain(err error, program string) {
-	e, ok := err.(*e)
+	e, ok := err.(*E)
 	if !ok {
 		fmt.Fprintln(os.Stderr, "Unknown error")
 		fmt.Fprintln(os.Stderr, "Message:   ", err.Error())
@@ -336,11 +336,11 @@ func Explain(err error, program string) {
 //
 // Adapted from: https://github.com/upspin/upspin/blob/master/errors/errors.go
 func Match(err1, err2 error) bool {
-	e1, ok := err1.(*e)
+	e1, ok := err1.(*E)
 	if !ok {
 		return false
 	}
-	e2, ok := err2.(*e)
+	e2, ok := err2.(*E)
 	if !ok {
 		return false
 	}
