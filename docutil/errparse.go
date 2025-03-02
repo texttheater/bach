@@ -1,4 +1,4 @@
-package main
+package docutil
 
 import (
 	"encoding/json"
@@ -9,11 +9,14 @@ import (
 	"github.com/texttheater/bach/interpreter"
 )
 
-func parseError(input string) (error, error) {
+func ParseError(input string) (error, error) {
 	var v map[string]any
-	err := json.Unmarshal([]byte(input), v)
+	err := json.Unmarshal([]byte(input), &v)
 	if err != nil {
 		return nil, err
+	}
+	if len(v) == 0 {
+		return nil, nil
 	}
 	var e errors.E
 	if kind, ok := v["Kind"]; ok {
@@ -96,5 +99,4 @@ func parseError(input string) (error, error) {
 		e.GotParam = gotParam
 	}
 	return &e, nil
-
 }

@@ -3,11 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
-	"html"
-	"strings"
+	"os"
 
 	"github.com/alecthomas/kong"
 	"github.com/texttheater/bach/builtin"
+	"github.com/texttheater/bach/docutil"
 	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/shapes"
 )
@@ -62,14 +62,14 @@ func (b *BuiltinCmd) Run() error {
 		fmt.Printf("%s\n\n", funcer.Summary)
 		fmt.Printf("| | Type | Value |\n")
 		fmt.Printf("|---|---|---|\n")
-		fmt.Printf("| Input | %s | %s |\n", inlineCode(funcer.InputType.String()), funcer.InputDescription)
+		fmt.Printf("| Input | %s | %s |\n", docutil.InlineCode(funcer.InputType.String()), funcer.InputDescription)
 		for i, param := range funcer.Params {
-			fmt.Printf("| %s (param #%d) | %s | %s |\n", param.Name, i+1, inlineCode(param.String()), param.Description)
+			fmt.Printf("| %s (param #%d) | %s | %s |\n", param.Name, i+1, docutil.InlineCode(param.String()), param.Description)
 		}
-		fmt.Printf("|Output | %s | %s |\n\n", inlineCode(funcer.OutputType.String()), funcer.OutputDescription)
+		fmt.Printf("|Output | %s | %s |\n\n", docutil.InlineCode(funcer.OutputType.String()), funcer.OutputDescription)
 		fmt.Printf("%s\n\n", funcer.Notes)
 		fmt.Printf("### Examples\n\n")
-		printExamplesTable(funcer.Examples)
+		docutil.PrintExamplesTable(os.Stdout, funcer.Examples)
 		fmt.Printf("\n")
 	}
 	return nil
@@ -84,44 +84,6 @@ func (e *ExamplesCmd) Run() error {
 	if !ok {
 		return errors.New("unknown example set")
 	}
-	printExamplesTable(examples)
+	docutil.PrintExamplesTable(os.Stdout, examples)
 	return nil
-}
-
-// inlineCode takes a string representing some program code and converts it to
-// a Markdown representation suitable for processing by mdbook.
-func inlineCode(s string) string {
-	// handle empty string specially: do not generate <code></code> tags
-	if s == "" {
-		return ""
-	}
-	// escape HTML special characters
-	s = html.EscapeString(s)
-	// escape characters that mdbook treats specially
-	s = strings.ReplaceAll(s, "|", "&#124;")
-	s = strings.ReplaceAll(s, "\\", "&#92;")
-	// wrap in code tags
-	s = "<code>" + s + "</code>"
-	// return
-	return s
-}
-
-func printExamplesTable(examples []shapes.Example) {
-	fmt.Printf("| Program | Type | Value | Error |\n")
-	fmt.Printf("|---|---|---|---|\n")
-	for _, example := range examples {
-		var err string
-		if example.Error == nil {
-			err = ""
-		} else {
-			err = strings.TrimSpace(fmt.Sprintf("%s", example.Error))
-		}
-		fmt.Printf(
-			"| %s | %s | %s | %s |\n",
-			inlineCode(example.Program),
-			inlineCode(example.OutputType),
-			inlineCode(example.OutputValue),
-			inlineCode(err),
-		)
-	}
 }

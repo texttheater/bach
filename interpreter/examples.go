@@ -4,6 +4,9 @@ import (
 	"github.com/texttheater/bach/shapes"
 )
 
+// TODO replace these by examples defined inline in doc; automatically add them
+// to the test suite.
+
 var SimpleTypeExamples = []shapes.Example{
 	{`null`, `Null`, `null`, nil},
 	{`false`, `Bool`, `false`, nil},
