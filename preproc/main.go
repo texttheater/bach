@@ -21,7 +21,9 @@ func processExampleSet(scanner *bufio.Scanner, buffer *bytes.Buffer) error {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "```" {
-			examples = append(examples, currentExample)
+			if len(currentExample.Program) > 0 {
+				examples = append(examples, currentExample)
+			}
 			docutil.PrintExamplesTable(buffer, examples)
 			for _, x := range examples {
 				interpreter.TestExample(x)
