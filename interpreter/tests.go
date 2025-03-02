@@ -1,15 +1,92 @@
 package interpreter
 
 import (
-	//"log"
+	"log"
 	"math"
 	"testing"
 
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/grammar"
+	"github.com/texttheater/bach/shapes"
 	"github.com/texttheater/bach/states"
 	"github.com/texttheater/bach/types"
 )
+
+func TestExample(example shapes.Example) {
+	program := example.Program
+	wantTypeStr := example.OutputType
+	wantValueStr := example.OutputValue
+	wantError := example.Error
+	var wantType types.Type
+	var err error
+	if example.OutputType != "" {
+		wantType, err = grammar.ParseType(wantTypeStr)
+		if err != nil {
+			log.Println("ERROR: Could not parse expected type")
+			errors.Explain(err, wantTypeStr)
+			log.Fatal()
+		}
+	}
+	var wantValue states.Value
+	if example.OutputValue != "" {
+		_, wantValue, err = InterpretString(wantValueStr)
+		if err != nil {
+			log.Println("ERROR: Could not interpret expected value")
+			errors.Explain(err, wantValueStr)
+			log.Fatal()
+		}
+	}
+	gotType, gotValue, gotErr := InterpretString(example.Program)
+	var gotValueStr string
+	if gotValue != nil {
+		var err error
+		gotValueStr, err = gotValue.Repr()
+		if gotErr == nil {
+			gotErr = err
+		}
+	}
+	if wantError != nil {
+		if gotErr == nil {
+			log.Print("ERROR: Expected error but program succeeded.")
+			log.Printf("Program:        %s", program)
+			log.Printf("Expected error: %s", wantError)
+			log.Printf("Got type:       %s", gotType)
+			log.Printf("Got value:      %s", gotValueStr)
+			log.Fatal()
+		} else if !errors.Match(wantError, gotErr) {
+			log.Printf("ERROR: Expected error does not match actual error.")
+			log.Printf("Program:        %s", program)
+			log.Printf("Expected error: %s", wantError)
+			log.Printf("Got error:      %s", gotErr)
+			log.Fatal()
+		}
+	} else {
+		if gotErr != nil {
+			log.Print("ERROR: Expected program to succeed but got error.")
+			log.Printf("Program:        %s", program)
+			log.Printf("Expected type:  %s", wantType)
+			log.Printf("Expected value: %s", wantValueStr)
+			log.Printf("Got error:      %s", gotErr)
+			log.Fatal()
+		} else if !types.Equivalent(wantType, gotType) {
+			log.Print("ERROR: Program has unexpected output type.")
+			log.Printf("Program:        %s", program)
+			log.Printf("Expected type:  %s", wantType)
+			log.Printf("Expected value: %s", wantValueStr)
+			log.Printf("Got type:       %s", gotType)
+			log.Printf("Got value:      %s", gotValueStr)
+			log.Fatal()
+		} else if ok, _ := match(wantValue, gotValue); !ok {
+			log.Print("ERROR: Program has unexpected output value.")
+			log.Printf("Program:        %s", program)
+			log.Printf("Expected type:  %s", wantType)
+			log.Printf("Expected value: %s", wantValueStr)
+			log.Printf("Got type:       %s", gotType)
+			log.Printf("Got value:      %s", gotValueStr)
+			log.Fatal()
+		}
+	}
+}
 
 func TestProgramStr(program string, wantTypeString string, wantValueString string, wantError error, t *testing.T) {
 	var wantType types.Type

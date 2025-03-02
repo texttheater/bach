@@ -6,4 +6,29 @@ e.g., `Obj<Str>`. If specific keys and their types are known, this can be part
 of the type too, e.g.: `Obj<a: Num, b: Num, Str>`. The type at the end then
 describes all *other* values.
 
-{{#include ../bachdoc/examples/object-types.md}}
+```bachdoc
+P {}
+T Obj<Void>
+V {}
+E null
+
+P {a: 1}
+T Obj<a: Num, Void>
+V {a: 1}
+E null
+
+P {a: 1, b: "c"}
+T Obj<a: Num, b: Str, Void>
+V {a: 1, b: "c"}
+E null
+
+P for Any def f Obj<Num> as {a: 1, b: 2} ok f
+T Obj<Num>
+V {a: 1, b: 2}
+E null
+
+P for Any def f Obj<Any> as {a: 1, b: "c"} ok f
+T Obj<Any>
+V {a: 1, b: "c"}
+E null
+```

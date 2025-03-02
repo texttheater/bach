@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/texttheater/bach/docutil"
+	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/shapes"
 )
 
@@ -22,6 +23,9 @@ func processExampleSet(scanner *bufio.Scanner, buffer *bytes.Buffer) error {
 		if line == "```" {
 			examples = append(examples, currentExample)
 			docutil.PrintExamplesTable(buffer, examples)
+			for _, x := range examples {
+				interpreter.TestExample(x)
+			}
 			return nil
 		} else if line == "" {
 			examples = append(examples, currentExample)
@@ -81,7 +85,6 @@ func modifyBookItem(item object) error {
 }
 
 func main() {
-	log.Println("starting preprocessing")
 	if len(os.Args) > 1 && os.Args[1] == "supports" {
 		os.Exit(0)
 	}
