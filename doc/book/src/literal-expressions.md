@@ -2,9 +2,106 @@
 
 ## `Num` Literals
 
-Nonnegative real numbers can be written as integers, with a decimal point, or
-in exponential notation. Negative, infinity, and NaN values can be created
-using the builtin `-`, `inf`, and `nan` funcers.
+Nonnegative real numbers can be written in the decimal system: as integers,
+with a decimal point, or in exponential notation.
+
+```bachdoc
+P 123
+T Num
+V 123 
+E null
+
+P 1.23
+T Num
+V 1.23 
+E null
+
+P 01.23
+T Num
+V 1.23
+E null
+
+P .23
+T Num
+V 0.23
+E null
+
+P 1.
+T Num
+V 1
+E null
+
+P 1.23e2
+T Num
+V 123
+E null
+
+P 123E2
+T Num
+V 12300
+E null
+
+P 123E+2
+T Num
+V 12300
+E null
+
+P 1e-1
+T Num
+V 0.1
+E null
+
+P .1e0
+T Num
+V 0.1
+E null
+
+P 0010e-2
+T Num
+V 0.1
+E null
+
+P 0e+5
+T Num
+V 0
+E null
+
+```
+
+There are no literals for negative, infinity, or NaN values. But they can be created using the builtin `-`, `inf`, and `nan` funcers. For details, see [Math Funcers](math-funcers.md).
+
+```bachdoc
+P -1
+T Num
+V -1
+E null
+
+P -0010e-2
+T Num
+V -0.1
+E null
+
+P -0
+T Num
+V -0
+E null
+
+P inf
+T Num
+V inf
+E null
+
+P -inf
+T Num
+V -inf
+E null
+
+P nan
+T Num
+V nan
+E null
+```
+
 
 ## `Str` Literals
 
