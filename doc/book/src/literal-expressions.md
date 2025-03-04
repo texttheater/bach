@@ -104,15 +104,84 @@ E null
 
 ## `Str` Literals
 
-String literals are delimited by double quotes. Characters inside represent the
-byte sequence that is their UTF-8 encoding, with the exception of the four
-characters `\"{}`, which can be written as `\\`, `\"`, `{{`, and `}}`,
-respectively. Escape sequences of the form TODO represent the UTF-8 encoding of
-the Unicode codepoint TODO. Escape sequences of the form TODO represent the
-literal byte TODO. Bach expressions between curly braces represent the UTF-8
-encoding of the default string representation of their return value.
+Strings are sequences of bytes. String literals are delimited by double quotes. Characters inside generally represent the byte sequence that is their UTF-8 encoding. For example:
 
-TODO examples
+* `a` represents the byte sequence `61` (hexadecimal notation; UTF-8 encoding of Latin Small Letter A)
+* `~` represents the byte sequence `7E` (UTF-8 encoding of Tilde)
+* `abc` represents the byte sequence `61 62 63`
+* `日本語` represents the byte sequence `E6 97 A5 E6 9C AC E8 AA 9E`
+
+There are, however, the following exceptions:
+
+* `\a` represents the byte sequence `07` (UTF-8 encoding of Bell character)
+* `\b` represents the byte sequence `08` (UTF-8 encoding of Backspace)
+* `\f` represents the byte sequence `0C` (UTF-8 encoding of Form feed)
+* `\n` represents the byte sequence `0A` (UTF-8 encoding of Line feed)
+* `\r` represents the byte sequence `0D` (UTF-8 encoding of Carriage return)
+* `\t` represents the byte sequence `09` (UTF-8 encoding of Horizontal tab)
+* `\v` represents the byte sequence `09` (UTF-8 encoding of Vertical tab)
+* `\\` represents the byte sequence `5C` (UTF-8 encoding of Backslash)
+* `\"` represents the byte sequence `22` (UTF-8 encoding of Quotation mark)
+* `\` followed by three octal digits in the range from `000` to `3ff` (inclusive) represents the corresponding byte
+* `\x` followed by two hexadecimal digits represents the corresponding byte
+* `\u` followed by four hexadecimal digits represents the UTF-8 encoding of the corresponding code point, if defined
+* `\U` followed by eight hexadecimal digits represents the UTF-8 encoding of the corresponding code point, if defined
+* `{{` represents the byte sequence `7B` (UTF-8 encoding of Left curly bracket)
+* `}}` represents the byte sequence `7D` (UTF-8 encoding of Right curly bracket)
+* `{`, followed by a Bach expression, followed by `}`, represents the UTF-8 encoding of what the expression evaluates to
+* Other uses of `\`, `"`, `{`, or `}` inside the delimiting quotes are invalid, as is the line feed character
+
+```bachdoc
+P "a"
+T Str
+V "a"
+E null
+
+P "\a"
+T Str
+V "\a"
+E null
+
+P "\"\\a\""
+T Str
+V "\"\\a\""
+E null
+
+P "\141"
+T Str
+V "a"
+E null
+
+P "\x61"
+T Str
+V "a"
+E null
+
+P "\u65e5\u672c\u8a9e"
+T Str
+V "日本語"
+E null
+
+P "\U000065e5\U0000672c\U00008a9e"
+T Str
+V "日本語"
+E null
+
+P "{{}}"
+T Str
+V "{{}}"
+E null
+
+P "1 + 1 = {1 +1}"
+T Str
+V "1 + 1 = 2"
+E null
+
+P "{ {a: 1 +1} }"
+T Str
+V "{{a: 2}}"
+E null
+```
 
 ## `Arr` Literals
 
