@@ -42,17 +42,17 @@ T Arr<Num>
 V [1]
 E null
 
-P [1, 2; [3, 4]]
+P [1, 2;[3, 4]]
 T Arr<Num, Num, Num, Num>
 V [1, 2, 3, 4]
 E null
 
-P [3, 4] =rest [1, 2; rest]
+P [3, 4] =rest [1, 2;rest]
 T Arr<Num, Num, Num, Num>
 V [1, 2, 3, 4]
 E null
 
-P [1, 2; [1, 2] each(+2)]
+P [1, 2;[1, 2] each(+2)]
 T Arr<Num, Num, Num...>
 V [1, 2, 3, 4]
 E null
