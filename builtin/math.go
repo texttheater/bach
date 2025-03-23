@@ -556,7 +556,7 @@ var MathFuncers = []shapes.Funcer{
 		"a number",
 		"toExponential",
 		[]*params.Param{
-			params.SimpleParam("precision", "the number digits after the decimal point", types.Num{}),
+			params.SimpleParam("precision", "the number of digits after the decimal point", types.Num{}),
 		},
 		types.Str{},
 		"a string representation of the input in exponential notation with the specified number of digits after the decimal point",
@@ -578,7 +578,7 @@ var MathFuncers = []shapes.Funcer{
 		"a number",
 		"toFixed",
 		[]*params.Param{
-			params.SimpleParam("precision", "the number digits after the decimal point", types.Num{}),
+			params.SimpleParam("precision", "the number of digits after the decimal point", types.Num{}),
 		},
 		types.Str{},
 		"a rounded string representation of the input with the specified number of digits after the decimal point",
