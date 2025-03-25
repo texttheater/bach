@@ -29,7 +29,7 @@ func (kind ErrorKind) String() string {
 
 func (kind *ErrorKind) UnmarshalJSON(data []byte) error {
 	var v string
-	err := json.Unmarshal(data, v)
+	err := json.Unmarshal(data, &v)
 	if err != nil {
 		return err
 	}
