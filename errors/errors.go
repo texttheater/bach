@@ -212,7 +212,7 @@ type E struct {
 func (err *E) Error() string {
 	m := make(map[string]any)
 	if err.Kind != nil {
-		m["kind"] = err.Kind.String()
+		m["Kind"] = err.Kind.String()
 	}
 	if err.Code != nil {
 		m["Code"] = err.Code.String()
