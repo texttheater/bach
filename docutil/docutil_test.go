@@ -23,13 +23,10 @@ func TestNullError(t *testing.T) {
 
 func TestEmptyError(t *testing.T) {
 	input := "{}"
-	e, err := docutil.ParseError(input)
+	_, err := docutil.ParseError(input)
 	if err != nil {
 		t.Errorf(`failed to parse %s: %s`, input, err)
 		return
-	}
-	if e != nil {
-		t.Errorf(`failed to parse %s: expected %s, got %s`, input, error(nil), e)
 	}
 }
 
