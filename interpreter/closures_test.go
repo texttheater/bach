@@ -9,5 +9,5 @@ import (
 )
 
 func TestClosures(t *testing.T) {
-	interpreter.TestProgram(`1 =a for Any def f Num as a ok f 2 =a f`, types.Num{}, states.NumValue(1), nil, t)
+	interpreter.TestProgram(`1 =a for Any def f Num as a ok f 2 =a f`, types.NumType{}, states.NumValue(1), nil, t)
 }

@@ -15,13 +15,13 @@ import (
 var ValueFuncers = []shapes.Funcer{
 	shapes.Funcer{
 		Summary:          "Checks two values for equality.",
-		InputType:        types.Any{},
+		InputType:        types.AnyType{},
 		InputDescription: "a value",
 		Name:             "==",
 		Params: []*params.Param{
-			params.SimpleParam("other", "another value", (types.Any{})),
+			params.SimpleParam("other", "another value", (types.AnyType{})),
 		},
-		OutputType:        types.Bool{},
+		OutputType:        types.BoolType{},
 		OutputDescription: "true if the input is the same as other, false otherwise",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -59,11 +59,11 @@ var ValueFuncers = []shapes.Funcer{
 	},
 	shapes.SimpleFuncer(
 		"The identity function.",
-		types.NewVar("A", types.Any{}),
+		types.NewTypeVar("A", types.AnyType{}),
 		"any value",
 		"id",
 		nil,
-		types.NewVar("A", types.Any{}),
+		types.NewTypeVar("A", types.AnyType{}),
 		"the input value",
 		"",
 		func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
@@ -78,12 +78,12 @@ var ValueFuncers = []shapes.Funcer{
 			)},
 		},
 	),
-	shapes.Funcer{InputType: types.Str{},
+	shapes.Funcer{InputType: types.StrType{},
 		Summary:           "Parses the string representation of a floating-point number.",
 		Name:              "parseFloat",
 		InputDescription:  "a floating-point number in string representation",
 		Params:            nil,
-		OutputType:        types.Num{},
+		OutputType:        types.NumType{},
 		OutputDescription: "the corresponding Num value",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -112,13 +112,13 @@ var ValueFuncers = []shapes.Funcer{
 
 	shapes.Funcer{
 		Summary:          "Parses the string representation of an integer number.",
-		InputType:        types.Str{},
+		InputType:        types.StrType{},
 		InputDescription: "an integer number in string representation",
 		Name:             "parseInt",
 		Params: []*params.Param{
-			params.SimpleParam("base", "the base that the input is in", types.Num{}),
+			params.SimpleParam("base", "the base that the input is in", types.NumType{}),
 		},
-		OutputType:        types.Num{},
+		OutputType:        types.NumType{},
 		OutputDescription: "the corresponding Num value",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -154,11 +154,11 @@ var ValueFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:           "Parses the string representation of a base-10 integer number.",
-		InputType:         types.Str{},
+		InputType:         types.StrType{},
 		InputDescription:  "an integer number in base-10 string representation",
 		Name:              "parseInt",
 		Params:            nil,
-		OutputType:        types.Num{},
+		OutputType:        types.NumType{},
 		OutputDescription: "the corresponding Num value",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -198,7 +198,7 @@ var ValueFuncers = []shapes.Funcer{
 		},
 	},
 
-	shapes.Funcer{InputType: types.Str{}, Name: "parseJSON", Params: nil, OutputType: types.Any{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+	shapes.Funcer{InputType: types.StrType{}, Name: "parseJSON", Params: nil, OutputType: types.AnyType{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		str := inputState.Value.(states.StrValue)
 		var data any
 		err := json.Unmarshal([]byte(str), &data)
@@ -212,7 +212,7 @@ var ValueFuncers = []shapes.Funcer{
 		return thunkFromData(data, pos)
 	}, IDs: nil},
 
-	shapes.Funcer{InputType: types.Any{}, Name: "toJSON", Params: nil, OutputType: types.Str{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+	shapes.Funcer{InputType: types.AnyType{}, Name: "toJSON", Params: nil, OutputType: types.StrType{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		data, err := inputState.Value.Data()
 		if err != nil {
 			return states.ThunkFromError(err)
@@ -228,12 +228,12 @@ var ValueFuncers = []shapes.Funcer{
 		return states.ThunkFromValue(states.StrValue(bytes))
 	}, IDs: nil},
 
-	shapes.Funcer{InputType: types.NewArr(types.NewTup([]types.Type{
-		types.Str{},
-		types.NewVar("A", types.Any{}),
-	})), Name: "toObj", Params: nil, OutputType: types.Obj{
+	shapes.Funcer{InputType: types.NewArrType(types.NewTup([]types.Type{
+		types.StrType{},
+		types.NewTypeVar("A", types.AnyType{}),
+	})), Name: "toObj", Params: nil, OutputType: types.ObjType{
 		Props: map[string]types.Type{},
-		Rest:  types.NewVar("A", types.Any{}),
+		Rest:  types.NewTypeVar("A", types.AnyType{}),
 	}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		var res states.ObjValue = make(map[string]*states.Thunk)
 		iter := states.IterFromValue(inputState.Value)
@@ -257,7 +257,7 @@ var ValueFuncers = []shapes.Funcer{
 		return states.ThunkFromValue(res)
 	}, IDs: nil},
 
-	shapes.Funcer{InputType: types.Any{}, Name: "toStr", Params: nil, OutputType: types.Str{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+	shapes.Funcer{InputType: types.AnyType{}, Name: "toStr", Params: nil, OutputType: types.StrType{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 		str, err := inputState.Value.Str()
 		if err != nil {
 			return states.ThunkFromError(err)

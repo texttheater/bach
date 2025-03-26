@@ -32,7 +32,7 @@ func (x AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*param
 		return shapes.Shape{}, nil, nil, err
 	}
 	// make sure pattern matches input Type
-	if !(types.Void{}).Subsumes(restType) {
+	if !(types.VoidType{}).Subsumes(restType) {
 		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.NonExhaustiveMatch),
 			errors.Pos(x.Pos),

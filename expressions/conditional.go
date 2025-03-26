@@ -50,11 +50,11 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*para
 		if err != nil {
 			return shapes.Shape{}, nil, nil, err
 		}
-		if !(types.Bool{}).Subsumes(guardOutputShape.Type) {
+		if !(types.BoolType{}).Subsumes(guardOutputShape.Type) {
 			return shapes.Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.ConditionMustBeBool),
 				errors.Pos(x.Guard.Position()),
-				errors.WantType(types.Bool{}),
+				errors.WantType(types.BoolType{}),
 				errors.GotType(guardOutputShape.Type),
 			)
 		}
@@ -87,7 +87,7 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*para
 	elisConsequentActions := make([]states.Action, len(x.AlternativeConsequents))
 	for i := range x.AlternativePatterns {
 		// reachability check
-		if (types.Void{}).Subsumes(inputShape.Type) {
+		if (types.VoidType{}).Subsumes(inputShape.Type) {
 			return shapes.Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.UnreachableElisClause),
 				errors.Pos(x.Pattern.Position()),
@@ -108,11 +108,11 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*para
 			if err != nil {
 				return shapes.Shape{}, nil, nil, err
 			}
-			if !(types.Bool{}).Subsumes(guardOutputShape.Type) {
+			if !(types.BoolType{}).Subsumes(guardOutputShape.Type) {
 				return shapes.Shape{}, nil, nil, errors.TypeError(
 					errors.Code(errors.ConditionMustBeBool),
 					errors.Pos(x.AlternativeGuards[i].Position()),
-					errors.WantType(types.Bool{}),
+					errors.WantType(types.BoolType{}),
 					errors.GotType(guardOutputShape.Type),
 				)
 			}
@@ -139,24 +139,24 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*para
 			Stack: inputShape.Stack,
 		}
 		// update output type
-		outputType = types.NewUnion(outputType, consequentOutputShape.Type)
+		outputType = types.NewUnionType(outputType, consequentOutputShape.Type)
 	}
 	// typecheck alternative
 	var alternativeAction states.Action
 	var alternativeIDs *states.IDStack
 	if x.Alternative == nil {
 		// exhaustivity check
-		//if !(types.VoidType{}).Subsumes(inputShape.Type) {
+		//if !(types.VoidTypeType{}).Subsumes(inputShape.Type) {
 		//	return shapes.Shape{}, nil, nil, errors.TypeError(
 		//		errors.Code(errors.NonExhaustiveMatch),
 		//		errors.Pos(x.Pos),
-		//		errors.WantType(types.VoidType{}),
+		//		errors.WantType(types.VoidTypeType{}),
 		//		errors.GotType(inputShape.Type),
 		//	)
 		//}
 	} else {
 		// reachability check
-		if !x.UnreachableAlternativeAllowed && (types.Void{}).Subsumes(inputShape.Type) {
+		if !x.UnreachableAlternativeAllowed && (types.VoidType{}).Subsumes(inputShape.Type) {
 			return shapes.Shape{}, nil, nil, errors.TypeError(
 				errors.Code(errors.UnreachableElseClause),
 				errors.Pos(x.Alternative.Position()),
@@ -170,7 +170,7 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*para
 		}
 		ids = ids.AddAll(alternativeIDs)
 		// update output type
-		outputType = types.NewUnion(outputType, alternativeOutputShape.Type)
+		outputType = types.NewUnionType(outputType, alternativeOutputShape.Type)
 	}
 	// make action
 	action := func(inputState states.State, args []states.Action) *states.Thunk {

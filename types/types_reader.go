@@ -1,53 +1,53 @@
 package types
 
-type Reader struct {
+type ReaderType struct {
 }
 
-func (t Reader) Subsumes(u Type) bool {
+func (t ReaderType) Subsumes(u Type) bool {
 	switch u.(type) {
-	case Void:
+	case VoidType:
 		return true
-	case Reader:
+	case ReaderType:
 		return true
 	default:
 		return false
 	}
 }
 
-func (t Reader) Bind(u Type, bindings map[string]Type) bool {
+func (t ReaderType) Bind(u Type, bindings map[string]Type) bool {
 	switch u.(type) {
-	case Void:
+	case VoidType:
 		return true
-	case Reader:
+	case ReaderType:
 		return true
 	default:
 		return false
 	}
 }
 
-func (t Reader) Instantiate(bindings map[string]Type) Type {
+func (t ReaderType) Instantiate(bindings map[string]Type) Type {
 	return t
 }
 
-func (t Reader) Partition(u Type) (Type, Type) {
+func (t ReaderType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
-	case Void:
+	case VoidType:
 		return u, t
-	case Reader:
-		return u, Void{}
-	case Union:
+	case ReaderType:
+		return u, VoidType{}
+	case UnionType:
 		return u.inversePartition(t)
-	case Any:
-		return t, Void{}
+	case AnyType:
+		return t, VoidType{}
 	default:
-		return Void{}, t
+		return VoidType{}, t
 	}
 }
 
-func (t Reader) String() string {
+func (t ReaderType) String() string {
 	return "Reader"
 }
 
-func (t Reader) ElementType() Type {
+func (t ReaderType) ElementType() Type {
 	panic("Reader is not a sequence type")
 }

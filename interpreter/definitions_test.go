@@ -12,70 +12,70 @@ import (
 func TestDefinitions(t *testing.T) {
 	interpreter.TestProgram(
 		`for Num def plusOne Num as +1 ok 1 plusOne`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(2),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`for Num def plusOne Num as +1 ok 1 plusOne plusOne`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(3),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`for Num def apply(for Num f Num) Num as f ok 1 apply(+1)`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(2),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`for Num def connectSelf(for Num f(for Any Num) Num) Num as =x f(x) ok 1 connectSelf(+)`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(2),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`for Num def connectSelf(for Num f(for Any Num) Num) Num as =x f(x) ok 1 connectSelf(+) 3 connectSelf(*)`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(9),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`for Num def connectSelf(for Num f(Num) Num) Num as =x f(x) ok 1 connectSelf(+)`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(2),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`for Num def apply(for Num f Num) Num as f ok 2 =n apply(+n)`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(4),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`for Any def f(a Num, b Num) Arr<Num, Num> as [a, b] ok f(2, 3)`,
-		types.NewTup([]types.Type{types.Num{}, types.Num{}}),
+		types.NewTup([]types.Type{types.NumType{}, types.NumType{}}),
 		states.NewArrValue([]states.Value{states.NumValue(2), states.NumValue(3)}),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`for <A> def apply(for <A> f <B>) <B> as f ok 1 apply(+1)`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(2),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`for <A>|Null def myMust <A> as is Null then fatal else id ok ok null myMust`,
-		types.Var{
+		types.TypeVar{
 			Name: "A",
 		},
 		nil,
@@ -87,14 +87,14 @@ func TestDefinitions(t *testing.T) {
 	)
 	interpreter.TestProgram(
 		`for <A>|Null def myMust <A> as is Null then fatal else id ok ok 1 myMust`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`for <A>|Null def myMust <A> as is <A> then id else fatal ok ok null myMust`,
-		types.Null{},
+		types.NullType{},
 		states.NullValue{},
 		nil,
 		t,
@@ -105,21 +105,21 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.ArgHasWrongOutputType),
-			errors.WantType(types.Var{
+			errors.WantType(types.TypeVar{
 				Name: "A",
-				Bound: types.NewUnion(
-					types.Null{},
-					types.Obj{
+				Bound: types.NewUnionType(
+					types.NullType{},
+					types.ObjType{
 						Props: map[string]types.Type{
-							"start": types.Num{},
-							"0":     types.Str{},
+							"start": types.NumType{},
+							"0":     types.StrType{},
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				),
 			},
 			),
-			errors.GotType(types.AnyObj),
+			errors.GotType(types.AnyObjType),
 			errors.ArgNum(1),
 		),
 		t,
@@ -130,7 +130,7 @@ func TestDefinitions(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.VoidObj),
+			errors.InputType(types.VoidObjType),
 			errors.Name("f"),
 			errors.NumParams(0),
 		),
@@ -138,11 +138,11 @@ func TestDefinitions(t *testing.T) {
 	)
 	interpreter.TestProgram(
 		`for <A Obj<a: Num, Any>> def f <A> as id ok {a: 1} f`,
-		types.Obj{
+		types.ObjType{
 			Props: map[string]types.Type{
-				"a": types.Num{},
+				"a": types.NumType{},
 			},
-			Rest: types.Void{},
+			Rest: types.VoidType{},
 		},
 		states.ObjValue(map[string]*states.Thunk{
 			"a": states.ThunkFromValue(states.NumValue(1)),
@@ -154,8 +154,8 @@ func TestDefinitions(t *testing.T) {
 	interpreter.TestProgram(
 		`for Any def f(for Any g <A Arr<Any...>>) <A> as g ok f([1, "a"])`,
 		types.NewTup([]types.Type{
-			types.Num{},
-			types.Str{},
+			types.NumType{},
+			types.StrType{},
 		}),
 		states.NewArrValue([]states.Value{
 			states.NumValue(1),
@@ -171,8 +171,8 @@ func TestDefinitions(t *testing.T) {
 		errors.TypeError(
 			errors.Code(errors.ArgHasWrongOutputType),
 			errors.ArgNum(1),
-			errors.WantType(types.NewVar("A", types.AnyArr)),
-			errors.GotType(types.Str{}),
+			errors.WantType(types.NewTypeVar("A", types.AnyArrType)),
+			errors.GotType(types.StrType{}),
 		),
 		t,
 	)

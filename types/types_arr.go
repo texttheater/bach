@@ -4,93 +4,93 @@ import (
 	"fmt"
 )
 
-type Arr struct {
+type ArrType struct {
 	El Type
 }
 
-var AnyArr Type = &Arr{Any{}}
+var AnyArrType Type = &ArrType{AnyType{}}
 
-var VoidArr Type = &Arr{Void{}}
+var VoidArrType Type = &ArrType{VoidType{}}
 
-func NewArr(el Type) *Arr {
-	return &Arr{
+func NewArrType(el Type) *ArrType {
+	return &ArrType{
 		El: el,
 	}
 }
 
-func (t *Arr) Subsumes(u Type) bool {
+func (t *ArrType) Subsumes(u Type) bool {
 	switch u := u.(type) {
-	case Void:
+	case VoidType:
 		return true
-	case *Nearr:
+	case *NearrType:
 		return t.El.Subsumes(u.Head) && t.Subsumes(u.Tail)
-	case *Arr:
+	case *ArrType:
 		return t.El.Subsumes(u.El)
-	case Union:
+	case UnionType:
 		return u.inverseSubsumes(t)
 	default:
 		return false
 	}
 }
 
-func (t *Arr) Bind(u Type, bindings map[string]Type) bool {
+func (t *ArrType) Bind(u Type, bindings map[string]Type) bool {
 	switch u := u.(type) {
-	case Void:
+	case VoidType:
 		return true
-	case *Nearr:
+	case *NearrType:
 		return t.El.Bind(u.ElementType(), bindings)
-	case *Arr:
+	case *ArrType:
 		return t.El.Bind(u.El, bindings)
-	case Union:
+	case UnionType:
 		return u.inverseBind(t, bindings)
 	default:
 		return false
 	}
 }
 
-func (t *Arr) Instantiate(bindings map[string]Type) Type {
-	return &Arr{t.El.Instantiate(bindings)}
+func (t *ArrType) Instantiate(bindings map[string]Type) Type {
+	return &ArrType{t.El.Instantiate(bindings)}
 }
 
-func (t *Arr) Partition(u Type) (Type, Type) {
+func (t *ArrType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
-	case Void:
+	case VoidType:
 		return u, t
-	case *Nearr:
+	case *NearrType:
 		headIntersection, _ := t.El.Partition(u.Head)
-		if (Void{}).Subsumes(headIntersection) {
-			return Void{}, t
+		if (VoidType{}).Subsumes(headIntersection) {
+			return VoidType{}, t
 		}
 		tailIntersection, _ := t.Partition(u.Tail)
-		if (Void{}).Subsumes(tailIntersection) {
-			return Void{}, t
+		if (VoidType{}).Subsumes(tailIntersection) {
+			return VoidType{}, t
 		}
-		return &Nearr{
+		return &NearrType{
 			Head: headIntersection,
 			Tail: tailIntersection,
 		}, t
-	case *Arr:
+	case *ArrType:
 		intersection, _ := t.El.Partition(u.El)
 		if intersection.Subsumes(t.El) {
-			return &Arr{intersection}, Void{}
+			return &ArrType{intersection}, VoidType{}
 		}
-		return &Arr{intersection}, t
-	case Union:
+		return &ArrType{intersection}, t
+	case UnionType:
 		return u.inversePartition(t)
-	case Any:
-		return t, Void{}
+	case AnyType:
+		return t, VoidType{}
 	default:
-		return Void{}, t
+		return VoidType{}, t
 	}
 }
 
-func (t *Arr) String() string {
-	if (Void{}).Subsumes(t.El) {
+func (t *ArrType) String() string {
+	if (VoidType{}).Subsumes(t.El) {
 		return "Arr<>"
 	}
 	return fmt.Sprintf("Arr<%s...>", t.El)
 }
 
-func (t *Arr) ElementType() Type {
+func (t *ArrType) ElementType() Type {
 	return t.El
 }

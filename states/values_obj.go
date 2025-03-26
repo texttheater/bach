@@ -75,7 +75,7 @@ func (v ObjValue) Data() (any, error) {
 
 func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
-	case types.Obj:
+	case types.ObjType:
 		for prop := range t.Props {
 			if v[prop] == nil {
 				return false, nil
@@ -91,11 +91,11 @@ func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 			}
 		}
 		return true, nil
-	case types.Union:
+	case types.UnionType:
 		return inhabits(v, t, stack)
-	case types.Any:
+	case types.AnyType:
 		return true, nil
-	case types.Var:
+	case types.TypeVar:
 		return stack.Inhabits(v, t)
 	default:
 		return false, nil

@@ -16,7 +16,7 @@ func TestArrays(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchFunction),
-			errors.InputType(types.Num{}),
+			errors.InputType(types.NumType{}),
 			errors.Name("each"),
 			errors.NumParams(1),
 		),
@@ -28,8 +28,8 @@ func TestArrays(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.RestRequiresArrType),
-			errors.WantType(types.AnyArr),
-			errors.GotType(types.Num{}),
+			errors.WantType(types.AnyArrType),
+			errors.GotType(types.NumType{}),
 		),
 		t,
 	)

@@ -28,18 +28,18 @@ func (x RegexpExpression) Typecheck(inputShape shapes.Shape, params []*params.Pa
 			errors.Pos(x.Pos),
 		)
 	}
-	if !(types.Str{}).Subsumes(inputShape.Type) {
+	if !(types.StrType{}).Subsumes(inputShape.Type) {
 		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.RegexpWantsString),
 			errors.Pos(x.Pos),
-			errors.WantType(types.Str{}),
+			errors.WantType(types.StrType{}),
 			errors.GotType(inputShape.Type),
 		)
 	}
-	submatchType := types.NewUnion(types.Null{}, types.Str{})
+	submatchType := types.NewUnionType(types.NullType{}, types.StrType{})
 	propTypeMap := make(map[string]types.Type)
-	propTypeMap["0"] = types.Str{}
-	propTypeMap["start"] = types.Num{}
+	propTypeMap["0"] = types.StrType{}
+	propTypeMap["start"] = types.NumType{}
 	subexpNames := x.Regexp.SubexpNames()
 	for i := 1; i < len(subexpNames); i++ {
 		name := subexpNames[i]
@@ -48,12 +48,12 @@ func (x RegexpExpression) Typecheck(inputShape shapes.Shape, params []*params.Pa
 			propTypeMap[name] = submatchType
 		}
 	}
-	matchType := types.Obj{
+	matchType := types.ObjType{
 		Props: propTypeMap,
-		Rest:  types.Void{},
+		Rest:  types.VoidType{},
 	}
 	outputShape := shapes.Shape{
-		Type:  types.NewUnion(types.Null{}, matchType),
+		Type:  types.NewUnionType(types.NullType{}, matchType),
 		Stack: inputShape.Stack,
 	}
 	action := func(inputState states.State, args []states.Action) *states.Thunk {
@@ -68,7 +68,7 @@ func (x RegexpExpression) Typecheck(inputShape shapes.Shape, params []*params.Pa
 
 		}
 		propThunkMap := make(map[string]*states.Thunk)
-		if propTypeMap["start"].Subsumes(types.Num{}) {
+		if propTypeMap["start"].Subsumes(types.NumType{}) {
 			propThunkMap["start"] = states.ThunkFromValue(states.NumValue(match[0]))
 		}
 		for i, name := range x.Regexp.SubexpNames() {

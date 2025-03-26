@@ -15,13 +15,13 @@ import (
 var TextFuncers = []shapes.Funcer{
 	shapes.SimpleFuncer(
 		"Compares strings lexicographically.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"<",
 		[]*params.Param{
-			params.SimpleParam("other", "another string", types.Str{}),
+			params.SimpleParam("other", "another string", types.StrType{}),
 		},
-		types.Bool{},
+		types.BoolType{},
 		"true if the input appears before other in lexicographical order, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -37,13 +37,13 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Compares strings lexicographically.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		">",
 		[]*params.Param{
-			params.SimpleParam("other", "another string", types.Str{}),
+			params.SimpleParam("other", "another string", types.StrType{}),
 		},
-		types.Bool{},
+		types.BoolType{},
 		"true if the input appears after other in lexicographical order, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -59,13 +59,13 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Compares strings lexicographically.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"<=",
 		[]*params.Param{
-			params.SimpleParam("other", "another string", types.Str{}),
+			params.SimpleParam("other", "another string", types.StrType{}),
 		},
-		types.Bool{},
+		types.BoolType{},
 		"true if the input appears before other in lexicographical order or is equal to it, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -81,13 +81,13 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Compares strings lexicographically.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		">=",
 		[]*params.Param{
-			params.SimpleParam("other", "another string", types.Str{}),
+			params.SimpleParam("other", "another string", types.StrType{}),
 		},
-		types.Bool{},
+		types.BoolType{},
 		"true if the input appears after other in lexicographical order or is equal to it, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -103,13 +103,13 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Concatenates two strings.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"+",
 		[]*params.Param{
-			params.SimpleParam("b", "another string", types.Str{}),
+			params.SimpleParam("b", "another string", types.StrType{}),
 		},
-		types.Str{},
+		types.StrType{},
 		"The input and b, concatenated.",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -125,11 +125,11 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.Funcer{
 		Summary:           "Converts a string to bytes.",
-		InputType:         types.Str{},
+		InputType:         types.StrType{},
 		InputDescription:  "a string",
 		Name:              "bytes",
 		Params:            nil,
-		OutputType:        types.NewArr(types.Num{}),
+		OutputType:        types.NewArrType(types.NumType{}),
 		OutputDescription: "The UTF-8 bytes representing the string.",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -157,11 +157,11 @@ var TextFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:           "Converts bytes to a string.",
-		InputType:         types.NewArr(types.Num{}),
+		InputType:         types.NewArrType(types.NumType{}),
 		InputDescription:  "an array of numbers (interpreted modulo 256 as UTF-8 bytes)",
 		Name:              "bytesToStr",
 		Params:            nil,
-		OutputType:        types.Str{},
+		OutputType:        types.StrType{},
 		OutputDescription: "the string represented by the input",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromValue(inputState.Value)
@@ -189,11 +189,11 @@ var TextFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:           "Converts a string to Unicode code points.",
-		InputType:         types.Str{},
+		InputType:         types.StrType{},
 		InputDescription:  "a string",
 		Name:              "codePoints",
 		Params:            nil,
-		OutputType:        types.NewArr(types.Num{}),
+		OutputType:        types.NewArrType(types.NumType{}),
 		OutputDescription: "the input represented as a sequence of code points",
 		Notes:             "If the input string contains invalid UTF-8 byte sequences, they will be represented by the Unicode replacement character (code point 65533).",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -220,11 +220,11 @@ var TextFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:           "Converts Unicode code points to a string.",
-		InputType:         types.NewArr(types.Num{}),
+		InputType:         types.NewArrType(types.NumType{}),
 		InputDescription:  "a sequence of numbers",
 		Name:              "codePointsToStr",
 		Params:            nil,
-		OutputType:        types.Str{},
+		OutputType:        types.StrType{},
 		OutputDescription: "UTF-8 encoded version of the input",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromValue(inputState.Value)
@@ -251,11 +251,11 @@ var TextFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:           "Splits a string around whitespace.",
-		InputType:         types.Str{},
+		InputType:         types.StrType{},
 		InputDescription:  "a string",
 		Name:              "fields",
 		Params:            nil,
-		OutputType:        types.NewArr(types.Str{}),
+		OutputType:        types.NewArrType(types.StrType{}),
 		OutputDescription: "the result of splitting the string around any kind or amount of white space",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			str := string(inputState.Value.(states.StrValue))
@@ -278,13 +278,13 @@ var TextFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Finds the position of a string within another.",
-		InputType:        types.Str{},
+		InputType:        types.StrType{},
 		InputDescription: "string to search inside",
 		Name:             "indexOf",
 		Params: []*params.Param{
-			params.SimpleParam("needle", "string to search for", types.Str{}),
+			params.SimpleParam("needle", "string to search for", types.StrType{}),
 		},
-		OutputType:        types.Num{},
+		OutputType:        types.NumType{},
 		OutputDescription: "offset of first occurrence of needle from the beginning of the input, measured in bytes, or -1 if none",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			haystack := string(inputState.Value.(states.StrValue))
@@ -305,11 +305,11 @@ var TextFuncers = []shapes.Funcer{
 	},
 	shapes.SimpleFuncer(
 		"Concatenates any number of strings.",
-		types.NewArr(types.Str{}),
+		types.NewArrType(types.StrType{}),
 		"an array of strings",
 		"join",
 		nil,
-		types.Str{},
+		types.StrType{},
 		"the concatenation of all the strings in the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -335,13 +335,13 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Concatenates any number of strings with a custom delimiter.",
-		types.NewArr(types.Str{}),
+		types.NewArrType(types.StrType{}),
 		"an array of strings",
 		"join",
 		[]*params.Param{
-			params.SimpleParam("glue", "delimiter to put between strings", types.Str{}),
+			params.SimpleParam("glue", "delimiter to put between strings", types.StrType{}),
 		},
-		types.Str{},
+		types.StrType{},
 		"the concatenation of all the strings in the input, with the glue in between",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -373,14 +373,14 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Right-pads a string.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"padEnd",
 		[]*params.Param{
-			params.SimpleParam("targetLength", "minimum string length for the output", types.Num{}),
-			params.SimpleParam("padString", "string to use as padding to bring the input to the desired length", types.Str{}),
+			params.SimpleParam("targetLength", "minimum string length for the output", types.NumType{}),
+			params.SimpleParam("padString", "string to use as padding to bring the input to the desired length", types.StrType{}),
 		},
-		types.Str{},
+		types.StrType{},
 		"the input followed by as many repetitions of padString as necessary to reach targetLength",
 		"padString is usually one character but can be longer, in which case each repetition starts from the left.",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -412,14 +412,14 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Left-pads a string.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"padStart",
 		[]*params.Param{
-			params.SimpleParam("targetLength", "minimum string length for the output", types.Num{}),
-			params.SimpleParam("padString", "string to use as padding to bring the input to the desired length", types.Str{}),
+			params.SimpleParam("targetLength", "minimum string length for the output", types.NumType{}),
+			params.SimpleParam("padString", "string to use as padding to bring the input to the desired length", types.StrType{}),
 		},
-		types.Str{},
+		types.StrType{},
 		"the input following as many repetitions of padString as necessary to reach targetLength",
 		"padString is usually one character but can be longer, in which case each repetition starts from the left.",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -451,14 +451,14 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.Funcer{
 		Summary:          "Replaces substrings.",
-		InputType:        types.Str{},
+		InputType:        types.StrType{},
 		InputDescription: "a string",
 		Name:             "replaceAll",
 		Params: []*params.Param{
-			params.SimpleParam("needle", "a substring to look for", types.Str{}),
-			params.SimpleParam("replacement", "a new string to replace needle with", types.Str{}),
+			params.SimpleParam("needle", "a substring to look for", types.StrType{}),
+			params.SimpleParam("replacement", "a new string to replace needle with", types.StrType{}),
 		},
-		OutputType:        types.Str{},
+		OutputType:        types.StrType{},
 		OutputDescription: "the input with all occurrences of needle replaced with replacement",
 		Notes:             "More precisely, whenever there are two or more overlapping occurrences of needle in the input, only the first one is replaced.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -481,14 +481,14 @@ var TextFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Replaces a substring.",
-		InputType:        types.Str{},
+		InputType:        types.StrType{},
 		InputDescription: "a string",
 		Name:             "replaceFirst",
 		Params: []*params.Param{
-			params.SimpleParam("needle", "a substring to look for", types.Str{}),
-			params.SimpleParam("replacement", "a new string to replace needle with", types.Str{}),
+			params.SimpleParam("needle", "a substring to look for", types.StrType{}),
+			params.SimpleParam("replacement", "a new string to replace needle with", types.StrType{}),
 		},
-		OutputType:        types.Str{},
+		OutputType:        types.StrType{},
 		OutputDescription: "the input with the first ocurrence of needle replaced with replacement",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -511,13 +511,13 @@ var TextFuncers = []shapes.Funcer{
 	},
 	shapes.SimpleFuncer(
 		"Checks whether a string starts with a specific substring.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"startsWith",
 		[]*params.Param{
-			params.SimpleParam("needle", "a prefix to look for", types.Str{}),
+			params.SimpleParam("needle", "a prefix to look for", types.StrType{}),
 		},
-		types.Bool{},
+		types.BoolType{},
 		"true if the input starts with needle, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -532,13 +532,13 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Checks whether a string ends with a specific substring.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"endsWith",
 		[]*params.Param{
-			params.SimpleParam("needle", "a suffix to look for", types.Str{}),
+			params.SimpleParam("needle", "a suffix to look for", types.StrType{}),
 		},
-		types.Bool{},
+		types.BoolType{},
 		"true if the input ends with needle, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -553,13 +553,13 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Concatenates multiple repetitions of a string.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"repeat",
 		[]*params.Param{
-			params.SimpleParam("n", "number of repetitions (will be truncated and min'd to 0)", types.Num{}),
+			params.SimpleParam("n", "number of repetitions (will be truncated and min'd to 0)", types.NumType{}),
 		},
-		types.Str{},
+		types.StrType{},
 		"the input, repeated n times",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -579,13 +579,13 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Extracts a substring from a string.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"slice",
 		[]*params.Param{
-			params.SimpleParam("start", "a positive integer", types.Num{}),
+			params.SimpleParam("start", "a positive integer", types.NumType{}),
 		},
-		types.Str{},
+		types.StrType{},
 		"the portion of the input that is after offset start",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -615,14 +615,14 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Extracts a substring from a string.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"slice",
 		[]*params.Param{
-			params.SimpleParam("start", "offset to start after", types.Num{}),
-			params.SimpleParam("end", "offset to end before", types.Num{}),
+			params.SimpleParam("start", "offset to start after", types.NumType{}),
+			params.SimpleParam("end", "offset to end before", types.NumType{}),
 		},
-		types.Str{},
+		types.StrType{},
 		"the portion of the input that is after offset start but before offset end",
 		"Negative offsets are counted from the end of the string.",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -665,11 +665,11 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Removes whitespace from the start and end of a string.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"trim",
 		nil,
-		types.Str{},
+		types.StrType{},
 		"the input, with leading and trailing whitespace removed",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -682,11 +682,11 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Removes whitespace from the start of a string.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"trimStart",
 		nil,
-		types.Str{},
+		types.StrType{},
 		"the input, with leading whitespace removed",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -699,11 +699,11 @@ var TextFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Removes whitespace from the end of a string.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"trimEnd",
 		nil,
-		types.Str{},
+		types.StrType{},
 		"the input, with trailing whitespace removed",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {

@@ -31,40 +31,40 @@ func (p ArrPattern) Position() lexer.Position {
 // elements and rest.
 func spreadInputType(inputType types.Type, elementTypes []types.Type) (restType types.Type, ok bool) {
 	switch t := inputType.(type) {
-	case *types.Nearr:
+	case *types.NearrType:
 		if len(elementTypes) == 0 {
 			return t, true
 		}
 		elementTypes[0] = t.Head
 		return spreadInputType(t.Tail, elementTypes[1:])
-	case *types.Arr:
+	case *types.ArrType:
 		// Optional: fail if the pattern wants to match more elements
 		// than the value can contain, as per its type. For now, it is
 		// is commented out and will instead lead to an error message
 		// about a surplus element not having type Void. That's a bit
 		// opaque but has the advantage of indicating the place where
 		// the array pattern is too long.
-		//if (types.VoidType{}).Subsumes(t.ElType) && len(elementTypes) > 0 {
+		//if (types.VoidTypeType{}).Subsumes(t.ElType) && len(elementTypes) > 0 {
 		//	return nil, false
 		//}
 		for i := range elementTypes {
 			elementTypes[i] = t.El
 		}
 		return t, true
-	case types.Union:
+	case types.UnionType:
 		for i := range elementTypes {
-			elementTypes[i] = types.Void{}
+			elementTypes[i] = types.VoidType{}
 		}
-		var restType types.Type = types.Void{}
+		var restType types.Type = types.VoidType{}
 		anyOk := false
 		for _, disjunct := range t {
 			disjunctElementTypes := make([]types.Type, len(elementTypes))
 			disjunctRestType, ok := spreadInputType(disjunct, disjunctElementTypes)
 			if ok {
 				for i := range elementTypes {
-					elementTypes[i] = types.NewUnion(elementTypes[i], disjunctElementTypes[i])
+					elementTypes[i] = types.NewUnionType(elementTypes[i], disjunctElementTypes[i])
 				}
-				restType = types.NewUnion(restType, disjunctRestType)
+				restType = types.NewUnionType(restType, disjunctRestType)
 				anyOk = true
 			}
 		}
@@ -113,7 +113,7 @@ func (p ArrPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type
 	pType := types.NewNearr(elementTypes, restShape.Type)
 	// partition the input type and check for impossible match
 	intersection, complement := inputShape.Type.Partition(pType)
-	if (types.Void{}).Subsumes(intersection) {
+	if (types.VoidType{}).Subsumes(intersection) {
 		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ImpossibleMatch),
 			errors.Pos(p.Pos),
@@ -179,7 +179,7 @@ func (p ObjPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type
 	// compute value input types
 	propInputTypeMap := make(map[string]types.Type)
 	switch t := inputShape.Type.(type) {
-	case types.Obj:
+	case types.ObjType:
 		for prop := range p.PropPatternMap {
 			valType, ok := t.Props[prop]
 			if !ok {
@@ -187,32 +187,32 @@ func (p ObjPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type
 			}
 			propInputTypeMap[prop] = valType
 		}
-	case types.Union:
+	case types.UnionType:
 	PatternProps:
 		for prop := range p.PropPatternMap {
-			propInputTypeMap[prop] = types.Void{}
+			propInputTypeMap[prop] = types.VoidType{}
 			for _, disjunct := range t {
 				switch d := disjunct.(type) {
-				case types.Obj:
+				case types.ObjType:
 					valType, ok := d.Props[prop]
 					if !ok {
-						propInputTypeMap[prop] = types.Any{}
+						propInputTypeMap[prop] = types.AnyType{}
 						continue PatternProps
 					}
-					propInputTypeMap[prop] = types.NewUnion(
+					propInputTypeMap[prop] = types.NewUnionType(
 						propInputTypeMap[prop],
 						valType,
 					)
 				}
 			}
 		}
-	case types.Any:
+	case types.AnyType:
 		for prop := range p.PropPatternMap {
-			propInputTypeMap[prop] = types.Any{}
+			propInputTypeMap[prop] = types.AnyType{}
 		}
 	default:
 		for prop := range p.PropPatternMap {
-			propInputTypeMap[prop] = types.Void{}
+			propInputTypeMap[prop] = types.VoidType{}
 		}
 	}
 	// process value patterns
@@ -232,13 +232,13 @@ func (p ObjPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type
 		propMatcherMap[prop] = valMatcher
 	}
 	// determine the type of values this pattern will match
-	pType := types.Obj{
+	pType := types.ObjType{
 		Props: propTypeMap,
-		Rest:  types.Any{},
+		Rest:  types.AnyType{},
 	}
 	// partition the input type and check for impossible match
 	intersection, complement := inputShape.Type.Partition(pType)
-	if (types.Void{}).Subsumes(intersection) {
+	if (types.VoidType{}).Subsumes(intersection) {
 		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ImpossibleMatch),
 			errors.Pos(p.Pos),
@@ -296,7 +296,7 @@ func (p TypePattern) Position() lexer.Position {
 func (p TypePattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type, Matcher, error) {
 	// partition the input type and check for impossible match
 	intersection, complement := inputShape.Type.Partition(p.Type)
-	if (types.Void{}).Subsumes(intersection) {
+	if (types.VoidType{}).Subsumes(intersection) {
 		return shapes.Shape{}, nil, nil, errors.TypeError(
 			errors.Code(errors.ImpossibleMatch),
 			errors.Pos(p.Pos),

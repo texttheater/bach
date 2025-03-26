@@ -33,7 +33,7 @@ type NameAssignment struct {
 
 func (g *NameAssignment) Ast() (expressions.Expression, error) {
 	name := g.EqName[1:]
-	pattern := expressions.TypePattern{g.Pos, types.Any{}, &name}
+	pattern := expressions.TypePattern{g.Pos, types.AnyType{}, &name}
 	return &expressions.AssignmentExpression{
 		Pos:     g.Pos,
 		Pattern: pattern,
@@ -72,7 +72,7 @@ func (g *ArrAssignment) Ast() (expressions.Expression, error) {
 	if g.Rest == nil {
 		restPattern = expressions.TypePattern{
 			Pos:  g.Pos,
-			Type: &types.Arr{types.Void{}},
+			Type: &types.ArrType{types.VoidType{}},
 		}
 	} else {
 		var err error

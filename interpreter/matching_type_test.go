@@ -12,7 +12,7 @@ import (
 func TestMatchingType(t *testing.T) {
 	interpreter.TestProgram(
 		`if true then 2 else "two" ok is Num then true else false ok`,
-		types.Bool{},
+		types.BoolType{},
 		states.BoolValue(true),
 		nil,
 		t,
@@ -23,14 +23,14 @@ func TestMatchingType(t *testing.T) {
 	//	nil,
 	//	errors.TypeError(
 	//		errors.Code(errors.NonExhaustiveMatch),
-	//		errors.WantType(types.VoidType{}),
-	//		errors.GotType(types.StrType{}),
+	//		errors.WantType(types.VoidTypeType{}),
+	//		errors.GotType(types.StrTypeType{}),
 	//	),
 	//	t,
 	//)
 	interpreter.TestProgram(
 		`if true then 2 else "two" ok is Num then true elis Str then false ok`,
-		types.Bool{},
+		types.BoolType{},
 		states.BoolValue(true),
 		nil,
 		t,

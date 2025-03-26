@@ -38,9 +38,9 @@ func (x ObjExpression) Typecheck(inputShape shapes.Shape, params []*params.Param
 		ids = ids.AddAll(propIDs)
 	}
 	outputShape := shapes.Shape{
-		Type: types.Obj{
+		Type: types.ObjType{
 			Props: propTypeMap,
-			Rest:  types.Void{},
+			Rest:  types.VoidType{},
 		},
 		Stack: inputShape.Stack,
 	}

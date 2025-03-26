@@ -15,7 +15,7 @@ func (g *TypeTemplate) Ast() types.Type {
 	result := g.NonDisjunctiveTypeTemplate.Ast()
 	for _, d := range g.Disjuncts {
 		t := d.Ast()
-		result = types.NewUnion(result, t)
+		result = types.NewUnionType(result, t)
 	}
 	return result
 }
@@ -77,30 +77,30 @@ type ArrTypeTemplate struct {
 
 func (g *ArrTypeTemplate) Ast() types.Type {
 	if g.TypeTemplate == nil {
-		return types.VoidArr
+		return types.VoidArrType
 	}
 	if len(g.TypeTemplates) == 0 && g.Ellipsis != nil {
-		return types.NewArr(g.TypeTemplate.Ast())
+		return types.NewArrType(g.TypeTemplate.Ast())
 	}
-	result := &types.Nearr{
+	result := &types.NearrType{
 		Head: g.TypeTemplate.Ast(),
 	}
 	current := result
 	length := len(g.TypeTemplates)
 	for i, t := range g.TypeTemplates {
 		if g.Ellipsis != nil && i == length-1 {
-			current.Tail = &types.Arr{
+			current.Tail = &types.ArrType{
 				El: t.Ast(),
 			}
 			return result
 		}
-		newTail := &types.Nearr{
+		newTail := &types.NearrType{
 			Head: t.Ast(),
 		}
 		current.Tail = newTail
 		current = newTail
 	}
-	current.Tail = types.VoidArr
+	current.Tail = types.VoidArrType
 	return result
 }
 
@@ -128,9 +128,9 @@ func (g *ObjTypeTemplate) Ast() types.Type {
 	} else if g.RestTypeTemplate2 != nil {
 		restType = g.RestTypeTemplate2.Ast()
 	} else {
-		restType = types.Any{}
+		restType = types.AnyType{}
 	}
-	return types.Obj{
+	return types.ObjType{
 		Props: propTypeMap,
 		Rest:  restType,
 	}
@@ -143,13 +143,13 @@ type TypeVariableTemplate struct {
 }
 
 func (g *TypeVariableTemplate) Ast() types.Type {
-	t := types.Var{
+	t := types.TypeVar{
 		Name: g.LangleLid[1:len(g.LangleLid)],
 	}
 	if g.UpperBound != nil {
 		t.Bound = g.UpperBound.Ast()
 	} else {
-		t.Bound = types.Any{}
+		t.Bound = types.AnyType{}
 	}
 	return t
 }

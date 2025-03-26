@@ -110,7 +110,7 @@ func VariableFuncer(id any, name string, varType types.Type) Funcer {
 		}
 		panic(fmt.Sprintf("variable %s not found", name))
 	}
-	return Funcer{InputType: types.Any{}, Name: name, Params: nil, OutputType: varType, Kernel: kernel, IDs: &states.IDStack{
+	return Funcer{InputType: types.AnyType{}, Name: name, Params: nil, OutputType: varType, Kernel: kernel, IDs: &states.IDStack{
 		Head: id,
 	}}
 

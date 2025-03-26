@@ -1,33 +1,33 @@
 package types
 
-type Any struct {
+type AnyType struct {
 }
 
-func (t Any) Subsumes(u Type) bool {
+func (t AnyType) Subsumes(u Type) bool {
 	return true
 }
 
-func (t Any) Bind(u Type, bindings map[string]Type) bool {
+func (t AnyType) Bind(u Type, bindings map[string]Type) bool {
 	return true
 }
 
-func (t Any) Instantiate(bindings map[string]Type) Type {
+func (t AnyType) Instantiate(bindings map[string]Type) Type {
 	return t
 }
 
-func (t Any) Partition(u Type) (Type, Type) {
+func (t AnyType) Partition(u Type) (Type, Type) {
 	switch u.(type) {
-	case Any:
-		return u, Void{}
+	case AnyType:
+		return u, VoidType{}
 	default:
 		return u, t
 	}
 }
 
-func (t Any) String() string {
+func (t AnyType) String() string {
 	return "Any"
 }
 
-func (t Any) ElementType() Type {
+func (t AnyType) ElementType() Type {
 	panic("Any is not a sequence type")
 }

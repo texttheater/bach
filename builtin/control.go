@@ -11,11 +11,11 @@ import (
 var ControlFuncers = []shapes.Funcer{
 	shapes.Funcer{
 		Summary:           "Aborts with an error message",
-		InputType:         types.Any{},
+		InputType:         types.AnyType{},
 		InputDescription:  "any value",
 		Name:              "fatal",
 		Params:            nil,
-		OutputType:        types.Void{},
+		OutputType:        types.VoidType{},
 		OutputDescription: "does not return",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -38,14 +38,14 @@ var ControlFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Aborts with an error message if input is null",
-		InputType: types.NewUnion(
-			types.Null{},
-			types.NewVar("A", types.Any{}),
+		InputType: types.NewUnionType(
+			types.NullType{},
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		InputDescription:  "a value that you want to be sure is not null",
 		Name:              "must",
 		Params:            nil,
-		OutputType:        types.NewVar("A", types.Any{}),
+		OutputType:        types.NewTypeVar("A", types.AnyType{}),
 		OutputDescription: "the input value, unless it is null",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {

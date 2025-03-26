@@ -81,7 +81,7 @@ func (v *ArrValue) Data() (any, error) {
 
 func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
-	case *types.Nearr:
+	case *types.NearrType:
 		if v == nil {
 			return false, nil
 		}
@@ -97,8 +97,8 @@ func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 			return false, err
 		}
 		return tail.Inhabits(t.Tail, stack)
-	case *types.Arr:
-		if (types.Any{}).Subsumes(t.El) {
+	case *types.ArrType:
+		if (types.AnyType{}).Subsumes(t.El) {
 			return true, nil
 		}
 		for v != nil {
@@ -115,11 +115,11 @@ func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 			}
 		}
 		return true, nil
-	case types.Union:
+	case types.UnionType:
 		return inhabits(v, t, stack)
-	case types.Any:
+	case types.AnyType:
 		return true, nil
-	case types.Var:
+	case types.TypeVar:
 		return stack.Inhabits(v, t)
 	default:
 		return false, nil

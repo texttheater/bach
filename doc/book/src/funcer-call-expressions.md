@@ -84,9 +84,9 @@ V "ab"
 E null
 ```
 
-```TODO
+```bachdoc
 P "a" +2
-E {"Code": "ArgHasWrongOutputType" ...}
+E {"Kind": "Type", "Code": "ArgHasWrongOutputType"}
 ```
 
 ## Partial Application

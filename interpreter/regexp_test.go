@@ -12,16 +12,16 @@ import (
 func TestRegexp(t *testing.T) {
 	interpreter.TestProgram(
 		`"abccd" ~b(?P<cs>c*)d~`,
-		types.NewUnion(
-			types.Null{},
-			types.Obj{
+		types.NewUnionType(
+			types.NullType{},
+			types.ObjType{
 				Props: map[string]types.Type{
-					"start": types.Num{},
-					"0":     types.Str{},
-					"1":     types.NewUnion(types.Null{}, types.Str{}),
-					"cs":    types.NewUnion(types.Null{}, types.Str{}),
+					"start": types.NumType{},
+					"0":     types.StrType{},
+					"1":     types.NewUnionType(types.NullType{}, types.StrType{}),
+					"cs":    types.NewUnionType(types.NullType{}, types.StrType{}),
 				},
-				Rest: types.Void{},
+				Rest: types.VoidType{},
 			},
 		),
 		states.ObjValueFromMap(map[string]states.Value{
@@ -35,16 +35,16 @@ func TestRegexp(t *testing.T) {
 	)
 	interpreter.TestProgram(
 		`"def" ~^b(?P<cs>c*)d~`,
-		types.NewUnion(
-			types.Null{},
-			types.Obj{
+		types.NewUnionType(
+			types.NullType{},
+			types.ObjType{
 				Props: map[string]types.Type{
-					"start": types.Num{},
-					"0":     types.Str{},
-					"1":     types.NewUnion(types.Null{}, types.Str{}),
-					"cs":    types.NewUnion(types.Null{}, types.Str{}),
+					"start": types.NumType{},
+					"0":     types.StrType{},
+					"1":     types.NewUnionType(types.NullType{}, types.StrType{}),
+					"cs":    types.NewUnionType(types.NullType{}, types.StrType{}),
 				},
-				Rest: types.Void{},
+				Rest: types.VoidType{},
 			},
 		),
 		states.NullValue{},
@@ -53,16 +53,16 @@ func TestRegexp(t *testing.T) {
 	)
 	interpreter.TestProgram(
 		`"abccd" ~^b(?P<cs>*)d~`,
-		types.NewUnion(
-			types.Null{},
-			types.Obj{
+		types.NewUnionType(
+			types.NullType{},
+			types.ObjType{
 				Props: map[string]types.Type{
-					"start": types.Num{},
-					"0":     types.Str{},
-					"1":     types.NewUnion(types.Null{}, types.Str{}),
-					"cs":    types.NewUnion(types.Null{}, types.Str{}),
+					"start": types.NumType{},
+					"0":     types.StrType{},
+					"1":     types.NewUnionType(types.NullType{}, types.StrType{}),
+					"cs":    types.NewUnionType(types.NullType{}, types.StrType{}),
 				},
-				Rest: types.Any{},
+				Rest: types.AnyType{},
 			},
 		),
 		nil,

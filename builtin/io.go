@@ -18,11 +18,11 @@ import (
 var IOFuncers = []shapes.Funcer{
 	shapes.Funcer{
 		Summary:           "Groups lines into blocks separated by empty lines.",
-		InputType:         types.NewArr(types.Str{}),
+		InputType:         types.NewArrType(types.StrType{}),
 		InputDescription:  "an array of consecutive lines",
 		Name:              "blocks",
 		Params:            nil,
-		OutputType:        types.NewArr(types.NewArr(types.Str{})),
+		OutputType:        types.NewArrType(types.NewArrType(types.StrType{})),
 		OutputDescription: "an array of arrays of lines, each representing a block",
 		Notes:             "Each empty line in the input marks the end of a block. Blocks can be empty. The empty lines themselves are not included.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -75,11 +75,11 @@ var IOFuncers = []shapes.Funcer{
 	},
 	shapes.SimpleFuncer(
 		"Writes to STDERR.",
-		types.NewVar("A", types.Any{}),
+		types.NewTypeVar("A", types.AnyType{}),
 		"any value",
 		"err",
 		nil,
-		types.NewVar("A", types.Any{}),
+		types.NewTypeVar("A", types.AnyType{}),
 		"the same value",
 		"Identity function with the side effect of writing a string representation of the value to STDERR, followed by a line break.",
 		func(inputValue states.Value, args []states.Value) (states.Value, error) {
@@ -94,13 +94,13 @@ var IOFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Writes to STDERR with a custom line end.",
-		types.NewVar("A", types.Any{}),
+		types.NewTypeVar("A", types.AnyType{}),
 		"any value",
 		"err",
 		[]*params.Param{
-			params.SimpleParam("end", "the line end to use", types.Str{}),
+			params.SimpleParam("end", "the line end to use", types.StrType{}),
 		},
-		types.NewVar("A", types.Any{}),
+		types.NewTypeVar("A", types.AnyType{}),
 		"the same value",
 		"Identity function with the side effect of writing a string representation of the value to STDERR, followed by a the specified line end.",
 		func(inputValue states.Value, args []states.Value) (states.Value, error) {
@@ -117,11 +117,11 @@ var IOFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Reads from STDIN.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"in",
 		nil,
-		types.Reader{},
+		types.ReaderType{},
 		"a Reader representing STDIN",
 		"",
 		func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
@@ -131,11 +131,11 @@ var IOFuncers = []shapes.Funcer{
 	),
 	shapes.Funcer{
 		Summary:           "Reads the next JSON value from a stream",
-		InputType:         types.Reader{},
+		InputType:         types.ReaderType{},
 		InputDescription:  "a Reader",
 		Name:              "json",
 		Params:            nil,
-		OutputType:        types.Any{},
+		OutputType:        types.AnyType{},
 		OutputDescription: "data structure represented by the JSON input",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -167,11 +167,11 @@ var IOFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:           "Reads a stream line-by-line",
-		InputType:         types.Reader{},
+		InputType:         types.ReaderType{},
 		InputDescription:  "a Reader",
 		Name:              "lines",
 		Params:            nil,
-		OutputType:        types.NewArr(types.Str{}),
+		OutputType:        types.NewArrType(types.StrType{}),
 		OutputDescription: "an array of lines, without the line-break character",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -193,11 +193,11 @@ var IOFuncers = []shapes.Funcer{
 	},
 	shapes.SimpleFuncer(
 		"Writes to STDOUT.",
-		types.NewVar("A", types.Any{}),
+		types.NewTypeVar("A", types.AnyType{}),
 		"any value",
 		"out",
 		nil,
-		types.NewVar("A", types.Any{}),
+		types.NewTypeVar("A", types.AnyType{}),
 		"the same value",
 		"Identity function with the side effect of writing a string representation of the value to STDERR, followed by a line break.",
 		func(inputValue states.Value, args []states.Value) (states.Value, error) {
@@ -212,13 +212,13 @@ var IOFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Writes to STDOUT with a custom line end.",
-		types.NewVar("A", types.Any{}),
+		types.NewTypeVar("A", types.AnyType{}),
 		"any value",
 		"out",
 		[]*params.Param{
-			params.SimpleParam("end", "", types.Str{}),
+			params.SimpleParam("end", "", types.StrType{}),
 		},
-		types.NewVar("A", types.Any{}),
+		types.NewTypeVar("A", types.AnyType{}),
 		"the same value",
 		"Identity function with the side effect of writing a string representation of the value to STDOUT, followed by a line break.",
 		func(inputValue states.Value, args []states.Value) (states.Value, error) {
@@ -235,11 +235,11 @@ var IOFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Creates a Reader from a Str.",
-		types.Str{},
+		types.StrType{},
 		"a string",
 		"reader",
 		nil,
-		types.Reader{},
+		types.ReaderType{},
 		"a Reader from which the input can be read",
 		"",
 		func(inputValue states.Value, args []states.Value) (states.Value, error) {

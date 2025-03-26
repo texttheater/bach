@@ -10,11 +10,11 @@ import (
 var LogicFuncers = []shapes.Funcer{
 	shapes.SimpleFuncer(
 		"Returns the value representing logical truth.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"true",
 		nil,
-		types.Bool{},
+		types.BoolType{},
 		"the unique value representing logical truth",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -26,11 +26,11 @@ var LogicFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns the value representing logical falsehood.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"false",
 		nil,
-		types.Bool{},
+		types.BoolType{},
 		"the unique value representing logical falsehood",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -42,13 +42,13 @@ var LogicFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes logical conjunction.",
-		types.Bool{},
+		types.BoolType{},
 		"a boolean value",
 		"and",
 		[]*params.Param{
-			params.SimpleParam("q", "another boolean value", types.Bool{}),
+			params.SimpleParam("q", "another boolean value", types.BoolType{}),
 		},
-		types.Bool{},
+		types.BoolType{},
 		"true if both the input and q are true, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -65,13 +65,13 @@ var LogicFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes logical disjunction.",
-		types.Bool{},
+		types.BoolType{},
 		"a boolean value",
 		"or",
 		[]*params.Param{
-			params.SimpleParam("q", "another boolean value", types.Bool{}),
+			params.SimpleParam("q", "another boolean value", types.BoolType{}),
 		},
-		types.Bool{},
+		types.BoolType{},
 		"true if at least one of the input and q is true, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -88,11 +88,11 @@ var LogicFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes logical negation.",
-		types.Bool{},
+		types.BoolType{},
 		"a boolean value",
 		"not",
 		nil,
-		types.Bool{},
+		types.BoolType{},
 		"true if the input is false, and false if the input is true",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -107,13 +107,13 @@ var LogicFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Checks equality of boolean values.",
-		types.Bool{},
+		types.BoolType{},
 		"a boolean value",
 		"==",
 		[]*params.Param{
-			params.SimpleParam("q", "another boolean value", types.Bool{}),
+			params.SimpleParam("q", "another boolean value", types.BoolType{}),
 		},
-		types.Bool{},
+		types.BoolType{},
 		"true if the input and q are identical, false otherwise",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {

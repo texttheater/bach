@@ -12,14 +12,14 @@ import (
 func TestMatchingObj(t *testing.T) {
 	interpreter.TestProgram(
 		`{a: 1} is {a: Num a} then a ok`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`{a: 1, b: 2} is {a: Num a} then a ok`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(1),
 		nil,
 		t,
@@ -35,7 +35,7 @@ func TestMatchingObj(t *testing.T) {
 	)
 	interpreter.TestProgram(
 		`if true then {a: 1} else {b: 2} ok is {a: Num a} then a elis {b: Num b} then b ok`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(1),
 		nil,
 		t,
@@ -60,18 +60,18 @@ func TestMatchingObj(t *testing.T) {
 	//)
 	interpreter.TestProgram(
 		`if true then {a: 1} else {b: 2} ok`,
-		types.NewUnion(
-			types.Obj{
+		types.NewUnionType(
+			types.ObjType{
 				Props: map[string]types.Type{
-					"a": types.Num{},
+					"a": types.NumType{},
 				},
-				Rest: types.Void{},
+				Rest: types.VoidType{},
 			},
-			types.Obj{
+			types.ObjType{
 				Props: map[string]types.Type{
-					"b": types.Num{},
+					"b": types.NumType{},
 				},
-				Rest: types.Void{},
+				Rest: types.VoidType{},
 			},
 		),
 		states.ObjValueFromMap(map[string]states.Value{
@@ -86,7 +86,7 @@ func TestMatchingObj(t *testing.T) {
 	// attribute not present in the type has Any type by default.
 	interpreter.TestProgram(
 		`if true then {a: 1} else {b: 2} ok is {a: Num x} with x ==1 then true elif false then false elis {a: Num x} then x elis {b: Num x} then x ok`,
-		types.NewUnion(types.Bool{}, types.Num{}),
+		types.NewUnionType(types.BoolType{}, types.NumType{}),
 		states.BoolValue(true),
 		nil,
 		t,

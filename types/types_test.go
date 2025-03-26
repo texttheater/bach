@@ -7,11 +7,11 @@ import (
 )
 
 func TestSubsumption1(t *testing.T) {
-	t1 := &types.Arr{types.Num{}}
+	t1 := &types.ArrType{types.NumType{}}
 	t2 := types.NewTup([]types.Type{
-		types.Num{},
-		types.Num{},
-		types.Num{},
+		types.NumType{},
+		types.NumType{},
+		types.NumType{},
 	})
 	if !t1.Subsumes(t2) {
 		t.Logf("%s should subsume %s", t1, t2)
@@ -20,8 +20,8 @@ func TestSubsumption1(t *testing.T) {
 }
 
 func TestSubsumption2(t *testing.T) {
-	t1 := &types.Arr{types.Void{}}
-	t2 := &types.Arr{types.Void{}}
+	t1 := &types.ArrType{types.VoidType{}}
+	t2 := &types.ArrType{types.VoidType{}}
 	if !t1.Subsumes(t2) {
 		t.Logf("%s should subsume %s", t1, t2)
 		t.Fail()
@@ -29,8 +29,8 @@ func TestSubsumption2(t *testing.T) {
 }
 
 func TestSubsumption3(t *testing.T) {
-	t1 := &types.Nearr{types.Any{}, &types.Nearr{types.Any{}, &types.Nearr{types.Any{}, types.AnyArr}}}
-	t2 := types.NewTup([]types.Type{types.Num{}, types.Num{}})
+	t1 := &types.NearrType{types.AnyType{}, &types.NearrType{types.AnyType{}, &types.NearrType{types.AnyType{}, types.AnyArrType}}}
+	t2 := types.NewTup([]types.Type{types.NumType{}, types.NumType{}})
 	if t1.Subsumes(t2) {
 		t.Logf("%s should not subsume %s", t1, t2)
 		t.Fail()
@@ -38,23 +38,23 @@ func TestSubsumption3(t *testing.T) {
 }
 
 func TestSubsumption4(t *testing.T) {
-	a1 := types.Obj{
-		map[string]types.Type{"a": types.Num{}},
-		types.Void{},
+	a1 := types.ObjType{
+		map[string]types.Type{"a": types.NumType{}},
+		types.VoidType{},
 	}
-	b2 := types.Obj{
-		map[string]types.Type{"b": types.Num{}},
-		types.Void{},
+	b2 := types.ObjType{
+		map[string]types.Type{"b": types.NumType{}},
+		types.VoidType{},
 	}
-	t1 := &types.Nearr{
+	t1 := &types.NearrType{
 		a1,
-		&types.Nearr{
+		&types.NearrType{
 			b2,
-			types.VoidArr,
+			types.VoidArrType,
 		},
 	}
 	gotType := t1.ElementType()
-	wantType := types.NewUnion(a1, b2)
+	wantType := types.NewUnionType(a1, b2)
 	if !gotType.Subsumes(wantType) {
 		t.Logf("%s should subsume %s", gotType, wantType)
 		t.Fail()
@@ -84,13 +84,13 @@ func TestSubsumption4(t *testing.T) {
 }
 
 func TestSubsumption5(t *testing.T) {
-	general := types.Obj{
-		Props: map[string]types.Type{"yes": types.Num{}},
-		Rest:  types.Any{},
+	general := types.ObjType{
+		Props: map[string]types.Type{"yes": types.NumType{}},
+		Rest:  types.AnyType{},
 	}
-	specific := types.Obj{
-		Props: map[string]types.Type{"yes": types.Num{}},
-		Rest:  types.Void{},
+	specific := types.ObjType{
+		Props: map[string]types.Type{"yes": types.NumType{}},
+		Rest:  types.VoidType{},
 	}
 	if !general.Subsumes(specific) {
 		t.Logf("%s should subsume %s", general, specific)

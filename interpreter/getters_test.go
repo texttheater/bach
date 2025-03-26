@@ -11,13 +11,13 @@ import (
 
 func TestGetters(t *testing.T) {
 	interpreter.TestProgram(`{a: 1, b: 2} @a`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(1),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(`{a: 1, b: 2} @b`,
-		types.Num{},
+		types.NumType{},
 		states.NumValue(2),
 		nil,
 		t,
@@ -27,36 +27,36 @@ func TestGetters(t *testing.T) {
 		nil,
 		errors.TypeError(
 			errors.Code(errors.NoSuchProperty),
-			errors.WantType(types.Obj{
+			errors.WantType(types.ObjType{
 				Props: map[string]types.Type{
-					"c": types.Any{},
+					"c": types.AnyType{},
 				},
-				Rest: types.Any{},
+				Rest: types.AnyType{},
 			}),
-			errors.GotType(types.Obj{
+			errors.GotType(types.ObjType{
 				Props: map[string]types.Type{
-					"a": types.Num{},
-					"b": types.Num{},
+					"a": types.NumType{},
+					"b": types.NumType{},
 				},
-				Rest: types.Void{},
+				Rest: types.VoidType{},
 			}),
 		),
 		t,
 	)
 	interpreter.TestProgram(`["a", "b", "c"] @0`,
-		types.Str{},
+		types.StrType{},
 		states.StrValue("a"),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(`["a", "b", "c"] @1`,
-		types.Str{},
+		types.StrType{},
 		states.StrValue("b"),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(`["a", "b", "c"] @2`,
-		types.Str{},
+		types.StrType{},
 		states.StrValue("c"),
 		nil,
 		t,

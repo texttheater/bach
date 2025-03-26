@@ -5,13 +5,13 @@ import (
 )
 
 func NewTup(elementTypes []Type) Type {
-	return NewNearr(elementTypes, &Arr{Void{}})
+	return NewNearr(elementTypes, &ArrType{VoidType{}})
 }
 
 func NewNearr(elementTypes []Type, restType Type) Type {
 	var t Type = restType
 	for i := len(elementTypes) - 1; i >= 0; i-- {
-		t = &Nearr{
+		t = &NearrType{
 			Head: elementTypes[i],
 			Tail: t,
 		}
@@ -19,96 +19,96 @@ func NewNearr(elementTypes []Type, restType Type) Type {
 	return t
 }
 
-type Nearr struct {
+type NearrType struct {
 	Head Type
 	Tail Type
 }
 
-func (t *Nearr) Subsumes(u Type) bool {
+func (t *NearrType) Subsumes(u Type) bool {
 	switch u := u.(type) {
-	case Void:
+	case VoidType:
 		return true
-	case *Nearr:
+	case *NearrType:
 		return t.Head.Subsumes(u.Head) && t.Tail.Subsumes(u.Tail)
-	case Union:
+	case UnionType:
 		return u.inverseSubsumes(t)
 	default:
 		return false
 	}
 }
 
-func (t *Nearr) Bind(u Type, bindings map[string]Type) bool {
+func (t *NearrType) Bind(u Type, bindings map[string]Type) bool {
 	switch u := u.(type) {
-	case Void:
+	case VoidType:
 		return true
-	case *Nearr:
+	case *NearrType:
 		return t.Head.Bind(u.Head, bindings) && t.Tail.Bind(u.Tail, bindings)
-	case Union:
+	case UnionType:
 		return u.inverseBind(t, bindings)
 	default:
 		return false
 	}
 }
 
-func (t *Nearr) Instantiate(bindings map[string]Type) Type {
-	return &Nearr{
+func (t *NearrType) Instantiate(bindings map[string]Type) Type {
+	return &NearrType{
 		Head: t.Head.Instantiate(bindings),
 		Tail: t.Tail.Instantiate(bindings),
 	}
 }
 
-func (t *Nearr) Partition(u Type) (Type, Type) {
+func (t *NearrType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
-	case Void:
+	case VoidType:
 		return u, t
-	case *Nearr:
+	case *NearrType:
 		headIntersection, _ := t.Head.Partition(u.Head)
-		if (Void{}).Subsumes(headIntersection) {
-			return Void{}, t
+		if (VoidType{}).Subsumes(headIntersection) {
+			return VoidType{}, t
 		}
 		tailIntersection, _ := t.Tail.Partition(u.Tail)
-		if (Void{}).Subsumes(tailIntersection) {
-			return Void{}, t
+		if (VoidType{}).Subsumes(tailIntersection) {
+			return VoidType{}, t
 		}
-		intersection := &Nearr{
+		intersection := &NearrType{
 			Head: headIntersection,
 			Tail: tailIntersection,
 		}
 		if intersection.Subsumes(t) {
-			return intersection, Void{}
+			return intersection, VoidType{}
 		}
 		return intersection, t
-	case *Arr:
+	case *ArrType:
 		headIntersection, _ := t.Head.Partition(u.El)
-		if (Void{}).Subsumes(headIntersection) {
-			return Void{}, t
+		if (VoidType{}).Subsumes(headIntersection) {
+			return VoidType{}, t
 		}
 		tailIntersection, _ := t.Tail.Partition(u)
-		if (Void{}).Subsumes(tailIntersection) {
-			return Void{}, t
+		if (VoidType{}).Subsumes(tailIntersection) {
+			return VoidType{}, t
 		}
-		intersection := &Nearr{
+		intersection := &NearrType{
 			Head: headIntersection,
 			Tail: tailIntersection,
 		}
 		if intersection.Subsumes(t) {
-			return intersection, Void{}
+			return intersection, VoidType{}
 		}
 		return intersection, t
-	case Union:
+	case UnionType:
 		return u.inversePartition(t)
-	case Any:
-		return t, Void{}
+	case AnyType:
+		return t, VoidType{}
 	default:
-		return Void{}, t
+		return VoidType{}, t
 	}
 }
 
-func (t Nearr) ElementType() Type {
-	return NewUnion(t.Head, t.Tail.ElementType())
+func (t NearrType) ElementType() Type {
+	return NewUnionType(t.Head, t.Tail.ElementType())
 }
 
-func (t *Nearr) String() string {
+func (t *NearrType) String() string {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("Arr<")
 	buffer.WriteString(t.Head.String())
@@ -116,12 +116,12 @@ func (t *Nearr) String() string {
 Loop:
 	for {
 		switch t := tail.(type) {
-		case *Nearr:
+		case *NearrType:
 			buffer.WriteString(", ")
 			buffer.WriteString(t.Head.String())
 			tail = t.Tail
-		case *Arr:
-			if !(Void{}).Subsumes(t.El) {
+		case *ArrType:
+			if !(VoidType{}).Subsumes(t.El) {
 				buffer.WriteString(", ")
 				buffer.WriteString(t.El.String())
 				buffer.WriteString("...")

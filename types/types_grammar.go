@@ -14,7 +14,7 @@ func (g *TypeSyntax) Ast() Type {
 	result := g.NonDisjunctiveType.Ast()
 	for _, d := range g.Disjuncts {
 		t := d.Ast()
-		result = NewUnion(result, t)
+		result = NewUnionType(result, t)
 	}
 	return result
 }
@@ -72,7 +72,7 @@ type VoidTypeSyntax struct {
 }
 
 func (g *VoidTypeSyntax) Ast() Type {
-	return Void{}
+	return VoidType{}
 }
 
 type NullTypeSyntax struct {
@@ -80,7 +80,7 @@ type NullTypeSyntax struct {
 }
 
 func (g *NullTypeSyntax) Ast() Type {
-	return Null{}
+	return NullType{}
 }
 
 type ReaderTypeSyntax struct {
@@ -88,7 +88,7 @@ type ReaderTypeSyntax struct {
 }
 
 func (g *ReaderTypeSyntax) Ast() Type {
-	return Reader{}
+	return ReaderType{}
 }
 
 type BoolTypeSyntax struct {
@@ -96,7 +96,7 @@ type BoolTypeSyntax struct {
 }
 
 func (g *BoolTypeSyntax) Ast() Type {
-	return Bool{}
+	return BoolType{}
 }
 
 type NumTypeSyntax struct {
@@ -104,7 +104,7 @@ type NumTypeSyntax struct {
 }
 
 func (g *NumTypeSyntax) Ast() Type {
-	return Num{}
+	return NumType{}
 }
 
 type StrTypeSyntax struct {
@@ -112,7 +112,7 @@ type StrTypeSyntax struct {
 }
 
 func (g *StrTypeSyntax) Ast() Type {
-	return Str{}
+	return StrType{}
 }
 
 type ArrTypeSyntax struct {
@@ -124,30 +124,30 @@ type ArrTypeSyntax struct {
 
 func (g *ArrTypeSyntax) Ast() Type {
 	if g.Type == nil {
-		return VoidArr
+		return VoidArrType
 	}
 	if len(g.Types) == 0 && g.Ellipsis != nil {
-		return NewArr(g.Type.Ast())
+		return NewArrType(g.Type.Ast())
 	}
-	result := &Nearr{
+	result := &NearrType{
 		Head: g.Type.Ast(),
 	}
 	current := result
 	length := len(g.Types)
 	for i, t := range g.Types {
 		if g.Ellipsis != nil && i == length-1 {
-			current.Tail = &Arr{
+			current.Tail = &ArrType{
 				El: t.Ast(),
 			}
 			return result
 		}
-		newTail := &Nearr{
+		newTail := &NearrType{
 			Head: t.Ast(),
 		}
 		current.Tail = newTail
 		current = newTail
 	}
-	current.Tail = VoidArr
+	current.Tail = VoidArrType
 	return result
 }
 
@@ -183,11 +183,11 @@ func (g *ObjTypeSyntax) Ast() Type {
 	}
 	var restTypeAst Type
 	if restType == nil {
-		restTypeAst = Any{}
+		restTypeAst = AnyType{}
 	} else {
 		restTypeAst = restType.Ast()
 	}
-	return Obj{
+	return ObjType{
 		Props: propTypeMap,
 		Rest:  restTypeAst,
 	}
@@ -198,7 +198,7 @@ type AnyTypeSyntax struct {
 }
 
 func (g *AnyTypeSyntax) Ast() Type {
-	return Any{}
+	return AnyType{}
 }
 
 type TypeVariableSyntax struct {
@@ -207,8 +207,8 @@ type TypeVariableSyntax struct {
 }
 
 func (g *TypeVariableSyntax) Ast() Type {
-	return NewVar(
+	return NewTypeVar(
 		g.LangleLid[1:len(g.LangleLid)],
-		Any{},
+		AnyType{},
 	)
 }

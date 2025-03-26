@@ -4,43 +4,43 @@ import (
 	"bytes"
 )
 
-type Var struct {
+type TypeVar struct {
 	Name  string
 	Bound Type
 }
 
-func NewVar(name string, bound Type) Var {
-	return Var{
+func NewTypeVar(name string, bound Type) TypeVar {
+	return TypeVar{
 		Name:  name,
 		Bound: bound,
 	}
 }
 
-func (t Var) Subsumes(u Type) bool {
+func (t TypeVar) Subsumes(u Type) bool {
 	switch u := u.(type) {
-	case Void:
+	case VoidType:
 		return true
-	case Var:
+	case TypeVar:
 		return t.Name == u.Name
 	default:
 		return false
 	}
 }
 
-func (t Var) Bind(u Type, bindings map[string]Type) bool {
+func (t TypeVar) Bind(u Type, bindings map[string]Type) bool {
 	if !t.Bound.Subsumes(u) {
 		return false
 	}
 	instType, ok := bindings[t.Name]
 	if !ok {
-		instType = Void{}
+		instType = VoidType{}
 	}
-	newInstType := NewUnion(instType, u)
+	newInstType := NewUnionType(instType, u)
 	bindings[t.Name] = newInstType
 	return true
 }
 
-func (t Var) Instantiate(bindings map[string]Type) Type {
+func (t TypeVar) Instantiate(bindings map[string]Type) Type {
 	instType, ok := bindings[t.Name]
 	if !ok {
 		return t
@@ -48,25 +48,25 @@ func (t Var) Instantiate(bindings map[string]Type) Type {
 	return instType
 }
 
-func (t Var) Partition(u Type) (Type, Type) {
+func (t TypeVar) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
-	case Void:
+	case VoidType:
 		return u, t
-	case Var:
+	case TypeVar:
 		if t.Name == u.Name {
-			return u, Void{}
+			return u, VoidType{}
 		}
-		return Void{}, t
-	case Union:
+		return VoidType{}, t
+	case UnionType:
 		return u.inversePartition(t)
-	case Any:
-		return t, Void{}
+	case AnyType:
+		return t, VoidType{}
 	default:
-		return Void{}, t
+		return VoidType{}, t
 	}
 }
 
-func (t Var) String() string {
+func (t TypeVar) String() string {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("<")
 	buffer.WriteString(t.Name)
@@ -78,6 +78,6 @@ func (t Var) String() string {
 	return buffer.String()
 }
 
-func (t Var) ElementType() Type {
+func (t TypeVar) ElementType() Type {
 	panic("type variable " + t.Name + " is not a sequence type")
 }

@@ -14,19 +14,19 @@ import (
 var ArrFuncers = []shapes.Funcer{
 	shapes.Funcer{
 		Summary: "Concatenates two arrays.",
-		InputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		InputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		InputDescription: "an array",
 		Name:             "+",
 		Params: []*params.Param{
-			params.SimpleParam("other", "another array", types.NewArr(
-				types.NewVar("B", types.Any{}),
+			params.SimpleParam("other", "another array", types.NewArrType(
+				types.NewTypeVar("B", types.AnyType{}),
 			)),
 		},
-		OutputType: types.NewArr(types.NewUnion(
-			types.NewVar("A", types.Any{}),
-			types.NewVar("B", types.Any{}),
+		OutputType: types.NewArrType(types.NewUnionType(
+			types.NewTypeVar("A", types.AnyType{}),
+			types.NewTypeVar("B", types.AnyType{}),
 		)),
 		OutputDescription: "the concatenation of both arrays",
 		Notes:             "",
@@ -64,11 +64,11 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:           "Checks if all elements are true.",
-		InputType:         types.NewArr(types.Bool{}),
+		InputType:         types.NewArrType(types.BoolType{}),
 		InputDescription:  "an array of boolean values",
 		Name:              "all",
 		Params:            nil,
-		OutputType:        types.Bool{},
+		OutputType:        types.BoolType{},
 		OutputDescription: "true iff all elements of the input are true",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -96,16 +96,16 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Removes the first n elements from the beginning of an array.",
-		InputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		InputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		InputDescription: "an array",
 		Name:             "drop",
 		Params: []*params.Param{
-			params.SimpleParam("n", "number of elements to remove", types.Num{}),
+			params.SimpleParam("n", "number of elements to remove", types.NumType{}),
 		},
-		OutputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		OutputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		OutputDescription: "the input with the first n elements removed",
 		Notes:             "",
@@ -135,35 +135,35 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Removes elements satisfying a condition from the beginning of an array.",
-		InputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		InputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		InputDescription: "an array",
 		Name:             "dropWhile",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "test",
 				Description: "a test to apply to the elements of the input",
 				Params:      nil,
-				OutputType: types.NewUnion(
-					types.Obj{
+				OutputType: types.NewUnionType(
+					types.ObjType{
 						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
+							"yes": types.NewTypeVar("B", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
-					types.Obj{
+					types.ObjType{
 						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
+							"no": types.NewTypeVar("C", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				),
 			},
 		},
-		OutputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		OutputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		OutputDescription: "The elements from the input, starting with the first one that does not pass the test.",
 		Notes:             "",
@@ -195,19 +195,19 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Applies a function to every element.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "each",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "f",
 				Description: "a function to apply to each element of the input",
 				Params:      nil,
-				OutputType:  types.NewVar("B", types.Any{}),
+				OutputType:  types.NewTypeVar("B", types.AnyType{}),
 			},
 		},
-		OutputType:        types.NewArr(types.NewVar("B", types.Any{})),
+		OutputType:        types.NewArrType(types.NewTypeVar("B", types.AnyType{})),
 		OutputDescription: "a list with the outputs of f applied to each element of the input",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -237,13 +237,13 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Pairs each element with a 0-based index.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "",
 		Name:             "enum",
 		Params:           nil,
-		OutputType: types.NewArr(types.NewTup([]types.Type{
-			types.Num{},
-			types.NewVar("A", types.Any{}),
+		OutputType: types.NewArrType(types.NewTup([]types.Type{
+			types.NumType{},
+			types.NewTypeVar("A", types.AnyType{}),
 		})),
 		OutputDescription: "the input with each element replaced with a 2-element array, the second element of which is the original element and the first is its index in the array, counting from 0",
 		Notes:             "",
@@ -274,15 +274,15 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Pairs each element with an index.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "enum",
 		Params: []*params.Param{
-			params.SimpleParam("start", "at which number to start counting", types.Num{}),
+			params.SimpleParam("start", "at which number to start counting", types.NumType{}),
 		},
-		OutputType: types.NewArr(types.NewTup([]types.Type{
-			types.Num{},
-			types.NewVar("A", types.Any{}),
+		OutputType: types.NewArrType(types.NewTup([]types.Type{
+			types.NumType{},
+			types.NewTypeVar("A", types.AnyType{}),
 		})),
 		OutputDescription: "the input with each element replaced with a 2-element array, the second element of which is the original element and the first is its index in the array, counting from start",
 		Notes:             "",
@@ -316,39 +316,39 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Finds the index and first element satisfying a condition.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "findFirst",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "test",
 				Description: "a test to apply to elements of the input",
 				Params:      nil,
-				OutputType: types.NewUnion(
-					types.Obj{
+				OutputType: types.NewUnionType(
+					types.ObjType{
 						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
+							"yes": types.NewTypeVar("B", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
-					types.Obj{
+					types.ObjType{
 						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
+							"no": types.NewTypeVar("C", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				),
 			},
 		},
-		OutputType: types.NewUnion(
-			types.Null{},
+		OutputType: types.NewUnionType(
+			types.NullType{},
 			types.NewNearr(
 				[]types.Type{
-					types.Num{},
-					types.NewVar("A", types.Any{}),
+					types.NumType{},
+					types.NewTypeVar("A", types.AnyType{}),
 				},
-				types.VoidArr,
+				types.VoidArrType,
 			),
 		),
 		OutputDescription: "the first element of the input passing the test, paired with its index, or Null if none",
@@ -374,34 +374,34 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Finds the index of the first element satisfying a condition.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "findFirstIndex",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "test",
 				Description: "a test to apply to elements of the input",
 				Params:      nil,
-				OutputType: types.NewUnion(
-					types.Obj{
+				OutputType: types.NewUnionType(
+					types.ObjType{
 						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
+							"yes": types.NewTypeVar("B", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
-					types.Obj{
+					types.ObjType{
 						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
+							"no": types.NewTypeVar("C", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				),
 			},
 		},
-		OutputType: types.NewUnion(
-			types.Null{},
-			types.Num{},
+		OutputType: types.NewUnionType(
+			types.NullType{},
+			types.NumType{},
 		),
 		OutputDescription: "the index of the first element of the input passing the test, or Null if none",
 		Notes:             "",
@@ -423,34 +423,34 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Finds the first element satisfying a condition.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "findFirstValue",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "test",
 				Description: "a test to apply to elements of the input",
 				Params:      nil,
-				OutputType: types.NewUnion(
-					types.Obj{
+				OutputType: types.NewUnionType(
+					types.ObjType{
 						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
+							"yes": types.NewTypeVar("B", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
-					types.Obj{
+					types.ObjType{
 						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
+							"no": types.NewTypeVar("C", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				),
 			},
 		},
-		OutputType: types.NewUnion(
-			types.Null{},
-			types.NewVar("A", types.Any{}),
+		OutputType: types.NewUnionType(
+			types.NullType{},
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		OutputDescription: "the first element of the input passing the test, or Null if none",
 		Notes:             "",
@@ -472,39 +472,39 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Finds the index and last element satisfying a condition.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "findLast",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "test",
 				Description: "a test to apply to elements of the input",
 				Params:      nil,
-				OutputType: types.NewUnion(
-					types.Obj{
+				OutputType: types.NewUnionType(
+					types.ObjType{
 						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
+							"yes": types.NewTypeVar("B", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
-					types.Obj{
+					types.ObjType{
 						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
+							"no": types.NewTypeVar("C", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				),
 			},
 		},
-		OutputType: types.NewUnion(
-			types.Null{},
+		OutputType: types.NewUnionType(
+			types.NullType{},
 			types.NewNearr(
 				[]types.Type{
-					types.Num{},
-					types.NewVar("A", types.Any{}),
+					types.NumType{},
+					types.NewTypeVar("A", types.AnyType{}),
 				},
-				types.VoidArr,
+				types.VoidArrType,
 			),
 		),
 		OutputDescription: "the last element of the input passing the test, paired with its index, or Null if none",
@@ -530,34 +530,34 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Finds the index of the last element satisfying a condition.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "findLastIndex",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "test",
 				Description: "a test to apply to elements of the input",
 				Params:      nil,
-				OutputType: types.NewUnion(
-					types.Obj{
+				OutputType: types.NewUnionType(
+					types.ObjType{
 						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
+							"yes": types.NewTypeVar("B", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
-					types.Obj{
+					types.ObjType{
 						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
+							"no": types.NewTypeVar("C", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				),
 			},
 		},
-		OutputType: types.NewUnion(
-			types.Null{},
-			types.Num{},
+		OutputType: types.NewUnionType(
+			types.NullType{},
+			types.NumType{},
 		),
 		OutputDescription: "the index of the last element of the input passing the test, or Null if none",
 		Notes:             "",
@@ -579,34 +579,34 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Finds the last element satisfying a condition.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "findLastValue",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "test",
 				Description: "a test to apply to elements of the input",
 				Params:      nil,
-				OutputType: types.NewUnion(
-					types.Obj{
+				OutputType: types.NewUnionType(
+					types.ObjType{
 						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
+							"yes": types.NewTypeVar("B", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
-					types.Obj{
+					types.ObjType{
 						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
+							"no": types.NewTypeVar("C", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				),
 			},
 		},
-		OutputType: types.NewUnion(
-			types.Null{},
-			types.NewVar("A", types.Any{}),
+		OutputType: types.NewUnionType(
+			types.NullType{},
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		OutputDescription: "the last element of the input passing the test, or Null if none",
 		Notes:             "",
@@ -628,22 +628,22 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Aggregates an array recursively.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "fold",
 		Params: []*params.Param{
-			params.SimpleParam("start", "initial accumulator", types.NewVar("B", types.Any{})),
+			params.SimpleParam("start", "initial accumulator", types.NewTypeVar("B", types.AnyType{})),
 			{
-				InputType:   types.NewVar("B", types.Any{}),
+				InputType:   types.NewTypeVar("B", types.AnyType{}),
 				Name:        "combine",
 				Description: "a function that combines the current accumulator with the next element to produce a new accumulator",
 				Params: []*params.Param{
-					params.SimpleParam("next", "the next element", types.NewVar("A", types.Any{})),
+					params.SimpleParam("next", "the next element", types.NewTypeVar("A", types.AnyType{})),
 				},
-				OutputType: types.NewVar("B", types.Any{}),
+				OutputType: types.NewTypeVar("B", types.AnyType{}),
 			},
 		},
-		OutputType:        types.NewVar("B", types.Any{}),
+		OutputType:        types.NewTypeVar("B", types.AnyType{}),
 		OutputDescription: "the accumulator after processing all elements",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -682,15 +682,15 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Returns the element at a given index.",
-		InputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		InputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		InputDescription: "an array",
 		Name:             "get",
 		Params: []*params.Param{
-			params.SimpleParam("index", "a 0-based index into the input", types.Num{}),
+			params.SimpleParam("index", "a 0-based index into the input", types.NumType{}),
 		},
-		OutputType:        types.NewVar("A", types.Any{}),
+		OutputType:        types.NewTypeVar("A", types.AnyType{}),
 		OutputDescription: "the element at the given index",
 		Notes:             "Throws BadIndex if the index is invalid or NoSuchIndex if there is not element at the give index.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -747,18 +747,18 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Returns the element at a given index, or a default value.",
-		InputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		InputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		InputDescription: "an array",
 		Name:             "get",
 		Params: []*params.Param{
-			params.SimpleParam("index", "a 0-based index into the input", types.Num{}),
-			params.SimpleParam("default", "default value to retur if there is no element at the given index", types.NewVar("B", types.Any{})),
+			params.SimpleParam("index", "a 0-based index into the input", types.NumType{}),
+			params.SimpleParam("default", "default value to retur if there is no element at the given index", types.NewTypeVar("B", types.AnyType{})),
 		},
-		OutputType: types.NewUnion(
-			types.NewVar("A", types.Any{}),
-			types.NewVar("B", types.Any{}),
+		OutputType: types.NewUnionType(
+			types.NewTypeVar("A", types.AnyType{}),
+			types.NewTypeVar("B", types.AnyType{}),
 		),
 		OutputDescription: "the element at the given index, or default if there isn't one.",
 		Notes:             "Throws BadIndex if the index is invalid.",
@@ -802,13 +802,13 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Join several arrays together into one.",
-		InputType: types.NewArr(
-			types.NewArr(types.NewVar("A", types.Any{})),
+		InputType: types.NewArrType(
+			types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		),
 		InputDescription:  "an array of arrays",
 		Name:              "join",
 		Params:            nil,
-		OutputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		OutputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		OutputDescription: "All arrays in the input joined together into one.",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -851,32 +851,32 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Keep only elements satisfying a condition.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "keep",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "test",
 				Description: "a test to apply to elements of the input",
 				Params:      nil,
-				OutputType: types.NewUnion(
-					types.Obj{
+				OutputType: types.NewUnionType(
+					types.ObjType{
 						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
+							"yes": types.NewTypeVar("B", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
-					types.Obj{
+					types.ObjType{
 						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
+							"no": types.NewTypeVar("C", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				),
 			},
 		},
-		OutputType:        types.NewArr(types.NewVar("B", types.Any{})),
+		OutputType:        types.NewArrType(types.NewTypeVar("B", types.AnyType{})),
 		OutputDescription: "The input with all elements not passing the test removed.",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -954,11 +954,11 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:           "Computes the length of an array.",
-		InputType:         types.AnyArr,
+		InputType:         types.AnyArrType,
 		InputDescription:  "an array",
 		Name:              "len",
 		Params:            nil,
-		OutputType:        types.Num{},
+		OutputType:        types.NumType{},
 		OutputDescription: "how many elements the input has",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -983,24 +983,24 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Finds the maximum element.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "max",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "less",
 				Description: `funcer that test whether its input is "less than" its first argument`,
 				Params: []*params.Param{
-					params.SimpleParam("other", "", types.NewVar("A", types.Any{})),
+					params.SimpleParam("other", "", types.NewTypeVar("A", types.AnyType{})),
 				},
-				OutputType: types.Bool{},
+				OutputType: types.BoolType{},
 			},
-			params.SimpleParam("default", "default value to return if the input is empty", types.NewVar("B", types.Any{})),
+			params.SimpleParam("default", "default value to return if the input is empty", types.NewTypeVar("B", types.AnyType{})),
 		},
-		OutputType: types.NewUnion(
-			types.NewVar("A", types.Any{}),
-			types.NewVar("B", types.Any{}),
+		OutputType: types.NewUnionType(
+			types.NewTypeVar("A", types.AnyType{}),
+			types.NewTypeVar("B", types.AnyType{}),
 		),
 		OutputDescription: "the maximum element, or default if the input is empty",
 		Notes:             "",
@@ -1016,31 +1016,31 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Finds the maximum element according to a sorting key.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "max",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "sortKey",
 				Description: `funcer that maps input elements to values by which they will be compared`,
 				Params:      nil,
-				OutputType:  types.NewVar("B", types.Any{}),
+				OutputType:  types.NewTypeVar("B", types.AnyType{}),
 			},
 			{
-				InputType:   types.NewVar("B", types.Any{}),
+				InputType:   types.NewTypeVar("B", types.AnyType{}),
 				Name:        "less",
 				Description: `funcer that tests whether its input is "less than" its first argument`,
 				Params: []*params.Param{
-					params.SimpleParam("other", "", types.NewVar("B", types.Any{})),
+					params.SimpleParam("other", "", types.NewTypeVar("B", types.AnyType{})),
 				},
-				OutputType: types.Bool{},
+				OutputType: types.BoolType{},
 			},
-			params.SimpleParam("default", "default value to return if the input is empty", types.NewVar("C", types.Any{})),
+			params.SimpleParam("default", "default value to return if the input is empty", types.NewTypeVar("C", types.AnyType{})),
 		},
-		OutputType: types.NewUnion(
-			types.NewVar("A", types.Any{}),
-			types.NewVar("C", types.Any{}),
+		OutputType: types.NewUnionType(
+			types.NewTypeVar("A", types.AnyType{}),
+			types.NewTypeVar("C", types.AnyType{}),
 		),
 		OutputDescription: "the maximum element, or default if the input is empty",
 		Notes:             "",
@@ -1054,24 +1054,24 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Finds the minimum element.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "min",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "less",
 				Description: `funcer that tests whether its input is "less than" its first argument`,
 				Params: []*params.Param{
-					params.SimpleParam("other", "", types.NewVar("A", types.Any{})),
+					params.SimpleParam("other", "", types.NewTypeVar("A", types.AnyType{})),
 				},
-				OutputType: types.Bool{},
+				OutputType: types.BoolType{},
 			},
-			params.SimpleParam("default", "default value to return if the input is empty", types.NewVar("B", types.Any{})),
+			params.SimpleParam("default", "default value to return if the input is empty", types.NewTypeVar("B", types.AnyType{})),
 		},
-		OutputType: types.NewUnion(
-			types.NewVar("A", types.Any{}),
-			types.NewVar("B", types.Any{}),
+		OutputType: types.NewUnionType(
+			types.NewTypeVar("A", types.AnyType{}),
+			types.NewTypeVar("B", types.AnyType{}),
 		),
 		OutputDescription: "the minimum element, or default if the input is empty",
 		Notes:             "",
@@ -1084,31 +1084,31 @@ var ArrFuncers = []shapes.Funcer{
 		}},
 	shapes.Funcer{
 		Summary:          "Finds the minimum element according to a sorting key.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "min",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "sortKey",
 				Description: `funcer that maps input elements to values by which they will be compared`,
 				Params:      nil,
-				OutputType:  types.NewVar("B", types.Any{}),
+				OutputType:  types.NewTypeVar("B", types.AnyType{}),
 			},
 			{
-				InputType:   types.NewVar("B", types.Any{}),
+				InputType:   types.NewTypeVar("B", types.AnyType{}),
 				Name:        "less",
 				Description: `funcer that tests whether its input is "less than" its first argument`,
 				Params: []*params.Param{
-					params.SimpleParam("other", "", types.NewVar("B", types.Any{})),
+					params.SimpleParam("other", "", types.NewTypeVar("B", types.AnyType{})),
 				},
-				OutputType: types.Bool{},
+				OutputType: types.BoolType{},
 			},
-			params.SimpleParam("default", "default value to return if the input is empty", types.NewVar("C", types.Any{})),
+			params.SimpleParam("default", "default value to return if the input is empty", types.NewTypeVar("C", types.AnyType{})),
 		},
-		OutputType: types.NewUnion(
-			types.NewVar("A", types.Any{}),
-			types.NewVar("C", types.Any{}),
+		OutputType: types.NewUnionType(
+			types.NewTypeVar("A", types.AnyType{}),
+			types.NewTypeVar("C", types.AnyType{}),
 		),
 		OutputDescription: "the minimum element, or default if the input is empty",
 		Notes:             "",
@@ -1122,15 +1122,15 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Builds a range of numbers",
-		InputType:        types.Any{},
+		InputType:        types.AnyType{},
 		InputDescription: "any value (is ignored)",
 		Name:             "range",
 		Params: []*params.Param{
-			params.SimpleParam("from", "lower limit (inclusive)", types.Num{}),
-			params.SimpleParam("to", "upper limit (inclusive)", types.Num{}),
+			params.SimpleParam("from", "lower limit (inclusive)", types.NumType{}),
+			params.SimpleParam("to", "upper limit (inclusive)", types.NumType{}),
 		},
-		OutputType: types.NewArr(
-			types.Num{},
+		OutputType: types.NewArrType(
+			types.NumType{},
 		),
 		OutputDescription: "an array with the integers in the specified interval",
 		Notes:             "",
@@ -1164,16 +1164,16 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Concatenates an array with copies of itself.",
-		InputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		InputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		InputDescription: "an array",
 		Name:             "repeat",
 		Params: []*params.Param{
-			params.SimpleParam("times", "how many times to repeat the input", types.Num{}),
+			params.SimpleParam("times", "how many times to repeat the input", types.NumType{}),
 		},
-		OutputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		OutputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		OutputDescription: "the elements of the input repeated times times in a single array",
 		Notes:             "",
@@ -1210,14 +1210,14 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Reverses an array.",
-		InputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		InputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		InputDescription: "an array",
 		Name:             "rev",
 		Params:           nil,
-		OutputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		OutputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		OutputDescription: "the input in reverse order",
 		Notes:             "",
@@ -1247,11 +1247,11 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:           "Checks if some element is true.",
-		InputType:         types.NewArr(types.Bool{}),
+		InputType:         types.NewArrType(types.BoolType{}),
 		InputDescription:  "an array of boolean values",
 		Name:              "some",
 		Params:            nil,
-		OutputType:        types.Bool{},
+		OutputType:        types.BoolType{},
 		OutputDescription: "true iff at least one element of the input is true",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -1279,11 +1279,11 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:           "Sorts numbers.",
-		InputType:         types.NewArr(types.Num{}),
+		InputType:         types.NewArrType(types.NumType{}),
 		InputDescription:  "an array of numbers",
 		Name:              "sort",
 		Params:            nil,
-		OutputType:        types.NewArr(types.Num{}),
+		OutputType:        types.NewArrType(types.NumType{}),
 		OutputDescription: "the input sorted from smallest to greatest",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -1296,11 +1296,11 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:           "Sorts strings.",
-		InputType:         types.NewArr(types.Str{}),
+		InputType:         types.NewArrType(types.StrType{}),
 		InputDescription:  "an array of strings",
 		Name:              "sort",
 		Params:            nil,
-		OutputType:        types.NewArr(types.Str{}),
+		OutputType:        types.NewArrType(types.StrType{}),
 		OutputDescription: "the input sorted lexicographically",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -1318,21 +1318,21 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Sorts values.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "sort",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "less",
 				Description: `funcer that tests whether its input is "less than" its first argument`,
 				Params: []*params.Param{
-					params.SimpleParam("other", "", types.NewVar("A", types.Any{})),
+					params.SimpleParam("other", "", types.NewTypeVar("A", types.AnyType{})),
 				},
-				OutputType: types.Bool{},
+				OutputType: types.BoolType{},
 			},
 		},
-		OutputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		OutputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		OutputDescription: "the input sorted by the given ordering function",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -1363,28 +1363,28 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Sorts an array with a sorting key.",
-		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		InputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		InputDescription: "an array",
 		Name:             "sortBy",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "sortKey",
 				Description: `funcer that maps input elements to values by which they will be compared`,
 				Params:      nil,
-				OutputType:  types.NewVar("B", types.Any{}),
+				OutputType:  types.NewTypeVar("B", types.AnyType{}),
 			},
 			{
-				InputType:   types.NewVar("B", types.Any{}),
+				InputType:   types.NewTypeVar("B", types.AnyType{}),
 				Name:        "less",
 				Description: `funcer that tests whether its input is "less than" its first argument`,
 				Params: []*params.Param{
-					params.SimpleParam("other", "", types.NewVar("B", types.Any{})),
+					params.SimpleParam("other", "", types.NewTypeVar("B", types.AnyType{})),
 				},
-				OutputType: types.Bool{},
+				OutputType: types.BoolType{},
 			},
 		},
-		OutputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		OutputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		OutputDescription: "the input sorting according to the given sorting key and ordering function",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -1408,16 +1408,16 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Takes the first n elements from an array.",
-		InputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		InputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		InputDescription: "an array",
 		Name:             "take",
 		Params: []*params.Param{
-			params.SimpleParam("n", "number of elements to take", types.Num{}),
+			params.SimpleParam("n", "number of elements to take", types.NumType{}),
 		},
-		OutputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		OutputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		OutputDescription: "array with the first n elements from the input",
 		Notes:             "",
@@ -1487,35 +1487,35 @@ var ArrFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Takes elements from the beginning of an array that satisfy a certain condition.",
-		InputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		InputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		InputDescription: "an array",
 		Name:             "takeWhile",
 		Params: []*params.Param{
 			{
-				InputType:   types.NewVar("A", types.Any{}),
+				InputType:   types.NewTypeVar("A", types.AnyType{}),
 				Name:        "test",
 				Description: "a test to apply to elements of the input",
 				Params:      nil,
-				OutputType: types.NewUnion(
-					types.Obj{
+				OutputType: types.NewUnionType(
+					types.ObjType{
 						Props: map[string]types.Type{
-							"yes": types.NewVar("B", types.Any{}),
+							"yes": types.NewTypeVar("B", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
-					types.Obj{
+					types.ObjType{
 						Props: map[string]types.Type{
-							"no": types.NewVar("C", types.Any{}),
+							"no": types.NewTypeVar("C", types.AnyType{}),
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				),
 			},
 		},
-		OutputType: types.NewArr(
-			types.NewVar("B", types.Any{}),
+		OutputType: types.NewArrType(
+			types.NewTypeVar("B", types.AnyType{}),
 		),
 		OutputDescription: "an array with the elements that pass the test, up to and excluding the first one that doesn't",
 		Notes:             "",

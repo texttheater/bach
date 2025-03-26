@@ -10,11 +10,11 @@ import (
 var TypeFuncers = []shapes.Funcer{
 	shapes.Funcer{
 		Summary:           "Gives the type of the input expression.",
-		InputType:         types.NewVar("A", types.Any{}),
+		InputType:         types.NewTypeVar("A", types.AnyType{}),
 		InputDescription:  "any value (is ignored)",
 		Name:              "type",
 		Params:            nil,
-		OutputType:        types.Str{},
+		OutputType:        types.StrType{},
 		OutputDescription: "a string representation of the type of the input expression",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {

@@ -18,13 +18,13 @@ import (
 var MathFuncers = []shapes.Funcer{
 	shapes.SimpleFuncer(
 		"Adds two numbers.",
-		types.Num{},
+		types.NumType{},
 		"the first summand",
 		"+",
 		[]*params.Param{
-			params.SimpleParam("b", "the second summand", types.Num{}),
+			params.SimpleParam("b", "the second summand", types.NumType{}),
 		},
-		types.Num{},
+		types.NumType{},
 		"the sum",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -40,12 +40,12 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Subtracts a number from another.",
-		types.Num{},
+		types.NumType{},
 		"the minuend",
 		"-",
 		[]*params.Param{
-			params.SimpleParam("b", "the subtrahend", types.Num{}),
-		}, types.Num{},
+			params.SimpleParam("b", "the subtrahend", types.NumType{}),
+		}, types.NumType{},
 		"the difference",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -60,13 +60,13 @@ var MathFuncers = []shapes.Funcer{
 
 	shapes.SimpleFuncer(
 		"Returns the additive inverse of a number.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"-",
 		[]*params.Param{
-			params.SimpleParam("n", "a number", types.Num{}),
+			params.SimpleParam("n", "a number", types.NumType{}),
 		},
-		types.Num{},
+		types.NumType{},
 		"the additive inverse (opposite number) of n",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -86,13 +86,13 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Multiplies two numbers.",
-		types.Num{},
+		types.NumType{},
 		"the first factor",
 		"*",
 		[]*params.Param{
-			params.SimpleParam("b", "the second factor", types.Num{}),
+			params.SimpleParam("b", "the second factor", types.NumType{}),
 		},
-		types.Num{},
+		types.NumType{},
 		"the product",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -106,13 +106,13 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Divides a number by another.",
-		types.Num{},
+		types.NumType{},
 		"the dividend",
 		"/",
 		[]*params.Param{
-			params.SimpleParam("b", "the divisor", types.Num{}),
+			params.SimpleParam("b", "the divisor", types.NumType{}),
 		},
-		types.Num{},
+		types.NumType{},
 		"the quotient",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -127,13 +127,13 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Remainder",
-		types.Num{},
+		types.NumType{},
 		"the dividend",
 		"%",
 		[]*params.Param{
-			params.SimpleParam("b", "the divisor", types.Num{}),
+			params.SimpleParam("b", "the divisor", types.NumType{}),
 		},
-		types.Num{},
+		types.NumType{},
 		"the remainder of integer division (rounded towards zero)",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -148,13 +148,13 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Less than",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"<",
 		[]*params.Param{
-			params.SimpleParam("b", "another number", types.Num{}),
+			params.SimpleParam("b", "another number", types.NumType{}),
 		},
-		types.Bool{},
+		types.BoolType{},
 		"true iff the input is smaller than b",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -170,13 +170,13 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Greater than",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		">",
 		[]*params.Param{
-			params.SimpleParam("b", "another number", types.Num{}),
+			params.SimpleParam("b", "another number", types.NumType{}),
 		},
-		types.Bool{},
+		types.BoolType{},
 		"true iff the input is greater than b",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -192,13 +192,13 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Less than or equal to",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"<=",
 		[]*params.Param{
-			params.SimpleParam("b", "another number", types.Num{}),
+			params.SimpleParam("b", "another number", types.NumType{}),
 		},
-		types.Bool{},
+		types.BoolType{},
 		"true iff the input is less than or equal to b",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -214,13 +214,13 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Greater than or equal to",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		">=",
 		[]*params.Param{
-			params.SimpleParam("b", "another number", types.Num{}),
+			params.SimpleParam("b", "another number", types.NumType{}),
 		},
-		types.Bool{},
+		types.BoolType{},
 		"true iff the input is greater than or equal to b",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -236,11 +236,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the sum of several numbers.",
-		types.NewArr(types.Num{}),
+		types.NewArrType(types.NumType{}),
 		"an array of numbers",
 		"sum",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"their sum",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -264,11 +264,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the arithmetic mean (average) of several numbers.",
-		types.NewArr(types.Num{}),
+		types.NewArrType(types.NumType{}),
 		"an array of numbers",
 		"mean",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"their mean",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -295,11 +295,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns infinity.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"inf",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the special number value representing positive infinity",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -314,11 +314,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns NaN.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"nan",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the special number value representing “not a number”",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -333,11 +333,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Checks whether a number is finite.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"isFinite",
 		nil,
-		types.Bool{},
+		types.BoolType{},
 		"true unless the input is positive or negative infinity",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -354,11 +354,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Checks whether a number is NaN.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"isNaN",
 		nil,
-		types.Bool{},
+		types.BoolType{},
 		"true iff the input is NaN",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -372,11 +372,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns the floating point epsilon.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"epsilon",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the difference between 1 and the smallest floating point number greater than 1",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -388,11 +388,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns the largest safe integer.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"largestSafeInteger",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the largest integer that can be represented as an IEEE-754 double precision number and cannot be the result of rounding another number to fit IEEE-754",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -406,11 +406,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns the largest representable number.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"largestNum",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the largest number representable as an IEEE-754 double precision number",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -423,11 +423,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns the smallest safe integer.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"smallestSafeInteger",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the smallest integer that can be represented as an IEEE-754 double precision number and cannot be the result of rounding another integer to fit the IEEE-754 double precision representation",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -441,11 +441,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns the smallest representable positive number.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"smallestPositiveNum",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the smallest representable positive number",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -457,11 +457,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Checks whether a number is integer.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"isInteger",
 		nil,
-		types.Bool{},
+		types.BoolType{},
 		"true iff the input represents a whole number",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -475,11 +475,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Checks whether a number is a safe integer.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"isSafeInteger",
 		nil,
-		types.Bool{},
+		types.BoolType{},
 		"true iff the input is an integer and cannot be the result of rounding another integer to fit the IEEE-754 double precision representation",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -497,13 +497,13 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Converts an integer to a specified base.",
-		types.Num{},
+		types.NumType{},
 		"an integer",
 		"toBase",
 		[]*params.Param{
-			params.SimpleParam("base", "an integer between 2 and 36 (inclusive)", types.Num{}),
+			params.SimpleParam("base", "an integer between 2 and 36 (inclusive)", types.NumType{}),
 		},
-		types.Str{},
+		types.StrType{},
 		"a string representation of the input in the specified base",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -534,11 +534,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Converts a number to exponential notation.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"toExponential",
 		nil,
-		types.Str{},
+		types.StrType{},
 		"a string representation of the input in exponential notation with 6 digits after the decimal point",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -552,13 +552,13 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Converts a number to exponential notation.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"toExponential",
 		[]*params.Param{
-			params.SimpleParam("precision", "the number of digits after the decimal point", types.Num{}),
+			params.SimpleParam("precision", "the number of digits after the decimal point", types.NumType{}),
 		},
-		types.Str{},
+		types.StrType{},
 		"a string representation of the input in exponential notation with the specified number of digits after the decimal point",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -574,13 +574,13 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Converts a number to fixed-point notation.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"toFixed",
 		[]*params.Param{
-			params.SimpleParam("precision", "the number of digits after the decimal point", types.Num{}),
+			params.SimpleParam("precision", "the number of digits after the decimal point", types.NumType{}),
 		},
-		types.Str{},
+		types.StrType{},
 		"a rounded string representation of the input with the specified number of digits after the decimal point",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -597,11 +597,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns Euler's number.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"e",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"an approximation of Euler's number",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -613,11 +613,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns the natural logarithm of 2.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"ln2",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the approximate natural logarithm of 2",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -629,11 +629,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns the natural logarithm of 10.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"ln10",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the approximate natural logarithm of 10",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -645,11 +645,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns the base-2 logarithm of e",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"log2e",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the approximate base-2 logarithm of Euler's number",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -661,11 +661,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns the base-10 logarithm of e",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"log10e",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the approximate base-10 logarithm of Euler's number",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -677,11 +677,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns pi.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"pi",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"an approximation of pi",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -694,11 +694,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns the square root of 1/2.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"sqrt1_2",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the approximate square root of 1/2",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -710,11 +710,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns the square root of 2.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"sqrt2",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the approximate square root of 2",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -726,11 +726,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the absolute value.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"abs",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the absolute value of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -745,11 +745,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the inverse cosine.",
-		types.Num{},
+		types.NumType{},
 		"a number in the interval [-1, 1]",
 		"acos",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the inverse cosine (in radians) of the input, or `nan` if the input is invalid",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -766,11 +766,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the inverse hyperbolic cosine.",
-		types.Num{},
+		types.NumType{},
 		"a number greater than or equal to 1",
 		"acosh",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the inverse hyperoblic cosine of the input, or `nan` if the input is invalid",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -785,11 +785,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the inverse sine.",
-		types.Num{},
+		types.NumType{},
 		"a number in the interval [-1, 1]",
 		"asin",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the inverse sine (in radians) of the input, of nan if the input is invalid",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -806,11 +806,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the inverse hyperbolic sine.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"asinh",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the inverse hyperbolic sine of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -826,11 +826,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the inverse tangent.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"atan",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the inverse tangent (in radians) of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -846,13 +846,13 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the angle in the plane.",
-		types.Num{},
+		types.NumType{},
 		"a number y (y-coordinate)",
 		"atan2",
 		[]*params.Param{
-			params.SimpleParam("x", "a number (x-coordinate)", types.Num{}),
+			params.SimpleParam("x", "a number (x-coordinate)", types.NumType{}),
 		},
-		types.Num{},
+		types.NumType{},
 		"the angle in the plane (in radians) between the positive x-axis and the ray from (0, 0) to (x, y)",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -868,11 +868,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the inverse hyperbolic tangent.",
-		types.Num{},
+		types.NumType{},
 		"a number in the interval [-1, 1]",
 		"atanh",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the inverse hyperbolic tangent of the input, or `nan` if the input is invalid",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -889,11 +889,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the cube root.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"cbrt",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the cube root of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -909,11 +909,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Rounds a number up.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"ceil",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the smallest integer greater than or equal to the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -929,11 +929,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Count leading zeros.",
-		types.Num{},
+		types.NumType{},
 		"a number (is truncated to integer)",
 		"clz32",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the number of leading zero bits in the 32-bit binary representation of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -956,11 +956,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the cosine.",
-		types.Num{},
+		types.NumType{},
 		"an angle in radians",
 		"cos",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the cosine of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -979,11 +979,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the hyperbolic cosine.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"cosh",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the hyperbolic cosine of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -999,11 +999,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the exponential function.",
-		types.Num{},
+		types.NumType{},
 		"the exponent",
 		"exp",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"e (Euler's number) raised to the exponent",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1020,11 +1020,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the exponential function, subtracted by one.",
-		types.Num{},
+		types.NumType{},
 		"the exponent",
 		"expm1",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"",
 		"e (Euler's number) raised to the exponent, minus 1",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1042,11 +1042,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Rounds down.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"floor",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the largest integer less than or equal to the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1062,11 +1062,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Rounds to 32-bit precision.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"fround",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the nearest 32-bit single precision float representation",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1082,11 +1082,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the square root of the sum of squares",
-		types.NewArr(types.Num{}),
+		types.NewArrType(types.NumType{}),
 		"an array of numbers",
 		"hypot",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the square root of the sum of the squares of the input numbers",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1112,13 +1112,13 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"32-bit multiplication",
-		types.Num{},
+		types.NumType{},
 		"the first factor",
 		"imul",
 		[]*params.Param{
-			params.SimpleParam("y", "the second factor", types.Num{}),
+			params.SimpleParam("y", "the second factor", types.NumType{}),
 		},
-		types.Num{},
+		types.NumType{},
 		"the product of the 32-bit versions (cf. fround) of the factors",
 		"", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			x := int32(int64(inputValue.(states.NumValue)))
@@ -1134,11 +1134,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the natural logarithm.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"log",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the natural (base e) logarithm of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1158,11 +1158,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the base 10 logarithm.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"log10",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the base 10 logarithm of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1181,11 +1181,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the natural logarithm of x + 1.",
-		types.Num{},
+		types.NumType{},
 		"a number (x)",
 		"log1p",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"",
 		"the natural (base e) logarithm of (x + 1)",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1201,11 +1201,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the base 2 logarithm.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"log2",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the base 2 logarithm of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1221,11 +1221,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Finds the largest number",
-		types.NewArr(types.Num{}),
+		types.NewArrType(types.NumType{}),
 		"an array of numbers",
 		"max",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the largest number in the input, or -inf if the input is empty",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1249,11 +1249,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Finds the smallest number",
-		types.NewArr(types.Num{}),
+		types.NewArrType(types.NumType{}),
 		"an array of numbers",
 		"min",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the smallest number in the input, or inf if the input is empty",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1277,13 +1277,13 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes powers (exponentiation).",
-		types.Num{},
+		types.NumType{},
 		"the base",
 		"**",
 		[]*params.Param{
-			params.SimpleParam("y", "the exponent", types.Num{}),
+			params.SimpleParam("y", "the exponent", types.NumType{}),
 		},
-		types.Num{},
+		types.NumType{},
 		"the base taken to the y-th power",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1300,11 +1300,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Returns a random number between 0 and 1.",
-		types.Any{},
+		types.AnyType{},
 		"any value (is ignored)",
 		"random",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"",
 		"a floating-point, pseudo-random number n with 0 <= n < 1 and approximately uniform distribution over that range",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1318,11 +1318,11 @@ var MathFuncers = []shapes.Funcer{
 	// TODO a funcer that returns a random integer in a specified interval
 	shapes.SimpleFuncer(
 		"Rounds a number to the nearest integer.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"round",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the nearest integer, or away from zero if there's two nearest integers",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1341,11 +1341,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Determines the sign of a number.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"sign",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"1 if the input is positive, -1 if negative, 0 if it's 0, and -0 if it's -0",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1373,11 +1373,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the sine.",
-		types.Num{},
+		types.NumType{},
 		"an angle in radians",
 		"sin",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the sine of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1395,11 +1395,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the hyperbolic sine.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"sinh",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the hyperbolic sine of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1415,11 +1415,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes square roots.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"sqrt",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the square root of the input, or nan if it's negative",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1438,11 +1438,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the tangent.",
-		types.Num{},
+		types.NumType{},
 		"an angle in radians",
 		"tan",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the tangent of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1457,11 +1457,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Computes the hyperbolic tangent.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"tanh",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the hyperbolic tangent of the input",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
@@ -1477,11 +1477,11 @@ var MathFuncers = []shapes.Funcer{
 	),
 	shapes.SimpleFuncer(
 		"Rounds towards zero.",
-		types.Num{},
+		types.NumType{},
 		"a number",
 		"trunc",
 		nil,
-		types.Num{},
+		types.NumType{},
 		"the input without fractional digits",
 		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {

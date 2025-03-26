@@ -12,7 +12,7 @@ type Value interface {
 	Equal(Value) (bool, error)
 }
 
-func inhabits(v Value, t types.Union, stack *BindingStack) (bool, error) {
+func inhabits(v Value, t types.UnionType, stack *BindingStack) (bool, error) {
 	for _, disjunct := range t {
 		ok, err := v.Inhabits(disjunct, stack)
 		if err != nil {

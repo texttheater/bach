@@ -9,7 +9,7 @@ import (
 )
 
 var InitialShape shapes.Shape = shapes.Shape{
-	Type:  types.Null{},
+	Type:  types.NullType{},
 	Stack: nil,
 }
 

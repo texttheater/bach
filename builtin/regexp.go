@@ -14,29 +14,29 @@ import (
 var RegexpFuncers = []shapes.Funcer{
 	shapes.Funcer{
 		Summary:          "Finds all non-overlapping matches in a string.",
-		InputType:        types.Str{},
+		InputType:        types.StrType{},
 		InputDescription: "a string",
 		Name:             "reFindAll",
 		Params: []*params.Param{
 			{
-				InputType:   types.Str{},
+				InputType:   types.StrType{},
 				Name:        "pattern",
 				Description: "a pattern",
 				Params:      nil,
-				OutputType: types.NewVar("A", types.NewUnion(
-					types.Null{},
-					types.Obj{
+				OutputType: types.NewTypeVar("A", types.NewUnionType(
+					types.NullType{},
+					types.ObjType{
 						Props: map[string]types.Type{
-							"start": types.Num{},
-							"0":     types.Str{},
+							"start": types.NumType{},
+							"0":     types.StrType{},
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				)),
 			},
 		},
-		OutputType: types.NewArr(
-			types.NewVar("A", types.Any{}),
+		OutputType: types.NewArrType(
+			types.NewTypeVar("A", types.AnyType{}),
 		),
 		OutputDescription: "array of matches",
 		Notes:             "Matches appear in the output from leftmost to rightmost. Matches that overlap an earlier match (i.e., a match that starts at a lower offset or one that starts at the same offset but is found earlier by the pattern) are not included.",
@@ -82,41 +82,41 @@ var RegexpFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Replaces the first match of a pattern in a string with something else.",
-		InputType:        types.Str{},
+		InputType:        types.StrType{},
 		InputDescription: "a string",
 		Name:             "reReplaceFirst",
 		Params: []*params.Param{
 			{
-				InputType:   types.Str{},
+				InputType:   types.StrType{},
 				Name:        "pattern",
 				Description: "a pattern",
 				Params:      nil,
-				OutputType: types.NewUnion(
-					types.Null{},
-					types.Obj{
+				OutputType: types.NewUnionType(
+					types.NullType{},
+					types.ObjType{
 						Props: map[string]types.Type{
-							"start": types.Num{},
-							"0":     types.Str{},
+							"start": types.NumType{},
+							"0":     types.StrType{},
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				),
 			},
 			{
-				InputType: types.Obj{
+				InputType: types.ObjType{
 					Props: map[string]types.Type{
-						"start": types.Num{},
-						"0":     types.Str{},
+						"start": types.NumType{},
+						"0":     types.StrType{},
 					},
-					Rest: types.Any{},
+					Rest: types.AnyType{},
 				},
 				Name:        "replacement",
 				Description: "takes a match and returns a string",
 				Params:      nil,
-				OutputType:  types.Str{},
+				OutputType:  types.StrType{},
 			},
 		},
-		OutputType:        types.Str{},
+		OutputType:        types.StrType{},
 		OutputDescription: "the input with the first match of the pattern replaced with the corresponding replacement, or unchanged if there is no match",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -159,41 +159,41 @@ var RegexpFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Replaces all non-overlapping matches of a pattern in a string with something else.",
-		InputType:        types.Str{},
+		InputType:        types.StrType{},
 		InputDescription: "a string",
 		Name:             "reReplaceAll",
 		Params: []*params.Param{
 			{
-				InputType:   types.Str{},
+				InputType:   types.StrType{},
 				Name:        "pattern",
 				Description: "a pattern",
 				Params:      nil,
-				OutputType: types.NewVar("A", types.NewUnion(
-					types.Null{},
-					types.Obj{
+				OutputType: types.NewTypeVar("A", types.NewUnionType(
+					types.NullType{},
+					types.ObjType{
 						Props: map[string]types.Type{
-							"start": types.Num{},
-							"0":     types.Str{},
+							"start": types.NumType{},
+							"0":     types.StrType{},
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				)),
 			},
 			{
-				InputType: types.Obj{
+				InputType: types.ObjType{
 					Props: map[string]types.Type{
-						"start": types.Num{},
-						"0":     types.Str{},
+						"start": types.NumType{},
+						"0":     types.StrType{},
 					},
-					Rest: types.Any{},
+					Rest: types.AnyType{},
 				},
 				Name:        "replacement",
 				Description: "takes a match and returns a string",
 				Params:      nil,
-				OutputType:  types.Str{},
+				OutputType:  types.StrType{},
 			},
 		},
-		OutputType:        types.Str{},
+		OutputType:        types.StrType{},
 		OutputDescription: "the input with all matches of the pattern replaced with the corresponding replacement, or unchanged if there is no match",
 		Notes:             "Matches are replaced from leftmost to rightmost. Matches that overlap an earlier match (i.e., a match that starts at a lower offset or one that starts at the same offset but is found earlier by the pattern) are not replaced.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -239,28 +239,28 @@ var RegexpFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Splits a string around a pattern.",
-		InputType:        types.Str{},
+		InputType:        types.StrType{},
 		InputDescription: "a string",
 		Name:             "reSplit",
 		Params: []*params.Param{
 			{
-				InputType:   types.Str{},
+				InputType:   types.StrType{},
 				Name:        "separator",
 				Description: "a pattern",
 				Params:      nil,
-				OutputType: types.NewUnion(
-					types.Null{},
-					types.Obj{
+				OutputType: types.NewUnionType(
+					types.NullType{},
+					types.ObjType{
 						Props: map[string]types.Type{
-							"start": types.Num{},
-							"0":     types.Str{},
+							"start": types.NumType{},
+							"0":     types.StrType{},
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				),
 			},
 		},
-		OutputType:        types.NewArr(types.Str{}),
+		OutputType:        types.NewArrType(types.StrType{}),
 		OutputDescription: "the parts of the input found in between occurrences of the separator",
 		Notes:             "If the separator pattern matches the empty string, the input is split into its individual code points. Separators are found from leftmost to rightmost. Separators that overlap an earlier separator (i.e., a separator that starts at a lower offset or one that starts at the same offset but is found earlier by the pattern) do not lead to splits.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -280,29 +280,29 @@ var RegexpFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary:          "Splits a string around a pattern, up to a certain number of times.",
-		InputType:        types.Str{},
+		InputType:        types.StrType{},
 		InputDescription: "a string",
 		Name:             "reSplit",
 		Params: []*params.Param{
 			{
-				InputType:   types.Str{},
+				InputType:   types.StrType{},
 				Name:        "separator",
 				Description: "a pattern",
 				Params:      nil,
-				OutputType: types.NewUnion(
-					types.Null{},
-					types.Obj{
+				OutputType: types.NewUnionType(
+					types.NullType{},
+					types.ObjType{
 						Props: map[string]types.Type{
-							"start": types.Num{},
-							"0":     types.Str{},
+							"start": types.NumType{},
+							"0":     types.StrType{},
 						},
-						Rest: types.Any{},
+						Rest: types.AnyType{},
 					},
 				),
 			},
-			params.SimpleParam("n", "maximum number of splits to make", types.Num{}),
-		}, OutputType: types.NewArr(
-			types.Str{},
+			params.SimpleParam("n", "maximum number of splits to make", types.NumType{}),
+		}, OutputType: types.NewArrType(
+			types.StrType{},
 		),
 		OutputDescription: "the parts of the input found in between occurrences of the separator",
 		Notes:             "If the separator pattern matches the empty string, the input is split into its individual code points. Separators are found from leftmost to rightmost. Separators that overlap an earlier separator (i.e., a separator that starts at a lower offset or one that starts at the same offset but is found earlier by the pattern) do not lead to splits. At most n splits are made so that the output contains at most n + 1 elements; later separator occurrences are ignored.",

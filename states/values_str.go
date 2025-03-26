@@ -27,13 +27,13 @@ func (v StrValue) Data() (any, error) {
 
 func (v StrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 	switch t := t.(type) {
-	case types.Str:
+	case types.StrType:
 		return true, nil
-	case types.Union:
+	case types.UnionType:
 		return inhabits(v, t, stack)
-	case types.Any:
+	case types.AnyType:
 		return true, nil
-	case types.Var:
+	case types.TypeVar:
 		return stack.Inhabits(v, t)
 	default:
 		return false, nil

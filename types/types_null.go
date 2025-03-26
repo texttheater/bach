@@ -1,53 +1,53 @@
 package types
 
-type Null struct {
+type NullType struct {
 }
 
-func (t Null) Subsumes(u Type) bool {
+func (t NullType) Subsumes(u Type) bool {
 	switch u.(type) {
-	case Void:
+	case VoidType:
 		return true
-	case Null:
+	case NullType:
 		return true
 	default:
 		return false
 	}
 }
 
-func (t Null) Bind(u Type, bindings map[string]Type) bool {
+func (t NullType) Bind(u Type, bindings map[string]Type) bool {
 	switch u.(type) {
-	case Void:
+	case VoidType:
 		return true
-	case Null:
+	case NullType:
 		return true
 	default:
 		return false
 	}
 }
 
-func (t Null) Instantiate(bindings map[string]Type) Type {
+func (t NullType) Instantiate(bindings map[string]Type) Type {
 	return t
 }
 
-func (t Null) Partition(u Type) (Type, Type) {
+func (t NullType) Partition(u Type) (Type, Type) {
 	switch u := u.(type) {
-	case Void:
+	case VoidType:
 		return u, t
-	case Null:
-		return u, Void{}
-	case Union:
+	case NullType:
+		return u, VoidType{}
+	case UnionType:
 		return u.inversePartition(t)
-	case Any:
-		return t, Void{}
+	case AnyType:
+		return t, VoidType{}
 	default:
-		return Void{}, t
+		return VoidType{}, t
 	}
 }
 
-func (t Null) String() string {
+func (t NullType) String() string {
 	return "Null"
 }
 
-func (t Null) ElementType() Type {
+func (t NullType) ElementType() Type {
 	panic("Null is not a sequence type")
 }

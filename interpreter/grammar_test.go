@@ -23,7 +23,7 @@ func TestGrammar(t *testing.T) {
 	// default) so > is not interpreted as a property identifier.
 	interpreter.TestProgram(
 		"for Str def f Obj<> as {} ok",
-		types.Null{},
+		types.NullType{},
 		states.NullValue{},
 		nil,
 		t,

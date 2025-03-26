@@ -47,7 +47,7 @@ func (g *Component) Ast() (expressions.Expression, error) {
 	if g.NumLiteral != nil {
 		return &expressions.ConstantExpression{
 			Pos:   g.Pos,
-			Type:  types.Num{},
+			Type:  types.NumType{},
 			Value: states.NumValue(*g.NumLiteral),
 		}, nil
 	}

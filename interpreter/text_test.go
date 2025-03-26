@@ -12,35 +12,35 @@ import (
 func TestText(t *testing.T) {
 	interpreter.TestProgram(
 		`"abc"`,
-		types.Str{},
+		types.StrType{},
 		states.StrValue("abc"),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`"\"\\abc\""`,
-		types.Str{},
+		types.StrType{},
 		states.StrValue(`"\abc"`),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`1 "abc"`,
-		types.Str{},
+		types.StrType{},
 		states.StrValue("abc"),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`"a{2 +2}"`,
-		types.Str{},
+		types.StrType{},
 		states.StrValue("a4"),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`"{{}}"`,
-		types.Str{},
+		types.StrType{},
 		states.StrValue("{}"),
 		nil,
 		t,
@@ -56,35 +56,35 @@ func TestText(t *testing.T) {
 	)
 	interpreter.TestProgram(
 		`"\t"`,
-		types.Str{},
+		types.StrType{},
 		states.StrValue("\t"),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`"日本語"`,
-		types.Str{},
+		types.StrType{},
 		states.StrValue("日本語"),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`"\u65e5\u672c\u8a9e"`,
-		types.Str{},
+		types.StrType{},
 		states.StrValue("日本語"),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`"\U000065e5\U0000672c\U00008a9e"`,
-		types.Str{},
+		types.StrType{},
 		states.StrValue("日本語"),
 		nil,
 		t,
 	)
 	interpreter.TestProgram(
 		`"\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e"`,
-		types.Str{},
+		types.StrType{},
 		states.StrValue("日本語"),
 		nil,
 		t,

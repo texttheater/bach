@@ -12,13 +12,13 @@ import (
 var ObjFuncers = []shapes.Funcer{
 	shapes.Funcer{
 		Summary:          "Combines the items of two objects into one.",
-		InputType:        types.AnyObj,
+		InputType:        types.AnyObjType,
 		InputDescription: "an object",
 		Name:             "+",
 		Params: []*params.Param{
-			params.SimpleParam("other", "another object", types.AnyObj),
+			params.SimpleParam("other", "another object", types.AnyObjType),
 		},
-		OutputType:        types.AnyObj,
+		OutputType:        types.AnyObjType,
 		OutputDescription: "an object with the items of the input and other",
 		Notes:             "Where the input and other share keys, the values of other are used in the output.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -43,16 +43,16 @@ var ObjFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Retrieves the value of a given property.",
-		InputType: types.Obj{
+		InputType: types.ObjType{
 			Props: map[string]types.Type{},
-			Rest:  types.NewVar("A", types.Any{}),
+			Rest:  types.NewTypeVar("A", types.AnyType{}),
 		},
 		InputDescription: "an object",
 		Name:             "get",
 		Params: []*params.Param{
-			params.SimpleParam("prop", "a property key", types.NewUnion(types.Str{}, types.Num{})),
+			params.SimpleParam("prop", "a property key", types.NewUnionType(types.StrType{}, types.NumType{})),
 		},
-		OutputType:        types.NewVar("A", types.Any{}),
+		OutputType:        types.NewTypeVar("A", types.AnyType{}),
 		OutputDescription: "the value associated in the input object with the given property key",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -97,16 +97,16 @@ var ObjFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Checks for the presence of a given property.",
-		InputType: types.Obj{
+		InputType: types.ObjType{
 			Props: map[string]types.Type{},
-			Rest:  types.NewVar("A", types.Any{}),
+			Rest:  types.NewTypeVar("A", types.AnyType{}),
 		},
 		InputDescription: "an object",
 		Name:             "has",
 		Params: []*params.Param{
-			params.SimpleParam("prop", "a property key", types.NewUnion(types.Str{}, types.Num{})),
+			params.SimpleParam("prop", "a property key", types.NewUnionType(types.StrType{}, types.NumType{})),
 		},
-		OutputType:        types.Bool{},
+		OutputType:        types.BoolType{},
 		OutputDescription: "true if the object has the given property, false if not",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -130,17 +130,17 @@ var ObjFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Iterates over the properties together with the values.",
-		InputType: types.Obj{
+		InputType: types.ObjType{
 			Props: map[string]types.Type{},
-			Rest:  types.NewVar("A", types.Any{}),
+			Rest:  types.NewTypeVar("A", types.AnyType{}),
 		},
 		InputDescription: "an object",
 		Name:             "items",
 		Params:           nil,
-		OutputType: types.NewArr(
+		OutputType: types.NewArrType(
 			types.NewTup([]types.Type{
-				types.Str{},
-				types.NewVar("A", types.Any{}),
+				types.StrType{},
+				types.NewTypeVar("A", types.AnyType{}),
 			}),
 		),
 		OutputDescription: "an array of tuples of the properties and associated values of the input object",
@@ -173,14 +173,14 @@ var ObjFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Lists the properties of an object.",
-		InputType: types.Obj{
+		InputType: types.ObjType{
 			Props: map[string]types.Type{},
-			Rest:  types.NewVar("A", types.Any{}),
+			Rest:  types.NewTypeVar("A", types.AnyType{}),
 		},
 		InputDescription:  "an object",
 		Name:              "props",
 		Params:            nil,
-		OutputType:        types.NewArr(types.Str{}),
+		OutputType:        types.NewArrType(types.StrType{}),
 		OutputDescription: "all the property keys of the object, as an array",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -204,14 +204,14 @@ var ObjFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Lists the values of an object.",
-		InputType: types.Obj{
+		InputType: types.ObjType{
 			Props: map[string]types.Type{},
-			Rest:  types.NewVar("A", types.Any{}),
+			Rest:  types.NewTypeVar("A", types.AnyType{}),
 		},
 		InputDescription:  "an object",
 		Name:              "values",
 		Params:            nil,
-		OutputType:        types.NewArr(types.NewVar("A", types.Any{})),
+		OutputType:        types.NewArrType(types.NewTypeVar("A", types.AnyType{})),
 		OutputDescription: "all the property values of the object, as an array",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
@@ -232,18 +232,18 @@ var ObjFuncers = []shapes.Funcer{
 	},
 	shapes.Funcer{
 		Summary: "Removes a property from an object.",
-		InputType: types.Obj{
+		InputType: types.ObjType{
 			Props: map[string]types.Type{},
-			Rest:  types.NewVar("A", types.Any{}),
+			Rest:  types.NewTypeVar("A", types.AnyType{}),
 		},
 		InputDescription: "an object",
 		Name:             "without",
 		Params: []*params.Param{
-			params.SimpleParam("prop", "a property key", types.Str{}),
+			params.SimpleParam("prop", "a property key", types.StrType{}),
 		},
-		OutputType: types.Obj{
+		OutputType: types.ObjType{
 			Props: map[string]types.Type{},
-			Rest:  types.NewVar("A", types.Any{}),
+			Rest:  types.NewTypeVar("A", types.AnyType{}),
 		},
 		OutputDescription: "the input object, but with the specified property removed",
 		Notes:             "",
