@@ -4,6 +4,7 @@ import (
 	"github.com/alecthomas/participle"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/expressions"
+	"github.com/texttheater/bach/lexer"
 	"github.com/texttheater/bach/params"
 	"github.com/texttheater/bach/types"
 )
@@ -18,14 +19,21 @@ func init() {
 	var err error
 	parser, err = participle.Build(
 		&Composition{},
-		participle.Lexer(LexerDefinition),
+		participle.Lexer(lexer.LexerDefinition),
 	)
 	if err != nil {
 		panic(err)
 	}
 	typeParser, err = participle.Build(
 		&types.TypeSyntax{},
-		participle.Lexer(LexerDefinition),
+		participle.Lexer(lexer.LexerDefinition),
+	)
+	if err != nil {
+		panic(err)
+	}
+	paramParser, err = participle.Build(
+		&Param{},
+		participle.Lexer(lexer.LexerDefinition),
 	)
 	if err != nil {
 		panic(err)

@@ -5,12 +5,13 @@ import (
 
 	"github.com/alecthomas/participle"
 	"github.com/texttheater/bach/grammar"
+	"github.com/texttheater/bach/lexer"
 )
 
 func TestNumGetter(t *testing.T) {
 	parser, err := participle.Build(
 		&grammar.Getter{},
-		participle.Lexer(grammar.LexerDefinition),
+		participle.Lexer(lexer.LexerDefinition),
 	)
 	if err != nil {
 		t.Fatal(err)

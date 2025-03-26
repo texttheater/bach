@@ -1,4 +1,4 @@
-package grammar
+package lexer
 
 import (
 	"github.com/alecthomas/participle/lexer"
