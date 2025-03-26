@@ -4,17 +4,18 @@ import (
 	"github.com/alecthomas/participle/lexer"
 	"github.com/texttheater/bach/expressions"
 	"github.com/texttheater/bach/params"
+	"github.com/texttheater/bach/types"
 )
 
 type Definition struct {
 	Pos        lexer.Position
-	InputType  *TypeTemplate `"for" @@`
-	Name       *string       `"def" ( ( @Lid | @Op1 | @Op2 )`
-	NameLpar   *string       `      | @NameLpar`
-	Param      *NamedParam   `        @@`
-	Params     []*NamedParam `        ( "," @@ )* ")" )`
-	OutputType *Type         `@@`
-	Body       *Composition  `"as" @@ "ok"`
+	InputType  *TypeTemplate     `"for" @@`
+	Name       *string           `"def" ( ( @Lid | @Op1 | @Op2 )`
+	NameLpar   *string           `      | @NameLpar`
+	Param      *NamedParam       `        @@`
+	Params     []*NamedParam     `        ( "," @@ )* ")" )`
+	OutputType *types.TypeSyntax `@@`
+	Body       *Composition      `"as" @@ "ok"`
 }
 
 func (g *Definition) Ast() (expressions.Expression, error) {

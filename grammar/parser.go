@@ -24,7 +24,7 @@ func init() {
 		panic(err)
 	}
 	typeParser, err = participle.Build(
-		&Type{},
+		&types.TypeSyntax{},
 		participle.Lexer(LexerDefinition),
 	)
 	if err != nil {
@@ -49,7 +49,7 @@ func ParseComposition(input string) (expressions.Expression, error) {
 }
 
 func ParseType(input string) (types.Type, error) {
-	t := &Type{}
+	t := &types.TypeSyntax{}
 	err := typeParser.ParseString(input, t)
 	if err != nil {
 		if parserError, ok := err.(participle.Error); ok {

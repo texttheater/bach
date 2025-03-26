@@ -22,16 +22,16 @@ func (g *TypeTemplate) Ast() types.Type {
 
 type NonDisjunctiveTypeTemplate struct {
 	Pos                  lexer.Position
-	VoidType             *VoidType             `  @@`
-	NullType             *NullType             `| @@`
-	ReaderType           *ReaderType           `| @@`
-	BoolType             *BoolType             `| @@`
-	NumType              *NumType              `| @@`
-	StrType              *StrType              `| @@`
-	ArrTypeTemplate      *ArrTypeTemplate      `| @@`
-	ObjTypeTemplate      *ObjTypeTemplate      `| @@`
-	AnyType              *AnyType              `| @@`
-	TypeVariableTemplate *TypeVariableTemplate `| @@`
+	VoidType             *types.VoidTypeSyntax   `  @@`
+	NullType             *types.NullTypeSyntax   `| @@`
+	ReaderType           *types.ReaderTypeSyntax `| @@`
+	BoolType             *types.BoolTypeSyntax   `| @@`
+	NumType              *types.NumTypeSyntax    `| @@`
+	StrType              *types.StrTypeSyntax    `| @@`
+	ArrTypeTemplate      *ArrTypeTemplate        `| @@`
+	ObjTypeTemplate      *ObjTypeTemplate        `| @@`
+	AnyType              *types.AnyTypeSyntax    `| @@`
+	TypeVariableTemplate *TypeVariableTemplate   `| @@`
 }
 
 func (g *NonDisjunctiveTypeTemplate) Ast() types.Type {
@@ -105,13 +105,13 @@ func (g *ArrTypeTemplate) Ast() types.Type {
 }
 
 type ObjTypeTemplate struct {
-	Pos               lexer.Position `"Obj<"`
-	Prop              *string        `( ( @Lid | @Op1 | @Op2 | @NumLiteral )`
-	ValTypeTemplate   *Type          `  ":" @@`
-	Props             []string       `  ( "," ( @Lid | @Op1 | @Op2 | @NumLiteral )`
-	ValTypeTemplates  []*Type        `     ":" @@ )*`
-	RestTypeTemplate1 *Type          `  ( "," @@ )?`
-	RestTypeTemplate2 *Type          `| ( @@ )? ) ">"`
+	Pos               lexer.Position      `"Obj<"`
+	Prop              *string             `( ( @Lid | @Op1 | @Op2 | @NumLiteral )`
+	ValTypeTemplate   *types.TypeSyntax   `  ":" @@`
+	Props             []string            `  ( "," ( @Lid | @Op1 | @Op2 | @NumLiteral )`
+	ValTypeTemplates  []*types.TypeSyntax `     ":" @@ )*`
+	RestTypeTemplate1 *types.TypeSyntax   `  ( "," @@ )?`
+	RestTypeTemplate2 *types.TypeSyntax   `| ( @@ )? ) ">"`
 }
 
 func (g *ObjTypeTemplate) Ast() types.Type {
@@ -138,8 +138,8 @@ func (g *ObjTypeTemplate) Ast() types.Type {
 
 type TypeVariableTemplate struct {
 	Pos        lexer.Position
-	LangleLid  string `@LangleLid`
-	UpperBound *Type  `( @@ )? ">"`
+	LangleLid  string            `@LangleLid`
+	UpperBound *types.TypeSyntax `( @@ )? ">"`
 }
 
 func (g *TypeVariableTemplate) Ast() types.Type {

@@ -55,8 +55,8 @@ func (g *NamePattern) Ast() (expressions.Pattern, error) {
 
 type TypePattern struct {
 	Pos  lexer.Position
-	Type *Type   `@@`
-	Name *string `( @Lid | @Op1 | @Op2 )?`
+	Type *types.TypeSyntax `@@`
+	Name *string           `( @Lid | @Op1 | @Op2 )?`
 }
 
 func (g *TypePattern) Ast() (expressions.Pattern, error) {
