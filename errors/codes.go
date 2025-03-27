@@ -1,7 +1,6 @@
 package errors
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -134,59 +133,53 @@ func (code ErrorCode) DefaultMessage() string {
 	}
 }
 
-func (code *ErrorCode) UnmarshalJSON(data []byte) error {
-	var v string
-	err := json.Unmarshal(data, &v)
-	if err != nil {
-		return err
-	}
-	switch v {
+func ParseCode(s string) (ErrorCode, error) {
+	switch s {
 	case "Syntax":
-		*code = Syntax
+		return Syntax, nil
 	case "ParamsNotAllowed":
-		*code = ParamsNotAllowed
+		return ParamsNotAllowed, nil
 	case "NoSuchFunction":
-		*code = NoSuchFunction
+		return NoSuchFunction, nil
 	case "ArgHasWrongOutputType":
-		*code = ArgHasWrongOutputType
+		return ArgHasWrongOutputType, nil
 	case "ParamDoesNotMatch":
-		*code = ParamDoesNotMatch
+		return ParamDoesNotMatch, nil
 	case "FunctionBodyHasWrongOutputType":
-		*code = FunctionBodyHasWrongOutputType
+		return FunctionBodyHasWrongOutputType, nil
 	case "ConditionMustBeBool":
-		*code = ConditionMustBeBool
+		return ConditionMustBeBool, nil
 	case "MappingRequiresArrType":
-		*code = MappingRequiresArrType
+		return MappingRequiresArrType, nil
 	case "RestRequiresArrType":
-		*code = RestRequiresArrType
+		return RestRequiresArrType, nil
 	case "ComposeWithVoid":
-		*code = ComposeWithVoid
+		return ComposeWithVoid, nil
 	case "VoidProgram":
-		*code = VoidProgram
+		return VoidProgram, nil
 	case "NonExhaustiveMatch":
-		*code = NonExhaustiveMatch
+		return NonExhaustiveMatch, nil
 	case "ImpossibleMatch":
-		*code = ImpossibleMatch
+		return ImpossibleMatch, nil
 	case "UnreachableElisClause":
-		*code = UnreachableElisClause
+		return UnreachableElisClause, nil
 	case "UnreachableElseClause":
-		*code = UnreachableElseClause
+		return UnreachableElseClause, nil
 	case "RegexpWantsString":
-		*code = RegexpWantsString
+		return RegexpWantsString, nil
 	case "BadRegexp":
-		*code = BadRegexp
+		return BadRegexp, nil
 	case "UnexpectedValue":
-		*code = UnexpectedValue
+		return UnexpectedValue, nil
 	case "NoSuchProperty":
-		*code = NoSuchProperty
+		return NoSuchProperty, nil
 	case "NoSuchIndex":
-		*code = NoSuchIndex
+		return NoSuchIndex, nil
 	case "BadIndex":
-		*code = BadIndex
+		return BadIndex, nil
 	case "NoGetterAllowed":
-		*code = NoGetterAllowed
+		return NoGetterAllowed, nil
 	default:
-		return fmt.Errorf("invalid error code")
+		return 0, fmt.Errorf("invalid error code")
 	}
-	return nil
 }

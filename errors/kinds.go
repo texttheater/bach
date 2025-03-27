@@ -1,7 +1,6 @@
 package errors
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -27,23 +26,17 @@ func (kind ErrorKind) String() string {
 	}
 }
 
-func (kind *ErrorKind) UnmarshalJSON(data []byte) error {
-	var v string
-	err := json.Unmarshal(data, &v)
-	if err != nil {
-		return err
-	}
-	switch v {
+func ParseKind(s string) (ErrorKind, error) {
+	switch s {
 	case "Syntax":
-		*kind = SyntaxKind
+		return SyntaxKind, nil
 	case "Type":
-		*kind = TypeKind
+		return TypeKind, nil
 	case "Value":
-		*kind = ValueKind
+		return ValueKind, nil
 	case "UnknownKind":
-		*kind = UnknownKind
+		return UnknownKind, nil
 	default:
-		return fmt.Errorf("invalid error kind")
+		return 0, fmt.Errorf("invalid error kind")
 	}
-	return nil
 }

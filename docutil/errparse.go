@@ -20,10 +20,18 @@ func ParseError(input string) (error, error) {
 	}
 	var e errors.E
 	if kind, ok := v["Kind"]; ok {
-		e.Kind = kind.(*errors.ErrorKind)
+		kind, err := errors.ParseKind(kind.(string))
+		if err != nil {
+			return nil, err
+		}
+		e.Kind = &kind
 	}
 	if code, ok := v["Code"]; ok {
-		e.Code = code.(*errors.ErrorCode)
+		code, err := errors.ParseCode(code.(string))
+		if err != nil {
+			return nil, err
+		}
+		e.Code = &code
 	}
 	if pos, ok := v["Pos"]; ok {
 		pos := pos.(map[string]any)
@@ -76,13 +84,16 @@ func ParseError(input string) (error, error) {
 		*e.Name = name.(string)
 	}
 	if argNum, ok := v["ArgNum"]; ok {
-		*e.ArgNum = argNum.(int)
+		argNum := int(argNum.(float64))
+		e.ArgNum = &argNum
 	}
 	if numParams, ok := v["NumParams"]; ok {
-		*e.NumParams = numParams.(int)
+		numParams := int(numParams.(float64))
+		e.NumParams = &numParams
 	}
 	if paramNum, ok := v["ParamNum"]; ok {
-		*e.ParamNum = paramNum.(int)
+		paramNum := int(paramNum.(float64))
+		e.ParamNum = &paramNum
 	}
 	if wantParam, ok := v["WantParam"]; ok {
 		wantParam, err := grammar.ParseParam(wantParam.(string))
