@@ -82,11 +82,9 @@ P "a" +"b"
 T Str
 V "ab"
 E null
-```
 
-```TODO
 P "a" +2
-E {"Code": "ArgHasWrongOutputType" ...}
+E {"Kind": "Type", "Code": "ArgHasWrongOutputType", "ArgNum": 1, "WantType": "Str", "GotType": "Num"}
 ```
 
 ## Partial Application
