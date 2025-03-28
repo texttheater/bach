@@ -16,13 +16,13 @@ const (
 func (kind ErrorKind) String() string {
 	switch kind {
 	case SyntaxKind:
-		return "Syntax error"
+		return "Syntax"
 	case TypeKind:
-		return "Type error"
+		return "Type"
 	case ValueKind:
-		return "Value error"
+		return "Value"
 	default:
-		return "Unknown error"
+		return "Unknown"
 	}
 }
 

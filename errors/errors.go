@@ -273,7 +273,7 @@ func Explain(err error, program string) {
 	// header and position
 	fmt.Fprint(os.Stderr, e.Kind)
 	if e.Pos != nil && e.Pos.Line > 0 {
-		fmt.Fprintln(os.Stderr, " at", e.Pos)
+		fmt.Fprintln(os.Stderr, " error at", e.Pos)
 		lines := strings.SplitAfter(program, "\n")
 		line := lines[e.Pos.Line-1]
 		column := e.Pos.Column
