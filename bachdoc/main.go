@@ -32,7 +32,8 @@ func main() {
 }
 
 var cli struct {
-	Builtin BuiltinCmd `cmd:"" help:"Generate documentation for the builtin funcers of a given category."`
+	Builtin    BuiltinCmd    `cmd:"" help:"Generate documentation for the builtin funcers of a given category."`
+	Preprocess PreprocessCmd `cmd:"" help:"Preprocess a mdBook .md file, formatting Bach code examples"`
 }
 
 type BuiltinCmd struct {
@@ -59,5 +60,14 @@ func (b *BuiltinCmd) Run() error {
 		docutil.PrintExamplesTable(os.Stdout, funcer.Examples)
 		fmt.Printf("\n")
 	}
+	return nil
+}
+
+type PreprocessCmd struct {
+	// TODO
+}
+
+func (p *PreprocessCmd) Run() error {
+	// TODO
 	return nil
 }
