@@ -25,8 +25,6 @@ var FuncersByCategory = map[string][]shapes.Funcer{
 	"control": builtin.ControlFuncers,
 }
 
-var ExampleSetsByName = map[string][]shapes.Example{}
-
 func main() {
 	ctx := kong.Parse(&cli)
 	err := ctx.Run()
@@ -34,8 +32,7 @@ func main() {
 }
 
 var cli struct {
-	Builtin  BuiltinCmd  `cmd:"" help:"Generate documentation for the builtin funcers of a given category."`
-	Examples ExamplesCmd `cmd:"" help:"Format a given example set as a markdown table."`
+	Builtin BuiltinCmd `cmd:"" help:"Generate documentation for the builtin funcers of a given category."`
 }
 
 type BuiltinCmd struct {
@@ -62,18 +59,5 @@ func (b *BuiltinCmd) Run() error {
 		docutil.PrintExamplesTable(os.Stdout, funcer.Examples)
 		fmt.Printf("\n")
 	}
-	return nil
-}
-
-type ExamplesCmd struct {
-	Name string `arg:"" help:"Name of example set."`
-}
-
-func (e *ExamplesCmd) Run() error {
-	examples, ok := ExampleSetsByName[e.Name]
-	if !ok {
-		return errors.New("unknown example set")
-	}
-	docutil.PrintExamplesTable(os.Stdout, examples)
 	return nil
 }
