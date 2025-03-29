@@ -8,7 +8,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/texttheater/bach/docutil"
 	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/shapes"
 )
@@ -24,7 +23,7 @@ func processExampleSet(scanner *bufio.Scanner, buffer *bytes.Buffer) error {
 			if len(currentExample.Program) > 0 {
 				examples = append(examples, currentExample)
 			}
-			docutil.PrintExamplesTable(buffer, examples)
+			printExamplesTable(buffer, examples)
 			for _, x := range examples {
 				interpreter.TestExample(x)
 			}
@@ -39,7 +38,7 @@ func processExampleSet(scanner *bufio.Scanner, buffer *bytes.Buffer) error {
 		} else if strings.HasPrefix(line, "V ") {
 			currentExample.OutputValue = line[2:]
 		} else if strings.HasPrefix(line, "E ") {
-			e, err := docutil.ParseError(line[2:])
+			e, err := parseError(line[2:])
 			if err != nil {
 				return err
 			}

@@ -1,4 +1,4 @@
-package docutil
+package main
 
 import (
 	"fmt"
@@ -9,9 +9,9 @@ import (
 	"github.com/texttheater/bach/shapes"
 )
 
-// InlineCode takes a string representing some program code and converts it to
+// inlineCode takes a string representing some program code and converts it to
 // a Markdown representation suitable for processing by mdbook.
-func InlineCode(s string) string {
+func inlineCode(s string) string {
 	// handle empty string specially: do not generate <code></code> tags
 	if s == "" {
 		return ""
@@ -27,7 +27,7 @@ func InlineCode(s string) string {
 	return s
 }
 
-func PrintExamplesTable(w io.Writer, examples []shapes.Example) {
+func printExamplesTable(w io.Writer, examples []shapes.Example) {
 	fmt.Fprintf(w, "| Program | Type | Value | Error |\n")
 	fmt.Fprintf(w, "|---|---|---|---|\n")
 	for _, example := range examples {
@@ -40,10 +40,10 @@ func PrintExamplesTable(w io.Writer, examples []shapes.Example) {
 		fmt.Fprintf(
 			w,
 			"| %s | %s | %s | %s |\n",
-			InlineCode(example.Program),
-			InlineCode(example.OutputType),
-			InlineCode(example.OutputValue),
-			InlineCode(err),
+			inlineCode(example.Program),
+			inlineCode(example.OutputType),
+			inlineCode(example.OutputValue),
+			inlineCode(err),
 		)
 	}
 }

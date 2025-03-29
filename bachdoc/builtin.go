@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/texttheater/bach/builtin"
-	"github.com/texttheater/bach/docutil"
 	"github.com/texttheater/bach/shapes"
 )
 
@@ -38,14 +37,14 @@ func (b *builtinCmd) Run() error {
 		fmt.Printf("%s\n\n", funcer.Summary)
 		fmt.Printf("| | Type | Value |\n")
 		fmt.Printf("|---|---|---|\n")
-		fmt.Printf("| Input | %s | %s |\n", docutil.InlineCode(funcer.InputType.String()), funcer.InputDescription)
+		fmt.Printf("| Input | %s | %s |\n", inlineCode(funcer.InputType.String()), funcer.InputDescription)
 		for i, param := range funcer.Params {
-			fmt.Printf("| %s (param #%d) | %s | %s |\n", param.Name, i+1, docutil.InlineCode(param.String()), param.Description)
+			fmt.Printf("| %s (param #%d) | %s | %s |\n", param.Name, i+1, inlineCode(param.String()), param.Description)
 		}
-		fmt.Printf("|Output | %s | %s |\n\n", docutil.InlineCode(funcer.OutputType.String()), funcer.OutputDescription)
+		fmt.Printf("|Output | %s | %s |\n\n", inlineCode(funcer.OutputType.String()), funcer.OutputDescription)
 		fmt.Printf("%s\n\n", funcer.Notes)
 		fmt.Printf("### Examples\n\n")
-		docutil.PrintExamplesTable(os.Stdout, funcer.Examples)
+		printExamplesTable(os.Stdout, funcer.Examples)
 		fmt.Printf("\n")
 	}
 	return nil

@@ -1,4 +1,4 @@
-package docutil
+package main
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"github.com/texttheater/bach/interpreter"
 )
 
-func ParseError(input string) (error, error) {
+func parseError(input string) (error, error) {
 	var v map[string]any
 	err := json.Unmarshal([]byte(input), &v)
 	if err != nil {
