@@ -14,7 +14,7 @@ book : doc/book/bachdoc/builtin/null.md doc/book/bachdoc/builtin/io.md doc/book/
 
 doc/book/bachdoc/builtin/%.md : builtin/%.go bachdoc/main.go
 	mkdir -p "$$(dirname $@)"
-	go run bachdoc/main.go builtin $* > $@
+	go run ./bachdoc builtin $* > $@
 
 deploy : book
 	if [ -z $$DPLDEST ]; then echo DPLDEST is unset; exit 1; fi

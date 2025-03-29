@@ -86,15 +86,15 @@ func modifyBookItem(item object) error {
 	return nil
 }
 
-func main() {
-	if len(os.Args) > 1 && os.Args[1] == "supports" {
-		os.Exit(0)
-	}
+type preprocessCmd struct {
+}
+
+func (p *preprocessCmd) Run() error {
 	decoder := json.NewDecoder(os.Stdin)
 	var data []any
 	err := decoder.Decode(&data)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	book := data[1].(object)
 	sections := book["sections"].([]any)
@@ -106,6 +106,7 @@ func main() {
 	}
 	err = json.NewEncoder(os.Stdout).Encode(book)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
