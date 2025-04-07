@@ -12,6 +12,8 @@ var parser *participle.Parser
 
 var typeParser *participle.Parser
 
+var templateParser *participle.Parser
+
 var paramParser *participle.Parser
 
 func init() {
@@ -25,6 +27,20 @@ func init() {
 	}
 	typeParser, err = participle.Build(
 		&Type{},
+		participle.Lexer(LexerDefinition),
+	)
+	if err != nil {
+		panic(err)
+	}
+	templateParser, err = participle.Build(
+		&TypeTemplate{},
+		participle.Lexer(LexerDefinition),
+	)
+	if err != nil {
+		panic(err)
+	}
+	paramParser, err = participle.Build(
+		&Param{},
 		participle.Lexer(LexerDefinition),
 	)
 	if err != nil {
@@ -51,6 +67,22 @@ func ParseComposition(input string) (expressions.Expression, error) {
 func ParseType(input string) (types.Type, error) {
 	t := &Type{}
 	err := typeParser.ParseString(input, t)
+	if err != nil {
+		if parserError, ok := err.(participle.Error); ok {
+			return nil, errors.SyntaxError(
+				errors.Code(errors.Syntax),
+				errors.Pos(parserError.Token().Pos),
+				errors.Message(parserError.Message()),
+			)
+		}
+		return nil, err
+	}
+	return t.Ast(), nil
+}
+
+func ParseTypeTemplate(input string) (types.Type, error) {
+	t := &TypeTemplate{}
+	err := templateParser.ParseString(input, t)
 	if err != nil {
 		if parserError, ok := err.(participle.Error); ok {
 			return nil, errors.SyntaxError(
