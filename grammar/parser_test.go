@@ -26,7 +26,6 @@ func TestNumGetter(t *testing.T) {
 }
 
 func TestTypes(t *testing.T) {
-	// FIXME this causes a panic when parsed as a template
 	_, err := grammar.ParseType("Obj<>")
 	if err != nil {
 		t.Fatal(err)
@@ -40,6 +39,24 @@ func TestTypes(t *testing.T) {
 		t.Fatal(err)
 	}
 	_, err = grammar.ParseType("Obj<a: Num, b: Num>")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTypeTemplates(t *testing.T) {
+	_, err := grammar.ParseTypeTemplate("Obj<>")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = grammar.ParseTypeTemplate("Obj<a: Bool, b: Bool, Bool>")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = grammar.ParseTypeTemplate("Obj<a: Num, b: Num>")
 	if err != nil {
 		t.Fatal(err)
 	}

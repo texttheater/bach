@@ -105,34 +105,44 @@ func (g *ArrTypeTemplate) Ast() types.Type {
 }
 
 type ObjTypeTemplate struct {
-	Pos               lexer.Position `"Obj<"`
-	Prop              *string        `( ( @Lid | @Op1 | @Op2 | @NumLiteral )`
-	ValTypeTemplate   *Type          `  ":" @@`
-	Props             []string       `  ( "," ( @Lid | @Op1 | @Op2 | @NumLiteral )`
-	ValTypeTemplates  []*Type        `     ":" @@ )*`
-	RestTypeTemplate1 *Type          `  ( "," @@ )?`
-	RestTypeTemplate2 *Type          `| ( @@ )? ) ">"`
+	Pos       lexer.Position            `"Obj<"`
+	Prop      *string                   `( ( @Lid | @Op1 | @Op2 | @NumLiteral )`
+	ValType   *TypeTemplate             `  ":" @@`
+	AfterProp *ObjTypeTemplateAfterProp `  @@`
+	RestType  *TypeTemplate             `| @@? ">" )`
+}
+
+type ObjTypeTemplateAfterProp struct {
+	Pos       lexer.Position            `( ">"`
+	Prop      *string                   `| "," ( ( @Lid | @Op1 | @Op2 | @NumLiteral )`
+	ValType   *TypeTemplate             `        ":" @@`
+	AfterProp *ObjTypeTemplateAfterProp `        @@`
+	RestType  *TypeTemplate             `      | @@ ">" ) )`
 }
 
 func (g *ObjTypeTemplate) Ast() types.Type {
 	propTypeMap := make(map[string]types.Type)
+	restType := g.RestType
 	if g.Prop != nil {
-		propTypeMap[*g.Prop] = g.ValTypeTemplate.Ast()
-		for i := range g.Props {
-			propTypeMap[g.Props[i]] = g.ValTypeTemplates[i].Ast()
+		propTypeMap[*g.Prop] = g.ValType.Ast()
+		afterProp := g.AfterProp
+		for afterProp != nil {
+			if afterProp.Prop != nil {
+				propTypeMap[*afterProp.Prop] = afterProp.ValType.Ast()
+			}
+			restType = afterProp.RestType
+			afterProp = afterProp.AfterProp
 		}
 	}
-	var restType types.Type
-	if g.RestTypeTemplate1 != nil {
-		restType = g.RestTypeTemplate1.Ast()
-	} else if g.RestTypeTemplate2 != nil {
-		restType = g.RestTypeTemplate2.Ast()
+	var restTypeAst types.Type
+	if restType == nil {
+		restTypeAst = types.Any{}
 	} else {
-		restType = types.Any{}
+		restTypeAst = restType.Ast()
 	}
 	return types.Obj{
 		Props: propTypeMap,
-		Rest:  restType,
+		Rest:  restTypeAst,
 	}
 }
 
