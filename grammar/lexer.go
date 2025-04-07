@@ -11,7 +11,7 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		{"whitespace", `\s+`, nil},
 		// tokens starting type literals
 		{"TypeKeywordLangle", `(?:Arr|Obj)<`, nil},
-		{"TypeKeyword", `(?:Void|Null|Reader|Bool|Num|Str|Arr|Obj|Any)\b`, nil},
+		{"TypeKeyword", `(?:Void|Null|Reader|Bool|Num|Str|Any)\b`, nil},
 		// tokens starting calls
 		{"Op1Num", `[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
 		{"Op2Num", `(?:==|<=|>=|\*\*)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
