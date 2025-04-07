@@ -53,14 +53,14 @@ func parseError(input string) (error, error) {
 		*e.Message = message.(string)
 	}
 	if wantType, ok := v["WantType"]; ok {
-		wantType, err := grammar.ParseType(wantType.(string))
+		wantType, err := grammar.ParseTypeTemplate(wantType.(string))
 		if err != nil {
 			return nil, err
 		}
 		e.WantType = wantType
 	}
 	if gotType, ok := v["GotType"]; ok {
-		gotType, err := grammar.ParseType(gotType.(string))
+		gotType, err := grammar.ParseTypeTemplate(gotType.(string))
 		if err != nil {
 			return nil, err
 		}
@@ -74,14 +74,15 @@ func parseError(input string) (error, error) {
 		e.GotValue = v
 	}
 	if inputType, ok := v["InputType"]; ok {
-		inputType, err := grammar.ParseType(inputType.(string))
+		inputType, err := grammar.ParseTypeTemplate(inputType.(string))
 		if err != nil {
 			return nil, err
 		}
-		e.GotType = inputType
+		e.InputType = inputType
 	}
 	if name, ok := v["Name"]; ok {
-		*e.Name = name.(string)
+		name := name.(string)
+		e.Name = &name
 	}
 	if argNum, ok := v["ArgNum"]; ok {
 		argNum := int(argNum.(float64))
