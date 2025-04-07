@@ -26,6 +26,7 @@ func TestNumGetter(t *testing.T) {
 }
 
 func TestTypes(t *testing.T) {
+	// FIXME this causes a panic when parsed as a template
 	_, err := grammar.ParseType("Obj<>")
 	if err != nil {
 		t.Fatal(err)
