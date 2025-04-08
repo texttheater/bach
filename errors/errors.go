@@ -285,7 +285,7 @@ func Explain(err error, program string) {
 		fmt.Fprint(os.Stderr, strings.Repeat(" ", column-1))
 		fmt.Fprintln(os.Stderr, "^")
 	} else {
-		fmt.Fprintln(os.Stderr, "")
+		fmt.Fprintln(os.Stderr, " error")
 	}
 	// attributes
 	fmt.Fprintln(os.Stderr, "Code:      ", e.Code.String())
