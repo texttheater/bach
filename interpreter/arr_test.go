@@ -15,7 +15,7 @@ func TestArrays(t *testing.T) {
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
+			errors.Code(errors.NoSuchFuncer),
 			errors.InputType(types.Num{}),
 			errors.Name("each"),
 			errors.NumParams(1),

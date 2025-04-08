@@ -23,7 +23,7 @@ func TestCalls(t *testing.T) {
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
+			errors.Code(errors.NoSuchFuncer),
 			errors.InputType(types.Null{}),
 			errors.Name("f"),
 			errors.NumParams(1),
@@ -42,7 +42,7 @@ func TestCalls(t *testing.T) {
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
+			errors.Code(errors.NoSuchFuncer),
 			errors.InputType(types.Null{}),
 			errors.Name("f"),
 			errors.NumParams(0),
@@ -75,7 +75,7 @@ func TestCalls(t *testing.T) {
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
+			errors.Code(errors.NoSuchFuncer),
 			errors.InputType(types.Num{}),
 			errors.Name("f"),
 			errors.NumParams(0),
@@ -106,7 +106,7 @@ func TestCalls(t *testing.T) {
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
+			errors.Code(errors.NoSuchFuncer),
 			errors.InputType(types.Num{}),
 			errors.Name("g"),
 			errors.NumParams(0),
@@ -146,7 +146,7 @@ func TestCalls(t *testing.T) {
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
+			errors.Code(errors.NoSuchFuncer),
 			errors.InputType(types.Num{}),
 			errors.Name("g"),
 			errors.NumParams(0),
@@ -186,7 +186,7 @@ func TestCalls(t *testing.T) {
 		nil,
 		nil,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
+			errors.Code(errors.NoSuchFuncer),
 			errors.InputType(types.Num{}),
 			errors.Name("+"),
 			errors.NumParams(2),
@@ -232,7 +232,7 @@ func TestCalls(t *testing.T) {
 		``,
 		``,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
+			errors.Code(errors.NoSuchFuncer),
 			errors.InputType(types.Null{}),
 			errors.Name(`a`),
 			errors.NumParams(1),
@@ -244,7 +244,7 @@ func TestCalls(t *testing.T) {
 		``,
 		``,
 		errors.TypeError(
-			errors.Code(errors.NoSuchFunction),
+			errors.Code(errors.NoSuchFuncer),
 			errors.InputType(types.Null{}),
 			errors.Name(`a`),
 			errors.NumParams(1),

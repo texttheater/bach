@@ -125,12 +125,12 @@ E {"Kind": "Type", "Code": "ArgHasWrongOutputType", "ArgNum": 1, "WantType": "<A
 Note that funcers are looked up by input type, name, and number of paramters.
 They cannot be overloaded with respect to the parameters themselves. Thus,
 calling a funcer on the wrong input or with the wrong number of arguments
-results in a `NoSuchFunction` error. Calling it with the wrong kinds of
+results in a `NoSuchFuncer` error. Calling it with the wrong kinds of
 arguments, by contrast, leads to an `ArgHasWrongOutputType` error.
 
 ```bachdoc
 P for <A Obj<a: Num>> def f <A> as id ok {} f
-E {"Kind": "Type", "Code": "NoSuchFunction", "InputType": "Obj<Void>", "Name": "f", "NumParams": 0}
+E {"Kind": "Type", "Code": "NoSuchFuncer", "InputType": "Obj<Void>", "Name": "f", "NumParams": 0}
 
 P for Str def f Obj<> as {} ok "abc" reFindAll(f)
 E {"Kind": "Type", "Code": "ArgHasWrongOutputType", "ArgNum": 1, "WantType": "<A Null|Obj<start: Num, 0: Str, Any>>", "GotType": "Obj<Any>"}

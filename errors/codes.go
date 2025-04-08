@@ -9,7 +9,7 @@ type ErrorCode int
 const (
 	Syntax ErrorCode = iota
 	ParamsNotAllowed
-	NoSuchFunction
+	NoSuchFuncer
 	ArgHasWrongOutputType
 	ParamDoesNotMatch
 	FunctionBodyHasWrongOutputType
@@ -37,8 +37,8 @@ func (code ErrorCode) String() string {
 		return "Syntax"
 	case ParamsNotAllowed:
 		return "ParamsNotAllowed"
-	case NoSuchFunction:
-		return "NoSuchFunction"
+	case NoSuchFuncer:
+		return "NoSuchFuncer"
 	case ArgHasWrongOutputType:
 		return "ArgHasWrongOutputType"
 	case ParamDoesNotMatch:
@@ -88,8 +88,8 @@ func (code ErrorCode) DefaultMessage() string {
 		return "syntax error"
 	case ParamsNotAllowed:
 		return "This expression cannot be used as an argument here because it does not take parameters."
-	case NoSuchFunction:
-		return "no such function"
+	case NoSuchFuncer:
+		return "no such funcer"
 	case ArgHasWrongOutputType:
 		return "An argument has the wrong output type."
 	case ParamDoesNotMatch:
@@ -139,8 +139,8 @@ func ParseCode(s string) (ErrorCode, error) {
 		return Syntax, nil
 	case "ParamsNotAllowed":
 		return ParamsNotAllowed, nil
-	case "NoSuchFunction":
-		return NoSuchFunction, nil
+	case "NoSuchFuncer":
+		return NoSuchFuncer, nil
 	case "ArgHasWrongOutputType":
 		return ArgHasWrongOutputType, nil
 	case "ParamDoesNotMatch":

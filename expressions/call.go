@@ -28,7 +28,7 @@ funcers:
 		// reached bottom of stack without finding a matching funcer
 		if stack == nil {
 			return shapes.Shape{}, nil, nil, errors.TypeError(
-				errors.Code(errors.NoSuchFunction),
+				errors.Code(errors.NoSuchFuncer),
 				errors.Pos(x.Pos),
 				errors.InputType(inputShape.Type),
 				errors.Name(x.Name),
