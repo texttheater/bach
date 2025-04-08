@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"html"
 	"io"
 	"strings"
 
+	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/shapes"
 )
 
@@ -18,12 +20,13 @@ func inlineCode(s string) string {
 	}
 	// escape HTML special characters
 	s = html.EscapeString(s)
+	// turn newlines into <br> tags
+	s = strings.ReplaceAll(s, "\n", "<br>")
 	// escape characters that mdbook treats specially
 	s = strings.ReplaceAll(s, "|", "&#124;")
 	s = strings.ReplaceAll(s, "\\", "&#92;")
 	// wrap in code tags
 	s = "<code>" + s + "</code>"
-	// return
 	return s
 }
 
@@ -35,7 +38,9 @@ func printExamplesTable(w io.Writer, examples []shapes.Example) {
 		if example.Error == nil {
 			err = ""
 		} else {
-			err = strings.TrimSpace(fmt.Sprintf("%s", example.Error))
+			var buf bytes.Buffer
+			errors.Explain(&buf, example.Error, example.Program)
+			err = buf.String()
 		}
 		fmt.Fprintf(
 			w,
