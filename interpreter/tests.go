@@ -3,6 +3,7 @@ package interpreter
 import (
 	"log"
 	"math"
+	"os"
 	"testing"
 
 	"github.com/texttheater/bach/errors"
@@ -23,7 +24,7 @@ func TestExample(example shapes.Example) {
 		wantType, err = grammar.ParseType(wantTypeStr)
 		if err != nil {
 			log.Println("ERROR: Could not parse expected type")
-			errors.Explain(err, wantTypeStr)
+			errors.Explain(os.Stderr, err, wantTypeStr)
 			log.Fatal()
 		}
 	}
@@ -32,7 +33,7 @@ func TestExample(example shapes.Example) {
 		_, wantValue, err = InterpretString(wantValueStr)
 		if err != nil {
 			log.Println("ERROR: Could not interpret expected value")
-			errors.Explain(err, wantValueStr)
+			errors.Explain(os.Stderr, err, wantValueStr)
 			log.Fatal()
 		}
 	}
@@ -95,7 +96,7 @@ func TestProgramStr(program string, wantTypeString string, wantValueString strin
 		wantType, err = grammar.ParseType(wantTypeString)
 		if err != nil {
 			t.Log("ERROR: Could not parse expected type")
-			errors.Explain(err, wantTypeString)
+			errors.Explain(os.Stderr, err, wantTypeString)
 			t.Fail()
 		}
 	}
@@ -104,7 +105,7 @@ func TestProgramStr(program string, wantTypeString string, wantValueString strin
 		_, wantValue, err = InterpretString(wantValueString)
 		if err != nil {
 			t.Log("ERROR: Could not interpret expected value")
-			errors.Explain(err, wantValueString)
+			errors.Explain(os.Stderr, err, wantValueString)
 			t.Fail()
 		}
 	}

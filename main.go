@@ -48,20 +48,20 @@ func repl() {
 func execute(program string, displayResult bool) (success bool) {
 	_, value, err := interpreter.InterpretString(program)
 	if err != nil {
-		errors.Explain(err, program)
+		errors.Explain(os.Stderr, err, program)
 		return false
 	}
 	if displayResult {
 		str, err := value.Repr()
 		if err != nil {
-			errors.Explain(err, program)
+			errors.Explain(os.Stderr, err, program)
 			return false
 		}
 		fmt.Println(str)
 	} else {
 		err := forceEvaluation(value)
 		if err != nil {
-			errors.Explain(err, program)
+			errors.Explain(os.Stderr, err, program)
 			return false
 		}
 	}

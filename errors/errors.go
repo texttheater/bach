@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"os"
+	"io"
 	"strings"
 
 	"github.com/alecthomas/participle/lexer"
@@ -263,67 +263,67 @@ func (err *E) Error() string {
 	return buffer.String()
 }
 
-func Explain(err error, program string) {
+func Explain(w io.Writer, err error, program string) {
 	e, ok := err.(*E)
 	if !ok {
-		fmt.Fprintln(os.Stderr, "Unknown error")
-		fmt.Fprintln(os.Stderr, "Message:   ", err.Error())
+		fmt.Fprintln(w, "Unknown error")
+		fmt.Fprintln(w, "Message:   ", err.Error())
 		return
 	}
 	// header and position
-	fmt.Fprint(os.Stderr, e.Kind)
+	fmt.Fprint(w, e.Kind)
 	if e.Pos != nil && e.Pos.Line > 0 {
-		fmt.Fprintln(os.Stderr, " error at", e.Pos)
+		fmt.Fprintln(w, " error at", e.Pos)
 		lines := strings.SplitAfter(program, "\n")
 		line := lines[e.Pos.Line-1]
 		column := e.Pos.Column
 		// TODO shorten long lines
-		fmt.Fprint(os.Stderr, line)
+		fmt.Fprint(w, line)
 		if len(line) == 0 || line[len(line)-1] != '\n' {
-			fmt.Fprintln(os.Stderr)
+			fmt.Fprintln(w)
 		}
-		fmt.Fprint(os.Stderr, strings.Repeat(" ", column-1))
-		fmt.Fprintln(os.Stderr, "^")
+		fmt.Fprint(w, strings.Repeat(" ", column-1))
+		fmt.Fprintln(w, "^")
 	} else {
-		fmt.Fprintln(os.Stderr, " error")
+		fmt.Fprintln(w, " error")
 	}
 	// attributes
-	fmt.Fprintln(os.Stderr, "Code:      ", e.Code.String())
+	fmt.Fprintln(w, "Code:      ", e.Code.String())
 	if e.Message == nil {
-		fmt.Fprintln(os.Stderr, "Message:   ", e.Code.DefaultMessage())
+		fmt.Fprintln(w, "Message:   ", e.Code.DefaultMessage())
 	} else {
-		fmt.Fprintln(os.Stderr, "Message:   ", *e.Message)
+		fmt.Fprintln(w, "Message:   ", *e.Message)
 	}
 	if e.WantType != nil {
-		fmt.Fprintln(os.Stderr, "Want type: ", e.WantType)
+		fmt.Fprintln(w, "Want type: ", e.WantType)
 	}
 	if e.GotType != nil {
-		fmt.Fprintln(os.Stderr, "Got type:  ", e.GotType)
+		fmt.Fprintln(w, "Got type:  ", e.GotType)
 	}
 	if e.GotValue != nil {
 		gotValueStr, _ := e.GotValue.Repr()
-		fmt.Fprintln(os.Stderr, "Got value: ", gotValueStr)
+		fmt.Fprintln(w, "Got value: ", gotValueStr)
 	}
 	if e.InputType != nil {
-		fmt.Fprintln(os.Stderr, "Input type:", e.InputType)
+		fmt.Fprintln(w, "Input type:", e.InputType)
 	}
 	if e.Name != nil {
-		fmt.Fprintln(os.Stderr, "Name:      ", *e.Name)
+		fmt.Fprintln(w, "Name:      ", *e.Name)
 	}
 	if e.ArgNum != nil {
-		fmt.Fprintln(os.Stderr, "Arg #:     ", *e.ArgNum)
+		fmt.Fprintln(w, "Arg #:     ", *e.ArgNum)
 	}
 	if e.NumParams != nil {
-		fmt.Fprintln(os.Stderr, "# params:  ", *e.NumParams)
+		fmt.Fprintln(w, "# params:  ", *e.NumParams)
 	}
 	if e.ParamNum != nil {
-		fmt.Fprintln(os.Stderr, "Param #:   ", *e.ParamNum)
+		fmt.Fprintln(w, "Param #:   ", *e.ParamNum)
 	}
 	if e.WantParam != nil {
-		fmt.Fprintln(os.Stderr, "Want param:", e.WantParam)
+		fmt.Fprintln(w, "Want param:", e.WantParam)
 	}
 	if e.GotParam != nil {
-		fmt.Fprintln(os.Stderr, "Got param: ", e.GotParam)
+		fmt.Fprintln(w, "Got param: ", e.GotParam)
 	}
 }
 
