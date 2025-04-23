@@ -118,7 +118,7 @@ func (g *Op2Num) Ast() (expressions.Expression, error) {
 
 type Op1Lid struct {
 	Pos    lexer.Position
-	Op1Lid string `@LangleLid | @Op1Lid`
+	Op1Lid string `@LangleULid | @Op1Lid`
 }
 
 func (g *Op1Lid) Ast() (expressions.Expression, error) {

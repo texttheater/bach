@@ -15,22 +15,22 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		// tokens starting calls
 		{"Op1Num", `[+\-*/%<>](?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
 		{"Op2Num", `(?:==|<=|>=|\*\*)(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
-		{"LangleLid", `<(?:[\p{L}_][\p{L}_0-9]*)`, nil}, // special case of Op1Lid, but also used for type variables
-		{"Op1Lid", `[+\-*/%>](?:[\p{L}_][\p{L}_0-9]*)`, nil},
-		{"Op2Lid", `(?:==|<=|>=|\*\*)(?:[\p{L}_][\p{L}_0-9]*)`, nil},
-		{"NameQuot", `(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)"`, stateful.Push("StrLiteral")},
-		{"NameRegexp", `(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)~(?:\\.|[^/])*~`, nil},
-		{"NameLpar", `(?:[+\-*/%<>]|==|<=|>=|\*\*|[\p{L}_][\p{L}_0-9]*)\(`, nil},
-		{"NameLbrack", `(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)\[`, nil},
-		{"NameLbrace", `(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*){`, stateful.Push("Braces")},
+		{"LangleULid", `<(?:[\p{Lu}_][\p{L}_0-9]*)`, nil}, // used for type variables
+		{"Op1Lid", `[+\-*/%<>](?:[\p{Ll}_][\p{L}_0-9]*)`, nil},
+		{"Op2Lid", `(?:==|<=|>=|\*\*)(?:[\p{Ll}_][\p{L}_0-9]*)`, nil},
+		{"NameQuot", `(?:[+\-*/%<>]|==|<=|>=|[\p{Ll}_][\p{L}_0-9]*)"`, stateful.Push("StrLiteral")},
+		{"NameRegexp", `(?:[+\-*/%<>]|==|<=|>=|[\p{Ll}_][\p{L}_0-9]*)~(?:\\.|[^/])*~`, nil},
+		{"NameLpar", `(?:[+\-*/%<>]|==|<=|>=|\*\*|[\p{Ll}_][\p{L}_0-9]*)\(`, nil},
+		{"NameLbrack", `(?:[+\-*/%<>]|==|<=|>=|[\p{Ll}_][\p{L}_0-9]*)\[`, nil},
+		{"NameLbrace", `(?:[+\-*/%<>]|==|<=|>=|[\p{Ll}_][\p{L}_0-9]*){`, stateful.Push("Braces")},
 		// assignment
-		{"EqName", `=(?:[+\-*/%<>]|==|<=|>=|[\p{L}_][\p{L}_0-9]*)`, nil},
+		{"EqName", `=(?:[+\-*/%<>]|==|<=|>=|[\p{Ll}_][\p{L}_0-9]*)`, nil},
 		{"EqLbrack", `=\[`, nil},
 		{"EqLbrace", `={`, stateful.Push("Braces")},
 		// keywords
 		{"Keyword", `(?:for|def|as|ok|if|then|elif|else|is|elis|with)\b`, nil},
 		// names
-		{"Lid", `[\p{L}_][\p{L}_0-9]*`, nil},
+		{"Lid", `[\p{Ll}_][\p{L}_0-9]*`, nil},
 		{"Op2", `==|<=|>=|\*\*`, nil},
 		{"Op1", `[+\-*/%<>=]`, nil},
 		// ellipsis
@@ -39,7 +39,7 @@ var LexerDefinition lexer.Definition = lexer.Must(stateful.New(stateful.Rules{
 		{"NumLiteral", `\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+`, nil},
 		// getters
 		{"NumGetter", `@-?(?:\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+)`, nil},
-		{"LidGetter", `@[\p{L}_][\p{L}_0-9]*`, nil},
+		{"LidGetter", `@[\p{Ll}_][\p{L}_0-9]*`, nil},
 		{"Op2Getter", `@(?:==|<=|>=|\*\*)`, nil},
 		{"Op1Getter", `@[+\-*/%<>=]`, nil},
 		{"StrGetter", `@"(?:\\.|[^"])*"`, nil},

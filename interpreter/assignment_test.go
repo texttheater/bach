@@ -9,6 +9,15 @@ import (
 
 func TestAssignment(t *testing.T) {
 	interpreter.TestProgramStr(
+		`2 =Num`,
+		``,
+		``,
+		errors.SyntaxError(
+			errors.Code(errors.Syntax),
+		),
+		t,
+	)
+	interpreter.TestProgramStr(
 		`for Arr<Num...> def f Num as =[a, b] a ok`,
 		``,
 		``,

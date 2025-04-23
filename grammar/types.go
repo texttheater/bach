@@ -203,13 +203,13 @@ func (g *AnyType) Ast() types.Type {
 }
 
 type TypeVariable struct {
-	Pos       lexer.Position
-	LangleLid string `@LangleLid ">"`
+	Pos        lexer.Position
+	LangleULid string `@LangleULid ">"`
 }
 
 func (g *TypeVariable) Ast() types.Type {
 	return types.NewVar(
-		g.LangleLid[1:len(g.LangleLid)],
+		g.LangleULid[1:len(g.LangleULid)],
 		types.Any{},
 	)
 }

@@ -148,13 +148,13 @@ func (g *ObjTypeTemplate) Ast() types.Type {
 
 type TypeVariableTemplate struct {
 	Pos        lexer.Position
-	LangleLid  string `@LangleLid`
+	LangleULid string `@LangleULid`
 	UpperBound *Type  `( @@ )? ">"`
 }
 
 func (g *TypeVariableTemplate) Ast() types.Type {
 	t := types.Var{
-		Name: g.LangleLid[1:len(g.LangleLid)],
+		Name: g.LangleULid[1:len(g.LangleULid)],
 	}
 	if g.UpperBound != nil {
 		t.Bound = g.UpperBound.Ast()
