@@ -36,10 +36,10 @@ T Num
 V 3
 ```
 
-A type error occurs if the pattern cannot match values of the input type, e.g.,
-if an array pattern has a different length from the input, or matching objects
-with array patterns, or vice versa, or if an object pattern contains keys that
-the input doesn’t.
+An “impossible match” error occurs if the pattern cannot match any values of
+the input type, e.g., if an array pattern has a different length from the
+input, or matching objects with array patterns, or vice versa, or if an object
+pattern contains keys that the input doesn’t.
 
 ```bachdoc
 P [1, 2, 3] =[a, b]
@@ -50,4 +50,20 @@ E {"Kind": "Type", "Code": "ImpossibleMatch"}
 
 P {a: 1, b: 2, c: 3} ={g: h}
 E {"Kind": "Type", "Code": "ImpossibleMatch"}
+```
+
+A “nonexhaustive match” error occurs if the pattern can match some but not all
+values of the input type, e.g., if a variable-length array type is matched as
+fixed-length, or if an object type is matched against a key it might or might
+not contain.
+
+```bachdoc
+P for Arr<Num...> def f Num as =[a, b] a ok
+E {"Kind": "Type", "Code": "NonExhaustiveMatch"}
+
+P for Obj<a: Num, Num> def f Num as ={a: a, b: b} a +b ok
+E {"Kind": "Type", "Code": "NonExhaustiveMatch"}
+
+P for Obj<a: Num, Num> def f Num as ={b: b} b ok
+E {"Kind": "Type", "Code": "NonExhaustiveMatch"}
 ```

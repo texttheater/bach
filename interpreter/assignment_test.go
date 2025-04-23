@@ -17,31 +17,4 @@ func TestAssignment(t *testing.T) {
 		),
 		t,
 	)
-	interpreter.TestProgramStr(
-		`for Arr<Num...> def f Num as =[a, b] a ok`,
-		``,
-		``,
-		errors.TypeError(
-			errors.Code(errors.NonExhaustiveMatch),
-		),
-		t,
-	)
-	interpreter.TestProgramStr(
-		`for Obj<a: Num, Num> def f Num as ={a: a, b: b} a +b ok`,
-		``,
-		``,
-		errors.TypeError(
-			errors.Code(errors.NonExhaustiveMatch),
-		),
-		t,
-	)
-	interpreter.TestProgramStr(
-		`for Obj<a: Num, Num> def f Num as ={b: b} b ok`,
-		``,
-		``,
-		errors.TypeError(
-			errors.Code(errors.NonExhaustiveMatch),
-		),
-		t,
-	)
 }
