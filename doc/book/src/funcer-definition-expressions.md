@@ -2,10 +2,10 @@
 
 To define a funcer, use a *funcer definition expression*. It has the form `for
 I def N(P1, P2, ..., Pn) O as B ok`, where `I` is the funcer’s *input type*,
-`I` is its *name*, `P1, P2, ..., Pn` are `n` or more *parameters* (if `n=0`,
-leave out the parentheses), `O` is the funcer’s *output type*, and `B` is its
-*body*. When called, the funcer will evaluate like `B`, with parameters bound
-to the arguments passed at call time.
+`N` is its *name* (must start with a lower-case letter), `P1, P2, ..., Pn` are
+`n` or more *parameters* (if `n=0`, leave out the parentheses), `O` is the
+funcer’s *output type*, and `B` is its *body*. When called, the funcer will
+evaluate like `B`, with parameters bound to the arguments passed at call time.
 
 Here are some examples of defining and then calling funcers without parameters:
 
@@ -75,9 +75,9 @@ V 2
 
 ## Type Variables
 
-Funcer definition expressions can use type variables, written between angle
-brackets. When applying a funcer to an input expression, type variables are
-bound from left to right.
+Funcer definition expressions can use type variables. They are written between
+angle brackets and start with an upper-case letter. When applying a funcer to
+an input expression, type variables are bound from left to right.
 
 ```bachdoc
 P for <A> def apply(for <A> f <B>) <B> as f ok 1 apply(+1)
