@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/bits"
 	"math/rand"
+	"sort"
 	"strconv"
 
 	"github.com/texttheater/bach/errors"
@@ -260,6 +261,37 @@ var MathFuncers = []shapes.Funcer{
 		[]shapes.Example{
 			{"[1, 2, 3, 4] sum", "Num", "10", nil},
 			{"[] sum", "Num", "0", nil},
+		},
+	),
+	shapes.SimpleFuncer(
+		"Computes the median of several numbers.",
+		types.NewArr(types.Num{}),
+		"an array of numbers",
+		"median",
+		nil,
+		types.Num{},
+		"their median",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			numbers, err := states.NumsFromValue(inputValue)
+			if err != nil {
+				return nil, err
+			}
+			if len(numbers) == 0 {
+				return states.NumValue(math.NaN()), nil
+			}
+			sort.Float64s(numbers)
+			middle := len(numbers) / 2
+			if len(numbers)%2 != 0 {
+				return states.NumValue(numbers[middle]), nil
+			}
+			return states.NumValue((numbers[middle-1] + numbers[middle]) / 2), nil
+		},
+		[]shapes.Example{
+			{"[2, 3, 7] median", "Num", "3", nil},
+			{"[2, 3, 5, 7] median", "Num", "4", nil},
+			{"[1.25] median", "Num", "1.25", nil},
+			{"[] median", "Num", "nan", nil},
 		},
 	),
 	shapes.SimpleFuncer(

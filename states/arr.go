@@ -205,6 +205,22 @@ func SliceFromValue(v Value) ([]Value, error) {
 	return slice, nil
 }
 
+func NumsFromValue(v Value) ([]float64, error) {
+	var slice []float64
+	iter := IterFromValue(v)
+	for {
+		el, ok, err := iter()
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			break
+		}
+		slice = append(slice, float64(el.(NumValue)))
+	}
+	return slice, nil
+}
+
 func ThunkFromSlice(slice []Value) *Thunk {
 	i := 0
 	iter := func() (Value, bool, error) {
