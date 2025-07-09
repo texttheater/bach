@@ -48,14 +48,16 @@ V 0
 
 ## Predicate Expressions
 
-Predicate expressions are like conditional expressions except only the
-condition part (thus, the `if ...` clause, or the `is ...` clause, or the `is
-... with ...` clause) is written out. Bach then automatically completes: `then
-{yes: id} else {no: id}`. That is, the input is returned wrapped in an object
-that indicates whether it satisfies the condition. Predicate expressions can be
-used, e.g., for filtering. They usually occur as arguments to
-[funcers](funcer-call-expressions.md). In particular, several [array
-funcers](array-funcers.md) accept them.
+In Bach, a *predicate* is a function that for a given input `I` returns either
+`{yes: I}` or `{no: I}`. This is often useful, e.g., for checking the members
+of an array for some condition. Thus, several builtin [array
+funcers](array-funcers.md) accept them as arguments.
+
+Bach provides a special syntax for making such conditions easy to write. A
+predicate expression is like a conditional expression, except it consists
+only of the first part, that is, the `if ...` clause, or the `is ...` clause,
+or the `is ... with ...` clause. The `then {yes: id} else {no: id}` part is
+filled in automatically.
 
 ```bachdoc
 P is Null

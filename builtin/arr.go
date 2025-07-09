@@ -134,7 +134,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary: "Removes elements satisfying a predicate from the beginning of an array.",
+		Summary: "Removes elements satisfying a [predicate](conditional-expressions.md#predicate-expressions) from the beginning of an array.",
 		InputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
@@ -315,7 +315,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Finds the index and first element satisfying a predicate.",
+		Summary:          "Finds the index and first element satisfying a [predicate](conditional-expressions.md#predicate-expressions).",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findFirst",
@@ -373,7 +373,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Finds the index of the first element satisfying a predicate.",
+		Summary:          "Finds the index of the first element satisfying a [predicate](conditional-expressions.md#predicate-expressions).",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findFirstIndex",
@@ -422,7 +422,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Finds the first element satisfying a predicate.",
+		Summary:          "Finds the first element satisfying a [predicate](conditional-expressions.md#predicate-expressions).",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findFirstValue",
@@ -471,7 +471,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Finds the index and last element satisfying a predicate.",
+		Summary:          "Finds the index and last element satisfying a [predicate](conditional-expressions.md#predicate-expressions).",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findLast",
@@ -529,7 +529,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Finds the index of the last element satisfying a predicate.",
+		Summary:          "Finds the index of the last element satisfying a [predicate](conditional-expressions.md#predicate-expressions).",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findLastIndex",
@@ -578,7 +578,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Finds the last element satisfying a predicate.",
+		Summary:          "Finds the last element satisfying a [predicate](conditional-expressions.md#predicate-expressions).",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findLastValue",
@@ -850,7 +850,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Keep only elements satisfying a predicate.",
+		Summary:          "Keep only elements satisfying a [predicate](conditional-expressions.md#predicate-expressions).",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "keep",
@@ -1486,7 +1486,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary: "Takes elements from the beginning of an array that satisfy a certain predicate.",
+		Summary: "Takes elements from the beginning of an array that satisfy a certain [predicate](conditional-expressions.md#predicate-expressions).",
 		InputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
