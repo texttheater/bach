@@ -48,7 +48,7 @@ V 0
 
 ## Predicate Expressions
 
-Precicate expressions are like conditional expressions except only the
+Predicate expressions are like conditional expressions except only the
 condition part (thus, the `if ...` clause, or the `is ...` clause, or the `is
 ... with ...` clause) is written out. Bach then automatically completes: `then
 {yes: id} else {no: id}`. That is, the input is returned wrapped in an object
