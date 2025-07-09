@@ -134,7 +134,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary: "Removes elements satisfying a condition from the beginning of an array.",
+		Summary: "Removes elements satisfying a predicate from the beginning of an array.",
 		InputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
@@ -143,8 +143,8 @@ var ArrFuncers = []shapes.Funcer{
 		Params: []*params.Param{
 			{
 				InputType:   types.NewVar("A", types.Any{}),
-				Name:        "test",
-				Description: "a test to apply to the elements of the input",
+				Name:        "predicate",
+				Description: "a predicate to apply to the elements of the input",
 				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -165,7 +165,7 @@ var ArrFuncers = []shapes.Funcer{
 		OutputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
-		OutputDescription: "The elements from the input, starting with the first one that does not pass the test.",
+		OutputDescription: "The elements from the input, starting with the first one that does not satisfy the predicate.",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			arr := inputState.Value.(*states.ArrValue)
@@ -315,15 +315,15 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Finds the index and first element satisfying a condition.",
+		Summary:          "Finds the index and first element satisfying a predicate.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findFirst",
 		Params: []*params.Param{
 			{
 				InputType:   types.NewVar("A", types.Any{}),
-				Name:        "test",
-				Description: "a test to apply to elements of the input",
+				Name:        "predicate",
+				Description: "a predicate to apply to elements of the input",
 				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -351,7 +351,7 @@ var ArrFuncers = []shapes.Funcer{
 				types.VoidArr,
 			),
 		),
-		OutputDescription: "the first element of the input passing the test, paired with its index, or Null if none",
+		OutputDescription: "the first element of the input satisfying the predicate, paired with its index, or Null if none",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			idx, val, err := findFirst(inputState, args[0])
@@ -373,15 +373,15 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Finds the index of the first element satisfying a condition.",
+		Summary:          "Finds the index of the first element satisfying a predicate.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findFirstIndex",
 		Params: []*params.Param{
 			{
 				InputType:   types.NewVar("A", types.Any{}),
-				Name:        "test",
-				Description: "a test to apply to elements of the input",
+				Name:        "predicate",
+				Description: "a predicate to apply to elements of the input",
 				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -403,7 +403,7 @@ var ArrFuncers = []shapes.Funcer{
 			types.Null{},
 			types.Num{},
 		),
-		OutputDescription: "the index of the first element of the input passing the test, or Null if none",
+		OutputDescription: "the index of the first element of the input satisfying the predicate, or Null if none",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			idx, _, err := findFirst(inputState, args[0])
@@ -422,15 +422,15 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Finds the first element satisfying a condition.",
+		Summary:          "Finds the first element satisfying a predicate.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findFirstValue",
 		Params: []*params.Param{
 			{
 				InputType:   types.NewVar("A", types.Any{}),
-				Name:        "test",
-				Description: "a test to apply to elements of the input",
+				Name:        "predicate",
+				Description: "a predicate to apply to elements of the input",
 				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -452,7 +452,7 @@ var ArrFuncers = []shapes.Funcer{
 			types.Null{},
 			types.NewVar("A", types.Any{}),
 		),
-		OutputDescription: "the first element of the input passing the test, or Null if none",
+		OutputDescription: "the first element of the input satisfying the predicate, or Null if none",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			idx, val, err := findFirst(inputState, args[0])
@@ -471,15 +471,15 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Finds the index and last element satisfying a condition.",
+		Summary:          "Finds the index and last element satisfying a predicate.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findLast",
 		Params: []*params.Param{
 			{
 				InputType:   types.NewVar("A", types.Any{}),
-				Name:        "test",
-				Description: "a test to apply to elements of the input",
+				Name:        "predicate",
+				Description: "a predicate to apply to elements of the input",
 				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -507,7 +507,7 @@ var ArrFuncers = []shapes.Funcer{
 				types.VoidArr,
 			),
 		),
-		OutputDescription: "the last element of the input passing the test, paired with its index, or Null if none",
+		OutputDescription: "the last element of the input satisfying the predicate, paired with its index, or Null if none",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			idx, val, err := findLast(inputState, args[0])
@@ -529,15 +529,15 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Finds the index of the last element satisfying a condition.",
+		Summary:          "Finds the index of the last element satisfying a predicate.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findLastIndex",
 		Params: []*params.Param{
 			{
 				InputType:   types.NewVar("A", types.Any{}),
-				Name:        "test",
-				Description: "a test to apply to elements of the input",
+				Name:        "predicate",
+				Description: "a predicate to apply to elements of the input",
 				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -559,7 +559,7 @@ var ArrFuncers = []shapes.Funcer{
 			types.Null{},
 			types.Num{},
 		),
-		OutputDescription: "the index of the last element of the input passing the test, or Null if none",
+		OutputDescription: "the index of the last element of the input satisfying the predicate, or Null if none",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			idx, _, err := findLast(inputState, args[0])
@@ -578,15 +578,15 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Finds the last element satisfying a condition.",
+		Summary:          "Finds the last element satisfying a predicate.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "findLastValue",
 		Params: []*params.Param{
 			{
 				InputType:   types.NewVar("A", types.Any{}),
-				Name:        "test",
-				Description: "a test to apply to elements of the input",
+				Name:        "predicate",
+				Description: "a predicate to apply to elements of the input",
 				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -608,7 +608,7 @@ var ArrFuncers = []shapes.Funcer{
 			types.Null{},
 			types.NewVar("A", types.Any{}),
 		),
-		OutputDescription: "the last element of the input passing the test, or Null if none",
+		OutputDescription: "the last element of the input satisfying the predicate, or Null if none",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			idx, val, err := findLast(inputState, args[0])
@@ -850,15 +850,15 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Keep only elements satisfying a condition.",
+		Summary:          "Keep only elements satisfying a predicate.",
 		InputType:        types.NewArr(types.NewVar("A", types.Any{})),
 		InputDescription: "an array",
 		Name:             "keep",
 		Params: []*params.Param{
 			{
 				InputType:   types.NewVar("A", types.Any{}),
-				Name:        "test",
-				Description: "a test to apply to elements of the input",
+				Name:        "predicate",
+				Description: "a predicate to apply to elements of the input",
 				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -877,7 +877,7 @@ var ArrFuncers = []shapes.Funcer{
 			},
 		},
 		OutputType:        types.NewArr(types.NewVar("B", types.Any{})),
-		OutputDescription: "The input with all elements not passing the test removed.",
+		OutputDescription: "The input with all elements not satisfying the predicate removed.",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromValue(inputState.Value)
@@ -990,7 +990,7 @@ var ArrFuncers = []shapes.Funcer{
 			{
 				InputType:   types.NewVar("A", types.Any{}),
 				Name:        "less",
-				Description: `funcer that test whether its input is "less than" its first argument`,
+				Description: `funcer that tests whether its input is "less than" its first argument`,
 				Params: []*params.Param{
 					params.SimpleParam("other", "", types.NewVar("A", types.Any{})),
 				},
@@ -1486,7 +1486,7 @@ var ArrFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary: "Takes elements from the beginning of an array that satisfy a certain condition.",
+		Summary: "Takes elements from the beginning of an array that satisfy a certain predicate.",
 		InputType: types.NewArr(
 			types.NewVar("A", types.Any{}),
 		),
@@ -1495,8 +1495,8 @@ var ArrFuncers = []shapes.Funcer{
 		Params: []*params.Param{
 			{
 				InputType:   types.NewVar("A", types.Any{}),
-				Name:        "test",
-				Description: "a test to apply to elements of the input",
+				Name:        "predicate",
+				Description: "a predicate to apply to elements of the input",
 				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Obj{
@@ -1517,7 +1517,7 @@ var ArrFuncers = []shapes.Funcer{
 		OutputType: types.NewArr(
 			types.NewVar("B", types.Any{}),
 		),
-		OutputDescription: "an array with the elements that pass the test, up to and excluding the first one that doesn't",
+		OutputDescription: "an array with the elements that satisfy the predicate, up to and excluding the first one that doesn't",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromValue(inputState.Value)
@@ -1701,14 +1701,14 @@ func min(inputState states.State, key states.Action, less states.Action, def sta
 	}
 }
 
-func findFirst(inputState states.State, test states.Action) (index int, value states.Value, err error) {
+func findFirst(inputState states.State, predicate states.Action) (index int, value states.Value, err error) {
 	arr := inputState.Value.(*states.ArrValue)
 	i := 0
 	for {
 		if arr == nil {
 			return -1, nil, nil
 		}
-		obj, err := test(inputState.Replace(arr.Head), nil).EvalObj()
+		obj, err := predicate(inputState.Replace(arr.Head), nil).EvalObj()
 		if err != nil {
 			return -1, nil, err
 		}
@@ -1724,7 +1724,7 @@ func findFirst(inputState states.State, test states.Action) (index int, value st
 	}
 }
 
-func findLast(inputState states.State, test states.Action) (index int, value states.Value, err error) {
+func findLast(inputState states.State, predicate states.Action) (index int, value states.Value, err error) {
 	lastIndex := -1
 	var lastValue states.Value = nil
 	arr := inputState.Value.(*states.ArrValue)
@@ -1733,7 +1733,7 @@ func findLast(inputState states.State, test states.Action) (index int, value sta
 		if arr == nil {
 			return lastIndex, lastValue, nil
 		}
-		obj, err := test(inputState.Replace(arr.Head), nil).EvalObj()
+		obj, err := predicate(inputState.Replace(arr.Head), nil).EvalObj()
 		if err != nil {
 			return -1, nil, err
 		}

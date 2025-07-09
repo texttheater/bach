@@ -45,36 +45,3 @@ P for Num def expand Num as if <0 then -1 elif >0 then +1 else 0 ok ok 0 expand
 T Num
 V 0
 ```
-
-
-## Predicates
-
-`if` clauses, `is` clauses, and `is ... with` clauses can be used on their own
-(usually, as arguments to funcers). If the condition is satisfied, they return
-`{yes: I}`, and if not, `{no: I}`, where `I` is the input. Such predicate
-expressions can be passed, e.g., to some [array funcers](./array-funcers.md).
-
-```bachdoc
-P is Null
-E {"Kind": "Type", "Code": "UnreachableElseClause"}
-
-P 2 is Num with >3
-T Obj<yes: Num>|Obj<no: Num>
-V {no: 2}
-
-P 4 is Num with >3
-T Obj<yes: Num>|Obj<no: Num>
-V {yes: 4}
-
-P 2 if >3
-T Obj<yes: Num>|Obj<no: Num>
-V {no: 2}
-
-P 4 if >3
-T Obj<yes: Num>|Obj<no: Num>
-V {yes: 4}
-
-P for Any def f Num|Str as 2 ok f is Num _
-T Obj<yes: Num>|Obj<no: Str>
-V {yes: 2}
-```
