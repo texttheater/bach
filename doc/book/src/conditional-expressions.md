@@ -45,3 +45,39 @@ P for Num def expand Num as if <0 then -1 elif >0 then +1 else 0 ok ok 0 expand
 T Num
 V 0
 ```
+
+## Predicate Expressions
+
+Precicate expressions are like conditional expressions except only the
+condition part (thus, the `if ...` clause, or the `is ...` clause, or the `is
+... with ...` clause) is written out. Bach then automatically completes: `then
+{yes: id} else {no: id}`. That is, the input is returned wrapped in an object
+that indicates whether it satisfies the condition. Predicate expressions can be
+used, e.g., for filtering. They usually occur as arguments to
+[funcers](funcer-call-expressions.md). In particular, several [array
+funcers](array-funcers.md) accept them.
+
+```bachdoc
+P is Null
+E {"Kind": "Type", "Code": "UnreachableElseClause"}
+
+P 2 is Num with >3
+T Obj<yes: Num>|Obj<no: Num>
+V {no: 2}
+
+P 4 is Num with >3
+T Obj<yes: Num>|Obj<no: Num>
+V {yes: 4}
+
+P 2 if >3
+T Obj<yes: Num>|Obj<no: Num>
+V {no: 2}
+
+P 4 if >3
+T Obj<yes: Num>|Obj<no: Num>
+V {yes: 4}
+
+P for Any def f Num|Str as 2 ok f is Num _
+T Obj<yes: Num>|Obj<no: Str>
+V {yes: 2}
+```

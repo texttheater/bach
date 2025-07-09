@@ -4,7 +4,9 @@ A getter expressions consists of the `@` character followed by an
 [object](object-types.md) property name or an [array](array-types.md) index. It
 retrieves the value of the property or the element at the index for an input
 object or array. The input type must guarantee the existence of the
-property/index, otherwise a type error is raised.
+property/index, otherwise a type error is raised. If the input type cannot
+guarantee the existence of the property/index, use the `get` funcer [for
+objects](object-funcers.md#get) or [for arrays](array-funcers.md#get).
 
 ```bachdoc
 P {a: 1, b: 2} @a

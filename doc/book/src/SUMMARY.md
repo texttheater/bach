@@ -14,7 +14,6 @@
 	- [Funcer Definition Expressions](./funcer-definition-expressions.md)
 	- [Assignment Expressions](./assignment-expressions.md)
 	- [Conditional Expressions](./conditional-expressions.md)
-	- [Predicate Expressions](./predicate-expressions.md)
 	- [Getter Expressions](./getter-expressions.md)
 	- [Regexp Expressions](./regexp-expressions.md)
 - [Builtin Funcer Reference](./builtin-funcer-reference.md)
