@@ -120,6 +120,7 @@ P for Any def f(for Any g <A Arr<Any...>>) <A> as g ok f("a")
 E {"Kind": "Type", "Code": "ArgHasWrongOutputType", "ArgNum": 1, "WantType": "<A Arr<Any...>>", "GotType": "Str"}
 ```
 
+
 ## Matching Calls to Definitions
 
 Note that funcers are looked up by input type, name, and number of paramters.
@@ -135,3 +136,13 @@ E {"Kind": "Type", "Code": "NoSuchFuncer", "InputType": "Obj<Void>", "Name": "f"
 P for Str def f Obj<> as {} ok "abc" reFindAll(f)
 E {"Kind": "Type", "Code": "ArgHasWrongOutputType", "ArgNum": 1, "WantType": "<A Null|Obj<start: Num, 0: Str, Any>>", "GotType": "Obj<Any>"}
 ```
+
+
+## Variable Capturing
+
+TBD
+
+
+## Recursion
+
+TBD
