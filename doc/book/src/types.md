@@ -6,23 +6,51 @@ the `Any` type (all values are of this type). If you are wondering what the
 output type of your program is, you can always compose it with the `type`
 function, and you will get a string representation of the output type.
 
-    bach> null type
-    "Null"
-    bach> false type
-    "Bool"
-    bach> true type
-    "Bool"
-    bach> 42 type
-    "Num"
-    bach> 0.3 type
-    "Num"
-    bach> "Hello world!" type
-    "Str"
-    bach> [] type
-    "Arr<>"
-    bach> {} type
-    "Obj<Void>"
-    bach> for Any def f Num|Str as 0 ok f type
-    "Num|Str"
-    bach> for Any def f Any as null ok f type
-    "Any"
+The following table demonstrates this: in the Program column, there are a
+number of Bach programs, each consisting of some expression followed by the
+`type` function. The Type column indicates the output type of the whole
+program. Here, it’s always `Str` because that is the output type of `type`.
+Finally, the Value column contains the strings representing the types of the
+various expressions.
+
+```bachdoc
+P null type
+T Str
+V "Null"
+
+P false type
+T Str
+V "Bool"
+
+P true type
+T Str
+V "Bool"
+
+P 42 type
+T Str
+V "Num"
+
+P 0.3 type
+T Str
+V "Num"
+
+P "Hello world!" type
+T Str
+V "Str"
+
+P [] type
+T Str
+V "Arr<>"
+
+P {} type
+T Str
+V "Obj<Void>"
+
+P for Any def f Num|Str as 0 ok f type
+T Str
+V "Num|Str"
+
+P for Any def f Any as null ok f type
+T Str
+V "Any"
+```

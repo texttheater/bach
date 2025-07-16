@@ -16,6 +16,7 @@
 	- [Conditional Expressions](./conditional-expressions.md)
 	- [Getter Expressions](./getter-expressions.md)
 	- [Regexp Expressions](./regexp-expressions.md)
+	- [Composition Expressions](./composition-expressions.md)
 - [Builtin Funcer Reference](./builtin-funcer-reference.md)
 	- [Null Funcers](./null-funcers.md)
 	- [I/O Funcers](./io-funcers.md)
