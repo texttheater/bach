@@ -25,6 +25,7 @@ func inlineCode(s string) string {
 	// escape characters that mdbook treats specially
 	s = strings.ReplaceAll(s, "|", "&#124;")
 	s = strings.ReplaceAll(s, "\\", "&#92;")
+	s = strings.ReplaceAll(s, "~", "&#126;")
 	// wrap in code tags
 	s = "<code>" + s + "</code>"
 	return s

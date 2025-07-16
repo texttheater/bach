@@ -20,8 +20,8 @@ var RegexpFuncers = []shapes.Funcer{
 		Params: []*params.Param{
 			{
 				InputType:   types.Str{},
-				Name:        "pattern",
-				Description: "a pattern",
+				Name:        "regexp",
+				Description: "a [regexp](regexp-expressions.md)",
 				Params:      nil,
 				OutputType: types.NewVar("A", types.NewUnion(
 					types.Null{},
@@ -39,7 +39,7 @@ var RegexpFuncers = []shapes.Funcer{
 			types.NewVar("A", types.Any{}),
 		),
 		OutputDescription: "array of matches",
-		Notes:             "Matches appear in the output from leftmost to rightmost. Matches that overlap an earlier match (i.e., a match that starts at a lower offset or one that starts at the same offset but is found earlier by the pattern) are not included.",
+		Notes:             "Matches appear in the output from leftmost to rightmost. Matches that overlap an earlier match (i.e., a match that starts at a lower offset or one that starts at the same offset but is found earlier by the regexp) are not included.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			v := inputState.Value.(states.StrValue)
 			offset := 0
@@ -81,15 +81,15 @@ var RegexpFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Replaces the first match of a pattern in a string with something else.",
+		Summary:          "Replaces the first match of a regexp in a string with something else.",
 		InputType:        types.Str{},
 		InputDescription: "a string",
 		Name:             "reReplaceFirst",
 		Params: []*params.Param{
 			{
 				InputType:   types.Str{},
-				Name:        "pattern",
-				Description: "a pattern",
+				Name:        "regexp",
+				Description: "a [regexp](regexp-expressions.md)",
 				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Null{},
@@ -117,7 +117,7 @@ var RegexpFuncers = []shapes.Funcer{
 			},
 		},
 		OutputType:        types.Str{},
-		OutputDescription: "the input with the first match of the pattern replaced with the corresponding replacement, or unchanged if there is no match",
+		OutputDescription: "the input with the first match of the regexp replaced with the corresponding replacement, or unchanged if there is no match",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			match, err := args[0](inputState, nil).Eval()
@@ -158,15 +158,15 @@ var RegexpFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Replaces all non-overlapping matches of a pattern in a string with something else.",
+		Summary:          "Replaces all non-overlapping matches of a regexp in a string with something else.",
 		InputType:        types.Str{},
 		InputDescription: "a string",
 		Name:             "reReplaceAll",
 		Params: []*params.Param{
 			{
 				InputType:   types.Str{},
-				Name:        "pattern",
-				Description: "a pattern",
+				Name:        "regexp",
+				Description: "a [regexp](regexp-expressions.md)",
 				Params:      nil,
 				OutputType: types.NewVar("A", types.NewUnion(
 					types.Null{},
@@ -194,8 +194,8 @@ var RegexpFuncers = []shapes.Funcer{
 			},
 		},
 		OutputType:        types.Str{},
-		OutputDescription: "the input with all matches of the pattern replaced with the corresponding replacement, or unchanged if there is no match",
-		Notes:             "Matches are replaced from leftmost to rightmost. Matches that overlap an earlier match (i.e., a match that starts at a lower offset or one that starts at the same offset but is found earlier by the pattern) are not replaced.",
+		OutputDescription: "the input with all matches of the regexp replaced with the corresponding replacement, or unchanged if there is no match",
+		Notes:             "Matches are replaced from leftmost to rightmost. Matches that overlap an earlier match (i.e., a match that starts at a lower offset or one that starts at the same offset but is found earlier by the regexp) are not replaced.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := string(inputState.Value.(states.StrValue))
 			var output strings.Builder
@@ -238,7 +238,7 @@ var RegexpFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Splits a string around a pattern.",
+		Summary:          "Splits a string around a regexp.",
 		InputType:        types.Str{},
 		InputDescription: "a string",
 		Name:             "reSplit",
@@ -246,7 +246,7 @@ var RegexpFuncers = []shapes.Funcer{
 			{
 				InputType:   types.Str{},
 				Name:        "separator",
-				Description: "a pattern",
+				Description: "a [regexp](regexp-expressions.md)",
 				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Null{},
@@ -262,7 +262,7 @@ var RegexpFuncers = []shapes.Funcer{
 		},
 		OutputType:        types.NewArr(types.Str{}),
 		OutputDescription: "the parts of the input found in between occurrences of the separator",
-		Notes:             "If the separator pattern matches the empty string, the input is split into its individual code points. Separators are found from leftmost to rightmost. Separators that overlap an earlier separator (i.e., a separator that starts at a lower offset or one that starts at the same offset but is found earlier by the pattern) do not lead to splits.",
+		Notes:             "If the separator regexp matches the empty string, the input is split into its individual code points. Separators are found from leftmost to rightmost. Separators that overlap an earlier separator (i.e., a separator that starts at a lower offset or one that starts at the same offset but is found earlier by the regexp) do not lead to splits.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			return split(inputState, args, bindings, pos)
 		},
@@ -279,7 +279,7 @@ var RegexpFuncers = []shapes.Funcer{
 		},
 	},
 	shapes.Funcer{
-		Summary:          "Splits a string around a pattern, up to a certain number of times.",
+		Summary:          "Splits a string around a regexp, up to a certain number of times.",
 		InputType:        types.Str{},
 		InputDescription: "a string",
 		Name:             "reSplit",
@@ -287,7 +287,7 @@ var RegexpFuncers = []shapes.Funcer{
 			{
 				InputType:   types.Str{},
 				Name:        "separator",
-				Description: "a pattern",
+				Description: "a [regexp](regexp-expressions.md)",
 				Params:      nil,
 				OutputType: types.NewUnion(
 					types.Null{},
@@ -305,7 +305,7 @@ var RegexpFuncers = []shapes.Funcer{
 			types.Str{},
 		),
 		OutputDescription: "the parts of the input found in between occurrences of the separator",
-		Notes:             "If the separator pattern matches the empty string, the input is split into its individual code points. Separators are found from leftmost to rightmost. Separators that overlap an earlier separator (i.e., a separator that starts at a lower offset or one that starts at the same offset but is found earlier by the pattern) do not lead to splits. At most n splits are made so that the output contains at most n + 1 elements; later separator occurrences are ignored.",
+		Notes:             "If the separator regexp matches the empty string, the input is split into its individual code points. Separators are found from leftmost to rightmost. Separators that overlap an earlier separator (i.e., a separator that starts at a lower offset or one that starts at the same offset but is found earlier by the regexp) do not lead to splits. At most n splits are made so that the output contains at most n + 1 elements; later separator occurrences are ignored.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			return split(inputState, args, bindings, pos)
 		},
