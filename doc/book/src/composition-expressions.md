@@ -22,3 +22,20 @@ P "abc" codePoints len *3
 T Num
 V 9
 ```
+
+Note that when you compose with expressions that ignore their input, such as
+literals, only the last one has any effect on the output.
+
+```bachdoc
+P 1
+T Num
+V 1
+
+P 1 2
+T Num
+V 2
+
+P 1 2 3.5
+T Num
+V 3.5
+```
