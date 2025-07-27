@@ -140,7 +140,21 @@ E {"Kind": "Type", "Code": "ArgHasWrongOutputType", "ArgNum": 1, "WantType": "<A
 
 ## Variable Capturing
 
-TBD
+Funcers have access to the variables defined before, but not after the definition.
+
+```bachdoc
+P 1 =a for Any def f Num as a ok f
+T Num
+V 1
+
+P 1 =a for Any def f Num as a ok 2 =a f
+T Num
+V 1
+
+P 1 =a for Any def f Num as 2 =a a ok f
+T Num
+V 2
+```
 
 
 ## Recursion
