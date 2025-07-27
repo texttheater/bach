@@ -6,6 +6,9 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
+// FIXME should not use patterns but another thing that doesn't accept types
+// without names (does not make sense for assignments)
+
 type Assignment struct {
 	Pos            lexer.Position
 	NameAssignment *NameAssignment `  @@`
