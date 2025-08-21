@@ -82,4 +82,11 @@ V {yes: 4}
 P for Any def f Num|Str as 2 ok f is Num _
 T Obj<yes: Num>|Obj<no: Str>
 V {yes: 2}
+
+P [1, 2, 3] each(if ==1 then "a" elif ==2 then "b" else "c" ok)
+T Arr<Str...>
+V ["a", "b", "c"]
+
+P [1, 2, 3] each(if ==1 then "a" elif ==2 then "b" else "c")
+E {"Kind": "Syntax", "Code": "Syntax"}
 ```
