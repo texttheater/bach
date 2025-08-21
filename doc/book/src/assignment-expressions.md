@@ -34,6 +34,10 @@ V 2
 P {a: 1, b: 2, c: 3} ={a: d, b: e, c: f} f
 T Num
 V 3
+
+P for Num def cube Num as =n *n *n ok 3 cube
+T Num
+V 27
 ```
 
 An “impossible match” error occurs if the pattern cannot match any values of

@@ -30,6 +30,10 @@ function can be called with any input, by the given name, and will return a
 value of the given type.
 
 ```bachdoc
+P for Any def f(x Num) Num as x ok f(1)
+T Num
+V 1
+
 P for Num def plus(b Num) Num as +b ok 1 plus(1)
 T Num
 V 2
@@ -121,17 +125,40 @@ E {"Kind": "Type", "Code": "ArgHasWrongOutputType", "ArgNum": 1, "WantType": "<A
 ```
 
 
-## Matching Calls to Definitions
+## Overloading, Revisited
 
-Note that funcers are looked up by input type, name, and number of paramters.
-They cannot be overloaded with respect to the parameters themselves. Thus,
+Funcers are looked up by input type, name, and number of parameters. So you
+can, for example, define two funcers with the same name but different input
+types, and use both:
+
+```bachdoc
+P for Num def f Num as +2 ok for Str def f Str as +"2" ok
+T Null
+V null
+
+P for Num def f Num as +2 ok for Str def f Str as +"2" ok 2 f
+T Num
+V 4
+
+P for Num def f Num as +2 ok for Str def f Str as +"2" ok "a" f
+T Str
+V "a2"
+```
+
+Funcers *cannot* be overloaded with respect to the parameters themselves. Thus,
 calling a funcer on the wrong input or with the wrong number of arguments
 results in a `NoSuchFuncer` error. Calling it with the wrong kinds of
 arguments, by contrast, leads to an `ArgHasWrongOutputType` error.
 
 ```bachdoc
+P for Num def f Num as *2 ok f
+E {"Kind": "Type", "Code": "NoSuchFuncer", "InputType": "Null", "Name": "f", "NumParams": 0}
+
 P for <A Obj<a: Num>> def f <A> as id ok {} f
 E {"Kind": "Type", "Code": "NoSuchFuncer", "InputType": "Obj<Void>", "Name": "f", "NumParams": 0}
+
+P for Num def f Num as *2 ok 2 f(2)
+E {"Kind": "Type", "Code": "NoSuchFuncer", "InputType": "Num", "Name": "f", "NumParams": 1}
 
 P for Str def f Obj<> as {} ok "abc" reFindAll(f)
 E {"Kind": "Type", "Code": "ArgHasWrongOutputType", "ArgNum": 1, "WantType": "<A Null|Obj<start: Num, 0: Str, Any>>", "GotType": "Obj<Any>"}

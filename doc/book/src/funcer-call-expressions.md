@@ -7,7 +7,7 @@ funcers. A number of funcers are built-in to Bach (see [Builtin Funcer
 Reference](./builtin-funcer-reference.md)), and you can define your own (see
 [Funcer Definition Expressions](./funcer-definition-expressions.md)). Arguments
 go between parentheses. No space is allowed between the funcer name and the
-opening parentheses. For example, `len` returns the length of an array, `join`
+opening parenthesis. For example, `len` returns the length of an array, `join`
 joins a list of strings with a given glue string, and `+(1)` adds 1 to a
 number.
 
