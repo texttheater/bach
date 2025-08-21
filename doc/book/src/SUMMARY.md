@@ -29,4 +29,3 @@
 	- [Value Funcers](./value-funcers.md)
 	- [Regexp Funcers](./regexp-funcers.md)
 	- [Control Flow Abstraction Funcers](./control-flow-abstraction-funcers.md)
-	- [List of Builtin Funcers](./list-of-builtin-funcers.md)
