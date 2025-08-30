@@ -1337,8 +1337,8 @@ var MathFuncers = []shapes.Funcer{
 		"random",
 		nil,
 		types.Num{},
-		"",
 		"a floating-point, pseudo-random number n with 0 <= n < 1 and approximately uniform distribution over that range",
+		"",
 		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
 			return states.NumValue(rand.Float64()), nil
 		},
@@ -1347,7 +1347,47 @@ var MathFuncers = []shapes.Funcer{
 			{"[null] repeat(1000) each(random) each(<1) all", "Bool", "true", nil},
 		},
 	),
-	// TODO a funcer that returns a random integer in a specified interval
+	shapes.SimpleFuncer(
+		"Returns a random integer number in a specified interval.",
+		types.Any{},
+		"any value (is ignored)",
+		"random",
+		[]*params.Param{
+			params.SimpleParam("from", "lower bound (inclusive); rounded towards 0 if not integer", types.Num{}),
+			params.SimpleParam("to", "upper bound (exclusive); rounded towards 0 if not integer", types.Num{}),
+		},
+		types.Num{},
+		"a integer, pseudorandom number n with from <= n < to and approximately uniform distribution over that range",
+		"",
+		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
+			from := int64(argumentValues[0].(states.NumValue))
+			to := int64(argumentValues[1].(states.NumValue))
+			width := to - from
+			if width <= 0 {
+				return nil, errors.ValueError(
+					errors.Code(errors.UnexpectedValue),
+					errors.Message("to must be greater than from"),
+				)
+			}
+			r := rand.Int63n(width)
+			return states.NumValue(from + r), nil
+		},
+		[]shapes.Example{
+			{"[null] repeat(1000) each(random(2, 7)) each(>=2) all", "Bool", "true", nil},
+			{"[null] repeat(1000) each(random(2, 7)) each(<7) all", "Bool", "true", nil},
+			{"[null] repeat(1000) each(random(2, 7)) each(=n floor ==n) all", "Bool", "true", nil},
+			{"[null] repeat(1000) each(random(2.4, 7.6)) each(>=2) all", "Bool", "true", nil},
+			{"[null] repeat(1000) each(random(2.4, 7.6)) each(<7) all", "Bool", "true", nil},
+			{"[null] repeat(1000) each(random(2.4, 7.6)) each(=n floor ==n) all", "Bool", "true", nil},
+			{"[null] repeat(1000) each(random(-7, -2)) each(>=(-7)) all", "Bool", "true", nil},
+			{"[null] repeat(1000) each(random(-7, -2)) each(<(-2)) all", "Bool", "true", nil},
+			{"[null] repeat(1000) each(random(-7, -2)) each(=n floor ==n) all", "Bool", "true", nil},
+			{"[null] repeat(1000) each(random(-7.6, -2.4)) each(>=(-7)) all", "Bool", "true", nil},
+			{"[null] repeat(1000) each(random(-7.6, -2.4)) each(<(-2)) all", "Bool", "true", nil},
+			{"[null] repeat(1000) each(random(-7.6, -2.4)) each(=n floor ==n) all", "Bool", "true", nil},
+			{"random(7, 2)", "Bool", "", errors.ValueError(errors.Code(errors.UnexpectedValue))},
+			{"random(2, 2)", "Bool", "", errors.ValueError(errors.Code(errors.UnexpectedValue))}},
+	),
 	shapes.SimpleFuncer(
 		"Rounds a number to the nearest integer.",
 		types.Num{},
