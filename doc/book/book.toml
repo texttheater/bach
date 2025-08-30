@@ -7,6 +7,7 @@ title = "The Bach Programming Language"
 
 [output.html]
 additional-css = ["custom.css"]
+git-repository-url = "https://github.com/texttheater/bach"
 
 [preprocessor.bachdoc]
 command = "go run ./bachdoc preprocess"
