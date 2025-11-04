@@ -51,6 +51,11 @@ func spreadInputType(inputType types.Type, elementTypes []types.Type) (restType 
 			elementTypes[i] = t.El
 		}
 		return t, true
+	case types.Any:
+		for i := range elementTypes {
+			elementTypes[i] = types.Any{}
+		}
+		return t, true
 	case types.Union:
 		for i := range elementTypes {
 			elementTypes[i] = types.Void{}
