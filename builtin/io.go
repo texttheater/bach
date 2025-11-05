@@ -130,13 +130,13 @@ var IOFuncers = []shapes.Funcer{
 		nil,
 	),
 	shapes.Funcer{
-		Summary:           "Reads the next JSON value from a stream",
+		Summary:           "Reads JSON values from a stream",
 		InputType:         types.Reader{},
 		InputDescription:  "a Reader",
 		Name:              "json",
 		Params:            nil,
-		OutputType:        types.Any{},
-		OutputDescription: "data structure represented by the JSON input",
+		OutputType:        types.AnyArr,
+		OutputDescription: "array of data structures as they appear in the stream",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			reader := inputState.Value.(states.ReaderValue).Reader
