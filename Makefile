@@ -17,5 +17,4 @@ doc/book/bachdoc/builtin/%.md : builtin/%.go bachdoc/main.go
 	go run ./bachdoc builtin $* > $@
 
 deploy : book
-	if [ -z $$DPLDEST ]; then echo DPLDEST is unset; exit 1; fi
-	rsync -Pahz doc/book/book/ $$DPLDEST/
+	rsync -Pahz doc/book/book/ texttheater:bachlang.texttheater.net/
