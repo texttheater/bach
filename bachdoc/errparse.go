@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 
 	"github.com/alecthomas/participle/lexer"
+	"github.com/texttheater/bach/builtin"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/grammar"
 	"github.com/texttheater/bach/interpreter"
+	"github.com/texttheater/bach/states"
 )
 
 func parseError(input string) (error, error) {
@@ -67,7 +69,7 @@ func parseError(input string) (error, error) {
 		e.GotType = gotType
 	}
 	if gotValue, ok := v["GotValue"]; ok {
-		_, v, err := interpreter.InterpretString(gotValue.(string))
+		_, v, err := interpreter.InterpretString(builtin.InitialShape, states.InitialState, gotValue.(string))
 		if err != nil {
 			return nil, err
 		}

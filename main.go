@@ -5,10 +5,13 @@ import (
 	"os"
 
 	"github.com/alecthomas/kong"
+	"github.com/alecthomas/participle/lexer"
 	"github.com/c-bata/go-prompt"
+	"github.com/texttheater/bach/builtin"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/interpreter"
 	"github.com/texttheater/bach/states"
+	"github.com/texttheater/bach/types"
 )
 
 var cli struct {
@@ -29,7 +32,7 @@ func main() {
 		os.Exit(0)
 	}
 	// execute program given on command line
-	success := execute(cli.Program, !cli.Quiet)
+	success := executeCLI(cli.Program)
 	if !success {
 		os.Exit(1)
 	}
@@ -37,7 +40,7 @@ func main() {
 
 func repl() {
 	p := prompt.New(func(program string) {
-		execute(program, true)
+		execute(program)
 	}, func(prompt.Document) []prompt.Suggest {
 		return nil
 	},
@@ -45,50 +48,63 @@ func repl() {
 	p.Run()
 }
 
-func execute(program string, displayResult bool) (success bool) {
-	_, value, err := interpreter.InterpretString(program)
+func execute(program string) (success bool) {
+	_, value, err := interpreter.InterpretString(builtin.InitialShape, states.InitialState, program)
 	if err != nil {
 		errors.Explain(os.Stderr, err, program)
 		return false
 	}
-	if displayResult {
-		str, err := value.Repr()
-		if err != nil {
-			errors.Explain(os.Stderr, err, program)
-			return false
+	if !printValue(value, program) {
+		return false
+	}
+	return true
+}
+
+func executeCLI(program string) (success bool) {
+	initialShape := builtin.InitialShape
+	initialShape.Type = types.NewArr(types.Str{})
+	initialState := states.InitialState
+	initialState.Value = states.ReaderValue{Reader: os.Stdin}
+	val, err := builtin.Lines(initialState, nil, nil, lexer.Position{}).Eval()
+	if err != nil {
+		errors.Explain(os.Stderr, err, program)
+		return false
+	}
+	initialState.Value = val
+	typ, value, err := interpreter.InterpretString(initialShape, initialState, program)
+	if err != nil {
+		errors.Explain(os.Stderr, err, program)
+		return false
+	}
+	if types.AnyArr.Subsumes(typ) {
+		iter := states.IterFromValue(value)
+		for {
+			el, ok, err := iter()
+			if err != nil {
+				errors.Explain(os.Stderr, err, program)
+				return false
+			}
+			if !ok {
+				break
+			}
+			if !printValue(el, program) {
+				return false
+			}
 		}
-		fmt.Println(str)
 	} else {
-		err := forceEvaluation(value)
-		if err != nil {
-			errors.Explain(os.Stderr, err, program)
+		if !printValue(value, program) {
 			return false
 		}
 	}
 	return true
 }
 
-func forceEvaluation(v states.Value) error {
-	switch v := v.(type) {
-	case *states.ArrValue:
-		for v != nil {
-			err := forceEvaluation(v.Head)
-			if err != nil {
-				return err
-			}
-			v, err = v.Tail.EvalArr()
-			if err != nil {
-				return err
-			}
-		}
-	case states.ObjValue:
-		for _, w := range v {
-			val, err := w.Eval()
-			if err != nil {
-				return err
-			}
-			forceEvaluation(val)
-		}
+func printValue(value states.Value, program string) (success bool) {
+	str, err := value.Repr()
+	if err != nil {
+		errors.Explain(os.Stderr, err, program)
+		return false
 	}
-	return nil
+	fmt.Println(str)
+	return true
 }

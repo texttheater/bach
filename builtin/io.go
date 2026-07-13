@@ -174,19 +174,8 @@ var IOFuncers = []shapes.Funcer{
 		OutputType:        types.NewArr(types.Str{}),
 		OutputDescription: "an array of lines, without the line-break character",
 		Notes:             "",
-		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			reader := inputState.Value.(states.ReaderValue)
-			scanner := bufio.NewScanner(reader.Reader)
-			iter := func() (states.Value, bool, error) {
-				ok := scanner.Scan()
-				if !ok {
-					return nil, false, nil
-				}
-				return states.StrValue(scanner.Text()), true, nil
-			}
-			return states.ThunkFromIter(iter)
-		},
-		IDs: nil,
+		Kernel:            Lines,
+		IDs:               nil,
 		Examples: []shapes.Example{
 			{`"abc\nde\n\nf" reader lines`, `Arr<Str...>`, `["abc", "de", "", "f"]`, nil},
 		},
@@ -247,4 +236,17 @@ var IOFuncers = []shapes.Funcer{
 		},
 		nil,
 	),
+}
+
+func Lines(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+	reader := inputState.Value.(states.ReaderValue)
+	scanner := bufio.NewScanner(reader.Reader)
+	iter := func() (states.Value, bool, error) {
+		ok := scanner.Scan()
+		if !ok {
+			return nil, false, nil
+		}
+		return states.StrValue(scanner.Text()), true, nil
+	}
+	return states.ThunkFromIter(iter)
 }

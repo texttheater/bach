@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/texttheater/bach/builtin"
 	"github.com/texttheater/bach/errors"
 	"github.com/texttheater/bach/grammar"
 	"github.com/texttheater/bach/shapes"
@@ -30,14 +31,14 @@ func TestExample(example shapes.Example) {
 	}
 	var wantValue states.Value
 	if example.OutputValue != "" {
-		_, wantValue, err = InterpretString(wantValueStr)
+		_, wantValue, err = InterpretString(builtin.InitialShape, states.InitialState, wantValueStr)
 		if err != nil {
 			log.Println("ERROR: Could not interpret expected value")
 			errors.Explain(os.Stderr, err, wantValueStr)
 			log.Fatal()
 		}
 	}
-	gotType, gotValue, gotErr := InterpretString(example.Program)
+	gotType, gotValue, gotErr := InterpretString(builtin.InitialShape, states.InitialState, example.Program)
 	var gotValueStr string
 	if gotValue != nil {
 		var err error
@@ -102,7 +103,7 @@ func TestProgramStr(program string, wantTypeString string, wantValueString strin
 	}
 	var wantValue states.Value
 	if wantValueString != "" {
-		_, wantValue, err = InterpretString(wantValueString)
+		_, wantValue, err = InterpretString(builtin.InitialShape, states.InitialState, wantValueString)
 		if err != nil {
 			t.Log("ERROR: Could not interpret expected value")
 			errors.Explain(os.Stderr, err, wantValueString)
@@ -118,7 +119,7 @@ func TestProgram(program string, wantType types.Type, wantValue states.Value, wa
 	if wantValue != nil {
 		wantValueStr, _ = wantValue.Repr()
 	}
-	gotType, gotValue, gotErr := InterpretString(program)
+	gotType, gotValue, gotErr := InterpretString(builtin.InitialShape, states.InitialState, program)
 	var gotValueStr string
 	if gotValue != nil {
 		var err error
