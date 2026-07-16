@@ -157,16 +157,17 @@ func (v *ArrValue) Equal(w Value) (bool, error) {
 }
 
 func IterFromValue(v Value) func() (Value, bool, error) {
+	thunk := ThunkFromValue(v)
 	return func() (Value, bool, error) {
-		arr := v.(*ArrValue)
-		if arr == nil {
-			return nil, false, nil
-		}
-		var err error
-		v, err = arr.Tail.EvalArr()
+		val, err := thunk.Eval()
 		if err != nil {
 			return nil, false, err
 		}
+		arr := val.(*ArrValue)
+		if arr == nil {
+			return nil, false, nil
+		}
+		thunk = arr.Tail
 		return arr.Head, true, nil
 	}
 }
