@@ -9,4 +9,4 @@ additional-css = ["custom.css"]
 git-repository-url = "https://github.com/texttheater/bach"
 
 [preprocessor.bachdoc]
-command = "go run ./bachdoc preprocess"
+command = "../../bachdoc/bachdoc preprocess"

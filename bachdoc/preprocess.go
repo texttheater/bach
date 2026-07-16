@@ -96,7 +96,7 @@ func (p *preprocessCmd) Run() error {
 		return err
 	}
 	book := data[1].(object)
-	sections := book["sections"].([]any)
+	sections := book["items"].([]any)
 	for _, section := range sections {
 		err := modifyBookItem(section.(object))
 		if err != nil {

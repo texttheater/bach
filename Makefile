@@ -1,5 +1,7 @@
 default : fmt tidy test book
 
+always :
+
 fmt :
 	find . -name \*.go | xargs gofmt -w
 
@@ -9,8 +11,11 @@ tidy :
 test :
 	go test ./...
 
-book : doc/book/bachdoc/builtin/null.md doc/book/bachdoc/builtin/io.md doc/book/bachdoc/builtin/logic.md doc/book/bachdoc/builtin/math.md doc/book/bachdoc/builtin/text.md doc/book/bachdoc/builtin/arr.md doc/book/bachdoc/builtin/obj.md doc/book/bachdoc/builtin/types.md doc/book/bachdoc/builtin/values.md doc/book/bachdoc/builtin/regexp.md doc/book/bachdoc/builtin/control.md
+book : doc/book/bachdoc/builtin/null.md doc/book/bachdoc/builtin/io.md doc/book/bachdoc/builtin/logic.md doc/book/bachdoc/builtin/math.md doc/book/bachdoc/builtin/text.md doc/book/bachdoc/builtin/arr.md doc/book/bachdoc/builtin/obj.md doc/book/bachdoc/builtin/types.md doc/book/bachdoc/builtin/values.md doc/book/bachdoc/builtin/regexp.md doc/book/bachdoc/builtin/control.md bachdoc/bachdoc
 	mdbook build doc/book
+
+bachdoc/bachdoc : always
+	cd bachdoc; go build
 
 doc/book/bachdoc/builtin/%.md : builtin/%.go bachdoc/main.go
 	mkdir -p "$$(dirname $@)"
