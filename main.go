@@ -102,7 +102,7 @@ func executeCLI(program string) (success bool) {
 }
 
 func printValue(value states.Value, program string) (success bool) {
-	str, err := value.Repr()
+	str, err := value.Str()
 	if err != nil {
 		errors.Explain(os.Stderr, err, program)
 		return false
