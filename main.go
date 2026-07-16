@@ -91,6 +91,8 @@ func executeCLI(program string) (success bool) {
 				return false
 			}
 		}
+	} else if (types.Null{}).Subsumes(typ) {
+		// do nothing
 	} else {
 		if !printValue(value, program) {
 			return false
