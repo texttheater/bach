@@ -55,16 +55,10 @@ var RegexpFuncers = []shapes.Funcer{
 				if !ok {
 					return nil, false, nil
 				}
-				obj := map[string]*states.Thunk(objValue)
-				start, err := obj["start"].EvalInt()
-				if err != nil {
-					return nil, false, err
-				}
-				obj["start"] = states.ThunkFromValue(states.NumValue(start + offset))
-				group, err := obj["0"].EvalStr()
-				if err != nil {
-					return nil, false, err
-				}
+				obj := map[string]states.Value(objValue)
+				start := int(obj["start"].(states.NumValue))
+				obj["start"] = states.NumValue(start + offset)
+				group := string(obj["0"].(states.StrValue))
 				length := len(group)
 				end := start + length
 				offset += end
@@ -129,14 +123,8 @@ var RegexpFuncers = []shapes.Funcer{
 				return states.ThunkFromValue(inputState.Value)
 			case states.ObjValue:
 				old := string(inputState.Value.(states.StrValue))
-				start, err := match["start"].EvalInt()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				replaced, err := match["0"].EvalStr()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
+				start := int(match["start"].(states.NumValue))
+				replaced := string(match["0"].(states.StrValue))
 				length := len(replaced)
 				replacement, err := args[1](inputState.Replace(match), nil).EvalStr()
 				if err != nil {
@@ -210,14 +198,8 @@ var RegexpFuncers = []shapes.Funcer{
 					output.WriteString(input)
 					break loop
 				case states.ObjValue:
-					start, err := match["start"].EvalInt()
-					if err != nil {
-						return states.ThunkFromError(err)
-					}
-					group, err := match["0"].EvalStr()
-					if err != nil {
-						return states.ThunkFromError(err)
-					}
+					start := int(match["start"].(states.NumValue))
+					group := string(match["0"].(states.StrValue))
 					length := len(group)
 					output.WriteString(input[:start])
 					replacement, err := args[1](inputState.Replace(match), nil).EvalStr()
@@ -408,15 +390,9 @@ func split(inputState states.State, args []states.Action, bindings map[string]ty
 			v = ""
 			return piece, true, nil
 		}
-		obj := map[string]*states.Thunk(objValue)
-		sepStart, err := obj["start"].EvalInt()
-		if err != nil {
-			return nil, false, err
-		}
-		sep, err := obj["0"].EvalStr()
-		if err != nil {
-			return nil, false, err
-		}
+		obj := map[string]states.Value(objValue)
+		sepStart := int(obj["start"].(states.NumValue))
+		sep := string(obj["0"].(states.StrValue))
 		sepLength := len(sep)
 		sepEnd := sepStart + sepLength
 		piece := v[:sepStart]

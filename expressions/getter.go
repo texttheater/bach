@@ -43,10 +43,7 @@ func (x GetterExpression) Typecheck(inputShape shapes.Shape, params []*params.Pa
 			Stack: inputShape.Stack,
 		}
 		action := func(inputState states.State, args []states.Action) *states.Thunk {
-			val, err := inputState.Value.(states.ObjValue)[x.Name].Eval()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
+			val := inputState.Value.(states.ObjValue)[x.Name]
 			outputState := states.State{
 				Value:     val,
 				Stack:     inputState.Stack,

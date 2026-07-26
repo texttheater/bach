@@ -235,7 +235,7 @@ var ValueFuncers = []shapes.Funcer{
 		Props: map[string]types.Type{},
 		Rest:  types.NewVar("A", types.Any{}),
 	}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		var res states.ObjValue = make(map[string]*states.Thunk)
+		var res states.ObjValue = make(map[string]states.Value)
 		iter := states.IterFromValue(inputState.Value)
 		for {
 			val, ok, err := iter()
@@ -251,8 +251,7 @@ var ValueFuncers = []shapes.Funcer{
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			v := states.ThunkFromValue(tail.(*states.ArrValue).Head)
-			res[prop] = v
+			res[prop] = tail.(*states.ArrValue).Head
 		}
 		return states.ThunkFromValue(res)
 	}, IDs: nil},
@@ -291,9 +290,13 @@ func thunkFromData(data any, pos lexer.Position) *states.Thunk {
 		}
 		return states.ThunkFromIter(iter)
 	case map[string]any:
-		obj := make(map[string]*states.Thunk)
+		obj := make(map[string]states.Value)
 		for k, v := range data {
-			obj[k] = thunkFromData(v, pos)
+			val, err := thunkFromData(v, pos).Eval()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			obj[k] = val
 		}
 		return states.ThunkFromValue(states.ObjValue(obj))
 	default:

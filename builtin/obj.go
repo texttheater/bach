@@ -65,17 +65,13 @@ var ObjFuncers = []shapes.Funcer{
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			thunk, ok := inputValue[prop]
+			val, ok := inputValue[prop]
 			if !ok {
 				return states.ThunkFromError(errors.ValueError(
 					errors.Code(errors.NoSuchProperty),
 					errors.GotValue(states.StrValue(prop)),
 					errors.Pos(pos),
 				))
-			}
-			val, err = thunk.Eval()
-			if err != nil {
-				return states.ThunkFromError(err)
 			}
 			return states.ThunkFromValue(val)
 		},
@@ -149,12 +145,7 @@ var ObjFuncers = []shapes.Funcer{
 			inputValue := inputState.Value.(states.ObjValue)
 			c := make(chan *states.Thunk)
 			go func() {
-				for prop, thk := range inputValue {
-					val, err := thk.Eval()
-					if err != nil {
-						c <- states.ThunkFromError(err)
-						return
-					}
+				for prop, val := range inputValue {
 					item := states.NewArrValue([]states.Value{
 						states.StrValue(prop),
 						val,
@@ -218,8 +209,8 @@ var ObjFuncers = []shapes.Funcer{
 			inputValue := inputState.Value.(states.ObjValue)
 			c := make(chan *states.Thunk)
 			go func() {
-				for _, thk := range inputValue {
-					c <- thk
+				for _, val := range inputValue {
+					c <- states.ThunkFromValue(val)
 				}
 				c <- states.ThunkFromValue(nil)
 			}()

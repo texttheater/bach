@@ -14,20 +14,20 @@ var op2 *regexp.Regexp = regexp.MustCompile(`==|<=|>=|\*\*`)
 var num *regexp.Regexp = regexp.MustCompile(`\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+`)
 
 func ObjValueFromMap(m map[string]Value) ObjValue {
-	propThunkMap := make(map[string]*Thunk)
+	propThunkMap := make(map[string]Value)
 	for k, v := range m {
-		propThunkMap[k] = ThunkFromValue(v)
+		propThunkMap[k] = v
 	}
 	return propThunkMap
 }
 
-type ObjValue map[string]*Thunk
+type ObjValue map[string]Value
 
 func (v ObjValue) Repr() (string, error) {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("{")
 	firstWritten := false
-	for k, w := range v {
+	for k, val := range v {
 		if firstWritten {
 			buffer.WriteString(", ")
 		}
@@ -38,10 +38,6 @@ func (v ObjValue) Repr() (string, error) {
 			buffer.WriteString(fmt.Sprintf("%q", k))
 		}
 		buffer.WriteString(": ")
-		val, err := w.Eval()
-		if err != nil {
-			return "", err
-		}
 		wString, err := val.Repr()
 		if err != nil {
 			return "", err
@@ -59,11 +55,7 @@ func (v ObjValue) Str() (string, error) {
 
 func (v ObjValue) Data() (any, error) {
 	res := make(map[string]any, 0)
-	for k, t := range v {
-		val, err := t.Eval()
-		if err != nil {
-			return nil, err
-		}
+	for k, val := range v {
 		data, err := val.Data()
 		if err != nil {
 			return nil, err
@@ -81,11 +73,7 @@ func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 				return false, nil
 			}
 		}
-		for gotProp, thunk := range v {
-			val, err := thunk.Eval()
-			if err != nil {
-				return false, err
-			}
+		for gotProp, val := range v {
 			if ok, err := val.Inhabits(t.TypeForProp(gotProp), stack); !ok {
 				return false, err
 			}
@@ -108,18 +96,10 @@ func (v ObjValue) Equal(w Value) (bool, error) {
 		if len(v) != len(w) {
 			return false, nil
 		}
-		for prop, vThunk := range v {
-			wThunk, ok := w[prop]
+		for prop, vVal := range v {
+			wVal, ok := w[prop]
 			if !ok {
 				return false, nil
-			}
-			vVal, vErr := vThunk.Eval()
-			if vErr != nil {
-				return false, vErr
-			}
-			wVal, wErr := wThunk.Eval()
-			if wErr != nil {
-				return false, wErr
 			}
 			equal, err := vVal.Equal(wVal)
 			if err != nil {

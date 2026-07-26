@@ -895,11 +895,7 @@ var ArrFuncers = []shapes.Funcer{
 					if err != nil {
 						return nil, false, err
 					}
-					if thunk, ok := obj["yes"]; ok {
-						val, err = thunk.Eval()
-						if err != nil {
-							return nil, false, err
-						}
+					if val, ok := obj["yes"]; ok {
 						return val, true, nil
 					}
 				}
@@ -1534,11 +1530,7 @@ var ArrFuncers = []shapes.Funcer{
 				if err != nil {
 					return nil, false, err
 				}
-				if thunk, ok := obj["yes"]; ok {
-					val, err = thunk.Eval()
-					if err != nil {
-						return nil, false, err
-					}
+				if val, ok := obj["yes"]; ok {
 					return val, true, nil
 				}
 				return nil, false, nil

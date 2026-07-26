@@ -67,9 +67,9 @@ func (x RegexpExpression) Typecheck(inputShape shapes.Shape, params []*params.Pa
 			})
 
 		}
-		propThunkMap := make(map[string]*states.Thunk)
+		propValueMap := make(map[string]states.Value)
 		if propTypeMap["start"].Subsumes(types.Num{}) {
-			propThunkMap["start"] = states.ThunkFromValue(states.NumValue(match[0]))
+			propValueMap["start"] = states.NumValue(match[0])
 		}
 		for i, name := range x.Regexp.SubexpNames() {
 			fromIndex := match[2*i]
@@ -80,13 +80,13 @@ func (x RegexpExpression) Typecheck(inputShape shapes.Shape, params []*params.Pa
 			} else {
 				submatch = states.StrValue(inputString[fromIndex:toIndex])
 			}
-			propThunkMap[strconv.Itoa(i)] = states.ThunkFromValue(submatch)
+			propValueMap[strconv.Itoa(i)] = submatch
 			if name != "" {
-				propThunkMap[name] = states.ThunkFromValue(submatch)
+				propValueMap[name] = submatch
 			}
 		}
 		return states.ThunkFromState(states.State{
-			Value:     states.ObjValue(propThunkMap),
+			Value:     states.ObjValue(propValueMap),
 			Stack:     inputState.Stack,
 			TypeStack: inputState.TypeStack,
 		})
