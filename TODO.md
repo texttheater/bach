@@ -1,2 +1,5 @@
-* merge state and thunk, then move to a system where inputs are thunks and must
-  be evaluated by the actions using them, rather than outside
+* make objs nonlazy
+* thunks should wrap values, not states
+* states should contain thunks instead of values
+* make calls lazy by wrapping them in an action that returns a state with a thunk
+* make lists lazy by wrapping them in a thunk
