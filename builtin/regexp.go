@@ -47,7 +47,7 @@ var RegexpFuncers = []shapes.Funcer{
 			}
 			offset := 0
 			iter := func() (*states.Thunk, bool, error) {
-				val, err := args[0](inputState, nil).Thunk.Eval()
+				val, err := args[0](inputState.Replace(states.ThunkFromValue(states.StrValue(str))), nil).Thunk.Eval()
 				if err != nil {
 					return nil, false, err
 				}
@@ -133,7 +133,7 @@ var RegexpFuncers = []shapes.Funcer{
 				if err != nil {
 					return states.ThunkFromError(nil)
 				}
-				start, err := inputState.Thunk.EvalInt()
+				start, err := match["start"].EvalInt()
 				if err != nil {
 					return states.ThunkFromError(nil)
 				}
@@ -208,7 +208,7 @@ var RegexpFuncers = []shapes.Funcer{
 			var output strings.Builder
 		loop:
 			for {
-				matchThk := args[0](inputState.Replace(inputState.Thunk), nil).Thunk
+				matchThk := args[0](inputState.Replace(states.ThunkFromValue(states.StrValue(input))), nil).Thunk
 				match, err := matchThk.Eval()
 				if err != nil {
 					return states.ThunkFromError(err)
@@ -372,7 +372,7 @@ func split(inputState states.State, args []states.Action, bindings map[string]ty
 				str = ""
 				return states.ThunkFromValue(states.StrValue(piece)), true, nil
 			}
-			_, l = utf8.DecodeRuneInString(string(str))
+			_, l = utf8.DecodeRuneInString(str)
 			piece := str[:l]
 			str = str[l:]
 			splits++
@@ -403,7 +403,7 @@ func split(inputState states.State, args []states.Action, bindings map[string]ty
 			str = ""
 			return states.ThunkFromValue(states.StrValue(piece)), true, nil
 		}
-		val, err := regexp(inputState.Replace(states.ThunkFromValue(states.StrValue(""))), nil).Thunk.Eval()
+		val, err := regexp(inputState.Replace(states.ThunkFromValue(states.StrValue(str))), nil).Thunk.Eval()
 		if err != nil {
 			return nil, false, err
 		}
