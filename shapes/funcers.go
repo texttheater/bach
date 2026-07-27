@@ -49,7 +49,7 @@ func (f Funcer) SignatureAsMarkdown() string {
 	return output.String()
 }
 
-type SimpleKernel func(inputValue states.Value, argValues []states.Value) (states.Value, error)
+type SimpleKernel func(inputThunk *states.Thunk, argThunks []*states.Thunk) *states.Thunk
 
 func SimpleFuncer(summary string, wantInputType types.Type, inputDescription string, wantName string, pars []*params.Param, outputType types.Type, outputDescription string, notes string, simpleKernel SimpleKernel, examples []Example) Funcer {
 	// make regular kernel from simple kernel

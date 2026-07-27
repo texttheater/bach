@@ -13,15 +13,15 @@ var op1 *regexp.Regexp = regexp.MustCompile(`[+\-*/%<>=]`)
 var op2 *regexp.Regexp = regexp.MustCompile(`==|<=|>=|\*\*`)
 var num *regexp.Regexp = regexp.MustCompile(`\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+`)
 
-func ObjValueFromMap(m map[string]Value) ObjValue {
-	propThunkMap := make(map[string]Value)
+func ObjValueFromMap(m map[string]*Thunk) ObjValue {
+	propThunkMap := make(map[string]*Thunk)
 	for k, v := range m {
 		propThunkMap[k] = v
 	}
 	return propThunkMap
 }
 
-type ObjValue map[string]Value
+type ObjValue map[string]*Thunk
 
 func (v ObjValue) Repr() (string, error) {
 	buffer := bytes.Buffer{}

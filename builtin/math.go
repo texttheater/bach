@@ -28,10 +28,16 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the sum",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			inputNum := inputValue.(states.NumValue)
-			argumentNum := argumentValues[0].(states.NumValue)
-			return states.NumValue(inputNum + argumentNum), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			inputNum, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			argumentNum, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(inputNum + argumentNum))
 		},
 		[]shapes.Example{
 			{"1 +1", "Num", "2", nil},
@@ -49,10 +55,16 @@ var MathFuncers = []shapes.Funcer{
 		}, types.Num{},
 		"the difference",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			inputNum := inputValue.(states.NumValue)
-			argumentNum := argumentValues[0].(states.NumValue)
-			return states.NumValue(inputNum - argumentNum), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			inputNum, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			argumentNum, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(inputNum - argumentNum))
 		},
 		[]shapes.Example{
 			{"5 -3", "Num", "2", nil},
@@ -70,12 +82,15 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the additive inverse (opposite number) of n",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(argumentValues[0].(states.NumValue))
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			if math.Signbit(x) {
-				return states.NumValue(math.Copysign(x, 1)), nil
+				return states.ThunkFromValue(states.NumValue(math.Copysign(x, 1)))
 			} else {
-				return states.NumValue(math.Copysign(x, -1)), nil
+				return states.ThunkFromValue(states.NumValue(math.Copysign(x, -1)))
 			}
 		},
 		[]shapes.Example{
@@ -96,10 +111,16 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the product",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			inputNum := inputValue.(states.NumValue)
-			argumentNum := argumentValues[0].(states.NumValue)
-			return states.NumValue(inputNum * argumentNum), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			inputNum, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			argumentNum, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(inputNum * argumentNum))
 		},
 		[]shapes.Example{
 			{"2 *3", "Num", "6", nil},
@@ -116,10 +137,16 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the quotient",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			inputNum := inputValue.(states.NumValue)
-			argumentNum := argumentValues[0].(states.NumValue)
-			return states.NumValue(inputNum / argumentNum), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			inputNum, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			argumentNum, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(inputNum / argumentNum))
 		},
 		[]shapes.Example{
 			{"3 /2", "Num", "1.5", nil},
@@ -137,10 +164,16 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the remainder of integer division (rounded towards zero)",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			inputNum := inputValue.(states.NumValue)
-			argumentNum := argumentValues[0].(states.NumValue)
-			return states.NumValue(math.Mod(float64(inputNum), float64(argumentNum))), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			inputNum, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			argumentNum, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Mod(float64(inputNum), float64(argumentNum))))
 		},
 		[]shapes.Example{
 			{"3 %2", "Num", "1", nil},
@@ -158,10 +191,16 @@ var MathFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true iff the input is smaller than b",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			inputNum := inputValue.(states.NumValue)
-			argumentNum := argumentValues[0].(states.NumValue)
-			return states.BoolValue(inputNum < argumentNum), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			inputNum, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			argumentNum, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(inputNum < argumentNum))
 		},
 		[]shapes.Example{
 			{"2 <1", "Bool", "false", nil},
@@ -180,10 +219,16 @@ var MathFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true iff the input is greater than b",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			inputNum := inputValue.(states.NumValue)
-			argumentNum := argumentValues[0].(states.NumValue)
-			return states.BoolValue(inputNum > argumentNum), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			inputNum, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			argumentNum, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(inputNum > argumentNum))
 		},
 		[]shapes.Example{
 			{"2 >1", "Bool", "true", nil},
@@ -202,10 +247,16 @@ var MathFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true iff the input is less than or equal to b",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			inputNum := inputValue.(states.NumValue)
-			argumentNum := argumentValues[0].(states.NumValue)
-			return states.BoolValue(inputNum <= argumentNum), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			inputNum, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			argumentNum, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(inputNum <= argumentNum))
 		},
 		[]shapes.Example{
 			{"2 <=1", "Bool", "false", nil},
@@ -224,10 +275,16 @@ var MathFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true iff the input is greater than or equal to b",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			inputNum := inputValue.(states.NumValue)
-			argumentNum := argumentValues[0].(states.NumValue)
-			return states.BoolValue(inputNum >= argumentNum), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			inputNum, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			argumentNum, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(inputNum >= argumentNum))
 		},
 		[]shapes.Example{
 			{"2 >=1", "Bool", "true", nil},
@@ -244,16 +301,16 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"their sum",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			iter := states.IterFromValue(inputValue)
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			iter := states.IterFromThunk(inputThunk)
 			sum := 0.0
 			for {
 				value, ok, err := iter()
 				if err != nil {
-					return nil, err
+					return states.ThunkFromError(err)
 				}
 				if !ok {
-					return states.NumValue(sum), nil
+					return states.ThunkFromValue(states.NumValue(sum))
 				}
 				sum += float64(value.(states.NumValue))
 			}
@@ -272,20 +329,20 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"their median",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			numbers, err := states.NumsFromValue(inputValue)
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			numbers, err := states.NumsFromThunk(inputThunk)
 			if err != nil {
-				return nil, err
+				return states.ThunkFromError(err)
 			}
 			if len(numbers) == 0 {
-				return states.NumValue(math.NaN()), nil
+				return states.ThunkFromValue(states.NumValue(math.NaN()))
 			}
 			sort.Float64s(numbers)
 			middle := len(numbers) / 2
 			if len(numbers)%2 != 0 {
-				return states.NumValue(numbers[middle]), nil
+				return states.ThunkFromValue(states.NumValue(numbers[middle]))
 			}
-			return states.NumValue((numbers[middle-1] + numbers[middle]) / 2), nil
+			return states.ThunkFromValue(states.NumValue((numbers[middle-1] + numbers[middle]) / 2))
 		},
 		[]shapes.Example{
 			{"[2, 3, 7] median", "Num", "3", nil},
@@ -303,17 +360,17 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"their mean",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			iter := states.IterFromValue(inputValue)
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			iter := states.IterFromThunk(inputThunk)
 			sum := 0.0
 			count := 0.0
 			for {
 				value, ok, err := iter()
 				if err != nil {
-					return nil, err
+					return states.ThunkFromError(err)
 				}
 				if !ok {
-					return states.NumValue(sum / count), nil
+					return states.ThunkFromValue(states.NumValue(sum / count))
 				}
 				sum += float64(value.(states.NumValue))
 				count += 1.0
@@ -334,8 +391,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the special number value representing positive infinity",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(math.Inf(1)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(math.Inf(1)))
 		},
 		[]shapes.Example{
 			{"inf", "Num", "inf", nil},
@@ -353,8 +410,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the special number value representing “not a number”",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(math.NaN()), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(math.NaN()))
 		},
 		[]shapes.Example{
 			{"nan", "Num", "nan", nil},
@@ -372,9 +429,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true unless the input is positive or negative infinity",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.BoolValue(!math.IsInf(x, 0)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(!math.IsInf(x, 0)))
 		},
 		[]shapes.Example{
 			{"1024 isFinite", "Bool", "true", nil},
@@ -393,9 +453,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true iff the input is NaN",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.BoolValue(math.IsNaN(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(math.IsNaN(x)))
 		},
 		[]shapes.Example{
 			{"1024 isNaN", "Bool", "false", nil},
@@ -411,8 +474,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the difference between 1 and the smallest floating point number greater than 1",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(math.Nextafter(1, 2) - 1), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(math.Nextafter(1, 2) - 1))
 		},
 		[]shapes.Example{
 			{"epsilon", "Num", "2.220446049250313e-16", nil},
@@ -427,8 +490,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the largest integer that can be represented as an IEEE-754 double precision number and cannot be the result of rounding another number to fit IEEE-754",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(9007199254740991), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(9007199254740991))
 		},
 		[]shapes.Example{
 			{"largestSafeInteger +0", "Num", "9007199254740991", nil},
@@ -445,8 +508,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the largest number representable as an IEEE-754 double precision number",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(math.MaxFloat64), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(math.MaxFloat64))
 		},
 		[]shapes.Example{
 			{"largestNum", "Num", "1.7976931348623157e+308", nil},
@@ -462,8 +525,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the smallest integer that can be represented as an IEEE-754 double precision number and cannot be the result of rounding another integer to fit the IEEE-754 double precision representation",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(-9007199254740991), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(-9007199254740991))
 		},
 		[]shapes.Example{
 			{"smallestSafeInteger -0", "Num", "-9007199254740991", nil},
@@ -480,8 +543,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the smallest representable positive number",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(math.SmallestNonzeroFloat64), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(math.SmallestNonzeroFloat64))
 		},
 		[]shapes.Example{
 			{"smallestPositiveNum", "Num", "5e-324", nil},
@@ -496,9 +559,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true iff the input represents a whole number",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.BoolValue(x == float64(int(x))), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(x == float64(int(x))))
 		},
 		[]shapes.Example{
 			{"1.0 isInteger", "Bool", "true", nil},
@@ -514,9 +580,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true iff the input is an integer and cannot be the result of rounding another integer to fit the IEEE-754 double precision representation",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.BoolValue(x == float64(int(x)) && x >= -9007199254740991 && x <= 9007199254740991), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(x == float64(int(x)) && x >= -9007199254740991 && x <= 9007199254740991))
 		},
 		[]shapes.Example{
 			{"-9007199254740992 isSafeInteger", "Bool", "false", nil},
@@ -538,26 +607,32 @@ var MathFuncers = []shapes.Funcer{
 		types.Str{},
 		"a string representation of the input in the specified base",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			xInt := int64(x)
 			if x != float64(xInt) {
-				return nil, errors.ValueError(
+				return states.ThunkFromError(errors.ValueError(
 					errors.Code(errors.UnexpectedValue),
-					errors.GotValue(inputValue),
+					errors.GotValue(states.NumValue(x)),
 					errors.Message("base conversion for non-integers not yet supported"),
-				)
+				))
 			}
-			radix := float64(argumentValues[0].(states.NumValue))
+			radix, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			radixInt := int(radix)
 			if radix != float64(radixInt) || radixInt < 2 || radixInt > 36 {
-				return nil, errors.ValueError(
+				return states.ThunkFromError(errors.ValueError(
 					errors.Code(errors.UnexpectedValue),
-					errors.GotValue(argumentValues[0]),
+					errors.GotValue(states.NumValue(radix)),
 					errors.Message("radix must be an integer between 2 and 36 (inclusive)"),
-				)
+				))
 			}
-			return states.StrValue(strconv.FormatInt(xInt, radixInt)), nil
+			return states.ThunkFromValue(states.StrValue(strconv.FormatInt(xInt, radixInt)))
 		},
 		[]shapes.Example{
 			{"233 toBase(16)", "Str", `"e9"`, nil},
@@ -573,9 +648,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Str{},
 		"a string representation of the input in exponential notation with 6 digits after the decimal point",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.StrValue(fmt.Sprintf("%e", x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.StrValue(fmt.Sprintf("%e", x)))
 		},
 		[]shapes.Example{
 			{"77.1234 toExponential", "Str", `"7.712340e+01"`, nil},
@@ -593,11 +671,14 @@ var MathFuncers = []shapes.Funcer{
 		types.Str{},
 		"a string representation of the input in exponential notation with the specified number of digits after the decimal point",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			f := int(argumentValues[0].(states.NumValue))
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			f, err := argumentThunks[0].EvalInt()
 			format := "%." + strconv.Itoa(f) + "e"
-			return states.StrValue(fmt.Sprintf(format, x)), nil
+			return states.ThunkFromValue(states.StrValue(fmt.Sprintf(format, x)))
 		},
 		[]shapes.Example{
 			{"77.1234 toExponential(4)", "Str", `"7.7123e+01"`, nil},
@@ -615,11 +696,17 @@ var MathFuncers = []shapes.Funcer{
 		types.Str{},
 		"a rounded string representation of the input with the specified number of digits after the decimal point",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			f := int(argumentValues[0].(states.NumValue))
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			f, err := argumentThunks[0].EvalInt()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			format := "%." + strconv.Itoa(f) + "f"
-			return states.StrValue(fmt.Sprintf(format, x)), nil
+			return states.ThunkFromValue(states.StrValue(fmt.Sprintf(format, x)))
 		},
 		[]shapes.Example{
 			{"123.456 toFixed(2)", "Str", `"123.46"`, nil},
@@ -636,8 +723,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"an approximation of Euler's number",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(math.E), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(math.E))
 		},
 		[]shapes.Example{
 			{"e", "Num", "2.718281828459045", nil},
@@ -652,8 +739,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the approximate natural logarithm of 2",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(math.Ln2), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(math.Ln2))
 		},
 		[]shapes.Example{
 			{"ln2", "Num", "0.6931471805599453", nil},
@@ -668,8 +755,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the approximate natural logarithm of 10",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(math.Ln10), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(math.Ln10))
 		},
 		[]shapes.Example{
 			{"ln10", "Num", "2.302585092994046", nil},
@@ -684,8 +771,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the approximate base-2 logarithm of Euler's number",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(math.Log2E), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(math.Log2E))
 		},
 		[]shapes.Example{
 			{"log2e", "Num", "1.4426950408889634", nil},
@@ -700,8 +787,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the approximate base-10 logarithm of Euler's number",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(math.Log10E), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(math.Log10E))
 		},
 		[]shapes.Example{
 			{"log10e", "Num", "0.4342944819032518", nil},
@@ -716,8 +803,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"an approximation of pi",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(math.Pi), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(math.Pi))
 		},
 		[]shapes.Example{
 			{"pi", "Num", "3.141592653589793", nil},
@@ -733,8 +820,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the approximate square root of 1/2",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(0.7071067811865476), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(0.7071067811865476))
 		},
 		[]shapes.Example{
 			{"sqrt1_2", "Num", "0.7071067811865476", nil},
@@ -749,8 +836,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the approximate square root of 2",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(math.Sqrt2), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(math.Sqrt2))
 		},
 		[]shapes.Example{
 			{"sqrt2", "Num", "1.4142135623730951", nil},
@@ -765,9 +852,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the absolute value of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Abs(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Abs(x)))
 		},
 		[]shapes.Example{
 			{"3 -5 abs", "Num", "2", nil},
@@ -784,9 +874,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the inverse cosine (in radians) of the input, or `nan` if the input is invalid",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Acos(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Acos(x)))
 		},
 		[]shapes.Example{
 			{"-2 acos", "Num", "nan", nil},
@@ -805,9 +898,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the inverse hyperoblic cosine of the input, or `nan` if the input is invalid",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Acosh(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Acosh(x)))
 		},
 		[]shapes.Example{
 			{"0.9 acosh", "Num", "nan", nil},
@@ -824,9 +920,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the inverse sine (in radians) of the input, of nan if the input is invalid",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Asin(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Asin(x)))
 		},
 		[]shapes.Example{
 			{"-2 asin", "Num", "nan", nil},
@@ -845,9 +944,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the inverse hyperbolic sine of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Asinh(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Asinh(x)))
 		},
 		[]shapes.Example{
 			{"-1 asinh", "Num", "-0.881373587019543", nil},
@@ -865,9 +967,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the inverse tangent (in radians) of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Atan(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Atan(x)))
 		},
 		[]shapes.Example{
 			{"-10 atan", "Num", "-1.4711276743037345", nil},
@@ -887,10 +992,16 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the angle in the plane (in radians) between the positive x-axis and the ray from (0, 0) to (x, y)",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			y := float64(inputValue.(states.NumValue))
-			x := float64(argumentValues[0].(states.NumValue))
-			return states.NumValue(math.Atan2(y, x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			y, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			x, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Atan2(y, x)))
 		},
 		[]shapes.Example{
 			{"5 atan2(5)", "Num", "0.7853981633974483", nil},
@@ -907,9 +1018,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the inverse hyperbolic tangent of the input, or `nan` if the input is invalid",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Atanh(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Atanh(x)))
 		},
 		[]shapes.Example{
 			{"-2 atanh", "Num", "nan", nil},
@@ -928,9 +1042,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the cube root of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Cbrt(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Cbrt(x)))
 		},
 		[]shapes.Example{
 			{"-1 cbrt", "Num", "-1", nil},
@@ -948,9 +1065,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the smallest integer greater than or equal to the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Ceil(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Ceil(x)))
 		},
 		[]shapes.Example{
 			{".95 ceil", "Num", "1", nil},
@@ -968,9 +1088,13 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the number of leading zero bits in the 32-bit binary representation of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := uint32(inputValue.(states.NumValue))
-			return states.NumValue(bits.LeadingZeros32(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			xUint32 := uint32(x)
+			return states.ThunkFromValue(states.NumValue(bits.LeadingZeros32(xUint32)))
 		},
 		[]shapes.Example{
 			{"-inf clz32", "Num", "32", nil},
@@ -995,9 +1119,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the cosine of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Cos(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Cos(x)))
 		},
 		[]shapes.Example{
 			{"-inf cos", "Num", "nan", nil},
@@ -1018,9 +1145,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the hyperbolic cosine of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Cosh(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Cosh(x)))
 		},
 		[]shapes.Example{
 			{"0 cosh", "Num", "1", nil},
@@ -1038,9 +1168,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"e (Euler's number) raised to the exponent",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Exp(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Exp(x)))
 		},
 		[]shapes.Example{
 			{"-inf exp", "Num", "0", nil},
@@ -1059,9 +1192,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"",
 		"e (Euler's number) raised to the exponent, minus 1",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Expm1(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Expm1(x)))
 		},
 		[]shapes.Example{
 			{"-inf expm1", "Num", "-1", nil},
@@ -1081,9 +1217,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the largest integer less than or equal to the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Floor(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Floor(x)))
 		},
 		[]shapes.Example{
 			{"5.95 floor", "Num", "5", nil},
@@ -1101,9 +1240,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the nearest 32-bit single precision float representation",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(float32(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(float32(x)))
 		},
 		[]shapes.Example{
 			{"5.5 fround", "Num", "5.5", nil},
@@ -1121,19 +1263,22 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the square root of the sum of the squares of the input numbers",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			v := inputValue.(*states.ArrValue)
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			v, err := inputThunk.EvalArr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			x := make([]float64, 0)
 			for v != nil {
 				x = append(x, float64(v.Head.(states.NumValue)))
 				var err error
 				v, err = v.Tail.EvalArr()
 				if err != nil {
-					return nil, err
+					return states.ThunkFromError(err)
 				}
 			}
 			hypot := varhypot.Hypot(x...)
-			return states.NumValue(float64(hypot)), nil
+			return states.ThunkFromValue(states.NumValue(float64(hypot)))
 		},
 		[]shapes.Example{
 			{"[3, 4] hypot", "Num", "5", nil},
@@ -1152,10 +1297,18 @@ var MathFuncers = []shapes.Funcer{
 		},
 		types.Num{},
 		"the product of the 32-bit versions (cf. fround) of the factors",
-		"", func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := int32(int64(inputValue.(states.NumValue)))
-			y := int32(int64(argumentValues[0].(states.NumValue)))
-			return states.NumValue(x * y), nil
+		"", func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			xInt32 := int32(int64(x))
+			y, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			yInt32 := int32(int64(y))
+			return states.ThunkFromValue(states.NumValue(xInt32 * yInt32))
 		},
 		[]shapes.Example{
 			{"3 imul(4)", "Num", "12", nil},
@@ -1173,9 +1326,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the natural (base e) logarithm of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Log(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Log(x)))
 		},
 		[]shapes.Example{
 			{"-1 log", "Num", "nan", nil},
@@ -1197,9 +1353,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the base 10 logarithm of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Log10(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Log10(x)))
 		},
 		[]shapes.Example{
 			{"-2 log10", "Num", "nan", nil},
@@ -1220,9 +1379,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"",
 		"the natural (base e) logarithm of (x + 1)",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Log1p(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Log1p(x)))
 		},
 		[]shapes.Example{
 			{"1 log1p", "Num", "0.6931471805599453", nil},
@@ -1240,9 +1402,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the base 2 logarithm of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Log2(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Log2(x)))
 		},
 		[]shapes.Example{
 			{"3 log2", "Num", "1.5849625007211563", nil},
@@ -1260,18 +1425,21 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the largest number in the input, or -inf if the input is empty",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			v := inputValue.(*states.ArrValue)
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			v, err := inputThunk.EvalArr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			max := math.Inf(-1)
 			for v != nil {
 				max = math.Max(max, float64(v.Head.(states.NumValue)))
 				var err error
 				v, err = v.Tail.EvalArr()
 				if err != nil {
-					return nil, err
+					return states.ThunkFromError(err)
 				}
 			}
-			return states.NumValue(max), nil
+			return states.ThunkFromValue(states.NumValue(max))
 		},
 		[]shapes.Example{
 			{"[1, 3, 2] max", "Num", "3", nil},
@@ -1288,18 +1456,21 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the smallest number in the input, or inf if the input is empty",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			v := inputValue.(*states.ArrValue)
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			v, err := inputThunk.EvalArr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			min := math.Inf(1)
 			for v != nil {
 				min = math.Min(min, float64(v.Head.(states.NumValue)))
 				var err error
 				v, err = v.Tail.EvalArr()
 				if err != nil {
-					return nil, err
+					return states.ThunkFromError(err)
 				}
 			}
-			return states.NumValue(min), nil
+			return states.ThunkFromValue(states.NumValue(min))
 		},
 		[]shapes.Example{
 			{"[1, 3, 2] min", "Num", "1", nil},
@@ -1318,10 +1489,16 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the base taken to the y-th power",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			y := float64(argumentValues[0].(states.NumValue))
-			return states.NumValue(math.Pow(x, y)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			y, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Pow(x, y)))
 		},
 		[]shapes.Example{
 			{"7 **3", "Num", "343", nil},
@@ -1339,8 +1516,8 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"a floating-point, pseudo-random number n with 0 <= n < 1 and approximately uniform distribution over that range",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.NumValue(rand.Float64()), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.NumValue(rand.Float64()))
 		},
 		[]shapes.Example{
 			{"[null] repeat(1000) each(random) each(>=0) all", "Bool", "true", nil},
@@ -1359,18 +1536,26 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"a integer, pseudorandom number n with from <= n < to and approximately uniform distribution over that range",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			from := int64(argumentValues[0].(states.NumValue))
-			to := int64(argumentValues[1].(states.NumValue))
-			width := to - from
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			from, err := argumentThunks[0].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			to, err := argumentThunks[1].EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			fromInt64 := int64(from)
+			toInt64 := int64(to)
+			width := toInt64 - fromInt64
 			if width <= 0 {
-				return nil, errors.ValueError(
+				return states.ThunkFromError(errors.ValueError(
 					errors.Code(errors.UnexpectedValue),
 					errors.Message("to must be greater than from"),
-				)
+				))
 			}
 			r := rand.Int63n(width)
-			return states.NumValue(from + r), nil
+			return states.ThunkFromValue(states.NumValue(fromInt64 + r))
 		},
 		[]shapes.Example{
 			{"[null] repeat(1000) each(random(2, 7)) each(>=2) all", "Bool", "true", nil},
@@ -1397,9 +1582,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the nearest integer, or away from zero if there's two nearest integers",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Round(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Round(x)))
 		},
 		[]shapes.Example{
 			{"0.9 round", "Num", "1", nil},
@@ -1420,19 +1608,22 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"1 if the input is positive, -1 if negative, 0 if it's 0, and -0 if it's -0",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			if math.Signbit(x) {
 				if x == 0 {
-					return states.NumValue(math.Copysign(0, -1)), nil
+					return states.ThunkFromValue(states.NumValue(math.Copysign(0, -1)))
 				} else {
-					return states.NumValue(-1), nil
+					return states.ThunkFromValue(states.NumValue(-1))
 				}
 			} else {
 				if x == 0 {
-					return states.NumValue(0), nil
+					return states.ThunkFromValue(states.NumValue(0))
 				} else {
-					return states.NumValue(1), nil
+					return states.ThunkFromValue(states.NumValue(1))
 				}
 			}
 		},
@@ -1452,9 +1643,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the sine of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Sin(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Sin(x)))
 		},
 		[]shapes.Example{
 			{"-inf sin", "Num", "nan", nil},
@@ -1474,9 +1668,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the hyperbolic sine of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Sinh(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Sinh(x)))
 		},
 		[]shapes.Example{
 			{"0 sinh", "Num", "0", nil},
@@ -1494,9 +1691,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the square root of the input, or nan if it's negative",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Sqrt(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Sqrt(x)))
 		},
 		[]shapes.Example{
 			{"-1 sqrt", "Num", "nan", nil},
@@ -1517,9 +1717,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the tangent of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Tan(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Tan(x)))
 		},
 		[]shapes.Example{
 			{"0 *pi /180 tan", "Num", "0", nil},
@@ -1536,9 +1739,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the hyperbolic tangent of the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Tanh(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Tanh(x)))
 		},
 		[]shapes.Example{
 			{"-1 tanh", "Num", "-0.7615941559557649", nil},
@@ -1556,9 +1762,12 @@ var MathFuncers = []shapes.Funcer{
 		types.Num{},
 		"the input without fractional digits",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			x := float64(inputValue.(states.NumValue))
-			return states.NumValue(math.Trunc(x)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			x, err := inputThunk.EvalNum()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.NumValue(math.Trunc(x)))
 		},
 		[]shapes.Example{
 			{"13.37 trunc", "Num", "13", nil},

@@ -19,11 +19,15 @@ var ControlFuncers = []shapes.Funcer{
 		OutputDescription: "does not return",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			inputValue, err := inputState.Thunk.Eval()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			return states.ThunkFromError(
 				errors.ValueError(
 					errors.Code(errors.UnexpectedValue),
 					errors.Pos(pos),
-					errors.GotValue(inputState.Value),
+					errors.GotValue(inputValue),
 				),
 			)
 		},
@@ -49,17 +53,21 @@ var ControlFuncers = []shapes.Funcer{
 		OutputDescription: "the input value, unless it is null",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			switch inputState.Value.(type) {
+			inputValue, err := inputState.Thunk.Eval()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			switch inputValue.(type) {
 			case states.NullValue:
 				return states.ThunkFromError(
 					errors.ValueError(
 						errors.Code(errors.UnexpectedValue),
 						errors.Pos(pos),
-						errors.GotValue(inputState.Value),
+						errors.GotValue(inputValue),
 					),
 				)
 			default:
-				return states.ThunkFromValue(inputState.Value)
+				return states.ThunkFromValue(inputValue)
 			}
 		},
 		Examples: []shapes.Example{

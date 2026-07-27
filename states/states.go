@@ -5,7 +5,7 @@ import (
 )
 
 type State struct {
-	Value     Value
+	Thunk     *Thunk
 	Stack     *VariableStack
 	TypeStack *BindingStack
 }
@@ -13,16 +13,16 @@ type State struct {
 // Clear returns an identical state except that the Value is replaced with null
 func (s State) Clear() State {
 	return State{
-		Value:     NullValue{},
+		Thunk:     ThunkFromValue(NullValue{}),
 		Stack:     s.Stack,
 		TypeStack: s.TypeStack,
 	}
 }
 
 // Replace returns an identical state except that the Value is replaced with the given value
-func (s State) Replace(v Value) State {
+func (s State) Replace(t *Thunk) State {
 	return State{
-		Value:     v,
+		Thunk:     t,
 		Stack:     s.Stack,
 		TypeStack: s.TypeStack,
 	}
@@ -109,5 +109,5 @@ func (s *IDStack) String() string {
 }
 
 var InitialState = State{
-	Value: NullValue{},
+	Thunk: ThunkFromValue(NullValue{}),
 }

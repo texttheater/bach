@@ -49,7 +49,10 @@ var IOFuncers = []shapes.Funcer{
 					Tail: states.ThunkFromValue(next),
 				}, rest, nil
 			}
-			lines := inputState.Value.(*states.ArrValue)
+			lines, err := inputState.Thunk.EvalArr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			iter := func() (states.Value, bool, error) {
 				if lines == nil {
 					return nil, false, nil

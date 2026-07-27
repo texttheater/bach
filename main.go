@@ -64,20 +64,15 @@ func executeCLI(program string) (success bool) {
 	initialShape := builtin.InitialShape
 	initialShape.Type = types.NewArr(types.Str{})
 	initialState := states.InitialState
-	initialState.Value = states.ReaderValue{Reader: os.Stdin}
-	val, err := builtin.Lines(initialState, nil, nil, lexer.Position{}).Eval()
-	if err != nil {
-		errors.Explain(os.Stderr, err, program)
-		return false
-	}
-	initialState.Value = val
-	typ, value, err := interpreter.InterpretString(initialShape, initialState, program)
+	initialState.Thunk = states.ThunkFromValue(states.ReaderValue{Reader: os.Stdin})
+	initialState.Thunk = builtin.Lines(initialState, nil, nil, lexer.Position{})
+	typ, thk, err := interpreter.InterpretString(initialShape, initialState, program)
 	if err != nil {
 		errors.Explain(os.Stderr, err, program)
 		return false
 	}
 	if types.AnyArr.Subsumes(typ) {
-		iter := states.IterFromValue(value)
+		iter := states.IterFromThunk(thk)
 		for {
 			el, ok, err := iter()
 			if err != nil {

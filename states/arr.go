@@ -14,18 +14,16 @@ func NewArrValue(elements []Value) *ArrValue {
 		}
 		return &ArrValue{
 			Head: elements[i],
-			Tail: &Thunk{
-				Func: func() *Thunk {
-					return ThunkFromValue(arrFrom(i + 1))
-				},
-			},
+			Tail: ThunkFromFunc(func() (Value, error) {
+				return arrFrom(i + 1), nil
+			}),
 		}
 	}
 	return arrFrom(0)
 }
 
 type ArrValue struct {
-	Head Value
+	Head *Thunk
 	Tail *Thunk
 }
 
@@ -33,7 +31,11 @@ func (v *ArrValue) Repr() (string, error) {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("[")
 	if v != nil {
-		head, err := v.Head.Repr()
+		val, err := v.Head.Eval()
+		if err != nil {
+			return "", err
+		}
+		head, err := val.Repr()
 		if err != nil {
 			return "", err
 		}
@@ -156,24 +158,22 @@ func (v *ArrValue) Equal(w Value) (bool, error) {
 	}
 }
 
-func IterFromValue(v Value) func() (Value, bool, error) {
-	thunk := ThunkFromValue(v)
-	return func() (Value, bool, error) {
-		val, err := thunk.Eval()
+func IterFromThunk(t *Thunk) func() (*Thunk, bool, error) {
+	return func() (*Thunk, bool, error) {
+		arr, err := t.EvalArr()
 		if err != nil {
 			return nil, false, err
 		}
-		arr := val.(*ArrValue)
 		if arr == nil {
 			return nil, false, nil
 		}
-		thunk = arr.Tail
+		t = arr.Tail
 		return arr.Head, true, nil
 	}
 }
 
-func ThunkFromIter(iter func() (Value, bool, error)) *Thunk {
-	value, ok, err := iter()
+func ThunkFromIter(iter func() (*Thunk, bool, error)) *Thunk {
+	head, ok, err := iter()
 	if err != nil {
 		return ThunkFromError(err)
 	}
@@ -181,18 +181,14 @@ func ThunkFromIter(iter func() (Value, bool, error)) *Thunk {
 		return ThunkFromValue((*ArrValue)(nil))
 	}
 	return ThunkFromValue(&ArrValue{
-		Head: value,
-		Tail: &Thunk{
-			Func: func() *Thunk {
-				return ThunkFromIter(iter)
-			},
-		},
+		Head: head,
+		Tail: ThunkFromIter(iter),
 	})
 }
 
-func SliceFromValue(v Value) ([]Value, error) {
+func SliceFromThunk(t *Thunk) ([]Value, error) {
 	var slice []Value
-	iter := IterFromValue(v)
+	iter := IterFromThunk(t)
 	for {
 		el, ok, err := iter()
 		if err != nil {
@@ -206,9 +202,9 @@ func SliceFromValue(v Value) ([]Value, error) {
 	return slice, nil
 }
 
-func NumsFromValue(v Value) ([]float64, error) {
+func NumsFromThunk(t *Thunk) ([]float64, error) {
 	var slice []float64
-	iter := IterFromValue(v)
+	iter := IterFromThunk(t)
 	for {
 		el, ok, err := iter()
 		if err != nil {

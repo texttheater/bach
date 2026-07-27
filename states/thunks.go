@@ -1,19 +1,15 @@
 package states
 
 type Thunk struct {
-	Func      func() *Thunk
-	Value     Value
-	Error     error
-	Stack     *VariableStack
-	TypeStack *BindingStack
+	Func  func() (Value, error)
+	Value Value
+	Error error
 }
 
 func (t *Thunk) Eval() (Value, error) {
-	for t.Func != nil {
-		thunk := t.Func()
-		t.Func = thunk.Func
-		t.Value = thunk.Value
-		t.Error = thunk.Error
+	if t.Func != nil {
+		t.Value, t.Error = t.Func()
+		t.Func = nil
 	}
 	return t.Value, t.Error
 }
@@ -66,10 +62,16 @@ func (t *Thunk) EvalObj() (ObjValue, error) {
 	return val.(ObjValue), nil
 }
 
-func ThunkFromValue(v Value) *Thunk {
-	return ThunkFromState(State{
-		Value: v,
-	})
+func ThunkFromFunc(fun func() (Value, error)) *Thunk {
+	return &Thunk{
+		Func: fun,
+	}
+}
+
+func ThunkFromValue(val Value) *Thunk {
+	return &Thunk{
+		Value: val,
+	}
 }
 
 func ThunkFromError(err error) *Thunk {
@@ -78,24 +80,18 @@ func ThunkFromError(err error) *Thunk {
 	}
 }
 
-func ThunkFromState(state State) *Thunk {
-	return &Thunk{
-		Value:     state.Value,
-		Stack:     state.Stack,
-		TypeStack: state.TypeStack,
-	}
-}
-
-func IterFromError(err error) func() (Value, bool, error) {
-	return func() (Value, bool, error) {
+func IterFromError(err error) func() (*Thunk, bool, error) {
+	return func() (*Thunk, bool, error) {
 		return nil, false, err
 	}
 }
 
-func IterFromAction(state State, action Action) func() (Value, bool, error) {
-	val, err := action(state, nil).Eval()
-	if err != nil {
-		return IterFromError(err)
+func IterFromAction(state State, action Action) func() (*Thunk, bool, error) {
+	return IterFromThunk(action(state, nil).Thunk)
+}
+
+func StateFromError(err error) State {
+	return State{
+		Thunk: ThunkFromError(err),
 	}
-	return IterFromValue(val)
 }

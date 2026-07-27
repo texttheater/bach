@@ -22,11 +22,15 @@ var ObjFuncers = []shapes.Funcer{
 		OutputDescription: "an object with the items of the input and other",
 		Notes:             "Where the input and other share keys, the values of other are used in the output.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			obj, err := inputState.Thunk.EvalObj()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			res := states.ObjValue{}
-			for k, v := range inputState.Value.(states.ObjValue) {
+			for k, v := range obj {
 				res[k] = v
 			}
-			arg, err := args[0](inputState.Clear(), nil).EvalObj()
+			arg, err := args[0](inputState.Clear(), nil).Thunk.EvalObj()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
@@ -56,8 +60,11 @@ var ObjFuncers = []shapes.Funcer{
 		OutputDescription: "the value associated in the input object with the given property key",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			inputValue := inputState.Value.(states.ObjValue)
-			val, err := args[0](inputState.Clear(), nil).Eval()
+			obj, err := inputState.Thunk.EvalObj()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			val, err := args[0](inputState.Clear(), nil).Thunk.Eval()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
@@ -65,7 +72,7 @@ var ObjFuncers = []shapes.Funcer{
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			val, ok := inputValue[prop]
+			val, ok := obj[prop]
 			if !ok {
 				return states.ThunkFromError(errors.ValueError(
 					errors.Code(errors.NoSuchProperty),
@@ -106,8 +113,11 @@ var ObjFuncers = []shapes.Funcer{
 		OutputDescription: "true if the object has the given property, false if not",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			inputValue := inputState.Value.(states.ObjValue)
-			val, err := args[0](inputState.Clear(), nil).Eval()
+			obj, err := inputState.Thunk.EvalObj()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			val, err := args[0](inputState.Clear(), nil).Thunk.Eval()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
@@ -115,7 +125,7 @@ var ObjFuncers = []shapes.Funcer{
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			_, ok := inputValue[prop]
+			_, ok := obj[prop]
 			return states.ThunkFromValue(states.BoolValue(ok))
 		},
 		IDs: nil,
@@ -142,10 +152,13 @@ var ObjFuncers = []shapes.Funcer{
 		OutputDescription: "an array of tuples of the properties and associated values of the input object",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			inputValue := inputState.Value.(states.ObjValue)
+			obj, err := inputState.Thunk.EvalObj()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			c := make(chan *states.Thunk)
 			go func() {
-				for prop, val := range inputValue {
+				for prop, val := range obj {
 					item := states.NewArrValue([]states.Value{
 						states.StrValue(prop),
 						val,
@@ -175,10 +188,13 @@ var ObjFuncers = []shapes.Funcer{
 		OutputDescription: "all the property keys of the object, as an array",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			inputValue := inputState.Value.(states.ObjValue)
+			obj, err := inputState.Thunk.EvalObj()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			c := make(chan *states.Thunk)
 			go func() {
-				for prop := range inputValue {
+				for prop := range obj {
 					c <- states.ThunkFromValue(
 						states.StrValue(prop),
 					)
@@ -206,10 +222,13 @@ var ObjFuncers = []shapes.Funcer{
 		OutputDescription: "all the property values of the object, as an array",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			inputValue := inputState.Value.(states.ObjValue)
+			obj, err := inputState.Thunk.EvalObj()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			c := make(chan *states.Thunk)
 			go func() {
-				for _, val := range inputValue {
+				for _, val := range obj {
 					c <- states.ThunkFromValue(val)
 				}
 				c <- states.ThunkFromValue(nil)
@@ -239,13 +258,16 @@ var ObjFuncers = []shapes.Funcer{
 		OutputDescription: "the input object, but with the specified property removed",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			inputValue := inputState.Value.(states.ObjValue)
-			prop, err := args[0](inputState.Clear(), nil).EvalStr()
+			obj, err := inputState.Thunk.EvalObj()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			prop, err := args[0](inputState.Clear(), nil).Thunk.EvalStr()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
 			res := states.ObjValue{}
-			for k, v := range inputValue {
+			for k, v := range obj {
 				if k != prop {
 					res[k] = v
 				}
