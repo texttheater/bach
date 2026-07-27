@@ -74,12 +74,16 @@ var ArrFuncers = []shapes.Funcer{
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromThunk(inputState.Thunk)
 			for {
-				val, ok, err := input()
+				thk, ok, err := input()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
 				if !ok {
 					return states.ThunkFromValue(states.BoolValue(true))
+				}
+				val, err := thk.Eval()
+				if err != nil {
+					return states.ThunkFromError(err)
 				}
 				if !val.(states.BoolValue) {
 					return states.ThunkFromValue(states.BoolValue(false))
@@ -179,7 +183,7 @@ var ArrFuncers = []shapes.Funcer{
 				if arr == nil {
 					return states.ThunkFromValue(nil)
 				}
-				argInputState := inputState.Replace(states.ThunkFromValue(arr.Head))
+				argInputState := inputState.Replace(arr.Head)
 				obj, err := args[0](argInputState, nil).Thunk.EvalObj()
 				if err != nil {
 					return states.ThunkFromError(err)
@@ -218,20 +222,16 @@ var ArrFuncers = []shapes.Funcer{
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromThunk(inputState.Thunk)
-			output := func() (states.Value, bool, error) {
-				val, ok, err := input()
+			output := func() (*states.Thunk, bool, error) {
+				thk, ok, err := input()
 				if err != nil {
 					return nil, false, err
 				}
 				if !ok {
 					return nil, false, nil
 				}
-				argInputState := inputState.Replace(states.ThunkFromValue(val))
-				val, err = args[0](argInputState, nil).Thunk.Eval()
-				if err != nil {
-					return nil, false, err
-				}
-				return val, true, nil
+				argInputState := inputState.Replace(thk)
+				return args[0](argInputState, nil).Thunk, true, nil
 			}
 			return states.ThunkFromIter(output)
 		},
@@ -264,16 +264,11 @@ var ArrFuncers = []shapes.Funcer{
 				if !ok {
 					return nil, false, nil
 				}
-				val, err := thk.Eval()
-				if err != nil {
-					return nil, false, err
-				}
-				num := states.NumValue(i)
 				i++
-				return states.ThunkFromValue(states.NewArrValue([]states.Value{
-					num,
-					val,
-				})), true, nil
+				return states.ThunkFromSlice([]*states.Thunk{
+					states.ThunkFromValue(states.NumValue(i)),
+					thk,
+				}), true, nil
 			}
 			return states.ThunkFromIter(output)
 		},
@@ -302,7 +297,7 @@ var ArrFuncers = []shapes.Funcer{
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			output := func() (states.Value, bool, error) {
+			output := func() (*states.Thunk, bool, error) {
 				thk, ok, err := input()
 				if err != nil {
 					return nil, false, err
@@ -310,15 +305,11 @@ var ArrFuncers = []shapes.Funcer{
 				if !ok {
 					return nil, false, nil
 				}
-				val, err := thk.Eval()
-				if err != nil {
-					return nil, false, err
-				}
 				num := states.NumValue(i)
 				i++
-				return states.NewArrValue([]states.Value{
-					num,
-					val,
+				return states.ThunkFromSlice([]*states.Thunk{
+					states.ThunkFromValue(num),
+					thk,
 				}), true, nil
 			}
 			return states.ThunkFromIter(output)
@@ -368,16 +359,16 @@ var ArrFuncers = []shapes.Funcer{
 		OutputDescription: "the first element of the input satisfying the predicate, paired with its index, or Null if none",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			idx, val, err := findFirst(inputState, args[0])
+			idx, thk, err := findFirst(inputState, args[0])
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
 			if idx == -1 {
 				return states.ThunkFromValue(states.NullValue{})
 			}
-			return states.ThunkFromSlice([]states.Value{
-				states.NumValue(idx),
-				val,
+			return states.ThunkFromSlice([]*states.Thunk{
+				states.ThunkFromValue(states.NumValue(idx)),
+				thk,
 			})
 		},
 		IDs: nil,
@@ -469,14 +460,14 @@ var ArrFuncers = []shapes.Funcer{
 		OutputDescription: "the first element of the input satisfying the predicate, or Null if none",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			idx, val, err := findFirst(inputState, args[0])
+			idx, thk, err := findFirst(inputState, args[0])
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
 			if idx == -1 {
 				return states.ThunkFromValue(states.NullValue{})
 			}
-			return states.ThunkFromValue(val)
+			return thk
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
@@ -524,16 +515,16 @@ var ArrFuncers = []shapes.Funcer{
 		OutputDescription: "the last element of the input satisfying the predicate, paired with its index, or Null if none",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			idx, val, err := findLast(inputState, args[0])
+			idx, thk, err := findLast(inputState, args[0])
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
 			if idx == -1 {
 				return states.ThunkFromValue(states.NullValue{})
 			}
-			return states.ThunkFromSlice([]states.Value{
-				states.NumValue(idx),
-				val,
+			return states.ThunkFromSlice([]*states.Thunk{
+				states.ThunkFromValue(states.NumValue(idx)),
+				thk,
 			})
 		},
 		IDs: nil,
@@ -625,14 +616,14 @@ var ArrFuncers = []shapes.Funcer{
 		OutputDescription: "the last element of the input satisfying the predicate, or Null if none",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			idx, val, err := findLast(inputState, args[0])
+			idx, thk, err := findLast(inputState, args[0])
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
 			if idx == -1 {
 				return states.ThunkFromValue(states.NullValue{})
 			}
-			return states.ThunkFromValue(val)
+			return thk
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
@@ -675,14 +666,10 @@ var ArrFuncers = []shapes.Funcer{
 				if !ok {
 					return states.ThunkFromValue(acc)
 				}
-				val, err := thk.Eval()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
 				opInputState.Thunk = states.ThunkFromValue(acc)
 				acc, err = args[1](
 					opInputState,
-					[]states.Action{states.SimpleAction(val)},
+					[]states.Action{states.SimpleAction(thk)},
 				).Thunk.Eval()
 				if err != nil {
 					return states.ThunkFromError(err)
@@ -808,7 +795,7 @@ var ArrFuncers = []shapes.Funcer{
 			if arr == nil {
 				return args[1](inputState.Clear(), nil).Thunk
 			}
-			return states.ThunkFromValue(arr.Head)
+			return arr.Head
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
@@ -834,8 +821,8 @@ var ArrFuncers = []shapes.Funcer{
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromThunk(inputState.Thunk)
-			var arrIter func() (states.Value, bool, error)
-			output := func() (states.Value, bool, error) {
+			var arrIter func() (*states.Thunk, bool, error)
+			output := func() (*states.Thunk, bool, error) {
 				for {
 					if arrIter != nil {
 						val, ok, err := arrIter()
@@ -846,14 +833,14 @@ var ArrFuncers = []shapes.Funcer{
 							return val, true, nil
 						}
 					}
-					arrVal, ok, err := input()
+					arrThk, ok, err := input()
 					if err != nil {
 						return nil, false, err
 					}
 					if !ok {
 						return nil, false, nil
 					}
-					arrIter = states.IterFromThunk(states.ThunkFromValue(arrVal))
+					arrIter = states.IterFromThunk(arrThk)
 				}
 			}
 			return states.ThunkFromIter(output)
@@ -904,14 +891,14 @@ var ArrFuncers = []shapes.Funcer{
 			input := states.IterFromThunk(inputState.Thunk)
 			output := func() (*states.Thunk, bool, error) {
 				for {
-					val, ok, err := input()
+					thk, ok, err := input()
 					if err != nil {
 						return nil, false, err
 					}
 					if !ok {
 						return nil, false, nil
 					}
-					argInputState := inputState.Replace(states.ThunkFromValue(val))
+					argInputState := inputState.Replace(thk)
 					obj, err := args[0](argInputState, nil).Thunk.EvalObj()
 					if err != nil {
 						return nil, false, err
@@ -1162,13 +1149,13 @@ var ArrFuncers = []shapes.Funcer{
 				return states.ThunkFromError(err)
 			}
 			i := from
-			iter := func() (states.Value, bool, error) {
+			iter := func() (*states.Thunk, bool, error) {
 				if i >= to {
 					return nil, false, nil
 				}
 				v := states.NumValue(i)
 				i++
-				return v, true, nil
+				return states.ThunkFromValue(v), true, nil
 			}
 			return states.ThunkFromIter(iter)
 		},
@@ -1209,7 +1196,7 @@ var ArrFuncers = []shapes.Funcer{
 				for i := 0; i < nInt; i++ {
 					arr := input
 					for arr != nil {
-						c <- states.ThunkFromValue(arr.Head)
+						c <- arr.Head
 						arr, err = arr.Tail.EvalArr()
 						if err != nil {
 							c <- states.ThunkFromError(err)
@@ -1277,14 +1264,18 @@ var ArrFuncers = []shapes.Funcer{
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromThunk(inputState.Thunk)
 			for {
-				val, ok, err := input()
+				thk, ok, err := input()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
 				if !ok {
 					return states.ThunkFromValue(states.BoolValue(false))
 				}
-				if val.(states.BoolValue) {
+				val, err := thk.EvalBool()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				if val {
 					return states.ThunkFromValue(states.BoolValue(true))
 				}
 			}
@@ -1451,7 +1442,7 @@ var ArrFuncers = []shapes.Funcer{
 				return states.ThunkFromError(err)
 			}
 			i := 0
-			output := func() (states.Value, bool, error) {
+			output := func() (*states.Thunk, bool, error) {
 				if i >= stop {
 					return nil, false, nil
 				}
@@ -1544,15 +1535,15 @@ var ArrFuncers = []shapes.Funcer{
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input := states.IterFromThunk(inputState.Thunk)
-			output := func() (states.Value, bool, error) {
-				val, ok, err := input()
+			output := func() (*states.Thunk, bool, error) {
+				thk, ok, err := input()
 				if err != nil {
 					return nil, false, err
 				}
 				if !ok {
 					return nil, false, nil
 				}
-				argInputState := inputState.Replace(states.ThunkFromValue(val))
+				argInputState := inputState.Replace(thk)
 				obj, err := args[0](argInputState, nil).Thunk.EvalObj()
 				if err != nil {
 					return nil, false, err
@@ -1622,18 +1613,10 @@ func mySort(inputState states.State, key states.Action, less states.Action) *sta
 		return states.ThunkFromError(err)
 	}
 	myLess := func(i int, j int) bool {
-		aKey, err2 := key(inputState.Replace(states.ThunkFromValue(slice[i])), nil).Thunk.Eval()
-		if err2 != nil {
-			err = err2
-			return true
-		}
-		bKey, err2 := key(inputState.Replace(states.ThunkFromValue(slice[j])), nil).Thunk.Eval()
-		if err2 != nil {
-			err = err2
-			return true
-		}
+		aKey := key(inputState.Replace(slice[i]), nil).Thunk
+		bKey := key(inputState.Replace(slice[j]), nil).Thunk
 		less, err2 := less(
-			inputState.Replace(states.ThunkFromValue(aKey)),
+			inputState.Replace(aKey),
 			[]states.Action{states.SimpleAction(bKey)},
 		).Thunk.EvalBool()
 		if err2 != nil {
@@ -1661,10 +1644,7 @@ func max(inputState states.State, key states.Action, less states.Action, def sta
 		}
 		return states.ThunkFromValue(d)
 	}
-	record, err := key(
-		inputState.Replace(states.ThunkFromValue(arr.Head)),
-		nil,
-	).Thunk.Eval()
+	record := key(inputState.Replace(arr.Head), nil).Thunk
 	if err != nil {
 		return states.ThunkFromError(err)
 	}
@@ -1675,24 +1655,18 @@ func max(inputState states.State, key states.Action, less states.Action, def sta
 			return states.ThunkFromError(err)
 		}
 		if arr == nil {
-			return states.ThunkFromValue(recordHolder)
+			return recordHolder
 		}
-		val, err := key(
-			inputState.Replace(states.ThunkFromValue(arr.Head)),
-			nil,
-		).Thunk.Eval()
-		if err != nil {
-			return states.ThunkFromError(err)
-		}
+		thk := key(inputState.Replace(arr.Head), nil).Thunk
 		l, err := less(
-			inputState.Replace(states.ThunkFromValue(record)),
-			[]states.Action{states.SimpleAction(val)},
+			inputState.Replace(record),
+			[]states.Action{states.SimpleAction(thk)},
 		).Thunk.EvalBool()
 		if err != nil {
 			return states.ThunkFromError(err)
 		}
 		if l {
-			record = val
+			record = thk
 			recordHolder = arr.Head
 		}
 	}
@@ -1710,10 +1684,7 @@ func min(inputState states.State, key states.Action, less states.Action, def sta
 		}
 		return states.ThunkFromValue(d)
 	}
-	record, err := key(
-		inputState.Replace(states.ThunkFromValue(arr.Head)),
-		nil,
-	).Thunk.Eval()
+	record := key(inputState.Replace(arr.Head), nil).Thunk
 	if err != nil {
 		return states.ThunkFromError(err)
 	}
@@ -1724,30 +1695,27 @@ func min(inputState states.State, key states.Action, less states.Action, def sta
 			return states.ThunkFromError(err)
 		}
 		if arr == nil {
-			return states.ThunkFromValue(recordHolder)
+			return recordHolder
 		}
-		val, err := key(
-			inputState.Replace(states.ThunkFromValue(arr.Head)),
+		thk := key(
+			inputState.Replace(arr.Head),
 			nil,
-		).Thunk.Eval()
-		if err != nil {
-			return states.ThunkFromError(err)
-		}
+		).Thunk
 		l, err := less(
-			inputState.Replace(states.ThunkFromValue(val)),
+			inputState.Replace(thk),
 			[]states.Action{states.SimpleAction(record)},
 		).Thunk.EvalBool()
 		if err != nil {
 			return states.ThunkFromError(err)
 		}
 		if l {
-			record = val
+			record = thk
 			recordHolder = arr.Head
 		}
 	}
 }
 
-func findFirst(inputState states.State, predicate states.Action) (index int, value states.Value, err error) {
+func findFirst(inputState states.State, predicate states.Action) (index int, thunk *states.Thunk, err error) {
 	arr, err := inputState.Thunk.EvalArr()
 	if err != nil {
 		return -1, nil, err
@@ -1757,10 +1725,7 @@ func findFirst(inputState states.State, predicate states.Action) (index int, val
 		if arr == nil {
 			return -1, nil, nil
 		}
-		obj, err := predicate(
-			inputState.Replace(states.ThunkFromValue(arr.Head)),
-			nil,
-		).Thunk.EvalObj()
+		obj, err := predicate(inputState.Replace(arr.Head), nil).Thunk.EvalObj()
 		if err != nil {
 			return -1, nil, err
 		}
@@ -1776,9 +1741,9 @@ func findFirst(inputState states.State, predicate states.Action) (index int, val
 	}
 }
 
-func findLast(inputState states.State, predicate states.Action) (index int, value states.Value, err error) {
+func findLast(inputState states.State, predicate states.Action) (index int, thunk *states.Thunk, err error) {
 	lastIndex := -1
-	var lastValue states.Value = nil
+	var lastThunk *states.Thunk = nil
 	arr, err := inputState.Thunk.EvalArr()
 	if err != nil {
 		return -1, nil, err
@@ -1786,19 +1751,16 @@ func findLast(inputState states.State, predicate states.Action) (index int, valu
 	i := 0
 	for {
 		if arr == nil {
-			return lastIndex, lastValue, nil
+			return lastIndex, lastThunk, nil
 		}
-		obj, err := predicate(inputState.Replace(
-			states.ThunkFromValue(arr.Head)),
-			nil,
-		).Thunk.EvalObj()
+		obj, err := predicate(inputState.Replace(arr.Head), nil).Thunk.EvalObj()
 		if err != nil {
 			return -1, nil, err
 		}
 		_, ok := obj["yes"]
 		if ok {
 			lastIndex = i
-			lastValue = arr.Head
+			lastThunk = arr.Head
 		}
 		i++
 		arr, err = arr.Tail.EvalArr()

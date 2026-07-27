@@ -2,12 +2,8 @@ package states
 
 type Action func(inputState State, args []Action) State
 
-func SimpleAction(value Value) Action {
+func SimpleAction(thunk *Thunk) Action {
 	return func(inputState State, args []Action) State {
-		return State{
-			Thunk:     ThunkFromValue(value),
-			Stack:     inputState.Stack,
-			TypeStack: inputState.TypeStack,
-		}
+		return inputState.Replace(thunk)
 	}
 }

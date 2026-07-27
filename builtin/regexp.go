@@ -41,13 +41,13 @@ var RegexpFuncers = []shapes.Funcer{
 		OutputDescription: "array of matches",
 		Notes:             "Matches appear in the output from leftmost to rightmost. Matches that overlap an earlier match (i.e., a match that starts at a lower offset or one that starts at the same offset but is found earlier by the regexp) are not included.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			v := inputState.Value.(states.StrValue)
+			str, err := inputState.Thunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			offset := 0
-			iter := func() (states.Value, bool, error) {
-				regexpInputState := states.State{
-					Value: v,
-				}
-				val, err := args[0](regexpInputState, nil).Eval()
+			iter := func() (*states.Thunk, bool, error) {
+				val, err := args[0](inputState, nil).Thunk.Eval()
 				if err != nil {
 					return nil, false, err
 				}
@@ -55,15 +55,21 @@ var RegexpFuncers = []shapes.Funcer{
 				if !ok {
 					return nil, false, nil
 				}
-				obj := map[string]states.Value(objValue)
-				start := int(obj["start"].(states.NumValue))
-				obj["start"] = states.NumValue(start + offset)
-				group := string(obj["0"].(states.StrValue))
+				obj := map[string]*states.Thunk(objValue)
+				start, err := obj["start"].EvalInt()
+				if err != nil {
+					return nil, false, err
+				}
+				obj["start"] = states.ThunkFromValue(states.NumValue(start + offset))
+				group, err := obj["0"].EvalStr()
+				if err != nil {
+					return nil, false, err
+				}
 				length := len(group)
 				end := start + length
 				offset += end
-				v = states.StrValue(string(v)[end:])
-				return objValue, true, nil
+				str = str[end:]
+				return states.ThunkFromValue(objValue), true, nil
 			}
 			return states.ThunkFromIter(iter)
 		},
@@ -114,19 +120,29 @@ var RegexpFuncers = []shapes.Funcer{
 		OutputDescription: "the input with the first match of the regexp replaced with the corresponding replacement, or unchanged if there is no match",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			match, err := args[0](inputState, nil).Eval()
+			matchThk := args[0](inputState, nil).Thunk
+			match, err := matchThk.Eval()
 			if err != nil {
 				return states.ThunkFromError(nil)
 			}
 			switch match := match.(type) {
 			case states.NullValue:
-				return states.ThunkFromValue(inputState.Value)
+				return inputState.Thunk
 			case states.ObjValue:
-				old := string(inputState.Value.(states.StrValue))
-				start := int(match["start"].(states.NumValue))
-				replaced := string(match["0"].(states.StrValue))
+				old, err := inputState.Thunk.EvalStr()
+				if err != nil {
+					return states.ThunkFromError(nil)
+				}
+				start, err := inputState.Thunk.EvalInt()
+				if err != nil {
+					return states.ThunkFromError(nil)
+				}
+				replaced, err := match["0"].EvalStr()
+				if err != nil {
+					return states.ThunkFromError(nil)
+				}
 				length := len(replaced)
-				replacement, err := args[1](inputState.Replace(match), nil).EvalStr()
+				replacement, err := args[1](inputState.Replace(matchThk), nil).Thunk.EvalStr()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
@@ -185,24 +201,34 @@ var RegexpFuncers = []shapes.Funcer{
 		OutputDescription: "the input with all matches of the regexp replaced with the corresponding replacement, or unchanged if there is no match",
 		Notes:             "Matches are replaced from leftmost to rightmost. Matches that overlap an earlier match (i.e., a match that starts at a lower offset or one that starts at the same offset but is found earlier by the regexp) are not replaced.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := string(inputState.Value.(states.StrValue))
+			input, err := inputState.Thunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			var output strings.Builder
 		loop:
 			for {
-				val, err := args[0](inputState.Replace(states.StrValue(input)), nil).Eval()
+				matchThk := args[0](inputState.Replace(inputState.Thunk), nil).Thunk
+				match, err := matchThk.Eval()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
-				switch match := val.(type) {
+				switch match := match.(type) {
 				case states.NullValue:
 					output.WriteString(input)
 					break loop
 				case states.ObjValue:
-					start := int(match["start"].(states.NumValue))
-					group := string(match["0"].(states.StrValue))
+					start, err := match["start"].EvalInt()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
+					group, err := match["0"].EvalStr()
+					if err != nil {
+						return states.ThunkFromError(err)
+					}
 					length := len(group)
 					output.WriteString(input[:start])
-					replacement, err := args[1](inputState.Replace(match), nil).EvalStr()
+					replacement, err := args[1](inputState.Replace(matchThk), nil).Thunk.EvalStr()
 					if err != nil {
 						return states.ThunkFromError(err)
 					}
@@ -314,12 +340,15 @@ var RegexpFuncers = []shapes.Funcer{
 }
 
 func split(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-	v := inputState.Value.(states.StrValue)
+	str, err := inputState.Thunk.EvalStr()
+	if err != nil {
+		return states.ThunkFromError(err)
+	}
 	regexp := args[0]
 	maxSplits := -1
 	if len(args) > 1 {
 		var err error
-		maxSplits, err = args[1](inputState.Clear(), nil).EvalInt()
+		maxSplits, err = args[1](inputState.Clear(), nil).Thunk.EvalInt()
 		if err != nil {
 			return states.ThunkFromError(err)
 		}
@@ -327,81 +356,81 @@ func split(inputState states.State, args []states.Action, bindings map[string]ty
 	splits := 0
 	// Edge case 1: if the separator is empty, split the string into
 	// codepoints.
-	regexpInputState := states.State{
-		Value: states.StrValue(""),
-	}
-	val, err := regexp(regexpInputState, nil).Eval()
+	val, err := regexp(inputState.Replace(states.ThunkFromValue(states.StrValue(""))), nil).Thunk.Eval()
 	if err != nil {
 		return states.ThunkFromError(err)
 	}
 	_, ok := val.(states.ObjValue)
 	if ok {
-		iter := func() (states.Value, bool, error) {
-			if len(v) == 0 {
+		iter := func() (*states.Thunk, bool, error) {
+			if len(str) == 0 {
 				return nil, false, nil
 			}
 			var l int
 			if splits == maxSplits {
-				piece := v
-				v = ""
-				return piece, true, nil
+				piece := str
+				str = ""
+				return states.ThunkFromValue(states.StrValue(piece)), true, nil
 			}
-			_, l = utf8.DecodeRuneInString(string(v))
-			piece := v[:l]
-			v = v[l:]
+			_, l = utf8.DecodeRuneInString(string(str))
+			piece := str[:l]
+			str = str[l:]
 			splits++
-			return piece, true, nil
+			return states.ThunkFromValue(states.StrValue(piece)), true, nil
 		}
 		return states.ThunkFromIter(iter)
 	}
 	// Edge case 2: if the string is empty, return a single-element
 	// list containing the empty string.
-	if v == "" {
-		return states.ThunkFromSlice([]states.Value{
-			states.StrValue(""),
+	if str == "" {
+		return states.ThunkFromSlice([]*states.Thunk{
+			states.ThunkFromValue(states.StrValue("")),
 		})
 	}
 	// Now for the normal cases.
 	sepAtEnd := false
-	iter := func() (states.Value, bool, error) {
+	iter := func() (*states.Thunk, bool, error) {
 		if sepAtEnd {
 			sepAtEnd = false
-			return states.StrValue(""), true, nil
+			return states.ThunkFromValue(states.StrValue("")), true, nil
 		}
-		if len(v) == 0 {
+		if len(str) == 0 {
 			// end of string reached
 			return nil, false, nil
 		}
 		if splits == maxSplits {
-			piece := v
-			v = ""
-			return piece, true, nil
+			piece := str
+			str = ""
+			return states.ThunkFromValue(states.StrValue(piece)), true, nil
 		}
-		regexpInputState := states.State{
-			Value: v,
-		}
-		val, err := regexp(regexpInputState, nil).Eval()
+		val, err := regexp(inputState.Replace(states.ThunkFromValue(states.StrValue(""))), nil).Thunk.Eval()
 		if err != nil {
 			return nil, false, err
 		}
 		objValue, ok := val.(states.ObjValue)
 		if !ok {
-			piece := v
-			v = ""
-			return piece, true, nil
+			piece := str
+			str = ""
+			return states.ThunkFromValue(states.StrValue(piece)), true, nil
 		}
-		obj := map[string]states.Value(objValue)
-		sepStart := int(obj["start"].(states.NumValue))
-		sep := string(obj["0"].(states.StrValue))
+		obj := map[string]*states.Thunk(objValue)
+		sepStart, err := obj["start"].EvalInt()
+		if err != nil {
+			return nil, false, err
+		}
+		sep, err := obj["0"].EvalStr()
+		if err != nil {
+			return nil, false, err
+		}
 		sepLength := len(sep)
 		sepEnd := sepStart + sepLength
-		piece := v[:sepStart]
-		v = v[sepEnd:]
+		piece := str[:sepStart]
+		str = str[sepEnd:]
 		splits++
-		if len(v) == 0 && sepLength > 0 {
+		if len(str) == 0 && sepLength > 0 {
 			sepAtEnd = true
 		}
-		return piece, true, nil
+		return states.ThunkFromValue(states.StrValue(piece)), true, nil
 	}
 	return states.ThunkFromIter(iter)
 }

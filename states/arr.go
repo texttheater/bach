@@ -6,14 +6,14 @@ import (
 	"github.com/texttheater/bach/types"
 )
 
-func NewArrValue(elements []Value) *ArrValue {
+func ArrFromSlice(elements []Value) *ArrValue {
 	var arrFrom func(i int) *ArrValue
 	arrFrom = func(i int) *ArrValue {
 		if i == len(elements) {
 			return nil
 		}
 		return &ArrValue{
-			Head: elements[i],
+			Head: ThunkFromValue(elements[i]),
 			Tail: ThunkFromFunc(func() (Value, error) {
 				return arrFrom(i + 1), nil
 			}),
@@ -31,26 +31,30 @@ func (v *ArrValue) Repr() (string, error) {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("[")
 	if v != nil {
-		val, err := v.Head.Eval()
+		head, err := v.Head.Eval()
 		if err != nil {
 			return "", err
 		}
-		head, err := val.Repr()
+		headRepr, err := head.Repr()
 		if err != nil {
 			return "", err
 		}
-		buffer.WriteString(head)
+		buffer.WriteString(headRepr)
 		v, err = v.Tail.EvalArr()
 		if err != nil {
 			return "", err
 		}
 		for v != nil {
 			buffer.WriteString(", ")
-			head, err = v.Head.Repr()
+			head, err = v.Head.Eval()
 			if err != nil {
 				return "", err
 			}
-			buffer.WriteString(head)
+			headRepr, err := head.Repr()
+			if err != nil {
+				return "", err
+			}
+			buffer.WriteString(headRepr)
 			v, err = v.Tail.EvalArr()
 			if err != nil {
 				return "", err
@@ -68,7 +72,11 @@ func (v *ArrValue) Str() (string, error) {
 func (v *ArrValue) Data() (any, error) {
 	res := make([]any, 0)
 	for v != nil {
-		data, err := v.Head.Data()
+		head, err := v.Head.Eval()
+		if err != nil {
+			return nil, err
+		}
+		data, err := head.Data()
 		if err != nil {
 			return nil, err
 		}
@@ -87,7 +95,11 @@ func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 		if v == nil {
 			return false, nil
 		}
-		ok, err := v.Head.Inhabits(t.Head, stack)
+		head, err := v.Head.Eval()
+		if err != nil {
+			return false, err
+		}
+		ok, err := head.Inhabits(t.Head, stack)
 		if err != nil {
 			return false, err
 		}
@@ -104,7 +116,11 @@ func (v *ArrValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 			return true, nil
 		}
 		for v != nil {
-			ok, err := v.Head.Inhabits(t.El, stack)
+			head, err := v.Head.Eval()
+			if err != nil {
+				return false, err
+			}
+			ok, err := head.Inhabits(t.El, stack)
 			if err != nil {
 				return false, err
 			}
@@ -137,7 +153,15 @@ func (v *ArrValue) Equal(w Value) (bool, error) {
 		if w == nil {
 			return false, nil
 		}
-		ok, err := v.Head.Equal(w.Head)
+		vHead, err := v.Head.Eval()
+		if err != nil {
+			return false, err
+		}
+		wHead, err := w.Head.Eval()
+		if err != nil {
+			return false, err
+		}
+		ok, err := vHead.Equal(wHead)
 		if err != nil {
 			return false, err
 		}
@@ -186,8 +210,8 @@ func ThunkFromIter(iter func() (*Thunk, bool, error)) *Thunk {
 	})
 }
 
-func SliceFromThunk(t *Thunk) ([]Value, error) {
-	var slice []Value
+func SliceFromThunk(t *Thunk) ([]*Thunk, error) {
+	var slice []*Thunk
 	iter := IterFromThunk(t)
 	for {
 		el, ok, err := iter()
@@ -213,14 +237,18 @@ func NumsFromThunk(t *Thunk) ([]float64, error) {
 		if !ok {
 			break
 		}
-		slice = append(slice, float64(el.(NumValue)))
+		num, err := el.EvalNum()
+		if err != nil {
+			return nil, err
+		}
+		slice = append(slice, num)
 	}
 	return slice, nil
 }
 
-func ThunkFromSlice(slice []Value) *Thunk {
+func ThunkFromSlice(slice []*Thunk) *Thunk {
 	i := 0
-	iter := func() (Value, bool, error) {
+	iter := func() (*Thunk, bool, error) {
 		if i < len(slice) {
 			el := slice[i]
 			i++
@@ -232,7 +260,7 @@ func ThunkFromSlice(slice []Value) *Thunk {
 }
 
 func ThunkFromChannel(c <-chan *Thunk) *Thunk {
-	iter := func() (Value, bool, error) {
+	iter := func() (*Thunk, bool, error) {
 		thk := <-c
 		val, err := thk.Eval()
 		if err != nil {
@@ -241,7 +269,7 @@ func ThunkFromChannel(c <-chan *Thunk) *Thunk {
 		if val == nil {
 			return nil, false, nil
 		}
-		return val, true, nil
+		return thk, true, nil
 	}
 	return ThunkFromIter(iter)
 }

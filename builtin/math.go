@@ -312,7 +312,11 @@ var MathFuncers = []shapes.Funcer{
 				if !ok {
 					return states.ThunkFromValue(states.NumValue(sum))
 				}
-				sum += float64(value.(states.NumValue))
+				summand, err := value.EvalNum()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				sum += summand
 			}
 		},
 		[]shapes.Example{
@@ -372,7 +376,11 @@ var MathFuncers = []shapes.Funcer{
 				if !ok {
 					return states.ThunkFromValue(states.NumValue(sum / count))
 				}
-				sum += float64(value.(states.NumValue))
+				summand, err := value.EvalNum()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				sum += summand
 				count += 1.0
 			}
 		},
@@ -1264,18 +1272,21 @@ var MathFuncers = []shapes.Funcer{
 		"the square root of the sum of the squares of the input numbers",
 		"",
 		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
-			v, err := inputThunk.EvalArr()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
+			iter := states.IterFromThunk(inputThunk)
 			x := make([]float64, 0)
-			for v != nil {
-				x = append(x, float64(v.Head.(states.NumValue)))
-				var err error
-				v, err = v.Tail.EvalArr()
+			for {
+				next, ok, err := iter()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
+				if !ok {
+					break
+				}
+				num, err := next.EvalNum()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				x = append(x, num)
 			}
 			hypot := varhypot.Hypot(x...)
 			return states.ThunkFromValue(states.NumValue(float64(hypot)))
@@ -1426,18 +1437,21 @@ var MathFuncers = []shapes.Funcer{
 		"the largest number in the input, or -inf if the input is empty",
 		"",
 		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
-			v, err := inputThunk.EvalArr()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
 			max := math.Inf(-1)
-			for v != nil {
-				max = math.Max(max, float64(v.Head.(states.NumValue)))
-				var err error
-				v, err = v.Tail.EvalArr()
+			iter := states.IterFromThunk(inputThunk)
+			for {
+				next, ok, err := iter()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
+				if !ok {
+					break
+				}
+				num, err := next.EvalNum()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				max = math.Max(max, num)
 			}
 			return states.ThunkFromValue(states.NumValue(max))
 		},
@@ -1457,18 +1471,21 @@ var MathFuncers = []shapes.Funcer{
 		"the smallest number in the input, or inf if the input is empty",
 		"",
 		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
-			v, err := inputThunk.EvalArr()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			min := math.Inf(1)
-			for v != nil {
-				min = math.Min(min, float64(v.Head.(states.NumValue)))
-				var err error
-				v, err = v.Tail.EvalArr()
+			min := math.Inf(-1)
+			iter := states.IterFromThunk(inputThunk)
+			for {
+				next, ok, err := iter()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
+				if !ok {
+					break
+				}
+				num, err := next.EvalNum()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				min = math.Min(min, num)
 			}
 			return states.ThunkFromValue(states.NumValue(min))
 		},

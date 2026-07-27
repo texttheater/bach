@@ -39,21 +39,20 @@ func (x *TemplateLiteralExpression) Typecheck(inputShape shapes.Shape, params []
 		}
 		pieceActions[i] = pieceAction
 	}
-	action := func(inputState states.State, args []states.Action) *states.Thunk {
+	action := func(inputState states.State, args []states.Action) states.State {
 		buffer := bytes.Buffer{}
 		for _, pieceAction := range pieceActions {
-			val, err := pieceAction(inputState, nil).Eval()
+			val, err := pieceAction(inputState, nil).Thunk.Eval()
 			if err != nil {
-				return states.ThunkFromError(err)
+				return inputState.Replace(states.ThunkFromError(err))
 			}
 			out, err := val.Str()
 			if err != nil {
-				return states.ThunkFromError(err)
+				return inputState.Replace(states.ThunkFromError(err))
 			}
 			buffer.WriteString(out)
 		}
-		output := states.StrValue(buffer.String())
-		return states.ThunkFromState(inputState.Replace(output))
+		return inputState.Replace(states.ThunkFromValue(states.StrValue(buffer.String())))
 	}
 	return outputShape, action, nil, nil
 }

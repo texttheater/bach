@@ -59,8 +59,8 @@ funcers:
 			continue funcers
 		}
 		// typecheck and set parameters filled by this call
-		action1 := func(inputState states.State, args []states.Action) *states.Thunk {
-			return funcerDefinition.Kernel(inputState, args, bindings, x.Position())
+		action1 := func(inputState states.State, args []states.Action) states.State {
+			return inputState.Replace(funcerDefinition.Kernel(inputState, args, bindings, x.Position()))
 		}
 		argActions := make([]states.Action, len(x.Args))
 		argIDss := make([]*states.IDStack, len(x.Args))
@@ -99,12 +99,12 @@ funcers:
 			ids = ids.AddAll(argIDs)
 		}
 		// pass input variable stack to arguments
-		action2 := func(inputState states.State, args []states.Action) *states.Thunk {
+		action2 := func(inputState states.State, args []states.Action) states.State {
 			args2 := make([]states.Action, len(argActions)+len(args))
 			for i := range argActions {
 				prunedStack := inputState.Stack.Keep(argIDss[i]) // pass only what is needed to avoid memory leak
 				i := i
-				args2[i] = func(argInputState states.State, argArgs []states.Action) *states.Thunk {
+				args2[i] = func(argInputState states.State, argArgs []states.Action) states.State {
 					argInputState.Stack = prunedStack
 					return argActions[i](argInputState, argArgs)
 				}
@@ -133,21 +133,17 @@ funcers:
 			Stack: inputShape.Stack,
 		}
 		// set new type variables on action
-		action3 := func(inputState states.State, args []states.Action) *states.Thunk {
+		action3 := func(inputState states.State, args []states.Action) states.State {
 			for n, t := range bindings {
 				inputState.TypeStack = inputState.TypeStack.Update(n, t)
 			}
 			return action2(inputState, args)
 		}
 		// make call lazy
-		action := func(inputState states.State, args []states.Action) *states.Thunk {
-			return &states.Thunk{
-				Func: func() *states.Thunk {
-					return action3(inputState, args)
-				},
-				Stack:     inputState.Stack,
-				TypeStack: inputState.TypeStack,
-			}
+		action := func(inputState states.State, args []states.Action) states.State {
+			return inputState.Replace(states.ThunkFromFunc(func() (states.Value, error) {
+				return action3(inputState, args).Thunk.Eval()
+			}))
 		}
 		// return
 		return outputShape, action, ids, nil

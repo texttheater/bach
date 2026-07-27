@@ -54,25 +54,11 @@ type SimpleKernel func(inputThunk *states.Thunk, argThunks []*states.Thunk) *sta
 func SimpleFuncer(summary string, wantInputType types.Type, inputDescription string, wantName string, pars []*params.Param, outputType types.Type, outputDescription string, notes string, simpleKernel SimpleKernel, examples []Example) Funcer {
 	// make regular kernel from simple kernel
 	regularKernel := func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		argValues := make([]states.Value, len(pars))
+		argThunks := make([]*states.Thunk, len(pars))
 		for i, arg := range args {
-			val, err := arg(inputState.Clear(), nil).Eval()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			argValues[i] = val
+			argThunks[i] = arg(inputState.Clear(), nil).Thunk
 		}
-		value, err := simpleKernel(inputState.Value, argValues)
-		if err != nil {
-			return states.ThunkFromError(err)
-
-		}
-		return states.ThunkFromState(states.State{
-			Value:     value,
-			Stack:     inputState.Stack,
-			TypeStack: inputState.TypeStack,
-		})
-
+		return simpleKernel(inputState.Thunk, argThunks)
 	}
 	// return
 	return Funcer{
@@ -95,16 +81,7 @@ func VariableFuncer(id any, name string, varType types.Type) Funcer {
 		stack := inputState.Stack
 		for stack != nil {
 			if stack.Head.ID == id {
-				val, err := stack.Head.Action(states.InitialState, nil).Eval()
-				if err != nil {
-					return states.ThunkFromError(err)
-				}
-				return states.ThunkFromState(states.State{
-					Value:     val,
-					Stack:     inputState.Stack,
-					TypeStack: inputState.TypeStack,
-				})
-
+				return stack.Head.Action(states.InitialState, nil).Thunk
 			}
 			stack = stack.Tail
 		}
@@ -113,7 +90,6 @@ func VariableFuncer(id any, name string, varType types.Type) Funcer {
 	return Funcer{InputType: types.Any{}, Name: name, Params: nil, OutputType: varType, Kernel: kernel, IDs: &states.IDStack{
 		Head: id,
 	}}
-
 }
 
 type RegularKernel func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk

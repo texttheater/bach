@@ -39,16 +39,16 @@ func (x AssignmentExpression) Typecheck(inputShape shapes.Shape, params []*param
 		)
 	}
 	// make action
-	action := func(inputState states.State, args []states.Action) *states.Thunk {
+	action := func(inputState states.State, args []states.Action) states.State {
 		matcherVarStack, _, err := matcher(inputState)
 		if err != nil {
-			return states.ThunkFromError(err)
+			return inputState.Replace(states.ThunkFromError(err))
 		}
-		return states.ThunkFromState(states.State{
-			Value:     inputState.Value,
+		return states.State{
+			Thunk:     inputState.Thunk,
 			Stack:     matcherVarStack,
 			TypeStack: inputState.TypeStack,
-		})
+		}
 	}
 	return patternOutputShape, action, nil, nil
 }

@@ -1,5 +1,9 @@
 package states
 
+import (
+	"io"
+)
+
 type Thunk struct {
 	Func  func() (Value, error)
 	Value Value
@@ -60,6 +64,14 @@ func (t *Thunk) EvalObj() (ObjValue, error) {
 		return nil, err
 	}
 	return val.(ObjValue), nil
+}
+
+func (t *Thunk) EvalReader() (io.Reader, error) {
+	val, err := t.Eval()
+	if err != nil {
+		return nil, err
+	}
+	return val.(ReaderValue).Reader, nil
 }
 
 func ThunkFromFunc(fun func() (Value, error)) *Thunk {

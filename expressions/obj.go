@@ -44,20 +44,12 @@ func (x ObjExpression) Typecheck(inputShape shapes.Shape, params []*params.Param
 		},
 		Stack: inputShape.Stack,
 	}
-	action := func(inputState states.State, args []states.Action) *states.Thunk {
-		propValueMap := make(map[string]states.Value)
+	action := func(inputState states.State, args []states.Action) states.State {
+		propValueMap := make(map[string]*states.Thunk)
 		for prop, valAction := range propActionMap {
-			value, err := valAction(inputState, nil).Eval()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			propValueMap[prop] = value
+			propValueMap[prop] = valAction(inputState, nil).Thunk
 		}
-		return states.ThunkFromState(states.State{
-			Value:     states.ObjValue(propValueMap),
-			Stack:     inputState.Stack,
-			TypeStack: inputState.TypeStack,
-		})
+		return inputState.Replace(states.ThunkFromValue(states.ObjValue(propValueMap)))
 	}
 	return outputShape, action, ids, nil
 }

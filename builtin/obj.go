@@ -64,23 +64,24 @@ var ObjFuncers = []shapes.Funcer{
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			val, err := args[0](inputState.Clear(), nil).Thunk.Eval()
+			propThk := args[0](inputState.Clear(), nil).Thunk
+			propVal, err := propThk.Eval()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			prop, err := val.Str()
+			propStr, err := propVal.Str()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			val, ok := obj[prop]
+			valThk, ok := obj[propStr]
 			if !ok {
 				return states.ThunkFromError(errors.ValueError(
 					errors.Code(errors.NoSuchProperty),
-					errors.GotValue(states.StrValue(prop)),
+					errors.GotValue(states.StrValue(propStr)),
 					errors.Pos(pos),
 				))
 			}
-			return states.ThunkFromValue(val)
+			return valThk
 		},
 		IDs: nil,
 		Examples: []shapes.Example{
@@ -158,12 +159,12 @@ var ObjFuncers = []shapes.Funcer{
 			}
 			c := make(chan *states.Thunk)
 			go func() {
-				for prop, val := range obj {
-					item := states.NewArrValue([]states.Value{
-						states.StrValue(prop),
-						val,
+				for prop, thk := range obj {
+					item := states.ThunkFromSlice([]*states.Thunk{
+						states.ThunkFromValue(states.StrValue(prop)),
+						thk,
 					})
-					c <- states.ThunkFromValue(item)
+					c <- item
 				}
 				c <- states.ThunkFromValue(nil)
 			}()
@@ -228,8 +229,8 @@ var ObjFuncers = []shapes.Funcer{
 			}
 			c := make(chan *states.Thunk)
 			go func() {
-				for _, val := range obj {
-					c <- states.ThunkFromValue(val)
+				for _, thk := range obj {
+					c <- thk
 				}
 				c <- states.ThunkFromValue(nil)
 			}()

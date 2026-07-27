@@ -35,7 +35,7 @@ func (x WrapExpression) Typecheck(inputShape shapes.Shape, params []*params.Para
 		Stack: inputShape.Stack,
 	}
 	action := func(inputState states.State, args []states.Action) states.State {
-		wrappedValue := states.ObjValueFromMap(map[string]*states.Thunk{
+		wrappedValue := states.ObjFromMap(map[string]*states.Thunk{
 			x.Prop: inputState.Thunk,
 		})
 		return inputState.Replace(states.ThunkFromValue(wrappedValue))

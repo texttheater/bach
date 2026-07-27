@@ -23,7 +23,7 @@ func (x IdentityExpression) Typecheck(inputShape shapes.Shape, params []*params.
 			errors.Pos(x.Pos),
 		)
 	}
-	return inputShape, func(inputState states.State, args []states.Action) *states.Thunk {
-		return states.ThunkFromState(inputState)
+	return inputShape, func(inputState states.State, args []states.Action) states.State {
+		return inputState
 	}, nil, nil
 }

@@ -13,10 +13,18 @@ var op1 *regexp.Regexp = regexp.MustCompile(`[+\-*/%<>=]`)
 var op2 *regexp.Regexp = regexp.MustCompile(`==|<=|>=|\*\*`)
 var num *regexp.Regexp = regexp.MustCompile(`\d+\.(?:\d+)?(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+(?:[eE][+-]?\d+)?|\d+`)
 
-func ObjValueFromMap(m map[string]*Thunk) ObjValue {
+func ObjFromMap(m map[string]*Thunk) ObjValue {
 	propThunkMap := make(map[string]*Thunk)
 	for k, v := range m {
 		propThunkMap[k] = v
+	}
+	return propThunkMap
+}
+
+func ObjFromValMap(m map[string]Value) ObjValue {
+	propThunkMap := make(map[string]*Thunk)
+	for k, v := range m {
+		propThunkMap[k] = ThunkFromValue(v)
 	}
 	return propThunkMap
 }
@@ -27,7 +35,7 @@ func (v ObjValue) Repr() (string, error) {
 	buffer := bytes.Buffer{}
 	buffer.WriteString("{")
 	firstWritten := false
-	for k, val := range v {
+	for k, thk := range v {
 		if firstWritten {
 			buffer.WriteString(", ")
 		}
@@ -38,6 +46,10 @@ func (v ObjValue) Repr() (string, error) {
 			buffer.WriteString(fmt.Sprintf("%q", k))
 		}
 		buffer.WriteString(": ")
+		val, err := thk.Eval()
+		if err != nil {
+			return "", err
+		}
 		wString, err := val.Repr()
 		if err != nil {
 			return "", err
@@ -55,7 +67,11 @@ func (v ObjValue) Str() (string, error) {
 
 func (v ObjValue) Data() (any, error) {
 	res := make(map[string]any, 0)
-	for k, val := range v {
+	for k, thk := range v {
+		val, err := thk.Eval()
+		if err != nil {
+			return nil, err
+		}
 		data, err := val.Data()
 		if err != nil {
 			return nil, err
@@ -73,7 +89,11 @@ func (v ObjValue) Inhabits(t types.Type, stack *BindingStack) (bool, error) {
 				return false, nil
 			}
 		}
-		for gotProp, val := range v {
+		for gotProp, thk := range v {
+			val, err := thk.Eval()
+			if err != nil {
+				return false, err
+			}
 			if ok, err := val.Inhabits(t.TypeForProp(gotProp), stack); !ok {
 				return false, err
 			}
@@ -96,10 +116,18 @@ func (v ObjValue) Equal(w Value) (bool, error) {
 		if len(v) != len(w) {
 			return false, nil
 		}
-		for prop, vVal := range v {
-			wVal, ok := w[prop]
+		for prop, vThk := range v {
+			wThk, ok := w[prop]
 			if !ok {
 				return false, nil
+			}
+			vVal, err := vThk.Eval()
+			if err != nil {
+				return false, err
+			}
+			wVal, err := wThk.Eval()
+			if err != nil {
+				return false, err
 			}
 			equal, err := vVal.Equal(wVal)
 			if err != nil {

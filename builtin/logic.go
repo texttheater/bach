@@ -17,8 +17,8 @@ var LogicFuncers = []shapes.Funcer{
 		types.Bool{},
 		"the unique value representing logical truth",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.BoolValue(true), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.BoolValue(true))
 		},
 		[]shapes.Example{
 			{`true`, `Bool`, `true`, nil},
@@ -33,8 +33,8 @@ var LogicFuncers = []shapes.Funcer{
 		types.Bool{},
 		"the unique value representing logical falsehood",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			return states.BoolValue(false), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.BoolValue(false))
 		},
 		[]shapes.Example{
 			{`false`, `Bool`, `false`, nil},
@@ -51,10 +51,16 @@ var LogicFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true if both the input and q are true, false otherwise",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			inputBool := inputValue.(states.BoolValue)
-			argumentBool := argumentValues[0].(states.BoolValue)
-			return states.BoolValue(inputBool && argumentBool), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			inputBool, err := inputThunk.EvalBool()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			argumentBool, err := argumentThunks[0].EvalBool()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(inputBool && argumentBool))
 		},
 		[]shapes.Example{
 			{`false and(false)`, `Bool`, `false`, nil},
@@ -74,10 +80,16 @@ var LogicFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true if at least one of the input and q is true, false otherwise",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			inputBool := inputValue.(states.BoolValue)
-			argumentBool := argumentValues[0].(states.BoolValue)
-			return states.BoolValue(inputBool || argumentBool), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			inputBool, err := inputThunk.EvalBool()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			argumentBool, err := argumentThunks[0].EvalBool()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(inputBool || argumentBool))
 		},
 		[]shapes.Example{
 			{`false or(false)`, `Bool`, `false`, nil},
@@ -95,9 +107,12 @@ var LogicFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true if the input is false, and false if the input is true",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			inputBool := inputValue.(states.BoolValue)
-			return states.BoolValue(!inputBool), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			inputBool, err := inputThunk.EvalBool()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(!inputBool))
 		},
 		[]shapes.Example{
 			{`false not`, `Bool`, `true`, nil},
@@ -116,10 +131,16 @@ var LogicFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true if the input and q are identical, false otherwise",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			inputBool := inputValue.(states.BoolValue)
-			argumentBool := argumentValues[0].(states.BoolValue)
-			return states.BoolValue(inputBool == argumentBool), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			inputBool, err := inputThunk.EvalBool()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			argumentBool, err := argumentThunks[0].EvalBool()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(inputBool == argumentBool))
 		},
 		[]shapes.Example{
 			{`false ==false`, `Bool`, `true`, nil},

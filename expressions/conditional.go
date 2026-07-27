@@ -44,7 +44,7 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*para
 	var guardIDs *states.IDStack
 	if x.Guard == nil {
 		guardOutputShape = patternOutputShape
-		guardAction = states.SimpleAction(states.BoolValue(true))
+		guardAction = states.SimpleAction(states.ThunkFromValue(states.BoolValue(true)))
 	} else {
 		guardOutputShape, guardAction, guardIDs, err = x.Guard.Typecheck(patternOutputShape, nil)
 		if err != nil {
@@ -102,7 +102,7 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*para
 		var guardOutputShape shapes.Shape
 		if x.AlternativeGuards[i] == nil {
 			guardOutputShape = patternOutputShape
-			elisGuardActions[i] = states.SimpleAction(states.BoolValue(true))
+			elisGuardActions[i] = states.SimpleAction(states.ThunkFromValue(states.BoolValue(true)))
 		} else {
 			guardOutputShape, elisGuardActions[i], guardIDs, err = x.AlternativeGuards[i].Typecheck(patternOutputShape, nil)
 			if err != nil {
@@ -173,27 +173,26 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*para
 		outputType = types.NewUnion(outputType, alternativeOutputShape.Type)
 	}
 	// make action
-	action := func(inputState states.State, args []states.Action) *states.Thunk {
+	action := func(inputState states.State, args []states.Action) states.State {
 		matcherVarStack, ok, err := matcher(inputState)
 		if err != nil {
-			return states.ThunkFromError(err)
+			return inputState.Replace(states.ThunkFromError(err))
 		}
 		if ok {
 			guardInputState := states.State{
-				Value:     inputState.Value,
+				Thunk:     inputState.Thunk,
 				Stack:     matcherVarStack,
 				TypeStack: inputState.TypeStack,
 			}
-			thunk := guardAction(guardInputState, nil)
-			val, err := thunk.Eval()
+			guardOutputState := guardAction(guardInputState, nil)
+			guardOutputValue, err := guardOutputState.Thunk.EvalBool()
 			if err != nil {
-				return states.ThunkFromError(err)
+				return inputState.Replace(states.ThunkFromError(err))
 			}
-			boolGuardValue := val.(states.BoolValue)
-			if boolGuardValue {
+			if guardOutputValue {
 				consequentInputState := states.State{
-					Value:     inputState.Value,
-					Stack:     thunk.Stack,
+					Thunk:     inputState.Thunk,
+					Stack:     guardOutputState.Stack,
 					TypeStack: inputState.TypeStack,
 				}
 				return consequentAction(consequentInputState, nil)
@@ -202,24 +201,23 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*para
 		for i := range elisMatchers {
 			matcherVarStack, ok, err := elisMatchers[i](inputState)
 			if err != nil {
-				return states.ThunkFromError(err)
+				return inputState.Replace(states.ThunkFromError(err))
 			}
 			if ok {
 				guardInputState := states.State{
-					Value:     inputState.Value,
+					Thunk:     inputState.Thunk,
 					Stack:     matcherVarStack,
 					TypeStack: inputState.TypeStack,
 				}
-				thunk := elisGuardActions[i](guardInputState, nil)
-				val, err := thunk.Eval()
+				guardOutputState := elisGuardActions[i](guardInputState, nil)
+				guardOutputValue, err := guardOutputState.Thunk.EvalBool()
 				if err != nil {
-					return states.ThunkFromError(err)
+					return inputState.Replace(states.ThunkFromError(err))
 				}
-				boolGuardValue := val.(states.BoolValue)
-				if boolGuardValue {
+				if guardOutputValue {
 					consequentInputState := states.State{
-						Value:     inputState.Value,
-						Stack:     thunk.Stack,
+						Thunk:     inputState.Thunk,
+						Stack:     guardOutputState.Stack,
 						TypeStack: inputState.TypeStack,
 					}
 					return elisConsequentActions[i](consequentInputState, nil)
@@ -227,17 +225,22 @@ func (x ConditionalExpression) Typecheck(inputShape shapes.Shape, params []*para
 			}
 		}
 		if alternativeAction == nil {
-			return states.ThunkFromError(errors.TypeError(
+			val, err := inputState.Thunk.Eval()
+			if err != nil {
+				return inputState.Replace(states.ThunkFromError(err))
+			}
+			return inputState.Replace(states.ThunkFromError(errors.TypeError(
 				errors.Pos(x.Pos),
 				errors.Code(errors.UnexpectedValue),
-				errors.GotValue(inputState.Value)))
+				errors.GotValue(val),
+			)))
 		}
 		return alternativeAction(inputState, nil)
 	}
 	// return
 	outputShape := shapes.Shape{
-		outputType,
-		inputShape.Stack,
+		Type:  outputType,
+		Stack: inputShape.Stack,
 	}
 	return outputShape, action, ids, nil
 }

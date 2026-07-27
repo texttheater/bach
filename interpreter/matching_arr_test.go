@@ -118,7 +118,7 @@ func TestMatchingArr(t *testing.T) {
 				Tail: types.VoidArr,
 			},
 		},
-		states.NewArrValue(
+		states.ArrFromSlice(
 			[]states.Value{
 				states.NumValue(2),
 				states.NumValue(3),
@@ -133,7 +133,7 @@ func TestMatchingArr(t *testing.T) {
 			Head: types.Num{},
 			Tail: types.VoidArr,
 		},
-		states.NewArrValue(
+		states.ArrFromSlice(
 			[]states.Value{
 				states.NumValue(3),
 			},
@@ -144,7 +144,7 @@ func TestMatchingArr(t *testing.T) {
 	interpreter.TestProgram(
 		`[1, 2, 3] is [a, b, c;rest] then rest ok`,
 		types.VoidArr,
-		states.NewArrValue(
+		states.ArrFromSlice(
 			[]states.Value{},
 		),
 		nil,
@@ -155,7 +155,7 @@ func TestMatchingArr(t *testing.T) {
 		&types.Arr{
 			El: types.Num{},
 		},
-		states.NewArrValue([]states.Value{
+		states.ArrFromSlice([]states.Value{
 			states.NumValue(2),
 			states.NumValue(3),
 		}),

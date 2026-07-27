@@ -17,8 +17,8 @@ func TestArrEqual(t *testing.T) {
 		states.NumValue(2),
 		states.NumValue(3),
 	}
-	arr1 := states.NewArrValue(elements1)
-	arr2 := states.NewArrValue(elements2)
+	arr1 := states.ArrFromSlice(elements1)
+	arr2 := states.ArrFromSlice(elements2)
 	ok, err := arr1.Equal(arr2)
 	if err != nil {
 		t.Log(err)

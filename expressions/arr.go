@@ -34,11 +34,8 @@ func (x ArrExpression) Typecheck(inputShape shapes.Shape, params []*params.Param
 	var ids *states.IDStack
 	if x.Rest == nil {
 		outputType = types.VoidArr
-		action = func(inputState states.State, args []states.Action) *states.Thunk {
-			return states.ThunkFromState(states.State{
-				Value: (*states.ArrValue)(nil),
-				Stack: inputState.Stack,
-			})
+		action = func(inputState states.State, args []states.Action) states.State {
+			return inputState.Replace(states.ThunkFromValue((*states.ArrValue)(nil)))
 		}
 	} else {
 		var restShape shapes.Shape
@@ -69,18 +66,17 @@ func (x ArrExpression) Typecheck(inputShape shapes.Shape, params []*params.Param
 			Tail: outputType,
 		}
 		tailAction := action
-		action = func(inputState states.State, args []states.Action) *states.Thunk {
-			val, err := elementAction(inputState, nil).Eval()
+		action = func(inputState states.State, args []states.Action) states.State {
+			head, err := elementAction(inputState, nil).Thunk.Eval()
 			if err != nil {
-				return states.ThunkFromError(err)
+				return inputState.Replace(states.ThunkFromError(err))
 			}
-			return states.ThunkFromState(states.State{
-				Value: &states.ArrValue{
-					Head: val,
-					Tail: tailAction(inputState, nil),
-				},
-				Stack: inputState.Stack,
-			})
+			return inputState.Replace(states.ThunkFromValue(&states.ArrValue{
+				Head: states.ThunkFromValue(head),
+				Tail: states.ThunkFromFunc(func() (states.Value, error) {
+					return tailAction(inputState, nil).Thunk.Eval()
+				}),
+			}))
 		}
 		ids = ids.AddAll(elementIDs)
 	}

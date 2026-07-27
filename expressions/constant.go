@@ -30,12 +30,8 @@ func (x ConstantExpression) Typecheck(inputShape shapes.Shape, params []*params.
 		Type:  x.Type,
 		Stack: inputShape.Stack,
 	}
-	action := func(inputState states.State, args []states.Action) *states.Thunk {
-		return states.ThunkFromState(states.State{
-			Value:     x.Value,
-			Stack:     inputState.Stack,
-			TypeStack: inputState.TypeStack,
-		})
+	action := func(inputState states.State, args []states.Action) states.State {
+		return inputState.Replace(states.ThunkFromValue(x.Value))
 	}
 	return outputShape, action, nil, nil
 }

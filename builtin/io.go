@@ -31,7 +31,10 @@ var IOFuncers = []shapes.Funcer{
 				if lines == nil {
 					return nil, nil, nil
 				}
-				head := lines.Head.(states.StrValue)
+				head, err := lines.Head.EvalStr()
+				if err != nil {
+					return nil, nil, err
+				}
 				val, err := lines.Tail.Eval()
 				if err != nil {
 					return nil, nil, err
@@ -45,7 +48,7 @@ var IOFuncers = []shapes.Funcer{
 					return nil, nil, err
 				}
 				return &states.ArrValue{
-					Head: head,
+					Head: states.ThunkFromValue(states.StrValue(head)),
 					Tail: states.ThunkFromValue(next),
 				}, rest, nil
 			}
@@ -53,7 +56,7 @@ var IOFuncers = []shapes.Funcer{
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			iter := func() (states.Value, bool, error) {
+			iter := func() (*states.Thunk, bool, error) {
 				if lines == nil {
 					return nil, false, nil
 				}
@@ -63,7 +66,7 @@ var IOFuncers = []shapes.Funcer{
 				if err != nil {
 					return nil, false, err
 				}
-				return next, true, nil
+				return states.ThunkFromValue(next), true, nil
 			}
 			return states.ThunkFromIter(iter)
 		},
@@ -85,13 +88,13 @@ var IOFuncers = []shapes.Funcer{
 		types.NewVar("A", types.Any{}),
 		"the same value",
 		"Identity function with the side effect of writing a string representation of the value to STDERR, followed by a line break.",
-		func(inputValue states.Value, args []states.Value) (states.Value, error) {
-			str, err := inputValue.Str()
+		func(inputThunk *states.Thunk, argThunks []*states.Thunk) *states.Thunk {
+			str, err := inputThunk.EvalStr()
 			if err != nil {
-				return nil, err
+				return states.ThunkFromError(err)
 			}
 			fmt.Fprintln(os.Stderr, str)
-			return inputValue, nil
+			return inputThunk
 		},
 		nil,
 	),
@@ -106,15 +109,15 @@ var IOFuncers = []shapes.Funcer{
 		types.NewVar("A", types.Any{}),
 		"the same value",
 		"Identity function with the side effect of writing a string representation of the value to STDERR, followed by a the specified line end.",
-		func(inputValue states.Value, args []states.Value) (states.Value, error) {
-			str, err := inputValue.Str()
+		func(inputThunk *states.Thunk, argThunks []*states.Thunk) *states.Thunk {
+			str, err := inputThunk.EvalStr()
 			if err != nil {
-				return nil, err
+				return states.ThunkFromError(err)
 			}
-			end := string(args[0].(states.StrValue))
+			end, err := argThunks[0].EvalStr()
 			fmt.Fprint(os.Stderr, str)
 			fmt.Fprint(os.Stderr, end)
-			return inputValue, nil
+			return inputThunk
 		},
 		nil,
 	),
@@ -127,8 +130,8 @@ var IOFuncers = []shapes.Funcer{
 		types.Reader{},
 		"a Reader representing STDIN",
 		"",
-		func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
-			return states.ReaderValue{Reader: os.Stdin}, nil
+		func(inputThunk *states.Thunk, argThunks []*states.Thunk) *states.Thunk {
+			return states.ThunkFromValue(states.ReaderValue{Reader: os.Stdin})
 		},
 		nil,
 	),
@@ -142,9 +145,12 @@ var IOFuncers = []shapes.Funcer{
 		OutputDescription: "array of data structures as they appear in the stream",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			reader := inputState.Value.(states.ReaderValue).Reader
+			reader, err := inputState.Thunk.EvalReader()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			dec := json.NewDecoder(reader)
-			output := func() (states.Value, bool, error) {
+			output := func() (*states.Thunk, bool, error) {
 				if !dec.More() {
 					return nil, false, nil
 				}
@@ -157,11 +163,7 @@ var IOFuncers = []shapes.Funcer{
 						errors.Message(err.Error()),
 					)
 				}
-				val, err := thunkFromData(o, pos).Eval()
-				if err != nil {
-					return nil, false, err
-				}
-				return val, true, nil
+				return thunkFromData(o, pos), true, nil
 			}
 			return states.ThunkFromIter(output)
 		},
@@ -192,13 +194,17 @@ var IOFuncers = []shapes.Funcer{
 		types.NewVar("A", types.Any{}),
 		"the same value",
 		"Identity function with the side effect of writing a string representation of the value to STDERR, followed by a line break.",
-		func(inputValue states.Value, args []states.Value) (states.Value, error) {
-			str, err := inputValue.Str()
+		func(inputThunk *states.Thunk, argThunks []*states.Thunk) *states.Thunk {
+			val, err := inputThunk.Eval()
 			if err != nil {
-				return nil, err
+				return states.ThunkFromError(err)
+			}
+			str, err := val.Str()
+			if err != nil {
+				return states.ThunkFromError(err)
 			}
 			fmt.Println(str)
-			return inputValue, nil
+			return inputThunk
 		},
 		nil,
 	),
@@ -213,15 +219,18 @@ var IOFuncers = []shapes.Funcer{
 		types.NewVar("A", types.Any{}),
 		"the same value",
 		"Identity function with the side effect of writing a string representation of the value to STDOUT, followed by a line break.",
-		func(inputValue states.Value, args []states.Value) (states.Value, error) {
-			str, err := inputValue.Str()
+		func(inputThunk *states.Thunk, argThunks []*states.Thunk) *states.Thunk {
+			str, err := inputThunk.EvalStr()
 			if err != nil {
-				return nil, err
+				return states.ThunkFromError(err)
 			}
-			end := string(args[0].(states.StrValue))
+			end, err := argThunks[0].EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			fmt.Print(str)
 			fmt.Print(end)
-			return inputValue, nil
+			return inputThunk
 		},
 		nil,
 	),
@@ -234,22 +243,31 @@ var IOFuncers = []shapes.Funcer{
 		types.Reader{},
 		"a Reader from which the input can be read",
 		"",
-		func(inputValue states.Value, args []states.Value) (states.Value, error) {
-			return states.ReaderValue{strings.NewReader(string(inputValue.(states.StrValue)))}, nil
+		func(inputThunk *states.Thunk, argThunks []*states.Thunk) *states.Thunk {
+			str, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.ReaderValue{
+				Reader: strings.NewReader(str),
+			})
 		},
 		nil,
 	),
 }
 
 func Lines(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-	reader := inputState.Value.(states.ReaderValue)
-	scanner := bufio.NewScanner(reader.Reader)
-	iter := func() (states.Value, bool, error) {
+	reader, err := inputState.Thunk.EvalReader()
+	if err != nil {
+		return states.ThunkFromError(err)
+	}
+	scanner := bufio.NewScanner(reader)
+	iter := func() (*states.Thunk, bool, error) {
 		ok := scanner.Scan()
 		if !ok {
 			return nil, false, nil
 		}
-		return states.StrValue(scanner.Text()), true, nil
+		return states.ThunkFromValue(states.StrValue(scanner.Text())), true, nil
 	}
 	return states.ThunkFromIter(iter)
 }

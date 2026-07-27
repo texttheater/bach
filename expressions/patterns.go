@@ -133,8 +133,12 @@ func (p ArrPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type
 	}
 	// build matcher
 	matcher := func(inputState states.State) (*states.VariableStack, bool, error) {
+		val, err := inputState.Thunk.Eval()
+		if err != nil {
+			return nil, false, err
+		}
 		varStack := inputState.Stack
-		switch v := inputState.Value.(type) {
+		switch v := val.(type) {
 		case *states.ArrValue:
 			for _, elMatcher := range elementMatchers {
 				if v == nil {
@@ -142,7 +146,7 @@ func (p ArrPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type
 				}
 				var ok bool
 				varStack, ok, err = elMatcher(states.State{
-					Value:     v.Head,
+					Thunk:     v.Head,
 					Stack:     varStack,
 					TypeStack: inputState.TypeStack,
 				})
@@ -155,7 +159,7 @@ func (p ArrPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type
 				}
 			}
 			varStack, ok, err = restMatcher(states.State{
-				Value:     v,
+				Thunk:     states.ThunkFromValue(v),
 				Stack:     varStack,
 				TypeStack: inputState.TypeStack,
 			})
@@ -259,16 +263,20 @@ func (p ObjPattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Type
 	// build matcher
 	matcher := func(inputState states.State) (*states.VariableStack, bool, error) {
 		varStack := inputState.Stack
-		switch v := inputState.Value.(type) {
+		val, err := inputState.Thunk.Eval()
+		if err != nil {
+			return nil, false, err
+		}
+		switch v := val.(type) {
 		case states.ObjValue:
 			for prop, valMatcher := range propMatcherMap {
-				val, ok := v[prop]
+				thk, ok := v[prop]
 				if !ok {
 					return nil, false, nil
 				}
 				var err error
 				varStack, ok, err = valMatcher(states.State{
-					Value:     val,
+					Thunk:     thk,
 					Stack:     varStack,
 					TypeStack: inputState.TypeStack,
 				})
@@ -320,7 +328,11 @@ func (p TypePattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Typ
 	matcher := func(inputState states.State) (*states.VariableStack, bool, error) {
 		// TODO For efficiency, we should check inhabitation of a more
 		// general type than p.Type if that is equivalent.
-		if ok, err := inputState.Value.Inhabits(p.Type, inputState.TypeStack); !ok {
+		val, err := inputState.Thunk.Eval()
+		if err != nil {
+			return nil, false, err
+		}
+		if ok, err := val.Inhabits(p.Type, inputState.TypeStack); !ok {
 			return nil, false, err
 		}
 		varStack := inputState.Stack
@@ -328,7 +340,7 @@ func (p TypePattern) Typecheck(inputShape shapes.Shape) (shapes.Shape, types.Typ
 			varStack = &states.VariableStack{
 				Head: states.Variable{
 					ID:     p,
-					Action: states.SimpleAction(inputState.Value),
+					Action: states.SimpleAction(inputState.Thunk),
 				},
 				Tail: varStack,
 			}

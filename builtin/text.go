@@ -24,10 +24,16 @@ var TextFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true if the input appears before other in lexicographical order, false otherwise",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.BoolValue(str1 < str2), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str1, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			str2, err := argumentThunks[0].EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(str1 < str2))
 		},
 		[]shapes.Example{
 			{`"a" <"b"`, `Bool`, `true`, nil},
@@ -46,10 +52,16 @@ var TextFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true if the input appears after other in lexicographical order, false otherwise",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.BoolValue(str1 > str2), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str1, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			str2, err := argumentThunks[0].EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(str1 > str2))
 		},
 		[]shapes.Example{
 			{`"a" >"b"`, `Bool`, `false`, nil},
@@ -68,10 +80,16 @@ var TextFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true if the input appears before other in lexicographical order or is equal to it, false otherwise",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.BoolValue(str1 <= str2), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str1, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			str2, err := argumentThunks[0].EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(str1 <= str2))
 		},
 		[]shapes.Example{
 			{`"a" <="b"`, `Bool`, `true`, nil},
@@ -90,10 +108,16 @@ var TextFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true if the input appears after other in lexicographical order or is equal to it, false otherwise",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.BoolValue(str1 >= str2), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str1, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			str2, err := argumentThunks[0].EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(str1 >= str2))
 		},
 		[]shapes.Example{
 			{`"a" >="b"`, `Bool`, `false`, nil},
@@ -112,10 +136,16 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"The input and b, concatenated.",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.StrValue(str1 + str2), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str1, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			str2, err := argumentThunks[0].EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.StrValue(str1 + str2))
 		},
 		[]shapes.Example{
 			{`"ab" +"cd"`, `Str`, `"abcd"`, nil},
@@ -133,17 +163,20 @@ var TextFuncers = []shapes.Funcer{
 		OutputDescription: "The UTF-8 bytes representing the string.",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			str := inputState.Value.(states.StrValue)
+			str, err := inputState.Thunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			bytes := []byte(str)
-			var output func() (states.Value, bool, error)
+			var output func() (*states.Thunk, bool, error)
 			i := 0
-			output = func() (states.Value, bool, error) {
+			output = func() (*states.Thunk, bool, error) {
 				if i >= len(bytes) {
 					return nil, false, nil
 				}
 				v := states.NumValue(bytes[i])
 				i++
-				return v, true, nil
+				return states.ThunkFromValue(v), true, nil
 			}
 			return states.ThunkFromIter(output)
 		},
@@ -164,17 +197,21 @@ var TextFuncers = []shapes.Funcer{
 		OutputType:        types.Str{},
 		OutputDescription: "the string represented by the input",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := states.IterFromValue(inputState.Value)
+			input := states.IterFromThunk(inputState.Thunk)
 			var output strings.Builder
 			for {
-				v, ok, err := input()
+				thk, ok, err := input()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
 				if !ok {
 					break
 				}
-				output.WriteByte(byte(v.(states.NumValue)))
+				num, err := thk.EvalNum()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				output.WriteByte(byte(num))
 			}
 			return states.ThunkFromValue(states.StrValue(output.String()))
 		},
@@ -197,16 +234,19 @@ var TextFuncers = []shapes.Funcer{
 		OutputDescription: "the input represented as a sequence of code points",
 		Notes:             "If the input string contains invalid UTF-8 byte sequences, they will be represented by the Unicode replacement character (code point 65533).",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			str := inputState.Value.(states.StrValue)
+			str, err := inputState.Thunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			runes := []rune(str)
 			i := 0
-			output := func() (states.Value, bool, error) {
+			output := func() (*states.Thunk, bool, error) {
 				if i >= len(runes) {
 					return nil, false, nil
 				}
 				v := states.NumValue(runes[i])
 				i++
-				return v, true, nil
+				return states.ThunkFromValue(v), true, nil
 			}
 			return states.ThunkFromIter(output)
 		},
@@ -227,17 +267,21 @@ var TextFuncers = []shapes.Funcer{
 		OutputType:        types.Str{},
 		OutputDescription: "UTF-8 encoded version of the input",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			input := states.IterFromValue(inputState.Value)
+			input := states.IterFromThunk(inputState.Thunk)
 			var output strings.Builder
 			for {
-				v, ok, err := input()
+				thk, ok, err := input()
 				if err != nil {
 					return states.ThunkFromError(err)
 				}
 				if !ok {
 					break
 				}
-				output.WriteRune(rune(v.(states.NumValue)))
+				num, err := thk.EvalNum()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				output.WriteRune(rune(num))
 			}
 			return states.ThunkFromValue(states.StrValue(output.String()))
 		},
@@ -258,16 +302,19 @@ var TextFuncers = []shapes.Funcer{
 		OutputType:        types.NewArr(types.Str{}),
 		OutputDescription: "the result of splitting the string around any kind or amount of white space",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			str := string(inputState.Value.(states.StrValue))
+			str, err := inputState.Thunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			fields := strings.Fields(str)
 			i := 0
-			iter := func() (states.Value, bool, error) {
+			iter := func() (*states.Thunk, bool, error) {
 				if i >= len(fields) {
 					return nil, false, nil
 				}
 				v := states.StrValue(fields[i])
 				i++
-				return v, true, nil
+				return states.ThunkFromValue(v), true, nil
 			}
 			return states.ThunkFromIter(iter)
 		},
@@ -287,8 +334,11 @@ var TextFuncers = []shapes.Funcer{
 		OutputType:        types.Num{},
 		OutputDescription: "offset of first occurrence of needle from the beginning of the input, measured in bytes, or -1 if none",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			haystack := string(inputState.Value.(states.StrValue))
-			needle, err := args[0](inputState.Clear(), nil).EvalStr()
+			haystack, err := inputState.Thunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			needle, err := args[0](inputState.Clear(), nil).Thunk.EvalStr()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
@@ -312,18 +362,22 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"the concatenation of all the strings in the input",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			iter := states.IterFromValue(inputValue)
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			iter := states.IterFromThunk(inputThunk)
 			buffer := bytes.Buffer{}
 			for {
-				value, ok, err := iter()
+				thk, ok, err := iter()
 				if err != nil {
-					return nil, err
+					return states.ThunkFromError(err)
 				}
 				if !ok {
-					return states.StrValue(buffer.String()), nil
+					return states.ThunkFromValue(states.StrValue(buffer.String()))
 				}
-				buffer.WriteString(string(value.(states.StrValue)))
+				val, err := thk.EvalStr()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				buffer.WriteString(val)
 			}
 		},
 		[]shapes.Example{
@@ -344,23 +398,30 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"the concatenation of all the strings in the input, with the glue in between",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			iter := states.IterFromValue(inputValue)
-			sep := string(argumentValues[0].(states.StrValue))
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			iter := states.IterFromThunk(inputThunk)
+			sep, err := argumentThunks[0].EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			buffer := bytes.Buffer{}
 			firstWritten := false
 			for {
-				value, ok, err := iter()
+				thk, ok, err := iter()
 				if err != nil {
-					return nil, err
+					return states.ThunkFromError(err)
 				}
 				if !ok {
-					return states.StrValue(buffer.String()), nil
+					return states.ThunkFromValue(states.StrValue(buffer.String()))
 				}
 				if firstWritten {
 					buffer.WriteString(sep)
 				}
-				buffer.WriteString(string(value.(states.StrValue)))
+				val, err := thk.EvalStr()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				buffer.WriteString(val)
 				firstWritten = true
 			}
 		},
@@ -383,10 +444,19 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"the input followed by as many repetitions of padString as necessary to reach targetLength",
 		"padString is usually one character but can be longer, in which case each repetition starts from the left.",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			length := int(argumentValues[0].(states.NumValue))
-			padding := string(argumentValues[1].(states.StrValue))
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			length, err := argumentThunks[0].EvalInt()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			padding, err := argumentThunks[1].EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			var builder strings.Builder
 			builder.WriteString(str)
 			for {
@@ -400,7 +470,7 @@ var TextFuncers = []shapes.Funcer{
 				}
 				builder.WriteString(padding)
 			}
-			return states.StrValue(builder.String()), nil
+			return states.ThunkFromValue(states.StrValue(builder.String()))
 		},
 		[]shapes.Example{
 			{`"z" padEnd(2, " ")`, `Str`, `"z "`, nil},
@@ -422,10 +492,19 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"the input following as many repetitions of padString as necessary to reach targetLength",
 		"padString is usually one character but can be longer, in which case each repetition starts from the left.",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			length := int(argumentValues[0].(states.NumValue))
-			padding := string(argumentValues[1].(states.StrValue))
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			length, err := argumentThunks[0].EvalInt()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			padding, err := argumentThunks[1].EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			var builder strings.Builder
 			for {
 				delta := length - len(str) - builder.Len()
@@ -439,7 +518,7 @@ var TextFuncers = []shapes.Funcer{
 				builder.WriteString(padding)
 			}
 			builder.WriteString(str)
-			return states.StrValue(builder.String()), nil
+			return states.ThunkFromValue(states.StrValue(builder.String()))
 		},
 		[]shapes.Example{
 			{`"z" padStart(2, " ")`, `Str`, `" z"`, nil},
@@ -462,12 +541,15 @@ var TextFuncers = []shapes.Funcer{
 		OutputDescription: "the input with all occurrences of needle replaced with replacement",
 		Notes:             "More precisely, whenever there are two or more overlapping occurrences of needle in the input, only the first one is replaced.",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			haystack := inputState.Value.(states.StrValue)
-			needle, err := args[0](inputState.Clear(), nil).EvalStr()
+			haystack, err := inputState.Thunk.EvalStr()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			replacement, err := args[1](inputState.Clear(), nil).EvalStr()
+			needle, err := args[0](inputState.Clear(), nil).Thunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			replacement, err := args[1](inputState.Clear(), nil).Thunk.EvalStr()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
@@ -492,12 +574,15 @@ var TextFuncers = []shapes.Funcer{
 		OutputDescription: "the input with the first ocurrence of needle replaced with replacement",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			haystack := inputState.Value.(states.StrValue)
-			needle, err := args[0](inputState.Clear(), nil).EvalStr()
+			haystack, err := inputState.Thunk.EvalStr()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			replacement, err := args[1](inputState.Clear(), nil).EvalStr()
+			needle, err := args[0](inputState.Clear(), nil).Thunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			replacement, err := args[1](inputState.Clear(), nil).Thunk.EvalStr()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
@@ -520,10 +605,16 @@ var TextFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true if the input starts with needle, false otherwise",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.BoolValue(strings.HasPrefix(str1, str2)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str1, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			str2, err := argumentThunks[0].EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(strings.HasPrefix(str1, str2)))
 		},
 		[]shapes.Example{
 			{`"abc" startsWith("ab")`, `Bool`, `true`, nil},
@@ -541,10 +632,16 @@ var TextFuncers = []shapes.Funcer{
 		types.Bool{},
 		"true if the input ends with needle, false otherwise",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str1 := string(inputValue.(states.StrValue))
-			str2 := string(argumentValues[0].(states.StrValue))
-			return states.BoolValue(strings.HasSuffix(str1, str2)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str1, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			str2, err := argumentThunks[0].EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.BoolValue(strings.HasSuffix(str1, str2)))
 		},
 		[]shapes.Example{
 			{`"abc" endsWith("bc")`, `Bool`, `true`, nil},
@@ -562,13 +659,19 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"the input, repeated n times",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			n := int(argumentValues[0].(states.NumValue))
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			n, err := argumentThunks[0].EvalInt()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			if n < 0 {
 				n = 0
 			}
-			return states.StrValue(strings.Repeat(str, n)), nil
+			return states.ThunkFromValue(states.StrValue(strings.Repeat(str, n)))
 		},
 		[]shapes.Example{
 			{`"abc" repeat(3)`, `Str`, `"abcabcabc"`, nil},
@@ -588,9 +691,15 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"the portion of the input that is after offset start",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			start := int(argumentValues[0].(states.NumValue))
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			start, err := argumentThunks[0].EvalInt()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			if start < 0 {
 				start = len(str) + start
 				if start < 0 {
@@ -599,7 +708,7 @@ var TextFuncers = []shapes.Funcer{
 			} else if start > len(str) {
 				start = len(str)
 			}
-			return states.StrValue(str[start:]), nil
+			return states.ThunkFromValue(states.StrValue(str[start:]))
 		},
 		[]shapes.Example{
 			{`"abc" slice(-4)`, `Str`, `"abc"`, nil},
@@ -625,10 +734,19 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"the portion of the input that is after offset start but before offset end",
 		"Negative offsets are counted from the end of the string.",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			start := int(argumentValues[0].(states.NumValue))
-			end := int(argumentValues[1].(states.NumValue))
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			start, err := argumentThunks[0].EvalInt()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			end, err := argumentThunks[1].EvalInt()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			if start < 0 {
 				start = len(str) + start
 				if start < 0 {
@@ -645,7 +763,7 @@ var TextFuncers = []shapes.Funcer{
 			} else if end > len(str) {
 				end = len(str)
 			}
-			return states.StrValue(str[start:end]), nil
+			return states.ThunkFromValue(states.StrValue(str[start:end]))
 		},
 		[]shapes.Example{
 			{`"abc" slice(1, 2)`, `Str`, `"b"`, nil},
@@ -672,9 +790,12 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"the input, with leading and trailing whitespace removed",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			return states.StrValue(strings.TrimSpace(str)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.StrValue(strings.TrimSpace(str)))
 		},
 		[]shapes.Example{
 			{`" abc  " trim`, `Str`, `"abc"`, nil},
@@ -689,9 +810,12 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"the input, with leading whitespace removed",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			return states.StrValue(strings.TrimLeftFunc(str, unicode.IsSpace)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.StrValue(strings.TrimLeftFunc(str, unicode.IsSpace)))
 		},
 		[]shapes.Example{
 			{`" abc  " trimStart`, `Str`, `"abc  "`, nil},
@@ -706,9 +830,12 @@ var TextFuncers = []shapes.Funcer{
 		types.Str{},
 		"the input, with trailing whitespace removed",
 		"",
-		func(inputValue states.Value, argumentValues []states.Value) (states.Value, error) {
-			str := string(inputValue.(states.StrValue))
-			return states.StrValue(strings.TrimRightFunc(str, unicode.IsSpace)), nil
+		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
+			str, err := inputThunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.StrValue(strings.TrimRightFunc(str, unicode.IsSpace)))
 		},
 		[]shapes.Example{
 			{`" abc  " trimEnd`, `Str`, `" abc"`, nil},

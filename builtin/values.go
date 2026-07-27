@@ -25,8 +25,11 @@ var ValueFuncers = []shapes.Funcer{
 		OutputDescription: "true if the input is the same as other, false otherwise",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			a := inputState.Value
-			b, err := args[0](inputState.Clear(), nil).Eval()
+			a, err := inputState.Thunk.Eval()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			b, err := args[0](inputState.Clear(), nil).Thunk.Eval()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
@@ -66,8 +69,8 @@ var ValueFuncers = []shapes.Funcer{
 		types.NewVar("A", types.Any{}),
 		"the input value",
 		"",
-		func(inputValue states.Value, argValues []states.Value) (states.Value, error) {
-			return inputValue, nil
+		func(inputThunk *states.Thunk, argThunks []*states.Thunk) *states.Thunk {
+			return inputThunk
 		},
 		[]shapes.Example{
 			{`123 id`, `Num`, `123`, nil},
@@ -87,13 +90,16 @@ var ValueFuncers = []shapes.Funcer{
 		OutputDescription: "the corresponding Num value",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			s := string(inputState.Value.(states.StrValue))
+			s, err := inputState.Thunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			n, err := strconv.ParseFloat(s, 64)
 			if err != nil {
 				return states.ThunkFromError(errors.ValueError(
 					errors.Pos(pos),
 					errors.Code(errors.UnexpectedValue),
-					errors.GotValue(inputState.Value.(states.StrValue)),
+					errors.GotValue(states.StrValue(s)),
 					errors.Message(err.Error()),
 				))
 			}
@@ -122,8 +128,11 @@ var ValueFuncers = []shapes.Funcer{
 		OutputDescription: "the corresponding Num value",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			s := string(inputState.Value.(states.StrValue))
-			b, err := args[0](inputState.Clear(), nil).EvalNum()
+			s, err := inputState.Thunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			b, err := args[0](inputState.Clear(), nil).Thunk.EvalNum()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
@@ -132,7 +141,7 @@ var ValueFuncers = []shapes.Funcer{
 				return states.ThunkFromError(errors.ValueError(
 					errors.Pos(pos),
 					errors.Code(errors.UnexpectedValue),
-					errors.GotValue(inputState.Value.(states.StrValue)),
+					errors.GotValue(states.StrValue(s)),
 					errors.Message(err.Error()),
 				))
 			}
@@ -162,14 +171,17 @@ var ValueFuncers = []shapes.Funcer{
 		OutputDescription: "the corresponding Num value",
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-			s := string(inputState.Value.(states.StrValue))
+			s, err := inputState.Thunk.EvalStr()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
 			b := 10
 			n, err := strconv.ParseInt(s, int(b), 64)
 			if err != nil {
 				return states.ThunkFromError(errors.ValueError(
 					errors.Pos(pos),
 					errors.Code(errors.UnexpectedValue),
-					errors.GotValue(inputState.Value.(states.StrValue)),
+					errors.GotValue(states.StrValue(s)),
 					errors.Message(err.Error()),
 				))
 			}
@@ -197,72 +209,110 @@ var ValueFuncers = []shapes.Funcer{
 			)},
 		},
 	},
-
-	shapes.Funcer{InputType: types.Str{}, Name: "parseJSON", Params: nil, OutputType: types.Any{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		str := inputState.Value.(states.StrValue)
-		var data any
-		err := json.Unmarshal([]byte(str), &data)
-		if err != nil {
-			return states.ThunkFromError(errors.ValueError(
-				errors.Pos(pos),
-				errors.Code(errors.UnexpectedValue),
-				errors.Message(err.Error()),
-			))
-		}
-		return thunkFromData(data, pos)
-	}, IDs: nil},
-
-	shapes.Funcer{InputType: types.Any{}, Name: "toJSON", Params: nil, OutputType: types.Str{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		data, err := inputState.Value.Data()
-		if err != nil {
-			return states.ThunkFromError(err)
-		}
-		bytes, err := json.Marshal(data)
-		if err != nil {
-			return states.ThunkFromError(errors.ValueError(
-				errors.Pos(pos),
-				errors.Code(errors.UnexpectedValue),
-				errors.Message(err.Error()),
-			))
-		}
-		return states.ThunkFromValue(states.StrValue(bytes))
-	}, IDs: nil},
-
-	shapes.Funcer{InputType: types.NewArr(types.NewTup([]types.Type{
-		types.Str{},
-		types.NewVar("A", types.Any{}),
-	})), Name: "toObj", Params: nil, OutputType: types.Obj{
-		Props: map[string]types.Type{},
-		Rest:  types.NewVar("A", types.Any{}),
-	}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		var res states.ObjValue = make(map[string]states.Value)
-		iter := states.IterFromValue(inputState.Value)
-		for {
-			val, ok, err := iter()
+	shapes.Funcer{
+		InputType:  types.Str{},
+		Name:       "parseJSON",
+		Params:     nil,
+		OutputType: types.Any{},
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			str, err := inputState.Thunk.EvalStr()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			if !ok {
-				break
+			var data any
+			err = json.Unmarshal([]byte(str), &data)
+			if err != nil {
+				return states.ThunkFromError(errors.ValueError(
+					errors.Pos(pos),
+					errors.Code(errors.UnexpectedValue),
+					errors.Message(err.Error()),
+				))
 			}
-			arr := val.(*states.ArrValue)
-			prop := string(arr.Head.(states.StrValue))
-			tail, err := arr.Tail.Eval()
+			return thunkFromData(data, pos)
+		},
+		IDs: nil,
+	},
+	shapes.Funcer{
+		InputType:  types.Any{},
+		Name:       "toJSON",
+		Params:     nil,
+		OutputType: types.Str{},
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			val, err := inputState.Thunk.Eval()
 			if err != nil {
 				return states.ThunkFromError(err)
 			}
-			res[prop] = tail.(*states.ArrValue).Head
-		}
-		return states.ThunkFromValue(res)
-	}, IDs: nil},
-
-	shapes.Funcer{InputType: types.Any{}, Name: "toStr", Params: nil, OutputType: types.Str{}, Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-		str, err := inputState.Value.Str()
-		if err != nil {
-			return states.ThunkFromError(err)
-		}
-		return states.ThunkFromValue(states.StrValue(str))
-	}, IDs: nil},
+			data, err := val.Data()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			bytes, err := json.Marshal(data)
+			if err != nil {
+				return states.ThunkFromError(errors.ValueError(
+					errors.Pos(pos),
+					errors.Code(errors.UnexpectedValue),
+					errors.Message(err.Error()),
+				))
+			}
+			return states.ThunkFromValue(states.StrValue(bytes))
+		},
+		IDs: nil,
+	},
+	shapes.Funcer{
+		InputType: types.NewArr(types.NewTup([]types.Type{types.Str{}, types.NewVar("A", types.Any{})})),
+		Name:      "toObj",
+		Params:    nil,
+		OutputType: types.Obj{
+			Props: map[string]types.Type{},
+			Rest:  types.NewVar("A", types.Any{}),
+		},
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			var res states.ObjValue = make(map[string]*states.Thunk)
+			iter := states.IterFromThunk(inputState.Thunk)
+			for {
+				thk, ok, err := iter()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				if !ok {
+					break
+				}
+				arr, err := thk.EvalArr()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				prop, err := arr.Head.EvalStr()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				tail, err := arr.Tail.Eval()
+				if err != nil {
+					return states.ThunkFromError(err)
+				}
+				res[prop] = tail.(*states.ArrValue).Head
+			}
+			return states.ThunkFromValue(res)
+		},
+		IDs: nil,
+	},
+	shapes.Funcer{
+		InputType:  types.Any{},
+		Name:       "toStr",
+		Params:     nil,
+		OutputType: types.Str{},
+		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
+			val, err := inputState.Thunk.Eval()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			str, err := val.Str()
+			if err != nil {
+				return states.ThunkFromError(err)
+			}
+			return states.ThunkFromValue(states.StrValue(str))
+		},
+		IDs: nil,
+	},
 }
 
 func thunkFromData(data any, pos lexer.Position) *states.Thunk {
@@ -277,26 +327,20 @@ func thunkFromData(data any, pos lexer.Position) *states.Thunk {
 		return states.ThunkFromValue(states.StrValue(data))
 	case []any:
 		i := 0
-		iter := func() (states.Value, bool, error) {
+		iter := func() (*states.Thunk, bool, error) {
 			if i >= len(data) {
 				return nil, false, nil
 			}
-			val, err := thunkFromData(data[i], pos).Eval()
-			if err != nil {
-				return nil, false, err
-			}
+			thk := thunkFromData(data[i], pos)
 			i += 1
-			return val, true, nil
+			return thk, true, nil
 		}
 		return states.ThunkFromIter(iter)
 	case map[string]any:
-		obj := make(map[string]states.Value)
+		obj := make(map[string]*states.Thunk)
 		for k, v := range data {
-			val, err := thunkFromData(v, pos).Eval()
-			if err != nil {
-				return states.ThunkFromError(err)
-			}
-			obj[k] = val
+			thk := thunkFromData(v, pos)
+			obj[k] = thk
 		}
 		return states.ThunkFromValue(states.ObjValue(obj))
 	default:

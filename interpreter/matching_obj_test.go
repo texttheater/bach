@@ -74,7 +74,7 @@ func TestMatchingObj(t *testing.T) {
 				Rest: types.Void{},
 			},
 		),
-		states.ObjValueFromMap(map[string]states.Value{
+		states.ObjFromValMap(map[string]states.Value{
 			"a": states.NumValue(1),
 		}),
 		nil,

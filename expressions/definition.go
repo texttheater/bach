@@ -47,11 +47,11 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*param
 			})
 		}
 		bodyInputState := states.State{
-			Value:     inputState.Value,
+			Thunk:     inputState.Thunk,
 			Stack:     bodyInputStack,
 			TypeStack: inputState.TypeStack,
 		}
-		return bodyAction(bodyInputState, nil)
+		return bodyAction(bodyInputState, nil).Thunk
 	}
 	// make a funcer for the defined function, add it to the function stack
 	funFuncer := shapes.Funcer{InputType: x.InputType, Name: x.Name, Params: x.Params, OutputType: x.OutputType, Kernel: funKernel, IDs: nil}
@@ -64,7 +64,7 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*param
 			stack := inputState.Stack
 			for stack != nil {
 				if stack.Head.ID == id {
-					return stack.Head.Action(inputState, args)
+					return stack.Head.Action(inputState, args).Thunk
 				}
 				stack = stack.Tail
 			}
@@ -101,9 +101,9 @@ func (x DefinitionExpression) Typecheck(inputShape shapes.Shape, params []*param
 		Stack: functionStack,
 	}
 	// define action (crucially, setting body input stack)
-	action := func(inputState states.State, args []states.Action) *states.Thunk {
+	action := func(inputState states.State, args []states.Action) states.State {
 		bodyInputStackStub = inputState.Stack
-		return states.ThunkFromState(inputState)
+		return inputState
 
 	}
 	// return

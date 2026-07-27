@@ -66,15 +66,15 @@ func executeCLI(program string) (success bool) {
 	initialState := states.InitialState
 	initialState.Thunk = states.ThunkFromValue(states.ReaderValue{Reader: os.Stdin})
 	initialState.Thunk = builtin.Lines(initialState, nil, nil, lexer.Position{})
-	typ, thk, err := interpreter.InterpretString(initialShape, initialState, program)
+	typ, val, err := interpreter.InterpretString(initialShape, initialState, program)
 	if err != nil {
 		errors.Explain(os.Stderr, err, program)
 		return false
 	}
 	if types.AnyArr.Subsumes(typ) {
-		iter := states.IterFromThunk(thk)
+		iter := states.IterFromThunk(states.ThunkFromValue(val))
 		for {
-			el, ok, err := iter()
+			thk, ok, err := iter()
 			if err != nil {
 				errors.Explain(os.Stderr, err, program)
 				return false
@@ -82,14 +82,19 @@ func executeCLI(program string) (success bool) {
 			if !ok {
 				break
 			}
-			if !printValue(el, program) {
+			val, err := thk.Eval()
+			if err != nil {
+				errors.Explain(os.Stderr, err, program)
+				return false
+			}
+			if !printValue(val, program) {
 				return false
 			}
 		}
 	} else if (types.Null{}).Subsumes(typ) {
 		// do nothing
 	} else {
-		if !printValue(value, program) {
+		if !printValue(val, program) {
 			return false
 		}
 	}

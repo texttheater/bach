@@ -42,14 +42,12 @@ func (x GetterExpression) Typecheck(inputShape shapes.Shape, params []*params.Pa
 			Type:  outputType,
 			Stack: inputShape.Stack,
 		}
-		action := func(inputState states.State, args []states.Action) *states.Thunk {
-			val := inputState.Value.(states.ObjValue)[x.Name]
-			outputState := states.State{
-				Value:     val,
-				Stack:     inputState.Stack,
-				TypeStack: inputState.TypeStack,
+		action := func(inputState states.State, args []states.Action) states.State {
+			obj, err := inputState.Thunk.EvalObj()
+			if err != nil {
+				return inputState.Replace(states.ThunkFromError(err))
 			}
-			return states.ThunkFromState(outputState)
+			return inputState.Replace(obj[x.Name])
 		}
 		return outputShape, action, nil, nil
 	case *types.Nearr:
@@ -76,21 +74,19 @@ func (x GetterExpression) Typecheck(inputShape shapes.Shape, params []*params.Pa
 			Type:  outputType,
 			Stack: inputShape.Stack,
 		}
-		action := func(inputState states.State, args []states.Action) *states.Thunk {
-			arr := inputState.Value.(*states.ArrValue)
+		action := func(inputState states.State, args []states.Action) states.State {
+			arr, err := inputState.Thunk.EvalArr()
+			if err != nil {
+				return inputState.Replace(states.ThunkFromError(err))
+			}
 			for i := 0; i < index; i++ {
 				val, err := arr.Tail.Eval()
 				if err != nil {
-					return states.ThunkFromError(err)
+					return inputState.Replace(states.ThunkFromError(err))
 				}
 				arr = val.(*states.ArrValue)
 			}
-			outputState := states.State{
-				Value:     arr.Head,
-				Stack:     inputState.Stack,
-				TypeStack: inputState.TypeStack,
-			}
-			return states.ThunkFromState(outputState)
+			return inputState.Replace(arr.Head)
 		}
 		return outputShape, action, nil, nil
 	default:
