@@ -1,6 +1,7 @@
 package interpreter_test
 
 import (
+	"math"
 	"testing"
 
 	"github.com/texttheater/bach/interpreter"
@@ -46,9 +47,9 @@ func TestRecursion(t *testing.T) {
 	// tail-recursive factorial
 	// This does not exhaust the goroutine stack and runs in constant space.
 	interpreter.TestProgram(
-		`for Num def fac(acc Num) Num as =n if ==0 then acc else acc *n =acc n -1 fac(acc) ok ok 3 fac(1)`,
+		`for Num def fac(acc Num) Num as =n if ==0 then acc else acc *n =acc n -1 fac(acc) ok ok 10000000 fac(1)`,
 		types.Num{},
-		states.NumValue(6),
+		states.NumValue(math.Inf(1)),
 		nil,
 		t,
 	)
