@@ -264,9 +264,10 @@ var ArrFuncers = []shapes.Funcer{
 				if !ok {
 					return nil, false, nil
 				}
+				j := i
 				i++
 				return states.ThunkFromSlice([]*states.Thunk{
-					states.ThunkFromValue(states.NumValue(i)),
+					states.ThunkFromValue(states.NumValue(j)),
 					thk,
 				}), true, nil
 			}

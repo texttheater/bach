@@ -1471,7 +1471,7 @@ var MathFuncers = []shapes.Funcer{
 		"the smallest number in the input, or inf if the input is empty",
 		"",
 		func(inputThunk *states.Thunk, argumentThunks []*states.Thunk) *states.Thunk {
-			min := math.Inf(-1)
+			min := math.Inf(1)
 			iter := states.IterFromThunk(inputThunk)
 			for {
 				next, ok, err := iter()
