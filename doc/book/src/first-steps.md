@@ -1,5 +1,6 @@
 # First Steps
 
+
 ## The CLI
 
 Call Bach and pass a Bach program to it as an argument on the command line. In
@@ -15,13 +16,33 @@ quotes, we can compose our pogram with the function `out` to print it out:
 
     $ bach '"Hello world!" out'
     Hello world!
-    "Hello world!"
 
-`out` returns its input value unchanged, so we are still shown the string with the quotes at the end.
-To suppress this, we can call Bach with the `-q` flag:
+`out` returns the special value `null`, which the Bach CLI ignores, so you you
+only get that one line of output.
 
-    $ bach -q '"Hello world!" out'
-    Hello world!
+
+## Processing Lines
+
+On the command line, it is common to process files or input streams line by
+line, e.g., by applying an operation to each input line or by computing an
+aggregate function over them. Bach’s CLI treats the standard input (STDIN) as a
+list of lines that you can apply functions to. If those functions return a list
+of strings again, those are written out line by line.
+
+For example, you can parse each line as a number and add one to it:
+
+    $ echo "1\n2.5\n3" | bach 'each(parseFloat +1)'
+	2
+	3.5
+	4
+
+Or you can sort the input lines by length;
+
+    $ echo "aaa\na\naa" | bach 'sortBy(codePoints len, <)'
+	a
+	aa
+	aaa
+
 
 ## The REPL
 

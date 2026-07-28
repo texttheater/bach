@@ -1,6 +1,6 @@
 # The Bach Programming Language
 
-    $ bach -q '"Hello world!" out'
+    $ bach '"Hello world!" out'
     Hello world!
 
 Welcome to Bach, an experimental compositional programming language. Bach is a
