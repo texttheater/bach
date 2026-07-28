@@ -93,19 +93,3 @@ func ThunkFromError(err error) *Thunk {
 		Error: err,
 	}
 }
-
-func IterFromError(err error) func() (*Thunk, bool, error) {
-	return func() (*Thunk, bool, error) {
-		return nil, false, err
-	}
-}
-
-func IterFromAction(state State, action Action) func() (*Thunk, bool, error) {
-	return IterFromThunk(action(state, nil).Thunk)
-}
-
-func StateFromError(err error) State {
-	return State{
-		Thunk: ThunkFromError(err),
-	}
-}
