@@ -32,7 +32,7 @@ var ArrFuncers = []shapes.Funcer{
 		Notes:             "",
 		Kernel: func(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
 			input1 := states.IterFromThunk(inputState.Thunk)
-			input2 := states.IterFromAction(inputState.Clear(), args[0])
+			input2 := states.IterFromThunk(args[0](inputState.Clear(), nil).Thunk)
 			output := func() (*states.Thunk, bool, error) {
 				el, ok, err := input1()
 				if err != nil {
