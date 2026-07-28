@@ -85,9 +85,9 @@ var IOFuncers = []shapes.Funcer{
 		"any value",
 		"err",
 		nil,
-		types.NewVar("A", types.Any{}),
-		"the same value",
-		"Identity function with the side effect of writing a string representation of the value to STDERR, followed by a line break.",
+		types.Null{},
+		"null",
+		"Writes a string representation of the value to STDERR, followed by a line break.",
 		func(inputThunk *states.Thunk, argThunks []*states.Thunk) *states.Thunk {
 			str, err := inputThunk.EvalStr()
 			if err != nil {
@@ -106,9 +106,9 @@ var IOFuncers = []shapes.Funcer{
 		[]*params.Param{
 			params.SimpleParam("end", "the line end to use", types.Str{}),
 		},
-		types.NewVar("A", types.Any{}),
-		"the same value",
-		"Identity function with the side effect of writing a string representation of the value to STDERR, followed by a the specified line end.",
+		types.Null{},
+		"null",
+		"Writes a string representation of the value to STDERR, followed by the specified line end.",
 		func(inputThunk *states.Thunk, argThunks []*states.Thunk) *states.Thunk {
 			str, err := inputThunk.EvalStr()
 			if err != nil {
@@ -191,9 +191,9 @@ var IOFuncers = []shapes.Funcer{
 		"any value",
 		"out",
 		nil,
-		types.NewVar("A", types.Any{}),
-		"the same value",
-		"Identity function with the side effect of writing a string representation of the value to STDERR, followed by a line break.",
+		types.Null{},
+		"null",
+		"Writes a string representation of the value to STDERR, followed by a line break.",
 		func(inputThunk *states.Thunk, argThunks []*states.Thunk) *states.Thunk {
 			val, err := inputThunk.Eval()
 			if err != nil {
@@ -204,7 +204,7 @@ var IOFuncers = []shapes.Funcer{
 				return states.ThunkFromError(err)
 			}
 			fmt.Println(str)
-			return inputThunk
+			return states.ThunkFromValue(states.NullValue{})
 		},
 		nil,
 	),
@@ -216,9 +216,9 @@ var IOFuncers = []shapes.Funcer{
 		[]*params.Param{
 			params.SimpleParam("end", "", types.Str{}),
 		},
-		types.NewVar("A", types.Any{}),
-		"the same value",
-		"Identity function with the side effect of writing a string representation of the value to STDOUT, followed by a line break.",
+		types.Null{},
+		"null",
+		"Writes a string representation of the value to STDOUT, followed by the specified line end.",
 		func(inputThunk *states.Thunk, argThunks []*states.Thunk) *states.Thunk {
 			str, err := inputThunk.EvalStr()
 			if err != nil {
@@ -230,7 +230,7 @@ var IOFuncers = []shapes.Funcer{
 			}
 			fmt.Print(str)
 			fmt.Print(end)
-			return inputThunk
+			return states.ThunkFromValue(states.NullValue{})
 		},
 		nil,
 	),
