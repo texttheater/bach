@@ -5,15 +5,17 @@ import (
 )
 
 type Thunk struct {
-	Func  func() (Value, error)
+	Func  func() *Thunk
 	Value Value
 	Error error
 }
 
 func (t *Thunk) Eval() (Value, error) {
-	if t.Func != nil {
-		t.Value, t.Error = t.Func()
-		t.Func = nil
+	for t.Func != nil {
+		next := t.Func()
+		t.Func = next.Func
+		t.Value = next.Value
+		t.Error = next.Error
 	}
 	return t.Value, t.Error
 }
@@ -74,7 +76,7 @@ func (t *Thunk) EvalReader() (io.Reader, error) {
 	return val.(ReaderValue).Reader, nil
 }
 
-func ThunkFromFunc(fun func() (Value, error)) *Thunk {
+func ThunkFromFunc(fun func() *Thunk) *Thunk {
 	return &Thunk{
 		Func: fun,
 	}

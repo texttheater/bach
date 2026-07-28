@@ -257,10 +257,10 @@ var IOFuncers = []shapes.Funcer{
 }
 
 func Lines(inputState states.State, args []states.Action, bindings map[string]types.Type, pos lexer.Position) *states.Thunk {
-	return states.ThunkFromFunc(func() (states.Value, error) {
+	return states.ThunkFromFunc(func() *states.Thunk {
 		reader, err := inputState.Thunk.EvalReader()
 		if err != nil {
-			return nil, err
+			return states.ThunkFromError(err)
 		}
 		scanner := bufio.NewScanner(reader)
 		iter := func() (*states.Thunk, bool, error) {
@@ -270,10 +270,6 @@ func Lines(inputState states.State, args []states.Action, bindings map[string]ty
 			}
 			return states.ThunkFromValue(states.StrValue(scanner.Text())), true, nil
 		}
-		result, err := states.ThunkFromIter(iter).Eval()
-		if err != nil {
-			return nil, err
-		}
-		return result, nil
+		return states.ThunkFromIter(iter)
 	})
 }

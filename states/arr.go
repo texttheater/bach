@@ -14,8 +14,8 @@ func ArrFromSlice(elements []Value) *ArrValue {
 		}
 		return &ArrValue{
 			Head: ThunkFromValue(elements[i]),
-			Tail: ThunkFromFunc(func() (Value, error) {
-				return arrFrom(i + 1), nil
+			Tail: ThunkFromFunc(func() *Thunk {
+				return ThunkFromValue(arrFrom(i + 1))
 			}),
 		}
 	}

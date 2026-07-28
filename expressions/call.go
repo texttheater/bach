@@ -141,8 +141,8 @@ funcers:
 		}
 		// make call lazy
 		action := func(inputState states.State, args []states.Action) states.State {
-			return inputState.Replace(states.ThunkFromFunc(func() (states.Value, error) {
-				return action3(inputState, args).Thunk.Eval()
+			return inputState.Replace(states.ThunkFromFunc(func() *states.Thunk {
+				return action3(inputState, args).Thunk
 			}))
 		}
 		// return

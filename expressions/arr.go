@@ -73,9 +73,7 @@ func (x ArrExpression) Typecheck(inputShape shapes.Shape, params []*params.Param
 			}
 			return inputState.Replace(states.ThunkFromValue(&states.ArrValue{
 				Head: states.ThunkFromValue(head),
-				Tail: states.ThunkFromFunc(func() (states.Value, error) {
-					return tailAction(inputState, nil).Thunk.Eval()
-				}),
+				Tail: tailAction(inputState, nil).Thunk,
 			}))
 		}
 		ids = ids.AddAll(elementIDs)
